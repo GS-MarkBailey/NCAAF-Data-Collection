@@ -48,7 +48,7 @@ export function FieldDirectionDialog({
               variant === 'shadcn' && 'text-foreground',
             )}
           >
-            Set field direction
+            Set {homeTeam} field direction
           </DialogTitle>
           <DialogDescription
             className={cn(
@@ -56,8 +56,8 @@ export function FieldDirectionDialog({
               variant === 'shadcn' && 'text-muted-foreground',
             )}
           >
-            Which direction is {homeTeam} ({homeAbbr}) attacking? This controls
-            the ball-on arrow for the rest of the game.
+            Which direction is {homeAbbr} attacking? This controls the ball-on
+            arrow for the rest of the game.
           </DialogDescription>
         </DialogHeader>
 
