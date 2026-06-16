@@ -79,9 +79,9 @@ function FieldArrow({ direction }: { direction: BallOnArrowSide }) {
       fill="currentColor"
     >
       {direction === 'left' ? (
-        <path d="M10 7 1 1.5v11L10 7z" />
+        <path d="M9 1 1 7 9 13Z" />
       ) : (
-        <path d="M0 7l9-5.5v11L0 7z" />
+        <path d="M1 1 9 7 1 13Z" />
       )}
     </svg>
   )
