@@ -59,7 +59,7 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
   }
 
   return (
-    <Card className="flex min-h-0 flex-1 flex-col">
+    <Card className="flex min-h-0 flex-1 flex-col [--card-spacing:--spacing(2)]">
       <CardHeader className="border-b border-border">
         <CardTitle className="flex items-center gap-2 text-sm">
           <LayoutGrid className="size-4 text-muted-foreground" />
