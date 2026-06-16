@@ -25,6 +25,12 @@ export function ScoreboardPanel({ fixtureId }: ScoreboardPanelProps) {
   const possessionIsHome = useAppStore(
     (s) => s.games[fixtureId]?.possessionIsHome ?? true,
   )
+  const offenseIsHome = useAppStore(
+    (s) =>
+      s.games[fixtureId]?.simulation?.offenseIsHome ??
+      s.games[fixtureId]?.possessionIsHome ??
+      true,
+  )
   const homeAbbr = useAppStore((s) => s.games[fixtureId]?.fixture.homeAbbr ?? '')
   const awayAbbr = useAppStore((s) => s.games[fixtureId]?.fixture.awayAbbr ?? '')
 
@@ -129,10 +135,7 @@ export function ScoreboardPanel({ fixtureId }: ScoreboardPanelProps) {
               <StatCell label="QTR" value={clockPeriod} />
               <StatCell label="DOWN" value={down} />
               <StatCell label="TO GO" value={distance} />
-              <BallOnStatCell
-                ballOn={ballOn}
-                possessionIsHome={possessionIsHome}
-              />
+              <BallOnStatCell ballOn={ballOn} offenseIsHome={offenseIsHome} />
             </div>
             <PossessionSwitch
               awayAbbr={awayAbbr}

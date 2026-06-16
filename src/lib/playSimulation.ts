@@ -75,19 +75,30 @@ export interface BallOnDisplay {
   arrowSide: BallOnArrowSide
 }
 
-/** Yard line (1–50) and field-side arrow for scoreboard (home=left, away=right). */
-export function getBallOnDisplay(
+/** Convert offense-relative ball position to yards from the home goal line. */
+export function yardsFromHomeGoal(
   yardsFromOwnGoal: number,
-  possessionIsHome: boolean,
-): BallOnDisplay {
+  offenseIsHome: boolean,
+): number {
   const yards = Math.max(1, Math.min(99, yardsFromOwnGoal))
-  const onOffenseOwnSide = yards <= 50
-  const onHomeSide = possessionIsHome === onOffenseOwnSide
+  return offenseIsHome ? yards : 100 - yards
+}
+
+/** Yard line (1–50) and field-side arrow (home=left, away=right) from yards-from-home-goal. */
+export function getBallOnDisplay(yardsFromHomeGoal: number): BallOnDisplay {
+  const yards = Math.max(1, Math.min(99, yardsFromHomeGoal))
+  const onHomeSide = yards <= 50
 
   return {
-    yardLine: onOffenseOwnSide ? yards : 100 - yards,
+    yardLine: onHomeSide ? yards : 100 - yards,
     arrowSide: onHomeSide ? 'left' : 'right',
   }
+}
+
+/** Display yard line (1–50) from offense-relative field position. */
+export function getBallOnYardLine(yardsFromOwnGoal: number): number {
+  const yards = Math.max(1, Math.min(99, yardsFromOwnGoal))
+  return yards <= 50 ? yards : 100 - yards
 }
 
 function turnoverPossession(

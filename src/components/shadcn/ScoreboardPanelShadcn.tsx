@@ -33,6 +33,12 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
   const possessionIsHome = useAppStore(
     (s) => s.games[fixtureId]?.possessionIsHome ?? true,
   )
+  const offenseIsHome = useAppStore(
+    (s) =>
+      s.games[fixtureId]?.simulation?.offenseIsHome ??
+      s.games[fixtureId]?.possessionIsHome ??
+      true,
+  )
   const homeAbbr = useAppStore((s) => s.games[fixtureId]?.fixture.homeAbbr ?? '')
   const awayAbbr = useAppStore((s) => s.games[fixtureId]?.fixture.awayAbbr ?? '')
 
@@ -131,7 +137,7 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
             <StatCell label="TO GO" value={distance} />
             <BallOnStatCell
               ballOn={ballOn}
-              possessionIsHome={possessionIsHome}
+              offenseIsHome={offenseIsHome}
               pulseEndColor="var(--card)"
               shellClassName="border-border py-4 landscape-mobile:py-3"
               labelClassName="text-muted-foreground"

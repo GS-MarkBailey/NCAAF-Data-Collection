@@ -215,9 +215,15 @@ export const useAppStore = create<AppStore>((set, get) => ({
         ? game.fixture.homeAbbr
         : game.fixture.awayAbbr
 
+      const absoluteYards = game.possessionIsHome
+        ? game.ballOn
+        : 100 - game.ballOn
+      const nextBallOn = possessionIsHome ? absoluteYards : 100 - absoluteYards
+
       return {
         games: updateGame(state.games, fixtureId, (g) => ({
           ...g,
+          ballOn: nextBallOn,
           possessionIsHome,
           simulation: g.simulation
             ? { ...g.simulation, offenseIsHome: possessionIsHome }
