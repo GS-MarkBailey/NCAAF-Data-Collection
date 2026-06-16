@@ -249,13 +249,17 @@ export const useAppStore = create<AppStore>((set, get) => ({
   setHomeAttacksRight: (fixtureId, homeAttacksRight) => {
     set((state) => {
       const game = state.games[fixtureId]
-      if (!game || game.homeAttacksRight !== null) return state
+      if (!game || game.homeAttacksRight === homeAttacksRight) return state
+
+      const isInitialSet = game.homeAttacksRight === null
 
       return {
         games: updateGame(state.games, fixtureId, (g) => ({
           ...g,
           homeAttacksRight,
-          clock: { ...g.clock, running: true },
+          clock: isInitialSet
+            ? { ...g.clock, running: true }
+            : g.clock,
         })),
         actionLogs: appendAction(
           state.actionLogs,

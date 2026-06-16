@@ -1,4 +1,4 @@
-import { Download, ScrollText } from 'lucide-react'
+import { Download, Settings } from 'lucide-react'
 import {
   downloadActionLogCsv,
   formatActionGameClock,
@@ -7,6 +7,7 @@ import {
   formatActionType,
 } from '@/lib/actionLog'
 import { UiVariantSwitch } from '@/components/UiVariantSwitch'
+import { FieldDirectionPicker } from '@/components/game/FieldDirectionPicker'
 import { useAppStore } from '@/store/gameStore'
 import type { UserAction } from '@/types/actions'
 import { Badge } from '@/components/ui/badge'
@@ -31,21 +32,22 @@ export function ActionLogDialogShadcn({ fixtureId }: ActionLogDialogShadcnProps)
   const actions = useAppStore(
     (s) => s.actionLogs[fixtureId] ?? EMPTY_ACTIONS,
   )
+  const game = useAppStore((s) => s.games[fixtureId])
 
   const reversed = [...actions].reverse()
 
   return (
     <Dialog>
       <DialogTrigger render={<Button variant="outline" size="icon" />}>
-        <ScrollText />
-        <span className="sr-only">Open console</span>
+        <Settings />
+        <span className="sr-only">Open settings</span>
       </DialogTrigger>
 
       <DialogContent className="flex max-h-[min(80dvh,28rem)] flex-col gap-0 overflow-hidden p-0 sm:max-w-md">
         <DialogHeader className="border-b px-4 pt-4 pb-0">
-          <DialogTitle>Console</DialogTitle>
+          <DialogTitle>Settings</DialogTitle>
           <DialogDescription>
-            Action history and display options
+            Action log, field direction, and display options
           </DialogDescription>
         </DialogHeader>
 
@@ -55,10 +57,13 @@ export function ActionLogDialogShadcn({ fixtureId }: ActionLogDialogShadcnProps)
         >
           <TabsList className="mx-4 mt-3 w-[calc(100%-2rem)]">
             <TabsTrigger value="log" className="flex-1">
-              Action Log
+              Log
+            </TabsTrigger>
+            <TabsTrigger value="field" className="flex-1">
+              Field
             </TabsTrigger>
             <TabsTrigger value="display" className="flex-1">
-              UI Variant
+              UI
             </TabsTrigger>
           </TabsList>
 
@@ -118,6 +123,21 @@ export function ActionLogDialogShadcn({ fixtureId }: ActionLogDialogShadcnProps)
                 </ol>
               )}
             </div>
+          </TabsContent>
+
+          <TabsContent value="field" className="px-4 pt-3 pb-4">
+            {game ? (
+              <FieldDirectionPicker
+                fixtureId={fixtureId}
+                homeAbbr={game.fixture.homeAbbr}
+                homeAttacksRight={game.homeAttacksRight}
+                variant="shadcn"
+              />
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Load a fixture to set field direction.
+              </p>
+            )}
           </TabsContent>
 
           <TabsContent value="display" className="px-4 pt-3 pb-4">

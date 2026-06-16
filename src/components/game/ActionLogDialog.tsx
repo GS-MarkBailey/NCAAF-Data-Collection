@@ -1,4 +1,4 @@
-import { Download, ScrollText } from 'lucide-react'
+import { Download, Settings } from 'lucide-react'
 import {
   downloadActionLogCsv,
   formatActionGameClock,
@@ -7,6 +7,7 @@ import {
   formatActionType,
 } from '@/lib/actionLog'
 import { UiVariantSwitchCustom } from '@/components/UiVariantSwitchCustom'
+import { FieldDirectionPicker } from '@/components/game/FieldDirectionPicker'
 import { useAppStore } from '@/store/gameStore'
 import type { UserAction } from '@/types/actions'
 import {
@@ -28,6 +29,7 @@ export function ActionLogDialog({ fixtureId }: ActionLogDialogProps) {
   const actions = useAppStore(
     (s) => s.actionLogs[fixtureId] ?? EMPTY_ACTIONS,
   )
+  const game = useAppStore((s) => s.games[fixtureId])
 
   const reversed = [...actions].reverse()
 
@@ -35,18 +37,18 @@ export function ActionLogDialog({ fixtureId }: ActionLogDialogProps) {
     <Dialog>
       <DialogTrigger
         className="flex size-10 shrink-0 items-center justify-center rounded-[10px] border border-[var(--color-panel-border)] bg-[var(--color-panel)] text-[var(--color-text)] shadow-[var(--shadow-panel)] transition-colors active:bg-[var(--color-play-card-bg)]"
-        aria-label="Open console"
+        aria-label="Open settings"
       >
-        <ScrollText className="size-4" strokeWidth={2} />
+        <Settings className="size-4" strokeWidth={2} />
       </DialogTrigger>
 
       <DialogContent className="!flex max-h-[min(80dvh,28rem)] w-full max-w-md flex-col gap-0 overflow-hidden border-[var(--color-panel-border)] bg-[var(--color-panel)] p-0 sm:max-w-md">
         <div className="border-b border-[var(--color-panel-border)] px-4 pt-3 pr-12">
           <DialogTitle className="text-base font-semibold text-[var(--color-text)]">
-            Console
+            Settings
           </DialogTitle>
           <DialogDescription className="text-xs text-[var(--color-text-muted)]">
-            Action history and display options
+            Action log, field direction, and display options
           </DialogDescription>
         </div>
 
@@ -56,10 +58,13 @@ export function ActionLogDialog({ fixtureId }: ActionLogDialogProps) {
         >
           <TabsList className="mx-4 mt-3 w-[calc(100%-2rem)]">
             <TabsTrigger value="log" className="flex-1">
-              Action Log
+              Log
+            </TabsTrigger>
+            <TabsTrigger value="field" className="flex-1">
+              Field
             </TabsTrigger>
             <TabsTrigger value="display" className="flex-1">
-              UI Variant
+              UI
             </TabsTrigger>
           </TabsList>
 
@@ -120,6 +125,21 @@ export function ActionLogDialog({ fixtureId }: ActionLogDialogProps) {
                 </ol>
               )}
             </div>
+          </TabsContent>
+
+          <TabsContent value="field" className="px-4 pt-3 pb-4">
+            {game ? (
+              <FieldDirectionPicker
+                fixtureId={fixtureId}
+                homeAbbr={game.fixture.homeAbbr}
+                homeAttacksRight={game.homeAttacksRight}
+                variant="custom"
+              />
+            ) : (
+              <p className="text-xs text-[var(--color-text-muted)]">
+                Load a fixture to set field direction.
+              </p>
+            )}
           </TabsContent>
 
           <TabsContent value="display" className="px-4 pt-3 pb-4">

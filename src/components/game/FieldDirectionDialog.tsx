@@ -1,4 +1,3 @@
-import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
   Dialog,
@@ -8,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { useAppStore } from '@/store/gameStore'
+import { FieldDirectionPicker } from '@/components/game/FieldDirectionPicker'
 import type { GameState } from '@/types'
 
 interface FieldDirectionDialogProps {
@@ -22,15 +21,8 @@ export function FieldDirectionDialog({
   game,
   variant = 'custom',
 }: FieldDirectionDialogProps) {
-  const setHomeAttacksRight = useAppStore((s) => s.setHomeAttacksRight)
   const open = game.homeAttacksRight === null
   const { homeTeam, homeAbbr } = game.fixture
-
-  const buttonClass = cn(
-    'inline-flex items-center justify-center gap-2 rounded-[8px] border border-[var(--color-panel-border)] bg-[var(--color-panel)] px-4 py-2 text-sm font-semibold text-[var(--color-text)] transition-colors active:bg-[var(--color-play-card-bg)]',
-    variant === 'shadcn' &&
-      'border-border bg-background text-foreground hover:bg-muted',
-  )
 
   return (
     <Dialog open={open}>
@@ -62,26 +54,17 @@ export function FieldDirectionDialog({
 
         <DialogFooter
           className={cn(
-            'border-[var(--color-panel-border)] bg-[var(--color-play-card-bg)] sm:grid sm:grid-cols-2 sm:gap-2',
-            variant === 'shadcn' && 'border-border bg-muted/50 sm:grid sm:grid-cols-2 sm:gap-2',
+            'border-[var(--color-panel-border)] bg-[var(--color-play-card-bg)]',
+            variant === 'shadcn' && 'border-border bg-muted/50',
           )}
         >
-          <button
-            type="button"
-            className={buttonClass}
-            onClick={() => setHomeAttacksRight(fixtureId, false)}
-          >
-            <ArrowLeft className="size-4" aria-hidden />
-            Attacks left
-          </button>
-          <button
-            type="button"
-            className={buttonClass}
-            onClick={() => setHomeAttacksRight(fixtureId, true)}
-          >
-            Attacks right
-            <ArrowRight className="size-4" aria-hidden />
-          </button>
+          <FieldDirectionPicker
+            fixtureId={fixtureId}
+            homeAbbr={homeAbbr}
+            homeAttacksRight={game.homeAttacksRight}
+            variant={variant}
+            className="w-full"
+          />
         </DialogFooter>
       </DialogContent>
     </Dialog>
