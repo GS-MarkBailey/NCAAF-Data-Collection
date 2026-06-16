@@ -26,16 +26,10 @@ export function FieldDirectionDialog({
   const open = game.homeAttacksRight === null
   const { homeTeam, homeAbbr } = game.fixture
 
-  const secondaryButtonClass = cn(
+  const buttonClass = cn(
     'inline-flex items-center justify-center gap-2 rounded-[8px] border border-[var(--color-panel-border)] bg-[var(--color-panel)] px-4 py-2 text-sm font-semibold text-[var(--color-text)] transition-colors active:bg-[var(--color-play-card-bg)]',
     variant === 'shadcn' &&
       'border-border bg-background text-foreground hover:bg-muted',
-  )
-
-  const primaryButtonClass = cn(
-    'inline-flex items-center justify-center gap-2 rounded-[8px] bg-[var(--color-brand)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[var(--color-brand-hover)]',
-    variant === 'shadcn' &&
-      'bg-[var(--color-brand)] hover:bg-[var(--color-brand-hover)]',
   )
 
   return (
@@ -75,7 +69,7 @@ export function FieldDirectionDialog({
         >
           <button
             type="button"
-            className={secondaryButtonClass}
+            className={buttonClass}
             onClick={() => setHomeAttacksRight(fixtureId, false)}
           >
             <ArrowLeft className="size-4" aria-hidden />
@@ -83,7 +77,7 @@ export function FieldDirectionDialog({
           </button>
           <button
             type="button"
-            className={primaryButtonClass}
+            className={buttonClass}
             onClick={() => setHomeAttacksRight(fixtureId, true)}
           >
             Attacks right
