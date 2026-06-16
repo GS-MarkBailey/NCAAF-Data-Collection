@@ -91,7 +91,7 @@ export function ScoreboardPanel({ fixtureId }: ScoreboardPanelProps) {
               }
               aria-pressed={!paused && !awaitingQuarterStart && !regulationComplete}
             >
-              <span className="text-[2.75rem] font-bold leading-none tracking-tight text-[var(--color-text)] landscape-mobile:text-5xl">
+              <span className="text-[2rem] font-bold leading-none tracking-tight text-[var(--color-text)]">
                 {formatClock(clockSeconds)}
               </span>
               {awaitingQuarterStart && (

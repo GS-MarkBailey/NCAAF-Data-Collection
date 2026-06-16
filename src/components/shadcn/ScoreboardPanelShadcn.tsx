@@ -96,7 +96,7 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
             aria-pressed={!paused && !awaitingQuarterStart && !regulationComplete}
           >
             <div className="flex flex-col items-center gap-2">
-              <span className="text-[2.75rem] font-bold leading-none landscape-mobile:text-5xl">
+              <span className="text-[2rem] font-bold leading-none">
                 {formatClock(clockSeconds)}
               </span>
               {awaitingQuarterStart && (
