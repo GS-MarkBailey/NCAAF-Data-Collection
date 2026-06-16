@@ -25,7 +25,7 @@ function FixturesPageCustom() {
   }
 
   return (
-    <div className="flex h-dvh flex-col bg-[var(--color-app-bg)] safe-x safe-b">
+    <div className="flex h-dvh flex-col bg-[var(--color-app-bg)] safe-x safe-t safe-b">
       <header className="shrink-0 px-1 py-4">
         <h1 className="text-lg font-bold text-[var(--color-text)]">Fixtures</h1>
         <p className="text-xs text-[var(--color-text-muted)]">

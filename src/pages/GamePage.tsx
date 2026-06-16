@@ -44,7 +44,7 @@ function GamePageCustom() {
   const takeControl = game.takeControlActive
 
   return (
-    <div className="flex h-dvh flex-col bg-[var(--color-app-bg)] safe-b">
+    <div className="flex h-dvh flex-col bg-[var(--color-app-bg)] safe-t safe-b">
       <GameHeader
         game={game}
         onToggleTakeControl={() => toggleTakeControl(fixtureId)}

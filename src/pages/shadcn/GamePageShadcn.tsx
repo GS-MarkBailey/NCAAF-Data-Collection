@@ -33,7 +33,7 @@ export function GamePageShadcn() {
   const takeControl = game.takeControlActive
 
   return (
-    <div className="flex h-dvh flex-col bg-background safe-b">
+    <div className="flex h-dvh flex-col bg-background safe-t safe-b">
       <GameHeaderShadcn
         game={game}
         onToggleTakeControl={() => toggleTakeControl(fixtureId)}

@@ -207,6 +207,10 @@ textarea {
   padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
 }
 
+@utility safe-t {
+  padding-top: max(0.5rem, env(safe-area-inset-top));
+}
+
 .panel-header {
   display: flex;
   align-items: center;
