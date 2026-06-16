@@ -117,17 +117,19 @@ function PlayCardShadcn({
     >
       <CardHeader>
         <div className="flex items-start justify-between gap-2">
-          <CardTitle className="text-sm">
+          <CardTitle className="text-xs">
             {downLabel(play.down)} & {play.distance}
           </CardTitle>
           <Badge className="rounded-md border-transparent bg-[var(--color-time-pill)] text-[11px] font-semibold text-[var(--color-time-pill-text)]">
             {play.clock}
           </Badge>
         </div>
-        <CardDescription>Ball on {play.ballOn}</CardDescription>
+        <CardDescription className="text-xs">
+          Ball on {play.ballOn}
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        <p className="text-sm">{play.description}</p>
+        <p className="text-[8px]">{play.description}</p>
       </CardContent>
     </Card>
   )
