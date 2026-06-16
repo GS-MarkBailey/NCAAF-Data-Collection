@@ -62,7 +62,8 @@ export function RiskManagementPanelShadcn({
               value={key}
               className={cn(
                 'h-full min-h-12 w-full justify-center whitespace-normal px-2 text-center text-sm leading-tight landscape-mobile:text-xs',
-                'data-pressed:border-destructive data-pressed:bg-destructive data-pressed:text-white',
+                'border-border bg-secondary text-secondary-foreground hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)]',
+                'data-pressed:border-destructive data-pressed:bg-destructive data-pressed:text-white data-pressed:hover:bg-destructive',
                 fullWidth && 'col-span-2',
               )}
             >
