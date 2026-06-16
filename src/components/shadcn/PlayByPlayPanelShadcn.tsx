@@ -112,7 +112,7 @@ function PlayCardShadcn({
     <Card
       size="sm"
       className={cn(
-        'relative gap-0 px-3 py-2.5 pr-[3.25rem]',
+        'relative gap-0 p-2',
         pulsing && 'push-data-pulse',
       )}
       style={{ '--push-pulse-end': 'var(--card)' } as CSSProperties}
