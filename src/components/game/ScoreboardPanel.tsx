@@ -180,16 +180,16 @@ function PossessionSwitch({
   return (
     <div className="flex min-h-0 flex-1 w-full border-t border-[var(--color-panel-border)]">
       <PossessionOption
-        label={awayAbbr}
-        active={!possessionIsHome}
-        onClick={() => onSelect(false)}
-        ariaLabel={`Give possession to ${awayAbbr}`}
-      />
-      <PossessionOption
         label={homeAbbr}
         active={possessionIsHome}
         onClick={() => onSelect(true)}
         ariaLabel={`Give possession to ${homeAbbr}`}
+      />
+      <PossessionOption
+        label={awayAbbr}
+        active={!possessionIsHome}
+        onClick={() => onSelect(false)}
+        ariaLabel={`Give possession to ${awayAbbr}`}
         isLast
       />
     </div>

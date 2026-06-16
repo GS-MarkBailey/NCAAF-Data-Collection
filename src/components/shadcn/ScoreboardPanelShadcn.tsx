@@ -135,28 +135,28 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
             <Button
               type="button"
               variant="ghost"
-              onClick={() => setPossession(fixtureId, false)}
-              aria-pressed={!possessionIsHome}
-              aria-label={`Give possession to ${awayAbbr}`}
-              className={cn(
-                'h-full min-h-0 rounded-none border-0 border-r border-border py-0 text-lg font-semibold',
-                !possessionIsHome && 'bg-[var(--color-score-bg)] text-white hover:bg-[var(--color-score-bg)] hover:text-white',
-              )}
-            >
-              {awayAbbr}
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
               onClick={() => setPossession(fixtureId, true)}
               aria-pressed={possessionIsHome}
               aria-label={`Give possession to ${homeAbbr}`}
               className={cn(
-                'h-full min-h-0 rounded-none border-0 py-0 text-lg font-semibold',
+                'h-full min-h-0 rounded-none border-0 border-r border-border py-0 text-lg font-semibold',
                 possessionIsHome && 'bg-[var(--color-score-bg)] text-white hover:bg-[var(--color-score-bg)] hover:text-white',
               )}
             >
               {homeAbbr}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setPossession(fixtureId, false)}
+              aria-pressed={!possessionIsHome}
+              aria-label={`Give possession to ${awayAbbr}`}
+              className={cn(
+                'h-full min-h-0 rounded-none border-0 py-0 text-lg font-semibold',
+                !possessionIsHome && 'bg-[var(--color-score-bg)] text-white hover:bg-[var(--color-score-bg)] hover:text-white',
+              )}
+            >
+              {awayAbbr}
             </Button>
           </div>
         </div>
