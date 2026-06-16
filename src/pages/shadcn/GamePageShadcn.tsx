@@ -42,10 +42,10 @@ export function GamePageShadcn() {
       <div className="flex min-h-0 flex-1 flex-col px-3 pb-3 safe-x landscape-mobile:px-4 landscape-mobile:pb-2">
         <div
           className={cn(
-            'flex min-h-0 flex-1 flex-col gap-3 rounded-xl p-3 transition-all landscape-mobile:gap-3 landscape-mobile:p-3',
+            'flex min-h-0 flex-1 flex-col gap-3 rounded-xl border-[3px] p-3 transition-colors landscape-mobile:gap-3 landscape-mobile:p-3',
             takeControl
-              ? 'border-[3px] border-destructive bg-destructive/10'
-              : 'bg-card ring-1 ring-foreground/10',
+              ? 'border-destructive bg-destructive/10'
+              : 'border-border/30 bg-card',
           )}
         >
           <Tabs

@@ -62,7 +62,7 @@ export function GameHeaderShadcn({
           <Button
             variant="ghost"
             className={cn(
-              'border-0 text-white shadow-none',
+              'min-w-[8.25rem] border-0 text-white shadow-none',
               takeControlActive
                 ? 'bg-[var(--color-danger)] hover:bg-[var(--color-danger-hover)]'
                 : 'bg-[var(--color-brand)] hover:bg-[var(--color-brand-hover)]',

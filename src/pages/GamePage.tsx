@@ -53,10 +53,10 @@ function GamePageCustom() {
       <div className="flex min-h-0 flex-1 flex-col px-4 pb-0 safe-x landscape-mobile:px-2 landscape-mobile:pb-2">
         <div
           className={cn(
-            'grid min-h-0 flex-1 grid-cols-1 gap-3 rounded-[var(--radius-panel)] p-3 transition-all landscape-mobile:grid-cols-3 landscape-mobile:gap-3 landscape-mobile:p-3',
+            'grid min-h-0 flex-1 grid-cols-1 gap-3 rounded-[var(--radius-panel)] border-[3px] p-3 transition-colors landscape-mobile:grid-cols-3 landscape-mobile:gap-3 landscape-mobile:p-3',
             takeControl
-              ? 'border-[3px] border-[var(--color-danger-border)] bg-[var(--color-danger-bg)]'
-              : 'border border-[var(--color-panel-border)] bg-[var(--color-panel)] shadow-[var(--shadow-panel)]',
+              ? 'border-[var(--color-danger-border)] bg-[var(--color-danger-bg)]'
+              : 'border-[var(--color-panel-border)] bg-[var(--color-panel)] shadow-[var(--shadow-panel)]',
           )}
         >
           <ScoreboardPanel fixtureId={fixtureId} />

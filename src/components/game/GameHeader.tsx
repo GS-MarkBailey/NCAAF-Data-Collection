@@ -38,7 +38,7 @@ export function GameHeader({ game, onToggleTakeControl }: GameHeaderProps) {
           type="button"
           onClick={onToggleTakeControl}
           className={cn(
-            'rounded-[10px] px-4 py-2.5 text-[13px] font-semibold text-white shadow-sm transition-colors landscape-mobile:px-3 landscape-mobile:py-2 landscape-mobile:text-xs',
+            'min-w-[8.25rem] rounded-[10px] px-4 py-2.5 text-[13px] font-semibold text-white shadow-sm transition-colors landscape-mobile:px-3 landscape-mobile:py-2 landscape-mobile:text-xs',
             takeControlActive
               ? 'bg-[var(--color-danger)] hover:bg-[var(--color-danger-hover)]'
               : 'bg-[var(--color-brand)] hover:bg-[var(--color-brand-hover)]',
