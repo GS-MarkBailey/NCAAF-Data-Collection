@@ -1,9 +1,10 @@
 import { ArrowLeft, ArrowRight } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
@@ -13,44 +14,82 @@ import type { GameState } from '@/types'
 interface FieldDirectionDialogProps {
   fixtureId: string
   game: GameState
+  variant?: 'custom' | 'shadcn'
 }
 
-export function FieldDirectionDialog({ fixtureId, game }: FieldDirectionDialogProps) {
+export function FieldDirectionDialog({
+  fixtureId,
+  game,
+  variant = 'custom',
+}: FieldDirectionDialogProps) {
   const setHomeAttacksRight = useAppStore((s) => s.setHomeAttacksRight)
   const open = game.homeAttacksRight === null
   const { homeTeam, homeAbbr } = game.fixture
 
+  const secondaryButtonClass = cn(
+    'inline-flex items-center justify-center gap-2 rounded-[8px] border border-[var(--color-panel-border)] bg-[var(--color-panel)] px-4 py-2 text-sm font-semibold text-[var(--color-text)] transition-colors active:bg-[var(--color-play-card-bg)]',
+    variant === 'shadcn' &&
+      'border-border bg-background text-foreground hover:bg-muted',
+  )
+
+  const primaryButtonClass = cn(
+    'inline-flex items-center justify-center gap-2 rounded-[8px] bg-[var(--color-brand)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[var(--color-brand-hover)]',
+    variant === 'shadcn' &&
+      'bg-[var(--color-brand)] hover:bg-[var(--color-brand-hover)]',
+  )
+
   return (
     <Dialog open={open}>
-      <DialogContent showCloseButton={false} className="sm:max-w-md">
+      <DialogContent
+        showCloseButton={false}
+        className={cn(
+          'border-[var(--color-panel-border)] bg-[var(--color-panel)] sm:max-w-sm',
+          variant === 'shadcn' && 'border-border bg-popover',
+        )}
+      >
         <DialogHeader>
-          <DialogTitle>Set field direction</DialogTitle>
-          <DialogDescription>
+          <DialogTitle
+            className={cn(
+              'text-base font-semibold text-[var(--color-text)]',
+              variant === 'shadcn' && 'text-foreground',
+            )}
+          >
+            Set field direction
+          </DialogTitle>
+          <DialogDescription
+            className={cn(
+              'text-sm leading-relaxed text-[var(--color-text-muted)]',
+              variant === 'shadcn' && 'text-muted-foreground',
+            )}
+          >
             Which direction is {homeTeam} ({homeAbbr}) attacking? This controls
             the ball-on arrow for the rest of the game.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid grid-cols-2 gap-3">
-          <Button
+        <DialogFooter
+          className={cn(
+            'border-[var(--color-panel-border)] bg-[var(--color-play-card-bg)] sm:grid sm:grid-cols-2 sm:gap-2',
+            variant === 'shadcn' && 'border-border bg-muted/50 sm:grid sm:grid-cols-2 sm:gap-2',
+          )}
+        >
+          <button
             type="button"
-            variant="outline"
-            className="h-auto flex-col gap-2 py-4"
+            className={secondaryButtonClass}
             onClick={() => setHomeAttacksRight(fixtureId, false)}
           >
-            <ArrowLeft className="size-6" aria-hidden />
-            <span className="text-sm font-medium">Attacks left</span>
-          </Button>
-          <Button
+            <ArrowLeft className="size-4" aria-hidden />
+            Attacks left
+          </button>
+          <button
             type="button"
-            variant="outline"
-            className="h-auto flex-col gap-2 py-4"
+            className={primaryButtonClass}
             onClick={() => setHomeAttacksRight(fixtureId, true)}
           >
-            <ArrowRight className="size-6" aria-hidden />
-            <span className="text-sm font-medium">Attacks right</span>
-          </Button>
-        </div>
+            Attacks right
+            <ArrowRight className="size-4" aria-hidden />
+          </button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

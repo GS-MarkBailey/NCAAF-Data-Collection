@@ -35,7 +35,7 @@ export function GamePageShadcn() {
 
   return (
     <div className="flex h-dvh flex-col bg-background safe-t safe-b">
-      <FieldDirectionDialog fixtureId={fixtureId} game={game} />
+      <FieldDirectionDialog fixtureId={fixtureId} game={game} variant="shadcn" />
       <GameHeaderShadcn
         game={game}
         onToggleTakeControl={() => toggleTakeControl(fixtureId)}
