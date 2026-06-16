@@ -217,7 +217,7 @@ textarea {
 }
 
 @utility safe-l {
-  padding-left: 0;
+  padding-left: 1rem;
 }
 
 @utility safe-r {
