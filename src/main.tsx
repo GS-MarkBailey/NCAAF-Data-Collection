@@ -1,7 +1,10 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
+import { initPwa } from '@/lib/pwa'
 import App from './App'
+
+initPwa()
 
 const storedVariant = localStorage.getItem('ncaaf-ui-variant')
 if (storedVariant) {
