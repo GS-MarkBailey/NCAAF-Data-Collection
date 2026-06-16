@@ -56,8 +56,7 @@ export function FieldDirectionDialog({
               variant === 'shadcn' && 'text-muted-foreground',
             )}
           >
-            Which direction is {homeAbbr} attacking? This controls the ball-on
-            arrow for the rest of the game.
+            Which direction is {homeAbbr} attacking?
           </DialogDescription>
         </DialogHeader>
 
