@@ -21,13 +21,18 @@ export function GameHeaderShadcn({
 
   return (
     <header className="shrink-0 safe-x">
-      <div className="flex items-center gap-3 py-3 landscape-mobile:py-2">
-        <Button variant="outline" size="icon" render={<Link to="/fixtures" />}>
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 py-3 landscape-mobile:py-2">
+        <Button
+          variant="outline"
+          size="icon"
+          className="justify-self-start"
+          render={<Link to="/fixtures" />}
+        >
           <ChevronLeft />
           <span className="sr-only">Back to fixtures</span>
         </Button>
 
-        <div className="flex min-w-0 flex-1 items-center justify-center gap-2">
+        <div className="flex min-w-0 items-center justify-center gap-2">
           <span className="truncate text-sm font-medium landscape-mobile:text-xs">
             {fixture.homeTeam}
           </span>
@@ -57,7 +62,7 @@ export function GameHeaderShadcn({
           </span>
         </div>
 
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex shrink-0 items-center justify-end gap-2 justify-self-end">
           <ActionLogDialogShadcn fixtureId={fixture.id} />
           <TakeControlButton
             variant="shadcn"

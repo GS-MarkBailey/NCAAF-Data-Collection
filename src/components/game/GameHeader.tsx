@@ -13,16 +13,16 @@ export function GameHeader({ game, onToggleTakeControl }: GameHeaderProps) {
   const { fixture, score, takeControlActive } = game
 
   return (
-    <header className="flex shrink-0 items-center gap-3 safe-x py-4 landscape-mobile:py-2">
+    <header className="grid shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-3 safe-x py-4 landscape-mobile:py-2">
       <Link
         to="/fixtures"
-        className="flex size-10 shrink-0 items-center justify-center rounded-[10px] border border-[var(--color-panel-border)] bg-[var(--color-panel)] text-[var(--color-text)] shadow-[var(--shadow-panel)]"
+        className="flex size-10 shrink-0 items-center justify-center justify-self-start rounded-[10px] border border-[var(--color-panel-border)] bg-[var(--color-panel)] text-[var(--color-text)] shadow-[var(--shadow-panel)]"
         aria-label="Back to fixtures"
       >
         <ChevronLeft className="size-5" strokeWidth={2.5} />
       </Link>
 
-      <div className="flex min-w-0 flex-1 items-center justify-center gap-2.5">
+      <div className="flex min-w-0 items-center justify-center gap-2.5">
         <span className="truncate text-[13px] font-semibold text-[var(--color-text)] landscape-mobile:text-xs">
           {fixture.homeTeam}
         </span>
@@ -32,7 +32,7 @@ export function GameHeader({ game, onToggleTakeControl }: GameHeaderProps) {
         </span>
       </div>
 
-      <div className="flex shrink-0 items-center gap-2">
+      <div className="flex shrink-0 items-center justify-end gap-2 justify-self-end">
         <ActionLogDialog fixtureId={fixture.id} />
         <TakeControlButton
           takeControlActive={takeControlActive}
