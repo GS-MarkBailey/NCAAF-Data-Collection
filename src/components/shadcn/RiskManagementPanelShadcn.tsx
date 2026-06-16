@@ -11,7 +11,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 
 const RISKS: { key: RiskType; label: string; fullWidth?: boolean }[] = [
   { key: 'challengeReview', label: 'Challenge / Review' },
-  { key: 'statDelay', label: 'Stat Delay' },
+  { key: 'statDelay', label: 'Unreliable' },
   { key: 'bigPlay', label: 'Big Play' },
   { key: 'penalty', label: 'Penalty' },
   { key: 'touchdown', label: 'Touchdown', fullWidth: true },

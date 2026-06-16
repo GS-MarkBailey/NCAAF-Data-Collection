@@ -4,7 +4,7 @@ import type { UserAction, UserActionType } from '@/types/actions'
 
 const RISK_LABELS: Record<RiskType, string> = {
   challengeReview: 'Challenge / Review',
-  statDelay: 'Stat Delay',
+  statDelay: 'Unreliable',
   bigPlay: 'Big Play',
   penalty: 'Penalty',
   touchdown: 'Touchdown',
