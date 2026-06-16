@@ -66,7 +66,7 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
           Scoreboard
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex min-h-0 flex-1 flex-col gap-4">
+      <CardContent className="flex min-h-0 flex-1 flex-col gap-2 [--card-spacing:--spacing(2)]">
         <div className="flex min-h-0 flex-1 items-stretch overflow-hidden rounded-lg border border-border">
           <Button
             variant="ghost"
