@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
+import { FieldDirectionDialog } from '@/components/game/FieldDirectionDialog'
 import { GameHeaderShadcn } from '@/components/shadcn/GameHeaderShadcn'
 import { PlayByPlayPanelShadcn } from '@/components/shadcn/PlayByPlayPanelShadcn'
 import { RiskManagementPanelShadcn } from '@/components/shadcn/RiskManagementPanelShadcn'
@@ -34,6 +35,7 @@ export function GamePageShadcn() {
 
   return (
     <div className="flex h-dvh flex-col bg-background safe-t safe-b">
+      <FieldDirectionDialog fixtureId={fixtureId} game={game} />
       <GameHeaderShadcn
         game={game}
         onToggleTakeControl={() => toggleTakeControl(fixtureId)}

@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { cn } from '@/lib/utils'
+import { FieldDirectionDialog } from '@/components/game/FieldDirectionDialog'
 import { GameHeader } from '@/components/game/GameHeader'
 import { ScoreboardPanel } from '@/components/game/ScoreboardPanel'
 import { PlayByPlayPanel } from '@/components/game/PlayByPlayPanel'
@@ -45,6 +46,7 @@ function GamePageCustom() {
 
   return (
     <div className="flex h-dvh flex-col bg-[var(--color-app-bg)] safe-t safe-b">
+      <FieldDirectionDialog fixtureId={fixtureId} game={game} />
       <GameHeader
         game={game}
         onToggleTakeControl={() => toggleTakeControl(fixtureId)}

@@ -7,6 +7,7 @@ export type UserActionType =
   | 'clock_adjust'
   | 'quarter_start'
   | 'possession_toggle'
+  | 'field_direction_set'
 
 interface UserActionBase {
   id: string
@@ -65,6 +66,14 @@ export type PossessionToggleAction = UserActionBase & {
   }
 }
 
+export type FieldDirectionSetAction = UserActionBase & {
+  type: 'field_direction_set'
+  payload: {
+    homeAttacksRight: boolean
+    homeAbbr: string
+  }
+}
+
 export type UserAction =
   | TakeControlAction
   | RiskToggleAction
@@ -72,6 +81,7 @@ export type UserAction =
   | ClockAdjustAction
   | QuarterStartAction
   | PossessionToggleAction
+  | FieldDirectionSetAction
 
 export type UserActionPayload<T extends UserActionType> = Extract<
   UserAction,

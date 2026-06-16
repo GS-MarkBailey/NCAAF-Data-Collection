@@ -74,6 +74,8 @@ export function formatActionLabel(action: UserAction): string {
       return `Quarter ${action.payload.toPeriod} started (${formatClock(action.payload.seconds)})`
     case 'possession_toggle':
       return `Possession → ${action.payload.teamAbbr}`
+    case 'field_direction_set':
+      return `${action.payload.homeAbbr} attacks ${action.payload.homeAttacksRight ? 'right' : 'left'}`
   }
 }
 
@@ -91,6 +93,8 @@ export function formatActionType(action: UserAction): string {
       return 'Quarter Start'
     case 'possession_toggle':
       return 'Possession'
+    case 'field_direction_set':
+      return 'Field Direction'
   }
 }
 

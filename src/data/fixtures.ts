@@ -261,10 +261,11 @@ export function createInitialGameState(fixture: Fixture): GameState {
 
   const base: GameState = {
     fixture,
+    homeAttacksRight: isDemo ? false : null,
     score: isDemo ? { home: 24, away: 17 } : { home: 0, away: 0 },
     clock: {
       seconds: isDemo ? DEMO_CLOCK_SECONDS : QUARTER_LENGTH_SECONDS,
-      running: true,
+      running: isDemo,
       period: isDemo ? 3 : 1,
     },
     down: isDemo ? 2 : 1,

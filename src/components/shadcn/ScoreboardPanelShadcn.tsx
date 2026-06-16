@@ -41,6 +41,9 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
   )
   const homeAbbr = useAppStore((s) => s.games[fixtureId]?.fixture.homeAbbr ?? '')
   const awayAbbr = useAppStore((s) => s.games[fixtureId]?.fixture.awayAbbr ?? '')
+  const homeAttacksRight = useAppStore(
+    (s) => s.games[fixtureId]?.homeAttacksRight ?? false,
+  )
 
   const toggleClock = useAppStore((s) => s.toggleClock)
   const adjustClock = useAppStore((s) => s.adjustClock)
@@ -138,6 +141,7 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
             <BallOnStatCell
               ballOn={ballOn}
               offenseIsHome={offenseIsHome}
+              homeAttacksRight={homeAttacksRight}
               pulseEndColor="var(--card)"
               shellClassName="border-border py-4 landscape-mobile:py-3"
               labelClassName="text-muted-foreground"

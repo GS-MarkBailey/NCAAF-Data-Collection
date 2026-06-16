@@ -85,14 +85,19 @@ export function yardsFromHomeGoal(
   return offenseIsHome ? yards : 100 - yards
 }
 
-/** Yard line (1–50) and field-side arrow (home=left, away=right) from yards-from-home-goal. */
-export function getBallOnDisplay(yardsFromHomeGoal: number): BallOnDisplay {
+/** Yard line (1–50) and attack-direction arrow from yards-from-home-goal. */
+export function getBallOnDisplay(
+  yardsFromHomeGoal: number,
+  homeAttacksRight: boolean,
+): BallOnDisplay {
   const yards = Math.max(1, Math.min(99, yardsFromHomeGoal))
   const onHomeSide = yards <= 50
+  const homeSideArrow: BallOnArrowSide = homeAttacksRight ? 'right' : 'left'
+  const awaySideArrow: BallOnArrowSide = homeAttacksRight ? 'left' : 'right'
 
   return {
     yardLine: onHomeSide ? yards : 100 - yards,
-    arrowSide: onHomeSide ? 'left' : 'right',
+    arrowSide: onHomeSide ? homeSideArrow : awaySideArrow,
   }
 }
 

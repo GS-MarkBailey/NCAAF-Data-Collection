@@ -24,6 +24,7 @@ interface AppStore {
   adjustClock: (fixtureId: string, delta: number) => void
   startNextQuarter: (fixtureId: string) => void
   setPossession: (fixtureId: string, possessionIsHome: boolean) => void
+  setHomeAttacksRight: (fixtureId: string, homeAttacksRight: boolean) => void
   tickClock: (fixtureId: string) => void
 }
 
@@ -237,6 +238,35 @@ export const useAppStore = create<AppStore>((set, get) => ({
             {
               type: 'possession_toggle',
               payload: { possessionIsHome, teamAbbr },
+            },
+            { seconds: game.clock.seconds, period: game.clock.period },
+          ),
+        ),
+      }
+    })
+  },
+
+  setHomeAttacksRight: (fixtureId, homeAttacksRight) => {
+    set((state) => {
+      const game = state.games[fixtureId]
+      if (!game || game.homeAttacksRight !== null) return state
+
+      return {
+        games: updateGame(state.games, fixtureId, (g) => ({
+          ...g,
+          homeAttacksRight,
+          clock: { ...g.clock, running: true },
+        })),
+        actionLogs: appendAction(
+          state.actionLogs,
+          createUserAction(
+            fixtureId,
+            {
+              type: 'field_direction_set',
+              payload: {
+                homeAttacksRight,
+                homeAbbr: game.fixture.homeAbbr,
+              },
             },
             { seconds: game.clock.seconds, period: game.clock.period },
           ),

@@ -6,6 +6,7 @@ import { usePushPulse } from '@/hooks/usePushPulse'
 interface BallOnStatCellProps {
   ballOn: number
   offenseIsHome: boolean
+  homeAttacksRight: boolean
   pulseEndColor?: string
   shellClassName?: string
   labelClassName?: string
@@ -15,6 +16,7 @@ interface BallOnStatCellProps {
 export function BallOnStatCell({
   ballOn,
   offenseIsHome,
+  homeAttacksRight,
   pulseEndColor = 'var(--color-panel)',
   shellClassName,
   labelClassName,
@@ -22,6 +24,7 @@ export function BallOnStatCell({
 }: BallOnStatCellProps) {
   const { yardLine, arrowSide } = getBallOnDisplay(
     yardsFromHomeGoal(ballOn, offenseIsHome),
+    homeAttacksRight,
   )
   const pulsing = usePushPulse(ballOn)
 
