@@ -39,7 +39,7 @@ export function RiskManagementPanelShadcn({
   }
 
   return (
-    <Card className="flex min-h-0 flex-1 flex-col [--card-spacing:--spacing(2)]">
+    <Card size="compact" className="flex min-h-0 flex-1 flex-col">
       <CardHeader className="border-b border-border">
         <CardTitle className="flex items-center gap-2 text-sm">
           <AlertTriangle className="size-4 text-muted-foreground" />
