@@ -39,7 +39,7 @@ export function GamePageShadcn() {
         onToggleTakeControl={() => toggleTakeControl(fixtureId)}
       />
 
-      <div className="flex min-h-0 flex-1 flex-col safe-l safe-r pb-3 landscape-mobile:pb-2">
+      <div className="flex min-h-0 flex-1 flex-col pl-4 safe-l safe-r pb-3 landscape-mobile:pb-2">
         <div
           className={cn(
             'flex min-h-0 flex-1 flex-col gap-3 rounded-xl border-[3px] p-3 transition-colors landscape-mobile:gap-3 landscape-mobile:p-3',
