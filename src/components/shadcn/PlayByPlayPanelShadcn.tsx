@@ -12,7 +12,6 @@ import { Badge } from '@/components/ui/badge'
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
@@ -112,25 +111,24 @@ function PlayCardShadcn({
   return (
     <Card
       size="sm"
-      className={cn(pulsing && 'push-data-pulse')}
+      className={cn(
+        'relative gap-0 px-3 py-2.5 pr-[3.25rem]',
+        pulsing && 'push-data-pulse',
+      )}
       style={{ '--push-pulse-end': 'var(--card)' } as CSSProperties}
     >
-      <CardHeader>
-        <div className="flex items-start justify-between gap-2">
-          <CardTitle className="text-xs">
-            {downLabel(play.down)} & {play.distance}
-          </CardTitle>
-          <Badge className="rounded-md border-transparent bg-[var(--color-time-pill)] text-[11px] font-semibold text-[var(--color-time-pill-text)]">
-            {play.clock}
-          </Badge>
-        </div>
-        <CardDescription className="text-xs">
-          Ball on {play.ballOn}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <p className="text-[8px]">{play.description}</p>
-      </CardContent>
+      <Badge className="absolute right-2.5 top-2 rounded-md border-transparent bg-[var(--color-time-pill)] px-2 py-0.5 text-[11px] font-semibold text-[var(--color-time-pill-text)]">
+        {play.clock}
+      </Badge>
+      <p className="text-[13px] font-bold leading-snug">
+        {downLabel(play.down)} & {play.distance}
+      </p>
+      <p className="mt-0.5 text-xs leading-snug text-muted-foreground">
+        Ball on {play.ballOn}
+      </p>
+      <p className="text-xs leading-snug text-muted-foreground">
+        {play.description}
+      </p>
     </Card>
   )
 }
