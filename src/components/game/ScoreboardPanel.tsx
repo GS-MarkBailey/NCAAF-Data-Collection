@@ -9,6 +9,7 @@ import {
 } from '@/lib/clock'
 import { usePushPulse } from '@/hooks/usePushPulse'
 import { useAppStore } from '@/store/gameStore'
+import { getEffectiveHomeAttacksRight } from '@/lib/playSimulation'
 import { BallOnStatCell } from '@/components/game/BallOnStatCell'
 
 interface ScoreboardPanelProps {
@@ -33,8 +34,12 @@ export function ScoreboardPanel({ fixtureId }: ScoreboardPanelProps) {
   )
   const homeAbbr = useAppStore((s) => s.games[fixtureId]?.fixture.homeAbbr ?? '')
   const awayAbbr = useAppStore((s) => s.games[fixtureId]?.fixture.awayAbbr ?? '')
-  const homeAttacksRight = useAppStore(
+  const homeAttacksRightBase = useAppStore(
     (s) => s.games[fixtureId]?.homeAttacksRight ?? false,
+  )
+  const homeAttacksRight = getEffectiveHomeAttacksRight(
+    homeAttacksRightBase,
+    clockPeriod,
   )
 
   const toggleClock = useAppStore((s) => s.toggleClock)

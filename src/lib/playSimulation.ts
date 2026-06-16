@@ -85,6 +85,24 @@ export function yardsFromHomeGoal(
   return offenseIsHome ? yards : 100 - yards
 }
 
+/**
+ * End-of-quarter switches that flip displayed field direction.
+ * Teams switch after Q1 and Q3; they stay on the same end through halftime (Q2→Q3).
+ */
+export function endSwitchCount(period: number): number {
+  if (period <= 1) return 0
+  if (period <= 3) return 1
+  return 2
+}
+
+/** Q1 base direction adjusted for end-of-quarter switches. */
+export function getEffectiveHomeAttacksRight(
+  homeAttacksRight: boolean,
+  period: number,
+): boolean {
+  return endSwitchCount(period) % 2 === 1 ? !homeAttacksRight : homeAttacksRight
+}
+
 /** Yard line (1–50) and attack-direction arrow from yards-from-home-goal. */
 export function getBallOnDisplay(
   yardsFromHomeGoal: number,
