@@ -1,7 +1,7 @@
 import type { Fixture, GameState } from '@/types'
 import { createDemoPlays } from '@/data/demoPlays'
 import { DEMO_CLOCK_SECONDS, QUARTER_LENGTH_SECONDS } from '@/lib/clock'
-import { createInitialSimulation } from '@/lib/playSimulation'
+import { createInitialSimulation, createQuarterStartPlay } from '@/lib/playSimulation'
 
 export const FIXTURES: Fixture[] = [
   {
@@ -259,7 +259,7 @@ export const FIXTURES: Fixture[] = [
 export function createInitialGameState(fixture: Fixture): GameState {
   const isDemo = fixture.id === 'NCAAF-2026-001'
 
-  return {
+  const base: GameState = {
     fixture,
     score: isDemo ? { home: 24, away: 17 } : { home: 0, away: 0 },
     clock: {
@@ -279,7 +279,14 @@ export function createInitialGameState(fixture: Fixture): GameState {
       touchdown: false,
     },
     takeControlActive: false,
-    plays: isDemo ? createDemoPlays(fixture) : [],
+    plays: [],
     simulation: createInitialSimulation(true),
+  }
+
+  return {
+    ...base,
+    plays: isDemo
+      ? createDemoPlays(fixture)
+      : [createQuarterStartPlay(base, base.clock.period)],
   }
 }

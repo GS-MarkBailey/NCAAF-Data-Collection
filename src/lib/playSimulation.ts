@@ -1,4 +1,5 @@
 import type { GameState, PlayEntry, PlaySimulationState } from '@/types'
+import { QUARTER_LENGTH_SECONDS } from '@/lib/clock'
 import { formatClock } from '@/lib/format'
 
 export type { PlaySimulationState }
@@ -99,6 +100,28 @@ export function getBallOnDisplay(yardsFromHomeGoal: number): BallOnDisplay {
 export function getBallOnYardLine(yardsFromOwnGoal: number): number {
   const yards = Math.max(1, Math.min(99, yardsFromOwnGoal))
   return yards <= 50 ? yards : 100 - yards
+}
+
+export function createQuarterStartPlay(
+  game: Pick<
+    GameState,
+    'fixture' | 'down' | 'distance' | 'ballOn' | 'possessionIsHome' | 'simulation'
+  >,
+  quarter: number,
+): PlayEntry {
+  const offenseIsHome =
+    game.simulation?.offenseIsHome ?? game.possessionIsHome
+  const { homeAbbr, awayAbbr, id: fixtureId } = game.fixture
+
+  return {
+    id: `quarter-${fixtureId}-${quarter}`,
+    quarter,
+    down: game.down,
+    distance: game.distance,
+    ballOn: formatBallOn(offenseIsHome, game.ballOn, homeAbbr, awayAbbr),
+    description: `Start of quarter ${quarter}`,
+    clock: formatClock(QUARTER_LENGTH_SECONDS),
+  }
 }
 
 function turnoverPossession(

@@ -3,7 +3,7 @@ import type { Fixture, GameState, RiskType } from '@/types'
 import type { ActionLogsByFixture, UserAction } from '@/types/actions'
 import { FIXTURES, createInitialGameState } from '@/data/fixtures'
 import { appendAction, createUserAction } from '@/lib/actionLog'
-import { tickPlaySimulation, createInitialSimulation } from '@/lib/playSimulation'
+import { tickPlaySimulation, createInitialSimulation, createQuarterStartPlay } from '@/lib/playSimulation'
 import {
   QUARTER_LENGTH_SECONDS,
   isAwaitingQuarterStart,
@@ -186,6 +186,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
             seconds: QUARTER_LENGTH_SECONDS,
             running: true,
           },
+          plays: [...g.plays, createQuarterStartPlay(g, toPeriod)],
         })),
         actionLogs: appendAction(
           state.actionLogs,
