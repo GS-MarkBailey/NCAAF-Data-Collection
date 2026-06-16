@@ -126,7 +126,7 @@ function PlayCardShadcn({
       <p className="mt-0.5 text-xs leading-snug text-muted-foreground">
         Ball on {play.ballOn}
       </p>
-      <p className="text-xs leading-snug text-muted-foreground">
+      <p className="w-full text-xs leading-snug text-muted-foreground">
         {play.description}
       </p>
     </Card>
