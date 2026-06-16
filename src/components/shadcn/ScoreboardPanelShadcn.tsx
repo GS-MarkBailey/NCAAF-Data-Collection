@@ -9,6 +9,7 @@ import {
 } from '@/lib/clock'
 import { usePushPulse } from '@/hooks/usePushPulse'
 import { useAppStore } from '@/store/gameStore'
+import { BallOnStatCell } from '@/components/game/BallOnStatCell'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -128,7 +129,14 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
             <StatCell label="QTR" value={clockPeriod} />
             <StatCell label="DOWN" value={down} />
             <StatCell label="TO GO" value={distance} />
-            <StatCell label="BALL ON" value={ballOn} />
+            <BallOnStatCell
+              ballOn={ballOn}
+              possessionIsHome={possessionIsHome}
+              pulseEndColor="var(--card)"
+              shellClassName="border-border py-4 landscape-mobile:py-3"
+              labelClassName="text-muted-foreground"
+              valueClassName="text-foreground"
+            />
           </div>
 
           <div className="grid min-h-0 flex-1 grid-cols-2 border-t border-border">

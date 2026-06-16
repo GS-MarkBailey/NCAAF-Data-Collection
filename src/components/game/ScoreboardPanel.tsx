@@ -9,6 +9,7 @@ import {
 } from '@/lib/clock'
 import { usePushPulse } from '@/hooks/usePushPulse'
 import { useAppStore } from '@/store/gameStore'
+import { BallOnStatCell } from '@/components/game/BallOnStatCell'
 
 interface ScoreboardPanelProps {
   fixtureId: string
@@ -128,7 +129,10 @@ export function ScoreboardPanel({ fixtureId }: ScoreboardPanelProps) {
               <StatCell label="QTR" value={clockPeriod} />
               <StatCell label="DOWN" value={down} />
               <StatCell label="TO GO" value={distance} />
-              <StatCell label="BALL ON" value={ballOn} />
+              <BallOnStatCell
+                ballOn={ballOn}
+                possessionIsHome={possessionIsHome}
+              />
             </div>
             <PossessionSwitch
               awayAbbr={awayAbbr}

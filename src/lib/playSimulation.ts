@@ -68,6 +68,28 @@ export function formatBallOn(
   return `${offenseIsHome ? awayAbbr : homeAbbr} ${oppYards}`
 }
 
+export type BallOnArrowSide = 'left' | 'right'
+
+export interface BallOnDisplay {
+  yardLine: number
+  arrowSide: BallOnArrowSide
+}
+
+/** Yard line (1–50) and field-side arrow for scoreboard (home=left, away=right). */
+export function getBallOnDisplay(
+  yardsFromOwnGoal: number,
+  possessionIsHome: boolean,
+): BallOnDisplay {
+  const yards = Math.max(1, Math.min(99, yardsFromOwnGoal))
+  const onOffenseOwnSide = yards <= 50
+  const onHomeSide = possessionIsHome === onOffenseOwnSide
+
+  return {
+    yardLine: onOffenseOwnSide ? yards : 100 - yards,
+    arrowSide: onHomeSide ? 'left' : 'right',
+  }
+}
+
 function turnoverPossession(
   game: GameState,
   simulation: PlaySimulationState,
