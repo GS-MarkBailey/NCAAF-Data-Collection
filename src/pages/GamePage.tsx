@@ -50,7 +50,7 @@ function GamePageCustom() {
         onToggleTakeControl={() => toggleTakeControl(fixtureId)}
       />
 
-      <div className="flex min-h-0 flex-1 flex-col pl-12 pr-4 pb-0 safe-x landscape-mobile:pl-12 landscape-mobile:pr-2 landscape-mobile:pb-2">
+      <div className="flex min-h-0 flex-1 flex-col safe-l safe-r pb-0 landscape-mobile:pb-2">
         <div
           className={cn(
             'grid min-h-0 flex-1 grid-cols-1 gap-3 rounded-[var(--radius-panel)] border-[3px] p-3 transition-colors landscape-mobile:grid-cols-3 landscape-mobile:gap-3 landscape-mobile:p-3',

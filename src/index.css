@@ -212,8 +212,24 @@ textarea {
 }
 
 @utility safe-x {
-  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-left: 1rem;
   padding-right: max(1rem, env(safe-area-inset-right));
+}
+
+@utility safe-l {
+  padding-left: 0;
+}
+
+@utility safe-r {
+  padding-right: max(1rem, env(safe-area-inset-right));
+}
+
+html.ios-notch .safe-x {
+  padding-left: max(1rem, env(safe-area-inset-left));
+}
+
+html.ios-notch .safe-l {
+  padding-left: max(1rem, env(safe-area-inset-left));
 }
 
 @utility safe-b {
