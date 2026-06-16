@@ -204,7 +204,7 @@ textarea {
 }
 
 @utility safe-b {
-  padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+  padding-bottom: 0.5rem;
 }
 
 @utility safe-t {
