@@ -98,7 +98,7 @@ function PlayCard({
   return (
     <div
       className={cn(
-        'relative rounded-[10px] border border-[var(--color-panel-border)] bg-[var(--color-play-card-bg)] px-3 py-2.5 pr-[3.25rem]',
+        'relative my-2 rounded-[10px] border border-[var(--color-panel-border)] bg-[var(--color-play-card-bg)] p-2',
         pulsing && 'push-data-pulse',
       )}
       style={
@@ -115,7 +115,7 @@ function PlayCard({
       <p className="mt-0.5 text-xs leading-snug text-[var(--color-text-secondary)]">
         Ball on {play.ballOn}
       </p>
-      <p className="text-xs leading-snug text-[var(--color-text-secondary)]">
+      <p className="w-full text-xs leading-snug text-[var(--color-text-secondary)]">
         {play.description}
       </p>
     </div>

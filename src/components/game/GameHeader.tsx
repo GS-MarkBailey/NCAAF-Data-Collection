@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom'
 import { ChevronLeft } from 'lucide-react'
-import { cn } from '@/lib/utils'
 import type { GameState } from '@/types'
 import { ActionLogDialog } from '@/components/game/ActionLogDialog'
+import { TakeControlButton } from '@/components/game/TakeControlButton'
 
 interface GameHeaderProps {
   game: GameState
@@ -34,18 +34,10 @@ export function GameHeader({ game, onToggleTakeControl }: GameHeaderProps) {
 
       <div className="flex shrink-0 items-center gap-2">
         <ActionLogDialog fixtureId={fixture.id} />
-        <button
-          type="button"
-          onClick={onToggleTakeControl}
-          className={cn(
-            'min-w-[8.25rem] rounded-[10px] px-4 py-2.5 text-[13px] font-semibold text-white shadow-sm transition-colors landscape-mobile:px-3 landscape-mobile:py-2 landscape-mobile:text-xs',
-            takeControlActive
-              ? 'bg-[var(--color-danger)] hover:bg-[var(--color-danger-hover)]'
-              : 'bg-[var(--color-brand)] hover:bg-[var(--color-brand-hover)]',
-          )}
-        >
-          {takeControlActive ? 'Stop Control' : 'Take Control'}
-        </button>
+        <TakeControlButton
+          takeControlActive={takeControlActive}
+          onToggleTakeControl={onToggleTakeControl}
+        />
       </div>
     </header>
   )

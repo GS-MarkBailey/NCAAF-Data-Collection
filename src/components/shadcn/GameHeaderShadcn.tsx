@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom'
 import { ChevronLeft } from 'lucide-react'
-import { cn } from '@/lib/utils'
 import type { GameState } from '@/types'
 import { ActionLogDialogShadcn } from '@/components/shadcn/ActionLogDialogShadcn'
+import { TakeControlButton } from '@/components/game/TakeControlButton'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -59,18 +59,11 @@ export function GameHeaderShadcn({
 
         <div className="flex shrink-0 items-center gap-2">
           <ActionLogDialogShadcn fixtureId={fixture.id} />
-          <Button
-            variant="ghost"
-            className={cn(
-              'min-w-[8.25rem] border-0 text-white shadow-none',
-              takeControlActive
-                ? 'bg-[var(--color-danger)] hover:bg-[var(--color-danger-hover)]'
-                : 'bg-[var(--color-brand)] hover:bg-[var(--color-brand-hover)]',
-            )}
-            onClick={onToggleTakeControl}
-          >
-            {takeControlActive ? 'Stop Control' : 'Take Control'}
-          </Button>
+          <TakeControlButton
+            variant="shadcn"
+            takeControlActive={takeControlActive}
+            onToggleTakeControl={onToggleTakeControl}
+          />
         </div>
       </div>
     </header>
