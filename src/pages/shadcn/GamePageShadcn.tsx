@@ -50,7 +50,7 @@ export function GamePageShadcn() {
         >
           <Tabs
             defaultValue="scoreboard"
-            className="flex min-h-0 flex-1 flex-col landscape-mobile:hidden"
+            className="flex min-h-0 flex-1 flex-col md:hidden landscape-mobile:hidden"
           >
             <TabsList className="w-full">
               <TabsTrigger value="scoreboard" className="flex-1">
@@ -77,7 +77,7 @@ export function GamePageShadcn() {
             </TabsContent>
           </Tabs>
 
-          <div className="hidden min-h-0 flex-1 grid-cols-3 gap-3 landscape-mobile:grid">
+          <div className="hidden min-h-0 flex-1 grid-cols-3 gap-3 md:grid landscape-mobile:grid">
             <ScoreboardPanelShadcn fixtureId={fixtureId} />
             <PlayByPlayPanelShadcn game={game} />
             <RiskManagementPanelShadcn
