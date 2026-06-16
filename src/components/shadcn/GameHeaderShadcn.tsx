@@ -73,7 +73,6 @@ export function GameHeaderShadcn({
           </Button>
         </div>
       </div>
-      <Separator />
     </header>
   )
 }
