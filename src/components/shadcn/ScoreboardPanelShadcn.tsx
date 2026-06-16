@@ -70,7 +70,7 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
         <div className="flex min-h-0 flex-1 items-stretch overflow-hidden rounded-lg border border-border">
           <Button
             variant="ghost"
-            className="h-full min-h-0 rounded-none border-r border-border px-3 active:bg-[var(--color-primary-bg)]"
+            className="h-full min-h-0 rounded-none border-0 border-r border-border px-3 active:bg-[var(--color-primary-bg)]"
             onClick={() => adjustClock(fixtureId, -1)}
             aria-label="Decrease clock by 1 second"
           >
@@ -80,7 +80,7 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
           <Button
             variant="ghost"
             className={cn(
-              'h-full min-h-0 flex-1 rounded-none border-r border-border',
+              'h-full min-h-0 flex-1 rounded-none border-0 border-r border-border',
               awaitingQuarterStart && 'bg-[var(--color-primary-bg)] hover:bg-[var(--color-primary-bg)]',
               regulationComplete && 'bg-muted',
             )}
@@ -115,7 +115,7 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
 
           <Button
             variant="ghost"
-            className="h-full min-h-0 rounded-none px-3 active:bg-[var(--color-primary-bg)]"
+            className="h-full min-h-0 rounded-none border-0 px-3 active:bg-[var(--color-primary-bg)]"
             onClick={() => adjustClock(fixtureId, 1)}
             aria-label="Increase clock by 1 second"
           >
