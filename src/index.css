@@ -29,7 +29,7 @@
 @custom-variant landscape-mobile (@media (orientation: landscape) and (max-height: 520px));
 
 @theme {
-  --color-app-bg: #f1f4f9;
+  --color-app-bg: #ecf5ec;
   --color-panel: #ffffff;
   --color-panel-border: #e4e7ec;
   --color-text: #1c1f26;
@@ -106,7 +106,7 @@ html[data-ui-variant='shadcn'] {
   --radius: 0.625rem;
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
-  --background: rgba(241, 244, 249, 1);
+  --background: #ecf5ec;
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
