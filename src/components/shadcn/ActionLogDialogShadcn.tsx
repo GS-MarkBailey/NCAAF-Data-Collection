@@ -28,6 +28,12 @@ interface ActionLogDialogShadcnProps {
 
 const EMPTY_ACTIONS: UserAction[] = []
 
+const SETTINGS_TAB_CONTENT =
+  'flex min-h-0 flex-1 flex-col gap-3 px-4 pt-3 pb-4'
+
+const SETTINGS_TAB_PANEL =
+  'min-h-0 flex-1 overflow-y-auto rounded-lg border border-border bg-muted/30 p-3'
+
 export function ActionLogDialogShadcn({ fixtureId }: ActionLogDialogShadcnProps) {
   const actions = useAppStore(
     (s) => s.actionLogs[fixtureId] ?? EMPTY_ACTIONS,
@@ -67,11 +73,8 @@ export function ActionLogDialogShadcn({ fixtureId }: ActionLogDialogShadcnProps)
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent
-            value="log"
-            className="flex min-h-0 flex-1 flex-col gap-3 px-4 pt-3 pb-4"
-          >
-            <div className="flex items-center justify-between gap-3">
+          <TabsContent value="log" className={SETTINGS_TAB_CONTENT}>
+            <div className="flex shrink-0 items-center justify-between gap-3">
               <p className="text-sm text-muted-foreground">
                 {actions.length} recorded action
                 {actions.length === 1 ? '' : 's'}
@@ -87,7 +90,7 @@ export function ActionLogDialogShadcn({ fixtureId }: ActionLogDialogShadcnProps)
               </Button>
             </div>
 
-            <div className="min-h-0 flex-1 overflow-y-auto">
+            <div className={SETTINGS_TAB_PANEL}>
               {reversed.length === 0 ? (
                 <p className="py-6 text-center text-sm text-muted-foreground">
                   No actions recorded yet.
@@ -97,7 +100,7 @@ export function ActionLogDialogShadcn({ fixtureId }: ActionLogDialogShadcnProps)
                   {reversed.map((action) => (
                     <li
                       key={action.id}
-                      className="rounded-lg border border-border bg-muted/30 p-3"
+                      className="rounded-lg border border-border bg-background p-3"
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex shrink-0 flex-col items-start gap-0.5">
@@ -125,27 +128,31 @@ export function ActionLogDialogShadcn({ fixtureId }: ActionLogDialogShadcnProps)
             </div>
           </TabsContent>
 
-          <TabsContent value="field" className="px-4 pt-3 pb-4">
-            {game ? (
-              <FieldDirectionPicker
-                fixtureId={fixtureId}
-                homeAbbr={game.fixture.homeAbbr}
-                homeAttacksRight={game.homeAttacksRight}
-                variant="shadcn"
-              />
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                Load a fixture to set field direction.
-              </p>
-            )}
+          <TabsContent value="field" className={SETTINGS_TAB_CONTENT}>
+            <div className={SETTINGS_TAB_PANEL}>
+              {game ? (
+                <FieldDirectionPicker
+                  fixtureId={fixtureId}
+                  homeAbbr={game.fixture.homeAbbr}
+                  homeAttacksRight={game.homeAttacksRight}
+                  variant="shadcn"
+                />
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  Load a fixture to set field direction.
+                </p>
+              )}
+            </div>
           </TabsContent>
 
-          <TabsContent value="display" className="px-4 pt-3 pb-4">
-            <UiVariantSwitch className="flex items-center justify-between gap-3 rounded-lg border bg-muted/30 px-3 py-3" />
-            <p className="mt-3 text-sm text-muted-foreground">
-              Switch between the custom operator UI and the shadcn component
-              reference view. Your choice is saved for this session.
-            </p>
+          <TabsContent value="display" className={SETTINGS_TAB_CONTENT}>
+            <div className={SETTINGS_TAB_PANEL}>
+              <UiVariantSwitch className="flex items-center justify-between gap-3" />
+              <p className="mt-3 text-sm text-muted-foreground">
+                Switch between the custom operator UI and the shadcn component
+                reference view. Your choice is saved for this session.
+              </p>
+            </div>
           </TabsContent>
         </Tabs>
       </DialogContent>

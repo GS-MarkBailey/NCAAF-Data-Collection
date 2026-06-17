@@ -25,6 +25,12 @@ interface ActionLogDialogProps {
 
 const EMPTY_ACTIONS: UserAction[] = []
 
+const SETTINGS_TAB_CONTENT =
+  'flex min-h-0 flex-1 flex-col gap-3 px-4 pt-3 pb-4'
+
+const SETTINGS_TAB_PANEL =
+  'min-h-0 flex-1 overflow-y-auto rounded-[10px] border border-[var(--color-panel-border)] bg-[var(--color-play-card-bg)] p-3'
+
 export function ActionLogDialog({ fixtureId }: ActionLogDialogProps) {
   const actions = useAppStore(
     (s) => s.actionLogs[fixtureId] ?? EMPTY_ACTIONS,
@@ -68,11 +74,8 @@ export function ActionLogDialog({ fixtureId }: ActionLogDialogProps) {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent
-            value="log"
-            className="flex min-h-0 flex-1 flex-col gap-3 px-4 pt-3 pb-4"
-          >
-            <div className="flex items-center justify-between gap-3">
+          <TabsContent value="log" className={SETTINGS_TAB_CONTENT}>
+            <div className="flex shrink-0 items-center justify-between gap-3">
               <p className="text-xs text-[var(--color-text-muted)]">
                 {actions.length} recorded action
                 {actions.length === 1 ? '' : 's'}
@@ -89,17 +92,17 @@ export function ActionLogDialog({ fixtureId }: ActionLogDialogProps) {
               </button>
             </div>
 
-            <div className="min-h-0 flex-1 overflow-y-auto">
+            <div className={SETTINGS_TAB_PANEL}>
               {reversed.length === 0 ? (
                 <p className="py-6 text-center text-sm text-[var(--color-text-muted)]">
                   No actions recorded yet.
                 </p>
               ) : (
-                <ol className="flex flex-col gap-1">
+                <ol className="flex flex-col gap-2">
                   {reversed.map((action) => (
                     <li
                       key={action.id}
-                      className="rounded-[10px] border border-[var(--color-panel-border)] bg-[var(--color-play-card-bg)] px-3 py-2"
+                      className="rounded-[10px] border border-[var(--color-panel-border)] bg-[var(--color-panel)] px-3 py-2"
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex shrink-0 flex-col items-start gap-0.5">
@@ -127,27 +130,31 @@ export function ActionLogDialog({ fixtureId }: ActionLogDialogProps) {
             </div>
           </TabsContent>
 
-          <TabsContent value="field" className="px-4 pt-3 pb-4">
-            {game ? (
-              <FieldDirectionPicker
-                fixtureId={fixtureId}
-                homeAbbr={game.fixture.homeAbbr}
-                homeAttacksRight={game.homeAttacksRight}
-                variant="custom"
-              />
-            ) : (
-              <p className="text-xs text-[var(--color-text-muted)]">
-                Load a fixture to set field direction.
-              </p>
-            )}
+          <TabsContent value="field" className={SETTINGS_TAB_CONTENT}>
+            <div className={SETTINGS_TAB_PANEL}>
+              {game ? (
+                <FieldDirectionPicker
+                  fixtureId={fixtureId}
+                  homeAbbr={game.fixture.homeAbbr}
+                  homeAttacksRight={game.homeAttacksRight}
+                  variant="custom"
+                />
+              ) : (
+                <p className="text-xs text-[var(--color-text-muted)]">
+                  Load a fixture to set field direction.
+                </p>
+              )}
+            </div>
           </TabsContent>
 
-          <TabsContent value="display" className="px-4 pt-3 pb-4">
-            <UiVariantSwitchCustom />
-            <p className="mt-3 text-xs leading-relaxed text-[var(--color-text-muted)]">
-              Switch between the custom operator UI and the shadcn component
-              reference view. Your choice is saved for this session.
-            </p>
+          <TabsContent value="display" className={SETTINGS_TAB_CONTENT}>
+            <div className={SETTINGS_TAB_PANEL}>
+              <UiVariantSwitchCustom />
+              <p className="mt-3 text-xs leading-relaxed text-[var(--color-text-muted)]">
+                Switch between the custom operator UI and the shadcn component
+                reference view. Your choice is saved for this session.
+              </p>
+            </div>
           </TabsContent>
         </Tabs>
       </DialogContent>
