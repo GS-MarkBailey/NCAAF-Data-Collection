@@ -44,7 +44,7 @@ export function ActionLogDialogShadcn({ fixtureId }: ActionLogDialogShadcnProps)
       </DialogTrigger>
 
       <DialogContent className="flex max-h-[min(80dvh,28rem)] flex-col gap-0 overflow-hidden p-0 sm:max-w-md">
-        <DialogHeader className="border-b px-4 pt-4 pb-0">
+        <DialogHeader className="border-b border-border px-4 pt-4 pb-0">
           <DialogTitle>Settings</DialogTitle>
           <DialogDescription>
             Action log, field direction, and display options
