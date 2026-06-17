@@ -102,10 +102,7 @@ export function ActionLogDialog({ fixtureId }: ActionLogDialogProps) {
                       className="rounded-[10px] border border-[var(--color-panel-border)] bg-[var(--color-play-card-bg)] px-3 py-2"
                     >
                       <div className="flex items-start justify-between gap-2">
-                        <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">
-                          {formatActionType(action)}
-                        </span>
-                        <div className="flex shrink-0 flex-col items-end gap-0.5">
+                        <div className="flex shrink-0 flex-col items-start gap-0.5">
                           <span className="text-[11px] font-semibold tabular-nums text-[var(--color-text)]">
                             {formatActionGameClock(action)}
                           </span>
@@ -116,6 +113,9 @@ export function ActionLogDialog({ fixtureId }: ActionLogDialogProps) {
                             {formatActionTime(action.timestamp)}
                           </time>
                         </div>
+                        <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">
+                          {formatActionType(action)}
+                        </span>
                       </div>
                       <p className="mt-0.5 text-sm font-medium text-[var(--color-text)]">
                         {formatActionLabel(action)}

@@ -97,13 +97,10 @@ export function ActionLogDialogShadcn({ fixtureId }: ActionLogDialogShadcnProps)
                   {reversed.map((action) => (
                     <li
                       key={action.id}
-                      className="rounded-lg border bg-muted/30 p-3"
+                      className="rounded-lg border border-border bg-muted/30 p-3"
                     >
                       <div className="flex items-start justify-between gap-2">
-                        <Badge variant="outline">
-                          {formatActionType(action)}
-                        </Badge>
-                        <div className="flex shrink-0 flex-col items-end gap-0.5">
+                        <div className="flex shrink-0 flex-col items-start gap-0.5">
                           <span className="text-xs font-semibold tabular-nums">
                             {formatActionGameClock(action)}
                           </span>
@@ -114,6 +111,9 @@ export function ActionLogDialogShadcn({ fixtureId }: ActionLogDialogShadcnProps)
                             {formatActionTime(action.timestamp)}
                           </time>
                         </div>
+                        <Badge variant="outline">
+                          {formatActionType(action)}
+                        </Badge>
                       </div>
                       <p className="mt-2 text-sm font-medium">
                         {formatActionLabel(action)}
