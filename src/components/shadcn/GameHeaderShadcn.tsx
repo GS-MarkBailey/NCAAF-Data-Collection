@@ -3,6 +3,7 @@ import { ChevronLeft } from 'lucide-react'
 import type { GameState } from '@/types'
 import { ActionLogDialogShadcn } from '@/components/shadcn/ActionLogDialogShadcn'
 import { ConnectionStatusChip } from '@/components/shadcn/ConnectionStatusChip'
+import { FeatureGate } from '@/components/game/FeatureGate'
 import { TakeControlButton } from '@/components/game/TakeControlButton'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -33,18 +34,24 @@ export function GameHeaderShadcn({
             <ChevronLeft />
             <span className="sr-only">Back to fixtures</span>
           </Button>
-          <ConnectionStatusChip />
+          <FeatureGate flag="header.connectionStatus">
+            <ConnectionStatusChip />
+          </FeatureGate>
         </div>
 
         <div className="min-w-0" aria-hidden />
 
         <div className="z-10 flex shrink-0 items-center justify-end gap-2 justify-self-end">
-          <ActionLogDialogShadcn fixtureId={fixture.id} />
-          <TakeControlButton
-            variant="shadcn"
-            takeControlActive={takeControlActive}
-            onToggleTakeControl={onToggleTakeControl}
-          />
+          <FeatureGate flag="header.settings">
+            <ActionLogDialogShadcn fixtureId={fixture.id} />
+          </FeatureGate>
+          <FeatureGate flag="header.takeControl">
+            <TakeControlButton
+              variant="shadcn"
+              takeControlActive={takeControlActive}
+              onToggleTakeControl={onToggleTakeControl}
+            />
+          </FeatureGate>
         </div>
 
         <div className="pointer-events-none absolute left-1/2 top-1/2 z-0 -translate-x-1/2 -translate-y-1/2">

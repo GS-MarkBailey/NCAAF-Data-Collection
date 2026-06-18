@@ -10,6 +10,7 @@ import {
   type QuarterStatus,
 } from '@/lib/clock'
 import { usePushPulse } from '@/hooks/usePushPulse'
+import { useFeatureFlag } from '@/hooks/useFeatureFlag'
 import { useAppStore } from '@/store/gameStore'
 import { getEffectiveHomeAttacksRight } from '@/lib/playSimulation'
 import { BallOnStatCell } from '@/components/game/BallOnStatCell'
@@ -56,6 +57,9 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
   const adjustClock = useAppStore((s) => s.adjustClock)
   const startNextQuarter = useAppStore((s) => s.startNextQuarter)
   const setPossession = useAppStore((s) => s.setPossession)
+  const showQuarterStatus = useFeatureFlag('scoreboard.quarterStatus')
+  const showClockAdjust = useFeatureFlag('scoreboard.clockAdjust')
+  const showPossessionSwitch = useFeatureFlag('scoreboard.possessionSwitch')
 
   const paused = !clockRunning
   const awaitingQuarterStart = isAwaitingQuarterStart({
@@ -85,19 +89,22 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
       </CardHeader>
       <CardContent className="flex min-h-0 flex-1 flex-col gap-2">
         <div className="flex min-h-0 flex-1 items-stretch overflow-hidden rounded-lg border border-border">
-          <Button
-            variant="ghost"
-            className="h-full min-h-0 rounded-none border-0 border-r border-border px-3 active:bg-[var(--color-primary-bg)]"
-            onClick={() => adjustClock(fixtureId, -1)}
-            aria-label="Decrease clock by 1 second"
-          >
-            <Minus />
-          </Button>
+          {showClockAdjust ? (
+            <Button
+              variant="ghost"
+              className="h-full min-h-0 rounded-none border-0 border-r border-border px-3 active:bg-[var(--color-primary-bg)]"
+              onClick={() => adjustClock(fixtureId, -1)}
+              aria-label="Decrease clock by 1 second"
+            >
+              <Minus />
+            </Button>
+          ) : null}
 
           <Button
             variant="ghost"
             className={cn(
-              'h-full min-h-0 flex-1 rounded-none border-0 border-r border-border',
+              'h-full min-h-0 flex-1 rounded-none border-0',
+              showClockAdjust && 'border-r border-border',
               awaitingQuarterStart && 'bg-[var(--color-primary-bg)] hover:bg-[var(--color-primary-bg)]',
               regulationComplete && 'bg-muted',
             )}
@@ -130,14 +137,16 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
             </div>
           </Button>
 
-          <Button
-            variant="ghost"
-            className="h-full min-h-0 rounded-none border-0 px-3 active:bg-[var(--color-primary-bg)]"
-            onClick={() => adjustClock(fixtureId, 1)}
-            aria-label="Increase clock by 1 second"
-          >
-            <Plus />
-          </Button>
+          {showClockAdjust ? (
+            <Button
+              variant="ghost"
+              className="h-full min-h-0 rounded-none border-0 px-3 active:bg-[var(--color-primary-bg)]"
+              onClick={() => adjustClock(fixtureId, 1)}
+              aria-label="Increase clock by 1 second"
+            >
+              <Plus />
+            </Button>
+          ) : null}
         </div>
 
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-border">
@@ -145,10 +154,14 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
             <StatCell
               label="QTR"
               value={clockPeriod}
-              status={getQuarterStatus({
-                seconds: clockSeconds,
-                running: clockRunning,
-              })}
+              status={
+                showQuarterStatus
+                  ? getQuarterStatus({
+                      seconds: clockSeconds,
+                      running: clockRunning,
+                    })
+                  : undefined
+              }
             />
             <StatCell label="DOWN" value={down} />
             <StatCell label="TO GO" value={distance} />
@@ -163,34 +176,36 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
             />
           </div>
 
-          <div className="grid min-h-0 flex-1 grid-cols-2 border-t border-border">
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => setPossession(fixtureId, true)}
-              aria-pressed={possessionIsHome}
-              aria-label={`Give possession to ${homeAbbr}`}
-              className={cn(
-                'h-full min-h-0 rounded-none border-0 border-r border-border py-0 text-lg font-semibold',
-                possessionIsHome && 'bg-[var(--color-score-bg)] text-white hover:bg-[var(--color-score-bg)] hover:text-white',
-              )}
-            >
-              {homeAbbr}
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => setPossession(fixtureId, false)}
-              aria-pressed={!possessionIsHome}
-              aria-label={`Give possession to ${awayAbbr}`}
-              className={cn(
-                'h-full min-h-0 rounded-none border-0 py-0 text-lg font-semibold',
-                !possessionIsHome && 'bg-[var(--color-score-bg)] text-white hover:bg-[var(--color-score-bg)] hover:text-white',
-              )}
-            >
-              {awayAbbr}
-            </Button>
-          </div>
+          {showPossessionSwitch ? (
+            <div className="grid min-h-0 flex-1 grid-cols-2 border-t border-border">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setPossession(fixtureId, true)}
+                aria-pressed={possessionIsHome}
+                aria-label={`Give possession to ${homeAbbr}`}
+                className={cn(
+                  'h-full min-h-0 rounded-none border-0 border-r border-border py-0 text-lg font-semibold',
+                  possessionIsHome && 'bg-[var(--color-score-bg)] text-white hover:bg-[var(--color-score-bg)] hover:text-white',
+                )}
+              >
+                {homeAbbr}
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setPossession(fixtureId, false)}
+                aria-pressed={!possessionIsHome}
+                aria-label={`Give possession to ${awayAbbr}`}
+                className={cn(
+                  'h-full min-h-0 rounded-none border-0 py-0 text-lg font-semibold',
+                  !possessionIsHome && 'bg-[var(--color-score-bg)] text-white hover:bg-[var(--color-score-bg)] hover:text-white',
+                )}
+              >
+                {awayAbbr}
+              </Button>
+            </div>
+          ) : null}
         </div>
       </CardContent>
     </Card>
