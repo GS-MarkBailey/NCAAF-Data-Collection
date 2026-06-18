@@ -212,28 +212,16 @@ textarea {
 }
 
 @utility safe-x {
-  padding-left: 1rem;
-  padding-right: 1rem;
+  padding-left: var(--app-safe-left, 1rem);
+  padding-right: var(--app-safe-right, 1rem);
 }
 
 @utility safe-l {
-  padding-left: 1rem;
+  padding-left: var(--app-safe-left, 1rem);
 }
 
 @utility safe-r {
-  padding-right: 1rem;
-}
-
-@media (orientation: landscape) {
-  html.ios-notch.notch-side-left .safe-l,
-  html.ios-notch.notch-side-left .safe-x {
-    padding-left: max(1rem, env(safe-area-inset-left, 0px));
-  }
-
-  html.ios-notch.notch-side-right .safe-r,
-  html.ios-notch.notch-side-right .safe-x {
-    padding-right: max(1rem, env(safe-area-inset-right, 0px));
-  }
+  padding-right: var(--app-safe-right, 1rem);
 }
 
 @utility safe-b {

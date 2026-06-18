@@ -34,26 +34,66 @@ export function detectIosWithNotch(): boolean {
   return Math.max(window.screen.width, window.screen.height) >= 812
 }
 
+const BASE_HORIZONTAL_SAFE = '1rem'
+
+function inferNotchSideFromScreen(): 'left' | 'right' | null {
+  const angle = screen.orientation?.angle ?? (window as Window & { orientation?: number }).orientation
+  if (angle == null) return null
+  if (angle === 90) return 'left'
+  if (angle === 270 || angle === -90) return 'right'
+  return null
+}
+
+function applyLandscapeSafePadding(hasNotch: boolean): void {
+  const root = document.documentElement
+  const isLandscape = window.matchMedia('(orientation: landscape)').matches
+
+  if (!hasNotch || !isLandscape) {
+    root.style.removeProperty('--app-safe-left')
+    root.style.removeProperty('--app-safe-right')
+    return
+  }
+
+  const leftInset = measureSafeAreaInset('left')
+  const rightInset = measureSafeAreaInset('right')
+  let notchOnLeft = leftInset > rightInset
+
+  if (leftInset === rightInset) {
+    const inferred = inferNotchSideFromScreen()
+    if (inferred) notchOnLeft = inferred === 'left'
+  }
+
+  if (notchOnLeft) {
+    root.style.setProperty('--app-safe-left', `max(${BASE_HORIZONTAL_SAFE}, ${leftInset}px)`)
+    root.style.setProperty('--app-safe-right', BASE_HORIZONTAL_SAFE)
+  } else {
+    root.style.setProperty('--app-safe-left', BASE_HORIZONTAL_SAFE)
+    root.style.setProperty('--app-safe-right', `max(${BASE_HORIZONTAL_SAFE}, ${rightInset}px)`)
+  }
+}
+
 export function markIosNotchDevice(): void {
   const root = document.documentElement
   const hasNotch = detectIosWithNotch()
   root.classList.toggle('ios-notch', hasNotch)
+  applyLandscapeSafePadding(hasNotch)
+}
 
-  root.classList.remove('notch-side-left', 'notch-side-right')
+let safeAreaUpdateTimer: ReturnType<typeof setTimeout> | undefined
 
-  if (!hasNotch) return
+/** iOS updates safe-area insets after orientationchange; re-measure once layout settles. */
+function scheduleSafeAreaUpdate(): void {
+  markIosNotchDevice()
 
-  const isLandscape = window.matchMedia('(orientation: landscape)').matches
-  if (!isLandscape) return
+  if (safeAreaUpdateTimer) clearTimeout(safeAreaUpdateTimer)
 
-  const leftInset = measureSafeAreaInset('left')
-  const rightInset = measureSafeAreaInset('right')
-
-  if (leftInset >= rightInset) {
-    root.classList.add('notch-side-left')
-  } else {
-    root.classList.add('notch-side-right')
-  }
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      markIosNotchDevice()
+      safeAreaUpdateTimer = setTimeout(markIosNotchDevice, 150)
+      setTimeout(markIosNotchDevice, 400)
+    })
+  })
 }
 
 export function markStandaloneMode(): void {
@@ -76,8 +116,10 @@ export function initPwa(): void {
     window.matchMedia(query).addEventListener('change', markStandaloneMode)
   }
 
-  window.addEventListener('resize', markIosNotchDevice)
-  window.addEventListener('orientationchange', markIosNotchDevice)
+  window.addEventListener('resize', scheduleSafeAreaUpdate)
+  window.addEventListener('orientationchange', scheduleSafeAreaUpdate)
+  window.visualViewport?.addEventListener('resize', scheduleSafeAreaUpdate)
+  screen.orientation?.addEventListener('change', scheduleSafeAreaUpdate)
 
   if (!('serviceWorker' in navigator)) return
 
