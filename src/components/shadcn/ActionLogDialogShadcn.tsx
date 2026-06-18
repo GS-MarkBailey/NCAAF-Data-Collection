@@ -6,7 +6,6 @@ import {
   formatActionTime,
   formatActionType,
 } from '@/lib/actionLog'
-import { UiVariantSwitch } from '@/components/UiVariantSwitch'
 import { FieldDirectionPicker } from '@/components/game/FieldDirectionPicker'
 import { useAppStore } from '@/store/gameStore'
 import type { UserAction } from '@/types/actions'
@@ -59,7 +58,7 @@ export function ActionLogDialogShadcn({ fixtureId }: ActionLogDialogShadcnProps)
         <DialogHeader className="shrink-0 border-b border-border px-4 pt-4 pb-0">
           <DialogTitle>Settings</DialogTitle>
           <DialogDescription>
-            Action log, field direction, and display options
+            Action log and field direction
           </DialogDescription>
         </DialogHeader>
 
@@ -73,9 +72,6 @@ export function ActionLogDialogShadcn({ fixtureId }: ActionLogDialogShadcnProps)
             </TabsTrigger>
             <TabsTrigger value="field" className="flex-1">
               Field
-            </TabsTrigger>
-            <TabsTrigger value="display" className="flex-1">
-              UI
             </TabsTrigger>
           </TabsList>
 
@@ -152,18 +148,6 @@ export function ActionLogDialogShadcn({ fixtureId }: ActionLogDialogShadcnProps)
                       Load a fixture to set field direction.
                     </p>
                   )}
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="display" className={SETTINGS_TAB_CONTENT}>
-              <div className={SETTINGS_TAB_PANEL}>
-                <div className={SETTINGS_TAB_SCROLL}>
-                  <UiVariantSwitch className="flex items-center justify-between gap-3" />
-                  <p className="mt-3 text-sm text-muted-foreground">
-                    Switch between the custom operator UI and the shadcn component
-                    reference view. Your choice is saved for this session.
-                  </p>
                 </div>
               </div>
             </TabsContent>

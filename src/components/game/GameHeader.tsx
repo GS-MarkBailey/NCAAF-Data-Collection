@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { ChevronLeft } from 'lucide-react'
 import type { GameState } from '@/types'
-import { ActionLogDialog } from '@/components/game/ActionLogDialog'
+import { ActionLogDialogShadcn } from '@/components/shadcn/ActionLogDialogShadcn'
 import { TakeControlButton } from '@/components/game/TakeControlButton'
 
 interface GameHeaderProps {
@@ -25,7 +25,7 @@ export function GameHeader({ game, onToggleTakeControl }: GameHeaderProps) {
       <div className="min-w-0" aria-hidden />
 
       <div className="z-10 flex shrink-0 items-center justify-end gap-2 justify-self-end">
-        <ActionLogDialog fixtureId={fixture.id} />
+        <ActionLogDialogShadcn fixtureId={fixture.id} />
         <TakeControlButton
           takeControlActive={takeControlActive}
           onToggleTakeControl={onToggleTakeControl}

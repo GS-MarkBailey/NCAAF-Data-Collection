@@ -22,10 +22,7 @@ export function FixturesPageShadcn() {
   return (
     <div className="flex h-dvh flex-col bg-background safe-x safe-t safe-b">
       <header className="shrink-0 space-y-1 px-4 py-6">
-        <div className="flex items-center gap-2">
-          <h1 className="text-lg font-semibold tracking-tight">Fixtures</h1>
-          <Badge variant="secondary">shadcn</Badge>
-        </div>
+        <h1 className="text-lg font-semibold tracking-tight">Fixtures</h1>
         <p className="text-sm text-muted-foreground">
           Select a match to open the data collection console
         </p>
