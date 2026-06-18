@@ -5,11 +5,13 @@ export type ConnectionStatus = 'online'
 
 const STATUS_CONFIG: Record<
   ConnectionStatus,
-  { label: string; dotClassName: string }
+  { label: string; dotClassName: string; chipClassName: string }
 > = {
   online: {
     label: 'online',
     dotClassName: 'bg-emerald-500',
+    chipClassName:
+      'border-emerald-200 bg-emerald-50 text-emerald-800',
   },
 }
 
@@ -25,7 +27,10 @@ export function ConnectionStatusChip({
   return (
     <Badge
       variant="outline"
-      className="h-7 gap-1.5 px-2 text-xs font-medium normal-case"
+      className={cn(
+        'h-7 gap-1.5 px-2 text-xs font-medium normal-case',
+        config.chipClassName,
+      )}
     >
       <span
         className={cn('size-2 shrink-0 rounded-full', config.dotClassName)}
