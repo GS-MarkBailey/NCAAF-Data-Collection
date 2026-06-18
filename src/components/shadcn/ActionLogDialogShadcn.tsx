@@ -58,24 +58,43 @@ export function ActionLogDialogShadcn({ fixtureId }: ActionLogDialogShadcnProps)
         <DialogHeader className="shrink-0 border-b border-border px-4 pt-4 pb-0">
           <DialogTitle>Settings</DialogTitle>
           <DialogDescription>
-            Action log and field direction
+            Field direction and action log
           </DialogDescription>
         </DialogHeader>
 
         <Tabs
-          defaultValue="log"
+          defaultValue="field"
           className="flex min-h-0 flex-1 flex-col gap-0"
         >
           <TabsList className="mx-4 mt-3 w-[calc(100%-2rem)] shrink-0">
-            <TabsTrigger value="log" className="flex-1">
-              Log
-            </TabsTrigger>
             <TabsTrigger value="field" className="flex-1">
               Field
+            </TabsTrigger>
+            <TabsTrigger value="log" className="flex-1">
+              Log
             </TabsTrigger>
           </TabsList>
 
           <div className="relative min-h-0 flex-1">
+            <TabsContent value="field" className={SETTINGS_TAB_CONTENT}>
+              <div className={SETTINGS_TAB_PANEL}>
+                <div className={SETTINGS_TAB_SCROLL}>
+                  {game ? (
+                    <FieldDirectionPicker
+                      fixtureId={fixtureId}
+                      homeAbbr={game.fixture.homeAbbr}
+                      homeAttacksRight={game.homeAttacksRight}
+                      variant="shadcn"
+                    />
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      Load a fixture to set field direction.
+                    </p>
+                  )}
+                </div>
+              </div>
+            </TabsContent>
+
             <TabsContent value="log" className={SETTINGS_TAB_CONTENT}>
               <div className={SETTINGS_TAB_PANEL}>
                 <div className="mb-3 flex shrink-0 items-center justify-between gap-3">
@@ -128,25 +147,6 @@ export function ActionLogDialogShadcn({ fixtureId }: ActionLogDialogShadcnProps)
                         </li>
                       ))}
                     </ol>
-                  )}
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="field" className={SETTINGS_TAB_CONTENT}>
-              <div className={SETTINGS_TAB_PANEL}>
-                <div className={SETTINGS_TAB_SCROLL}>
-                  {game ? (
-                    <FieldDirectionPicker
-                      fixtureId={fixtureId}
-                      homeAbbr={game.fixture.homeAbbr}
-                      homeAttacksRight={game.homeAttacksRight}
-                      variant="shadcn"
-                    />
-                  ) : (
-                    <p className="text-sm text-muted-foreground">
-                      Load a fixture to set field direction.
-                    </p>
                   )}
                 </div>
               </div>
