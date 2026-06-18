@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { ChevronLeft } from 'lucide-react'
 import type { GameState } from '@/types'
 import { ActionLogDialogShadcn } from '@/components/shadcn/ActionLogDialogShadcn'
+import { ConnectionStatusChip } from '@/components/shadcn/ConnectionStatusChip'
 import { TakeControlButton } from '@/components/game/TakeControlButton'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -22,15 +23,18 @@ export function GameHeaderShadcn({
   return (
     <header className="relative shrink-0 safe-x">
       <div className="relative grid grid-cols-[1fr_auto_1fr] items-center gap-3 py-3 landscape-mobile:py-2">
-        <Button
-          variant="outline"
-          size="icon"
-          className="z-10 justify-self-start"
-          render={<Link to="/fixtures" />}
-        >
-          <ChevronLeft />
-          <span className="sr-only">Back to fixtures</span>
-        </Button>
+        <div className="z-10 flex items-center gap-2 justify-self-start">
+          <Button
+            variant="outline"
+            size="icon"
+            className="justify-self-start"
+            render={<Link to="/fixtures" />}
+          >
+            <ChevronLeft />
+            <span className="sr-only">Back to fixtures</span>
+          </Button>
+          <ConnectionStatusChip />
+        </div>
 
         <div className="min-w-0" aria-hidden />
 
