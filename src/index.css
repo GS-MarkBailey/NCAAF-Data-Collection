@@ -213,7 +213,7 @@ textarea {
 
 @utility safe-x {
   padding-left: 1rem;
-  padding-right: max(1rem, env(safe-area-inset-right));
+  padding-right: 1rem;
 }
 
 @utility safe-l {
@@ -221,15 +221,19 @@ textarea {
 }
 
 @utility safe-r {
-  padding-right: max(1rem, env(safe-area-inset-right));
+  padding-right: 1rem;
 }
 
-html.ios-notch .safe-x {
-  padding-left: max(1rem, env(safe-area-inset-left));
-}
+@media (orientation: landscape) {
+  html.ios-notch.notch-side-left .safe-l,
+  html.ios-notch.notch-side-left .safe-x {
+    padding-left: max(1rem, env(safe-area-inset-left, 0px));
+  }
 
-html.ios-notch .safe-l {
-  padding-left: max(1rem, env(safe-area-inset-left));
+  html.ios-notch.notch-side-right .safe-r,
+  html.ios-notch.notch-side-right .safe-x {
+    padding-right: max(1rem, env(safe-area-inset-right, 0px));
+  }
 }
 
 @utility safe-b {

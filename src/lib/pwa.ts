@@ -35,7 +35,25 @@ export function detectIosWithNotch(): boolean {
 }
 
 export function markIosNotchDevice(): void {
-  document.documentElement.classList.toggle('ios-notch', detectIosWithNotch())
+  const root = document.documentElement
+  const hasNotch = detectIosWithNotch()
+  root.classList.toggle('ios-notch', hasNotch)
+
+  root.classList.remove('notch-side-left', 'notch-side-right')
+
+  if (!hasNotch) return
+
+  const isLandscape = window.matchMedia('(orientation: landscape)').matches
+  if (!isLandscape) return
+
+  const leftInset = measureSafeAreaInset('left')
+  const rightInset = measureSafeAreaInset('right')
+
+  if (leftInset >= rightInset) {
+    root.classList.add('notch-side-left')
+  } else {
+    root.classList.add('notch-side-right')
+  }
 }
 
 export function markStandaloneMode(): void {
