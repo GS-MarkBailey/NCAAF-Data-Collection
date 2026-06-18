@@ -20,7 +20,7 @@ export function FieldDirectionPicker({
   const setHomeAttacksRight = useAppStore((s) => s.setHomeAttacksRight)
 
   const buttonClass = cn(
-    'inline-flex items-center justify-center gap-2 rounded-[8px] border-2 px-4 py-2 text-sm font-semibold transition-colors',
+    'inline-flex items-center justify-center gap-2 rounded-[8px] border px-4 py-2 text-sm font-semibold transition-colors',
     variant === 'custom' &&
       'border-[var(--color-panel-border)] bg-[var(--color-panel)] text-[var(--color-text)] active:bg-[var(--color-play-card-bg)]',
     variant === 'shadcn' &&
@@ -29,8 +29,9 @@ export function FieldDirectionPicker({
 
   const selectedClass = cn(
     variant === 'custom' &&
-      'border-[var(--color-brand)] bg-[var(--color-play-card-bg)]',
-    variant === 'shadcn' && 'border-ring bg-muted',
+      'border-[var(--color-panel-border)] bg-[var(--color-primary-bg)] text-[var(--color-text)]',
+    variant === 'shadcn' &&
+      'border-border bg-secondary text-secondary-foreground hover:bg-secondary',
   )
 
   return (
