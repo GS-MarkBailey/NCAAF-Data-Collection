@@ -14,7 +14,8 @@ const RISKS: { key: RiskType; label: string; fullWidth?: boolean }[] = [
   { key: 'statDelay', label: 'Unreliable' },
   { key: 'bigPlay', label: 'Big Play' },
   { key: 'penalty', label: 'Penalty' },
-  { key: 'touchdown', label: 'Touchdown', fullWidth: true },
+  { key: 'touchdown', label: 'Touchdown' },
+  { key: 'playAboutToStart', label: 'Play About to Start' },
 ]
 
 interface RiskManagementPanelShadcnProps {

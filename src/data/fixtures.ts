@@ -278,6 +278,7 @@ export function createInitialGameState(fixture: Fixture): GameState {
       bigPlay: false,
       penalty: false,
       touchdown: false,
+      playAboutToStart: false,
     },
     takeControlActive: false,
     plays: [],

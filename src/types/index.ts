@@ -4,6 +4,7 @@ export type RiskType =
   | 'bigPlay'
   | 'penalty'
   | 'touchdown'
+  | 'playAboutToStart'
 
 export interface Fixture {
   id: string

@@ -8,6 +8,7 @@ const RISK_LABELS: Record<RiskType, string> = {
   bigPlay: 'Big Play',
   penalty: 'Penalty',
   touchdown: 'Touchdown',
+  playAboutToStart: 'Play About to Start',
 }
 
 export function createUserAction<T extends UserActionType>(
