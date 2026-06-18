@@ -27,12 +27,8 @@ export function FieldDirectionPicker({
       'border-border bg-background text-foreground hover:bg-muted',
   )
 
-  const selectedClass = cn(
-    variant === 'custom' &&
-      'border-[var(--color-panel-border)] bg-[var(--color-primary-bg)] text-[var(--color-text)]',
-    variant === 'shadcn' &&
-      'border-border bg-secondary text-secondary-foreground hover:bg-secondary',
-  )
+  const selectedClass =
+    'border-[var(--color-brand)] bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]'
 
   return (
     <div className={cn('grid grid-cols-2 gap-2', className)}>
