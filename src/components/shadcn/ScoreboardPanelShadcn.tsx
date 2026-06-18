@@ -3,9 +3,11 @@ import { LayoutGrid, Minus, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { formatClock } from '@/lib/format'
 import {
+  getQuarterStatus,
   isAwaitingQuarterStart,
   isRegulationComplete,
   nextQuarterNumber,
+  type QuarterStatus,
 } from '@/lib/clock'
 import { usePushPulse } from '@/hooks/usePushPulse'
 import { useAppStore } from '@/store/gameStore'
@@ -140,7 +142,14 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
 
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-border">
           <div className="flex min-h-0 flex-1 items-stretch">
-            <StatCell label="QTR" value={clockPeriod} />
+            <StatCell
+              label="QTR"
+              value={clockPeriod}
+              status={getQuarterStatus({
+                seconds: clockSeconds,
+                running: clockRunning,
+              })}
+            />
             <StatCell label="DOWN" value={down} />
             <StatCell label="TO GO" value={distance} />
             <BallOnStatCell
@@ -188,16 +197,39 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
   )
 }
 
-function StatCell({ label, value }: { label: string; value: number }) {
+const QUARTER_STATUS_CLASS: Record<
+  QuarterStatus,
+  { className: string; pulseEnd: string }
+> = {
+  in_play: { className: 'bg-emerald-50', pulseEnd: '#ecfdf5' },
+  in_progress: { className: 'bg-amber-50', pulseEnd: '#fffbeb' },
+  ended: { className: 'bg-red-50', pulseEnd: '#fef2f2' },
+}
+
+function StatCell({
+  label,
+  value,
+  status,
+}: {
+  label: string
+  value: number
+  status?: QuarterStatus
+}) {
   const pulsing = usePushPulse(value)
+  const statusStyle = status ? QUARTER_STATUS_CLASS[status] : undefined
 
   return (
     <div
       className={cn(
         'flex h-full min-h-0 flex-1 flex-col items-center justify-center border-r border-border px-1 py-4 last:border-r-0 landscape-mobile:py-3',
+        statusStyle?.className,
         pulsing && 'push-data-pulse',
       )}
-      style={{ '--push-pulse-end': 'var(--card)' } as CSSProperties}
+      style={
+        {
+          '--push-pulse-end': statusStyle?.pulseEnd ?? 'var(--card)',
+        } as CSSProperties
+      }
     >
       <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
         {label}

@@ -19,3 +19,14 @@ export function isRegulationComplete(clock: {
 export function nextQuarterNumber(period: number): number {
   return period + 1
 }
+
+export type QuarterStatus = 'in_play' | 'in_progress' | 'ended'
+
+export function getQuarterStatus(clock: {
+  seconds: number
+  running: boolean
+}): QuarterStatus {
+  if (clock.seconds === 0) return 'ended'
+  if (clock.running) return 'in_play'
+  return 'in_progress'
+}
