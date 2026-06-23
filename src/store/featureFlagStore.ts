@@ -7,6 +7,10 @@ import {
 } from '@/config/featureFlags'
 
 const STORAGE_KEY = 'ncaaf-feature-flags'
+const STORAGE_VERSION_KEY = 'ncaaf-feature-flags-version'
+const STORAGE_VERSION = 2
+
+const LOCKED_ON_FLAGS: FeatureFlagId[] = ['header.settings']
 
 type FeatureFlagState = Record<FeatureFlagId, boolean>
 
@@ -33,12 +37,25 @@ function mergeWithCodeDefaults(
   return { ...DEFAULT_FEATURE_FLAGS, ...partial }
 }
 
+function createFactoryState(): PersistedFeatureFlags {
+  const defaults = { ...DEFAULT_FEATURE_FLAGS }
+  return { active: defaults, savedDefaults: defaults }
+}
+
 function loadPersistedState(): PersistedFeatureFlags {
   try {
+    const storedVersion = Number(localStorage.getItem(STORAGE_VERSION_KEY) ?? 0)
+    if (storedVersion < STORAGE_VERSION) {
+      localStorage.removeItem(STORAGE_KEY)
+      localStorage.setItem(STORAGE_VERSION_KEY, String(STORAGE_VERSION))
+      const factory = createFactoryState()
+      persistState(factory)
+      return factory
+    }
+
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) {
-      const defaults = { ...DEFAULT_FEATURE_FLAGS }
-      return { active: defaults, savedDefaults: defaults }
+      return createFactoryState()
     }
 
     const parsed = JSON.parse(raw) as Partial<PersistedFeatureFlags> & Partial<FeatureFlagState>
@@ -54,8 +71,7 @@ function loadPersistedState(): PersistedFeatureFlags {
 
     return { active, savedDefaults }
   } catch {
-    const defaults = { ...DEFAULT_FEATURE_FLAGS }
-    return { active: defaults, savedDefaults: defaults }
+    return createFactoryState()
   }
 }
 
@@ -69,11 +85,33 @@ function flagsEqual(a: FeatureFlagState, b: FeatureFlagState): boolean {
 
 const initialState = loadPersistedState()
 
+function applyFactoryReset(): void {
+  const factory = createFactoryState()
+  persistState(factory)
+  useFeatureFlagStore.setState({
+    flags: factory.active,
+    savedDefaults: factory.savedDefaults,
+  })
+}
+
+export function initFeatureFlags(): void {
+  const params = new URLSearchParams(window.location.search)
+  if (params.has('resetFeatureFlags')) {
+    applyFactoryReset()
+    params.delete('resetFeatureFlags')
+    const nextSearch = params.toString()
+    const nextUrl = `${window.location.pathname}${nextSearch ? `?${nextSearch}` : ''}${window.location.hash}`
+    window.history.replaceState({}, '', nextUrl)
+  }
+}
+
 export const useFeatureFlagStore = create<FeatureFlagStore>((set, get) => ({
   flags: initialState.active,
   savedDefaults: initialState.savedDefaults,
 
   setFlag: (id, enabled) => {
+    if (!enabled && LOCKED_ON_FLAGS.includes(id)) return
+
     set((state) => {
       const flags = { ...state.flags, [id]: enabled }
       persistState({ active: flags, savedDefaults: state.savedDefaults })
@@ -109,9 +147,7 @@ export const useFeatureFlagStore = create<FeatureFlagStore>((set, get) => ({
   },
 
   resetToFactoryDefaults: () => {
-    const defaults = { ...DEFAULT_FEATURE_FLAGS }
-    persistState({ active: defaults, savedDefaults: defaults })
-    set({ flags: defaults, savedDefaults: defaults })
+    applyFactoryReset()
   },
 
   hasPendingChanges: () => !flagsEqual(get().flags, get().savedDefaults),

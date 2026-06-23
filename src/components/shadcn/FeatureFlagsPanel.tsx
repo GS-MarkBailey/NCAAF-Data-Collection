@@ -73,6 +73,7 @@ export function FeatureFlagsPanel() {
                       'parent' in flag ? (flag.parent as FeatureFlagId) : undefined
                     const parentDisabled =
                       parentId != null && !isEnabled(parentId)
+                    const lockedOn = flag.id === 'header.settings'
                     const isPending = flags[flag.id] !== savedDefaults[flag.id]
 
                     return (
@@ -81,12 +82,16 @@ export function FeatureFlagsPanel() {
                           id={flag.id}
                           label={flag.label}
                           description={
-                            'description' in flag ? flag.description : undefined
+                            lockedOn
+                              ? 'Always enabled so settings stay accessible.'
+                              : 'description' in flag
+                                ? flag.description
+                                : undefined
                           }
                           nested={parentId != null}
                           pending={isPending}
                           checked={flags[flag.id]}
-                          disabled={parentDisabled}
+                          disabled={parentDisabled || lockedOn}
                           onCheckedChange={(checked) => setFlag(flag.id, checked)}
                         />
                       </li>
