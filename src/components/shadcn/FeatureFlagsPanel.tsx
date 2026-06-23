@@ -103,7 +103,7 @@ export function FeatureFlagsPanel() {
             })}
           </div>
 
-          <div className="flex flex-wrap items-center justify-end gap-2 border-t border-border pt-3">
+          <div className="sticky bottom-0 z-10 -mx-1 flex flex-wrap items-center justify-end gap-2 border-t border-border bg-background px-1 pt-3 pb-1">
             <Button
               variant="outline"
               size="sm"
@@ -119,7 +119,12 @@ export function FeatureFlagsPanel() {
             >
               Discard
             </Button>
-            <Button size="sm" disabled={!isDirty} onClick={() => setConfirmOpen(true)}>
+            <Button
+              size="sm"
+              disabled={!isDirty}
+              onClick={() => setConfirmOpen(true)}
+              className="bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)] disabled:bg-secondary disabled:text-secondary-foreground disabled:opacity-100"
+            >
               Confirm as default
             </Button>
           </div>
@@ -145,6 +150,7 @@ export function FeatureFlagsPanel() {
                 confirmAsDefault()
                 setConfirmOpen(false)
               }}
+              className="bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
             >
               Confirm
             </Button>
