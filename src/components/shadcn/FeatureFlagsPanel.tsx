@@ -41,22 +41,23 @@ export function FeatureFlagsPanel() {
 
   return (
     <>
-      <div className="flex min-h-0 flex-1 flex-col gap-3">
-        <div className="shrink-0 space-y-3">
-          {isDirty ? (
-            <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-950">
-              {pendingCount} unsaved change{pendingCount === 1 ? '' : 's'} —
-              previewing now, not yet saved as default.
-            </div>
-          ) : (
-            <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-950">
-              Current setup matches your saved default experience.
-            </div>
-          )}
-        </div>
+      <div className="flex h-full min-h-0 flex-1 flex-col overflow-y-auto overscroll-y-contain">
+        <div className="flex flex-col gap-3 pr-1">
+          <div className="space-y-3">
+            {isDirty ? (
+              <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-950">
+                {pendingCount} unsaved change{pendingCount === 1 ? '' : 's'} —
+                previewing now, not yet saved as default.
+              </div>
+            ) : (
+              <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-950">
+                Current setup matches your saved default experience.
+              </div>
+            )}
+          </div>
 
-        <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
-          {FEATURE_FLAG_GROUPS.map((group) => {
+          <div className="space-y-4">
+            {FEATURE_FLAG_GROUPS.map((group) => {
             const groupFlags = FEATURE_FLAGS.filter((flag) => flag.group === group)
 
             if (groupFlags.length === 0) return null
@@ -94,28 +95,29 @@ export function FeatureFlagsPanel() {
                 </ul>
               </section>
             )
-          })}
-        </div>
+            })}
+          </div>
 
-        <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-border pt-3">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setFactoryResetOpen(true)}
-          >
-            Factory reset
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={discardChanges}
-            disabled={!isDirty}
-          >
-            Discard
-          </Button>
-          <Button size="sm" disabled={!isDirty} onClick={() => setConfirmOpen(true)}>
-            Confirm as default
-          </Button>
+          <div className="flex flex-wrap items-center justify-end gap-2 border-t border-border pt-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setFactoryResetOpen(true)}
+            >
+              Factory reset
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={discardChanges}
+              disabled={!isDirty}
+            >
+              Discard
+            </Button>
+            <Button size="sm" disabled={!isDirty} onClick={() => setConfirmOpen(true)}>
+              Confirm as default
+            </Button>
+          </div>
         </div>
       </div>
 

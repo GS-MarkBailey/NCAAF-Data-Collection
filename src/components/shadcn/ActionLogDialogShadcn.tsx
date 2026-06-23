@@ -172,7 +172,7 @@ export function ActionLogDialogShadcn({ fixtureId }: ActionLogDialogShadcnProps)
             ) : null}
 
             <TabsContent value="features" className={SETTINGS_TAB_CONTENT}>
-              <div className={SETTINGS_TAB_PANEL}>
+              <div className={`${SETTINGS_TAB_PANEL} h-full`}>
                 <FeatureFlagsPanel />
               </div>
             </TabsContent>
