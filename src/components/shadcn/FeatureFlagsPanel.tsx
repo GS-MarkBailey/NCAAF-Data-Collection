@@ -43,11 +43,6 @@ export function FeatureFlagsPanel() {
     <>
       <div className="flex min-h-0 flex-1 flex-col gap-3">
         <div className="shrink-0 space-y-3">
-          <p className="text-sm text-muted-foreground">
-            Toggle features to preview changes live. Confirm when ready to save
-            this setup as the default experience for this browser.
-          </p>
-
           {isDirty ? (
             <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-950">
               {pendingCount} unsaved change{pendingCount === 1 ? '' : 's'} —
