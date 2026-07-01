@@ -79,14 +79,6 @@ export const FEATURE_FLAGS = [
     defaultEnabled: true,
   },
   {
-    id: 'scoreboard.clockAdjust',
-    label: 'Clock adjust buttons',
-    description: 'Legacy plus and minus controls beside the game clock.',
-    group: 'Scoreboard',
-    parent: 'game.scoreboard',
-    defaultEnabled: false,
-  },
-  {
     id: 'scoreboard.possessionSwitch',
     label: 'Possession switch',
     description: 'Home / away possession selector.',

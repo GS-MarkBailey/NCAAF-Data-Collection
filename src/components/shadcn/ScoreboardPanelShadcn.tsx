@@ -1,5 +1,5 @@
 import { useState, type CSSProperties } from 'react'
-import { LayoutGrid, Minus, Plus } from 'lucide-react'
+import { LayoutGrid } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { formatClock } from '@/lib/format'
 import {
@@ -56,11 +56,9 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
     clockPeriod,
   )
 
-  const adjustClock = useAppStore((s) => s.adjustClock)
   const setClockTime = useAppStore((s) => s.setClockTime)
   const setPossession = useAppStore((s) => s.setPossession)
   const showQuarterStatus = useFeatureFlag('scoreboard.quarterStatus')
-  const showClockAdjust = useFeatureFlag('scoreboard.clockAdjust')
   const showPossessionSwitch = useFeatureFlag('scoreboard.possessionSwitch')
 
   const [editingClock, setEditingClock] = useState(false)
@@ -105,17 +103,6 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
       </CardHeader>
       <CardContent className="flex min-h-0 flex-1 flex-col gap-2">
         <div className="flex min-h-0 flex-1 items-stretch overflow-hidden rounded-lg border border-border">
-          {showClockAdjust && !editingClock ? (
-            <Button
-              variant="ghost"
-              className="h-full min-h-0 rounded-none border-0 border-r border-border px-3 active:bg-[var(--color-primary-bg)]"
-              onClick={() => adjustClock(fixtureId, -1)}
-              aria-label="Decrease clock by 1 second"
-            >
-              <Minus />
-            </Button>
-          ) : null}
-
           {editingClock ? (
             <div className="grid h-full min-h-0 flex-1 grid-rows-[minmax(0,1fr)_auto] overflow-hidden">
               <ClockWheelEditor
@@ -147,7 +134,6 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
               type="button"
               className={cn(
                 'flex h-full min-h-0 flex-1 flex-col items-center justify-center gap-2 rounded-none border-0 bg-transparent px-2 transition-colors',
-                showClockAdjust && 'border-r border-border',
                 awaitingQuarterStart && 'bg-[var(--color-primary-bg)]',
                 regulationComplete && 'bg-muted',
                 !regulationComplete && 'hover:bg-muted/40 active:bg-muted/60',
@@ -172,17 +158,6 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
               )}
             </button>
           )}
-
-          {showClockAdjust && !editingClock ? (
-            <Button
-              variant="ghost"
-              className="h-full min-h-0 rounded-none border-0 px-3 active:bg-[var(--color-primary-bg)]"
-              onClick={() => adjustClock(fixtureId, 1)}
-              aria-label="Increase clock by 1 second"
-            >
-              <Plus />
-            </Button>
-          ) : null}
         </div>
 
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-border">
