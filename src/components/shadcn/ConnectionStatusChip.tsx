@@ -23,7 +23,7 @@ const STATUS_STYLE: Record<
   }
 > = {
   online: {
-    label: 'online',
+    label: 'connected',
     dotClassName: 'bg-emerald-500',
     chipClassName: 'border-emerald-200 bg-emerald-50 text-emerald-800',
     textClassName: 'text-emerald-700',
