@@ -1,10 +1,7 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 
 const ITEM_HEIGHT = 28
-const VISIBLE_ROWS = 3
-const PADDING_ROWS = Math.floor(VISIBLE_ROWS / 2)
-const WHEEL_VIEWPORT_HEIGHT = ITEM_HEIGHT * VISIBLE_ROWS
 
 export const CLOCK_MINUTE_VALUES = Array.from({ length: 16 }, (_, index) => index)
 export const CLOCK_SECOND_VALUES = Array.from({ length: 60 }, (_, index) => index)
@@ -21,8 +18,24 @@ export function ClockWheelColumn({
   onChange,
 }: ClockWheelColumnProps) {
   const scrollerRef = useRef<HTMLDivElement>(null)
+  const viewportRef = useRef<HTMLDivElement>(null)
   const settleTimerRef = useRef<number | undefined>(undefined)
   const isDraggingRef = useRef(false)
+  const [edgePadding, setEdgePadding] = useState(0)
+
+  useEffect(() => {
+    const viewport = viewportRef.current
+    if (!viewport) return
+
+    const updatePadding = () => {
+      setEdgePadding(Math.max(0, (viewport.clientHeight - ITEM_HEIGHT) / 2))
+    }
+
+    updatePadding()
+    const observer = new ResizeObserver(updatePadding)
+    observer.observe(viewport)
+    return () => observer.disconnect()
+  }, [])
 
   const scrollToValue = useCallback(
     (nextValue: number, behavior: ScrollBehavior = 'auto') => {
@@ -42,7 +55,7 @@ export function ClockWheelColumn({
 
   useEffect(() => {
     scrollToValue(value)
-  }, [scrollToValue, value])
+  }, [edgePadding, scrollToValue, value])
 
   const settleSelection = useCallback(() => {
     const scroller = scrollerRef.current
@@ -66,10 +79,10 @@ export function ClockWheelColumn({
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col items-center overflow-hidden">
+    <div className="flex h-full min-h-0 flex-1 flex-col items-center overflow-hidden">
       <div
-        className="relative w-full max-w-[4rem] shrink-0 overflow-hidden"
-        style={{ height: WHEEL_VIEWPORT_HEIGHT }}
+        ref={viewportRef}
+        className="relative h-full min-h-0 w-full max-w-[4rem] overflow-hidden"
       >
         <div className="pointer-events-none absolute inset-x-0 top-1/2 z-10 h-7 -translate-y-1/2 rounded-md border-y border-border bg-muted/40" />
         <div
@@ -94,7 +107,7 @@ export function ClockWheelColumn({
             settleTimerRef.current = window.setTimeout(settleSelection, 100)
           }}
         >
-          <div style={{ height: ITEM_HEIGHT * PADDING_ROWS }} aria-hidden />
+          <div style={{ height: edgePadding }} aria-hidden />
           {values.map((option) => {
             const selected = option === value
             return (
@@ -112,7 +125,7 @@ export function ClockWheelColumn({
               </div>
             )
           })}
-          <div style={{ height: ITEM_HEIGHT * PADDING_ROWS }} aria-hidden />
+          <div style={{ height: edgePadding }} aria-hidden />
         </div>
       </div>
     </div>
@@ -133,7 +146,7 @@ export function ClockWheelEditor({
   onSecondsChange,
 }: ClockWheelEditorProps) {
   return (
-    <div className="flex min-h-0 flex-1 items-center justify-center gap-1.5 overflow-hidden px-1 py-1">
+    <div className="flex h-full min-h-0 items-center justify-center gap-1.5 overflow-hidden px-1">
       <ClockWheelColumn
         values={CLOCK_MINUTE_VALUES}
         value={minutes}
