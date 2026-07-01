@@ -17,6 +17,7 @@ import { useAppStore } from '@/store/gameStore'
 import { getEffectiveHomeAttacksRight } from '@/lib/playSimulation'
 import { BallOnStatCell } from '@/components/game/BallOnStatCell'
 import { ClockWheelEditor } from '@/components/game/ClockWheelEditor'
+import { PeriodControl } from '@/components/game/PeriodControl'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -57,6 +58,7 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
   )
 
   const setClockTime = useAppStore((s) => s.setClockTime)
+  const setClockPeriod = useAppStore((s) => s.setClockPeriod)
   const setPossession = useAppStore((s) => s.setPossession)
   const showQuarterStatus = useFeatureFlag('scoreboard.quarterStatus')
   const showPossessionSwitch = useFeatureFlag('scoreboard.possessionSwitch')
@@ -103,6 +105,10 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
       </CardHeader>
       <CardContent className="flex min-h-0 flex-1 flex-col gap-2">
         <div className="flex min-h-0 flex-1 items-stretch overflow-hidden rounded-lg border border-border">
+          <PeriodControl
+            period={clockPeriod}
+            onPeriodChange={(period) => setClockPeriod(fixtureId, period)}
+          />
           {editingClock ? (
             <div className="grid h-full min-h-0 flex-1 grid-rows-[minmax(0,1fr)_auto] overflow-hidden">
               <ClockWheelEditor
@@ -133,7 +139,7 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
             <button
               type="button"
               className={cn(
-                'flex h-full min-h-0 flex-1 flex-col items-center justify-center gap-2 rounded-none border-0 bg-transparent px-2 transition-colors',
+                'flex h-full min-h-0 min-w-0 flex-1 flex-col items-center justify-center gap-2 rounded-none border-0 bg-transparent px-2 transition-colors',
                 awaitingQuarterStart && 'bg-[var(--color-primary-bg)]',
                 regulationComplete && 'bg-muted',
                 !regulationComplete && 'hover:bg-muted/40 active:bg-muted/60',

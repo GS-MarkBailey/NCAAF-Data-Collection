@@ -6,6 +6,7 @@ import { appendAction, createUserAction } from '@/lib/actionLog'
 import { tickPlaySimulation, createInitialSimulation, createQuarterStartPlay } from '@/lib/playSimulation'
 import {
   QUARTER_LENGTH_SECONDS,
+  clampPeriod,
   isAwaitingQuarterStart,
 } from '@/lib/clock'
 
@@ -23,6 +24,7 @@ interface AppStore {
   toggleClock: (fixtureId: string) => void
   adjustClock: (fixtureId: string, delta: number) => void
   setClockTime: (fixtureId: string, seconds: number) => void
+  setClockPeriod: (fixtureId: string, period: number) => void
   startNextQuarter: (fixtureId: string) => void
   setPossession: (fixtureId: string, possessionIsHome: boolean) => void
   setHomeAttacksRight: (fixtureId: string, homeAttacksRight: boolean) => void
@@ -194,6 +196,40 @@ export const useAppStore = create<AppStore>((set, get) => ({
             {
               type: 'clock_adjust',
               payload: { delta, seconds: nextSeconds },
+            },
+            clockBefore,
+          ),
+        ),
+      }
+    })
+  },
+
+  setClockPeriod: (fixtureId, period) => {
+    set((state) => {
+      const game = state.games[fixtureId]
+      if (!game) return state
+
+      const toPeriod = clampPeriod(period)
+      if (toPeriod === game.clock.period) return state
+
+      const fromPeriod = game.clock.period
+      const clockBefore = {
+        seconds: game.clock.seconds,
+        period: game.clock.period,
+      }
+
+      return {
+        games: updateGame(state.games, fixtureId, (g) => ({
+          ...g,
+          clock: { ...g.clock, period: toPeriod },
+        })),
+        actionLogs: appendAction(
+          state.actionLogs,
+          createUserAction(
+            fixtureId,
+            {
+              type: 'period_set',
+              payload: { fromPeriod, toPeriod },
             },
             clockBefore,
           ),

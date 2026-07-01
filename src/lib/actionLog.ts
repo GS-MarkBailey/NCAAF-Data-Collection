@@ -71,6 +71,8 @@ export function formatActionLabel(action: UserAction): string {
       const direction = action.payload.delta > 0 ? 'increased' : 'decreased'
       return `Clock ${direction} by ${Math.abs(action.payload.delta)}s → ${formatClock(action.payload.seconds)}`
     }
+    case 'period_set':
+      return `Period Q${action.payload.fromPeriod} → Q${action.payload.toPeriod}`
     case 'quarter_start':
       return `Quarter ${action.payload.toPeriod} started (${formatClock(action.payload.seconds)})`
     case 'possession_toggle':
@@ -90,6 +92,8 @@ export function formatActionType(action: UserAction): string {
       return 'Clock'
     case 'clock_adjust':
       return 'Clock Adjust'
+    case 'period_set':
+      return 'Period'
     case 'quarter_start':
       return 'Quarter Start'
     case 'possession_toggle':
