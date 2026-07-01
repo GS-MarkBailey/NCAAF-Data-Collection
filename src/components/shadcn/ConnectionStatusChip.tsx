@@ -1,120 +1,169 @@
-import { useState } from 'react'
+import { ChevronDown } from 'lucide-react'
+import { Popover } from '@base-ui/react/popover'
 import { cn } from '@/lib/utils'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 
-export type ConnectionSubstatus =
+export type ConnectionStatusKind =
   | 'online'
   | 'offline'
   | 'reconnecting'
   | 'degraded'
 
-const SUBSTATUS_OPTIONS: {
-  id: ConnectionSubstatus
+export interface ConnectionStatusItem {
   label: string
-  dotClassName: string
-  chipClassName: string
-}[] = [
+  status: ConnectionStatusKind
+}
+
+const STATUS_STYLE: Record<
+  ConnectionStatusKind,
   {
-    id: 'online',
+    label: string
+    dotClassName: string
+    chipClassName: string
+    textClassName: string
+  }
+> = {
+  online: {
     label: 'online',
     dotClassName: 'bg-emerald-500',
     chipClassName: 'border-emerald-200 bg-emerald-50 text-emerald-800',
+    textClassName: 'text-emerald-700',
   },
-  {
-    id: 'offline',
+  offline: {
     label: 'offline',
     dotClassName: 'bg-red-500',
     chipClassName: 'border-red-200 bg-red-50 text-red-800',
+    textClassName: 'text-red-700',
   },
-  {
-    id: 'reconnecting',
+  reconnecting: {
     label: 'reconnecting',
     dotClassName: 'bg-amber-500',
     chipClassName: 'border-amber-200 bg-amber-50 text-amber-900',
+    textClassName: 'text-amber-800',
   },
-  {
-    id: 'degraded',
+  degraded: {
     label: 'degraded',
     dotClassName: 'bg-orange-500',
     chipClassName: 'border-orange-200 bg-orange-50 text-orange-900',
+    textClassName: 'text-orange-800',
   },
+}
+
+const STATUS_PRIORITY: Record<ConnectionStatusKind, number> = {
+  online: 1,
+  degraded: 2,
+  reconnecting: 3,
+  offline: 4,
+}
+
+const PROTOTYPE_STATUSES: ConnectionStatusItem[] = [
+  { label: 'Live feed', status: 'online' },
+  { label: 'Stats sync', status: 'online' },
+  { label: 'Play clock', status: 'online' },
+  { label: 'Scoreboard', status: 'online' },
 ]
 
-const SUBSTATUS_BY_ID = Object.fromEntries(
-  SUBSTATUS_OPTIONS.map((option) => [option.id, option]),
-) as Record<ConnectionSubstatus, (typeof SUBSTATUS_OPTIONS)[number]>
+function getSummaryStatus(
+  statuses: ConnectionStatusItem[],
+): ConnectionStatusKind {
+  return statuses.reduce<ConnectionStatusKind>(
+    (worst, item) =>
+      STATUS_PRIORITY[item.status] > STATUS_PRIORITY[worst]
+        ? item.status
+        : worst,
+    'online',
+  )
+}
 
-function StatusIndicator({
-  label,
-  dotClassName,
-}: {
-  label: string
-  dotClassName: string
-}) {
+function StatusDot({ className }: { className: string }) {
   return (
-    <>
-      <span
-        className={cn('size-2 shrink-0 rounded-full', dotClassName)}
-        aria-hidden
-      />
-      {label}
-    </>
+    <span
+      className={cn('size-2 shrink-0 rounded-full', className)}
+      aria-hidden
+    />
   )
 }
 
 interface ConnectionStatusChipProps {
-  status?: ConnectionSubstatus
-  onStatusChange?: (status: ConnectionSubstatus) => void
+  /** Overall status shown on the chip. Derived from `statuses` when omitted. */
+  summary?: ConnectionStatusKind
+  /** Up to four named connection statuses shown in the dropdown. */
+  statuses?: ConnectionStatusItem[]
 }
 
 export function ConnectionStatusChip({
-  status: statusProp,
-  onStatusChange,
+  summary,
+  statuses = PROTOTYPE_STATUSES,
 }: ConnectionStatusChipProps) {
-  const [internalStatus, setInternalStatus] =
-    useState<ConnectionSubstatus>('online')
-  const status = statusProp ?? internalStatus
-  const config = SUBSTATUS_BY_ID[status]
+  const items = statuses.slice(0, 4)
+  const summaryStatus = summary ?? getSummaryStatus(items)
+  const summaryConfig = STATUS_STYLE[summaryStatus]
+  const hasDropdown = items.length > 0
 
-  const handleChange = (value: ConnectionSubstatus | null) => {
-    if (!value) return
-    setInternalStatus(value)
-    onStatusChange?.(value)
+  const chip = (
+    <span
+      className={cn(
+        'group/badge inline-flex h-7 w-fit shrink-0 items-center justify-center gap-1.5 overflow-hidden rounded-4xl border px-2 py-0.5 text-xs font-medium whitespace-nowrap normal-case transition-all',
+        summaryConfig.chipClassName,
+        hasDropdown && 'cursor-pointer',
+      )}
+    >
+      <StatusDot className={summaryConfig.dotClassName} />
+      {summaryConfig.label}
+      {hasDropdown ? (
+        <ChevronDown className="size-3 opacity-60" aria-hidden />
+      ) : null}
+    </span>
+  )
+
+  if (!hasDropdown) {
+    return chip
   }
 
   return (
-    <Select value={status} onValueChange={handleChange}>
-      <SelectTrigger
-        size="sm"
-        aria-label="Connection status"
-        className={cn(
-          'h-7 gap-1.5 border px-2 text-xs font-medium normal-case shadow-none',
-          config.chipClassName,
-        )}
+    <Popover.Root>
+      <Popover.Trigger
+        type="button"
+        aria-label="Connection status details"
+        className="rounded-4xl outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
       >
-        <SelectValue>
-          <StatusIndicator
-            label={config.label}
-            dotClassName={config.dotClassName}
-          />
-        </SelectValue>
-      </SelectTrigger>
-      <SelectContent align="start" className="min-w-[9.5rem]">
-        {SUBSTATUS_OPTIONS.map((option) => (
-          <SelectItem key={option.id} value={option.id}>
-            <StatusIndicator
-              label={option.label}
-              dotClassName={option.dotClassName}
-            />
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+        {chip}
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Positioner side="bottom" align="start" sideOffset={6}>
+          <Popover.Popup
+            className={cn(
+              'z-50 min-w-[11rem] rounded-lg border bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10',
+              'data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95',
+              'data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95',
+            )}
+          >
+            <ul className="flex flex-col gap-0.5">
+              {items.map((item) => {
+                const config = STATUS_STYLE[item.status]
+                return (
+                  <li
+                    key={item.label}
+                    className="flex items-center justify-between gap-3 rounded-md px-2 py-1.5 text-xs"
+                  >
+                    <span className="font-medium text-foreground">
+                      {item.label}
+                    </span>
+                    <span
+                      className={cn(
+                        'inline-flex items-center gap-1.5 font-medium normal-case',
+                        config.textClassName,
+                      )}
+                    >
+                      <StatusDot className={config.dotClassName} />
+                      {config.label}
+                    </span>
+                  </li>
+                )
+              })}
+            </ul>
+          </Popover.Popup>
+        </Popover.Positioner>
+      </Popover.Portal>
+    </Popover.Root>
   )
 }
