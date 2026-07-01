@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { cn } from '@/lib/utils'
 
-const ITEM_HEIGHT = 36
-const VISIBLE_ROWS = 5
+const ITEM_HEIGHT = 28
+const VISIBLE_ROWS = 3
 const PADDING_ROWS = Math.floor(VISIBLE_ROWS / 2)
+const WHEEL_VIEWPORT_HEIGHT = ITEM_HEIGHT * VISIBLE_ROWS
 
 export const CLOCK_MINUTE_VALUES = Array.from({ length: 16 }, (_, index) => index)
 export const CLOCK_SECOND_VALUES = Array.from({ length: 60 }, (_, index) => index)
@@ -67,15 +68,15 @@ export function ClockWheelColumn({
   }
 
   return (
-    <div className="flex min-w-0 flex-1 flex-col items-center">
-      <span className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+    <div className="flex min-h-0 flex-1 flex-col items-center overflow-hidden">
+      <span className="mb-0.5 shrink-0 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
         {label}
       </span>
       <div
-        className="relative w-full max-w-[4.5rem]"
-        style={{ height: ITEM_HEIGHT * VISIBLE_ROWS }}
+        className="relative w-full max-w-[4rem] shrink-0 overflow-hidden"
+        style={{ height: WHEEL_VIEWPORT_HEIGHT }}
       >
-        <div className="pointer-events-none absolute inset-x-0 top-1/2 z-10 h-9 -translate-y-1/2 rounded-md border-y border-border bg-muted/40" />
+        <div className="pointer-events-none absolute inset-x-0 top-1/2 z-10 h-7 -translate-y-1/2 rounded-md border-y border-border bg-muted/40" />
         <div
           ref={scrollerRef}
           className={cn(
@@ -105,10 +106,10 @@ export function ClockWheelColumn({
               <div
                 key={option}
                 className={cn(
-                  'flex snap-center items-center justify-center tabular-nums transition-[transform,opacity,color]',
+                  'flex snap-center items-center justify-center tabular-nums transition-[opacity,color]',
                   selected
-                    ? 'scale-110 text-2xl font-bold text-foreground'
-                    : 'text-lg text-muted-foreground/70',
+                    ? 'text-xl font-bold text-foreground'
+                    : 'text-base text-muted-foreground/70',
                 )}
                 style={{ height: ITEM_HEIGHT }}
               >
@@ -137,14 +138,14 @@ export function ClockWheelEditor({
   onSecondsChange,
 }: ClockWheelEditorProps) {
   return (
-    <div className="flex min-h-0 flex-1 items-center justify-center gap-2 px-2">
+    <div className="flex min-h-0 flex-1 items-center justify-center gap-1.5 overflow-hidden px-1 py-1">
       <ClockWheelColumn
         label="Min"
         values={CLOCK_MINUTE_VALUES}
         value={minutes}
         onChange={onMinutesChange}
       />
-      <span className="pb-5 text-2xl font-bold leading-none text-muted-foreground">
+      <span className="shrink-0 self-center pb-4 text-xl font-bold leading-none text-muted-foreground">
         :
       </span>
       <ClockWheelColumn

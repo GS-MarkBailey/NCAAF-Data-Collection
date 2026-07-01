@@ -117,14 +117,16 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
           ) : null}
 
           {editingClock ? (
-            <div className="flex h-full min-h-0 flex-1 flex-col">
-              <ClockWheelEditor
-                minutes={draftMinutes}
-                seconds={draftSeconds}
-                onMinutesChange={setDraftMinutes}
-                onSecondsChange={setDraftSeconds}
-              />
-              <div className="flex shrink-0 gap-2 border-t border-border p-2">
+            <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
+              <div className="min-h-0 flex-1 overflow-hidden">
+                <ClockWheelEditor
+                  minutes={draftMinutes}
+                  seconds={draftSeconds}
+                  onMinutesChange={setDraftMinutes}
+                  onSecondsChange={setDraftSeconds}
+                />
+              </div>
+              <div className="relative z-10 flex shrink-0 gap-2 border-t border-border bg-background p-2">
                 <Button
                   variant="outline"
                   size="sm"
