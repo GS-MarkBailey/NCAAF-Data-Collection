@@ -1,4 +1,4 @@
-import { useState, type CSSProperties } from 'react'
+import { useState, type CSSProperties, type KeyboardEvent } from 'react'
 import { LayoutGrid } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { formatClock } from '@/lib/format'
@@ -58,6 +58,8 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
 
   const setClockTime = useAppStore((s) => s.setClockTime)
   const setClockPeriod = useAppStore((s) => s.setClockPeriod)
+  const toggleClock = useAppStore((s) => s.toggleClock)
+  const startNextQuarter = useAppStore((s) => s.startNextQuarter)
   const setPossession = useAppStore((s) => s.setPossession)
   const showQuarterStatus = useFeatureFlag('scoreboard.quarterStatus')
   const showPossessionSwitch = useFeatureFlag('scoreboard.possessionSwitch')
@@ -95,6 +97,26 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
     setClockTime(fixtureId, clockFromParts(draftMinutes, draftSeconds))
     setClockPeriod(fixtureId, draftPeriod)
     setEditingClock(false)
+  }
+
+  const handleToggleClock = () => {
+    if (regulationComplete) return
+
+    if (awaitingQuarterStart) {
+      startNextQuarter(fixtureId)
+      return
+    }
+
+    toggleClock(fixtureId)
+  }
+
+  const handleContainerKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (regulationComplete || event.target !== event.currentTarget) return
+
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      handleToggleClock()
+    }
   }
 
   return (
@@ -136,21 +158,44 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
               </div>
             </div>
           ) : (
-            <button
-              type="button"
+            <div
+              role="presentation"
+              tabIndex={regulationComplete ? undefined : 0}
+              aria-label={
+                regulationComplete
+                  ? 'End of regulation'
+                  : awaitingQuarterStart
+                    ? `Start quarter ${nextQuarterNumber(clockPeriod)}`
+                    : paused
+                      ? 'Start clock'
+                      : 'Pause clock'
+              }
+              onClick={handleToggleClock}
+              onKeyDown={handleContainerKeyDown}
               className={cn(
-                'flex h-full min-h-0 flex-1 flex-col items-center justify-center gap-2 rounded-none border-0 bg-transparent px-2 transition-colors',
+                'flex h-full min-h-0 flex-1 flex-col items-center justify-center gap-2 px-2 transition-colors',
                 awaitingQuarterStart && 'bg-[var(--color-primary-bg)]',
                 regulationComplete && 'bg-muted',
-                !regulationComplete && 'hover:bg-muted/40 active:bg-muted/60',
+                !regulationComplete && 'cursor-pointer hover:bg-muted/40 active:bg-muted/60',
               )}
-              onClick={handleOpenClockEditor}
-              disabled={regulationComplete}
-              aria-label={`Edit game clock, currently ${formatClock(clockSeconds)}`}
             >
-              <span className="text-[2rem] font-bold leading-none tabular-nums">
-                {formatClock(clockSeconds)}
-              </span>
+              <button
+                type="button"
+                className={cn(
+                  'rounded-md border-0 bg-transparent px-2 py-1 transition-colors',
+                  !regulationComplete && 'hover:bg-muted/60 active:bg-muted/80',
+                )}
+                onClick={(event) => {
+                  event.stopPropagation()
+                  handleOpenClockEditor()
+                }}
+                disabled={regulationComplete}
+                aria-label={`Edit game clock, currently ${formatClock(clockSeconds)}`}
+              >
+                <span className="text-[2rem] font-bold leading-none tabular-nums">
+                  {formatClock(clockSeconds)}
+                </span>
+              </button>
               {awaitingQuarterStart && (
                 <Badge className="rounded-full border-[var(--color-primary-border)] bg-[var(--color-primary-chip-bg)] text-[10px] font-bold tracking-wider text-[var(--color-primary-chip-text)] uppercase">
                   Start Q{nextQuarterNumber(clockPeriod)}
@@ -162,7 +207,7 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
               {paused && !awaitingQuarterStart && !regulationComplete && (
                 <Badge variant="destructive">Paused</Badge>
               )}
-            </button>
+            </div>
           )}
         </div>
 
