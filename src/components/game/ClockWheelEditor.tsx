@@ -10,14 +10,12 @@ export const CLOCK_MINUTE_VALUES = Array.from({ length: 16 }, (_, index) => inde
 export const CLOCK_SECOND_VALUES = Array.from({ length: 60 }, (_, index) => index)
 
 interface ClockWheelColumnProps {
-  label: string
   values: number[]
   value: number
   onChange: (value: number) => void
 }
 
 export function ClockWheelColumn({
-  label,
   values,
   value,
   onChange,
@@ -69,9 +67,6 @@ export function ClockWheelColumn({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col items-center overflow-hidden">
-      <span className="mb-0.5 shrink-0 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-        {label}
-      </span>
       <div
         className="relative w-full max-w-[4rem] shrink-0 overflow-hidden"
         style={{ height: WHEEL_VIEWPORT_HEIGHT }}
@@ -140,16 +135,14 @@ export function ClockWheelEditor({
   return (
     <div className="flex min-h-0 flex-1 items-center justify-center gap-1.5 overflow-hidden px-1 py-1">
       <ClockWheelColumn
-        label="Min"
         values={CLOCK_MINUTE_VALUES}
         value={minutes}
         onChange={onMinutesChange}
       />
-      <span className="shrink-0 self-center pb-4 text-xl font-bold leading-none text-muted-foreground">
+      <span className="shrink-0 self-center text-xl font-bold leading-none text-muted-foreground">
         :
       </span>
       <ClockWheelColumn
-        label="Sec"
         values={CLOCK_SECOND_VALUES}
         value={seconds}
         onChange={onSecondsChange}
