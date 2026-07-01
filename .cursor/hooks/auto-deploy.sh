@@ -16,6 +16,32 @@ if ! git rev-parse --git-dir > /dev/null 2>&1; then
   exit 0
 fi
 
+# Use macOS keychain; ~/.gitconfig may point at a stale temporary gh binary.
+git_push() {
+  local branch="$1"
+  git -c credential.https://github.com.helper=osxkeychain \
+      -c credential.https://gist.github.com.helper=osxkeychain \
+      push origin "$branch"
+}
+
+push_if_ahead() {
+  local branch="$1"
+  local ahead=0
+
+  ahead="$(git rev-list --count "origin/${branch}..HEAD" 2>/dev/null || echo 0)"
+  if [ "$ahead" -gt 0 ]; then
+    git_push "$branch"
+  fi
+}
+
+BRANCH="$(git branch --show-current)"
+if [ -z "$BRANCH" ]; then
+  exit 0
+fi
+
+# Publish any commits that failed to push previously.
+push_if_ahead "$BRANCH" || true
+
 # Skip if nothing changed (tracked, staged, or untracked).
 if git diff --quiet && git diff --cached --quiet && [ -z "$(git ls-files --others --exclude-standard)" ]; then
   exit 0
@@ -45,10 +71,6 @@ ${FILES}"
 fi
 
 git commit -m "$MSG"
-
-BRANCH="$(git branch --show-current)"
-if [ -n "$BRANCH" ]; then
-  git push origin "$BRANCH"
-fi
+git_push "$BRANCH"
 
 exit 0
