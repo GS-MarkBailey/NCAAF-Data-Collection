@@ -22,6 +22,7 @@ interface AppStore {
   toggleRisk: (fixtureId: string, risk: RiskType) => void
   toggleClock: (fixtureId: string) => void
   adjustClock: (fixtureId: string, delta: number) => void
+  setClockTime: (fixtureId: string, seconds: number) => void
   startNextQuarter: (fixtureId: string) => void
   setPossession: (fixtureId: string, possessionIsHome: boolean) => void
   setHomeAttacksRight: (fixtureId: string, homeAttacksRight: boolean) => void
@@ -159,6 +160,40 @@ export const useAppStore = create<AppStore>((set, get) => ({
             {
               type: 'clock_adjust',
               payload: { delta, seconds },
+            },
+            clockBefore,
+          ),
+        ),
+      }
+    })
+  },
+
+  setClockTime: (fixtureId, seconds) => {
+    set((state) => {
+      const game = state.games[fixtureId]
+      if (!game) return state
+
+      const nextSeconds = Math.max(0, seconds)
+      if (nextSeconds === game.clock.seconds) return state
+
+      const delta = nextSeconds - game.clock.seconds
+      const clockBefore = {
+        seconds: game.clock.seconds,
+        period: game.clock.period,
+      }
+
+      return {
+        games: updateGame(state.games, fixtureId, (g) => ({
+          ...g,
+          clock: { ...g.clock, seconds: nextSeconds },
+        })),
+        actionLogs: appendAction(
+          state.actionLogs,
+          createUserAction(
+            fixtureId,
+            {
+              type: 'clock_adjust',
+              payload: { delta, seconds: nextSeconds },
             },
             clockBefore,
           ),

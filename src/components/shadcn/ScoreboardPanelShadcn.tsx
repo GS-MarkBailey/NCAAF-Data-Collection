@@ -1,8 +1,10 @@
-import { type CSSProperties } from 'react'
+import { useState, type CSSProperties } from 'react'
 import { LayoutGrid, Minus, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { formatClock } from '@/lib/format'
 import {
+  clockFromParts,
+  clockToParts,
   getQuarterStatus,
   isAwaitingQuarterStart,
   isRegulationComplete,
@@ -14,6 +16,7 @@ import { useFeatureFlag } from '@/hooks/useFeatureFlag'
 import { useAppStore } from '@/store/gameStore'
 import { getEffectiveHomeAttacksRight } from '@/lib/playSimulation'
 import { BallOnStatCell } from '@/components/game/BallOnStatCell'
+import { ClockWheelEditor } from '@/components/game/ClockWheelEditor'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -53,13 +56,16 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
     clockPeriod,
   )
 
-  const toggleClock = useAppStore((s) => s.toggleClock)
   const adjustClock = useAppStore((s) => s.adjustClock)
-  const startNextQuarter = useAppStore((s) => s.startNextQuarter)
+  const setClockTime = useAppStore((s) => s.setClockTime)
   const setPossession = useAppStore((s) => s.setPossession)
   const showQuarterStatus = useFeatureFlag('scoreboard.quarterStatus')
   const showClockAdjust = useFeatureFlag('scoreboard.clockAdjust')
   const showPossessionSwitch = useFeatureFlag('scoreboard.possessionSwitch')
+
+  const [editingClock, setEditingClock] = useState(false)
+  const [draftMinutes, setDraftMinutes] = useState(0)
+  const [draftSeconds, setDraftSeconds] = useState(0)
 
   const paused = !clockRunning
   const awaitingQuarterStart = isAwaitingQuarterStart({
@@ -71,12 +77,22 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
     period: clockPeriod,
   })
 
-  const handleClockPress = () => {
-    if (awaitingQuarterStart) {
-      startNextQuarter(fixtureId)
-      return
-    }
-    toggleClock(fixtureId)
+  const handleOpenClockEditor = () => {
+    if (regulationComplete) return
+
+    const parts = clockToParts(clockSeconds)
+    setDraftMinutes(parts.minutes)
+    setDraftSeconds(parts.seconds)
+    setEditingClock(true)
+  }
+
+  const handleCancelClockEdit = () => {
+    setEditingClock(false)
+  }
+
+  const handleConfirmClockEdit = () => {
+    setClockTime(fixtureId, clockFromParts(draftMinutes, draftSeconds))
+    setEditingClock(false)
   }
 
   return (
@@ -89,7 +105,7 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
       </CardHeader>
       <CardContent className="flex min-h-0 flex-1 flex-col gap-2">
         <div className="flex min-h-0 flex-1 items-stretch overflow-hidden rounded-lg border border-border">
-          {showClockAdjust ? (
+          {showClockAdjust && !editingClock ? (
             <Button
               variant="ghost"
               className="h-full min-h-0 rounded-none border-0 border-r border-border px-3 active:bg-[var(--color-primary-bg)]"
@@ -100,27 +116,47 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
             </Button>
           ) : null}
 
-          <Button
-            variant="ghost"
-            className={cn(
-              'h-full min-h-0 flex-1 rounded-none border-0',
-              showClockAdjust && 'border-r border-border',
-              awaitingQuarterStart && 'bg-[var(--color-primary-bg)] hover:bg-[var(--color-primary-bg)]',
-              regulationComplete && 'bg-muted',
-            )}
-            onClick={handleClockPress}
-            disabled={regulationComplete}
-            aria-label={
-              awaitingQuarterStart
-                ? `Start quarter ${nextQuarterNumber(clockPeriod)}`
-                : paused
-                  ? 'Start clock'
-                  : 'Pause clock'
-            }
-            aria-pressed={!paused && !awaitingQuarterStart && !regulationComplete}
-          >
-            <div className="flex flex-col items-center gap-2">
-              <span className="text-[2rem] font-bold leading-none">
+          {editingClock ? (
+            <div className="flex h-full min-h-0 flex-1 flex-col">
+              <ClockWheelEditor
+                minutes={draftMinutes}
+                seconds={draftSeconds}
+                onMinutesChange={setDraftMinutes}
+                onSecondsChange={setDraftSeconds}
+              />
+              <div className="flex shrink-0 gap-2 border-t border-border p-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1"
+                  onClick={handleCancelClockEdit}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  size="sm"
+                  className="flex-1 bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
+                  onClick={handleConfirmClockEdit}
+                >
+                  Confirm
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              className={cn(
+                'flex h-full min-h-0 flex-1 flex-col items-center justify-center gap-2 rounded-none border-0 bg-transparent px-2 transition-colors',
+                showClockAdjust && 'border-r border-border',
+                awaitingQuarterStart && 'bg-[var(--color-primary-bg)]',
+                regulationComplete && 'bg-muted',
+                !regulationComplete && 'hover:bg-muted/40 active:bg-muted/60',
+              )}
+              onClick={handleOpenClockEditor}
+              disabled={regulationComplete}
+              aria-label={`Edit game clock, currently ${formatClock(clockSeconds)}`}
+            >
+              <span className="text-[2rem] font-bold leading-none tabular-nums">
                 {formatClock(clockSeconds)}
               </span>
               {awaitingQuarterStart && (
@@ -134,10 +170,10 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
               {paused && !awaitingQuarterStart && !regulationComplete && (
                 <Badge variant="destructive">Paused</Badge>
               )}
-            </div>
-          </Button>
+            </button>
+          )}
 
-          {showClockAdjust ? (
+          {showClockAdjust && !editingClock ? (
             <Button
               variant="ghost"
               className="h-full min-h-0 rounded-none border-0 px-3 active:bg-[var(--color-primary-bg)]"

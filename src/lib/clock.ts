@@ -30,3 +30,24 @@ export function getQuarterStatus(clock: {
   if (clock.running) return 'in_play'
   return 'in_progress'
 }
+
+export const CLOCK_EDIT_MAX_MINUTES = 15
+export const CLOCK_EDIT_MAX_SECONDS = 59
+
+export function clockToParts(totalSeconds: number): {
+  minutes: number
+  seconds: number
+} {
+  const clamped = Math.max(0, totalSeconds)
+  return {
+    minutes: Math.min(CLOCK_EDIT_MAX_MINUTES, Math.floor(clamped / 60)),
+    seconds: Math.min(CLOCK_EDIT_MAX_SECONDS, clamped % 60),
+  }
+}
+
+export function clockFromParts(minutes: number, seconds: number): number {
+  return (
+    Math.max(0, Math.min(CLOCK_EDIT_MAX_MINUTES, minutes)) * 60 +
+    Math.max(0, Math.min(CLOCK_EDIT_MAX_SECONDS, seconds))
+  )
+}

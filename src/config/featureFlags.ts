@@ -81,10 +81,10 @@ export const FEATURE_FLAGS = [
   {
     id: 'scoreboard.clockAdjust',
     label: 'Clock adjust buttons',
-    description: 'Plus and minus controls beside the game clock.',
+    description: 'Legacy plus and minus controls beside the game clock.',
     group: 'Scoreboard',
     parent: 'game.scoreboard',
-    defaultEnabled: true,
+    defaultEnabled: false,
   },
   {
     id: 'scoreboard.possessionSwitch',
