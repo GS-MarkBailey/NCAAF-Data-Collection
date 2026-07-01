@@ -8,7 +8,7 @@ import {
 
 const STORAGE_KEY = 'ncaaf-feature-flags'
 const STORAGE_VERSION_KEY = 'ncaaf-feature-flags-version'
-const STORAGE_VERSION = 2
+const STORAGE_VERSION = 3
 
 const LOCKED_ON_FLAGS: FeatureFlagId[] = ['header.settings']
 
@@ -45,15 +45,32 @@ function createFactoryState(): PersistedFeatureFlags {
 function loadPersistedState(): PersistedFeatureFlags {
   try {
     const storedVersion = Number(localStorage.getItem(STORAGE_VERSION_KEY) ?? 0)
+    const raw = localStorage.getItem(STORAGE_KEY)
+
+    if (storedVersion < STORAGE_VERSION && raw) {
+      // Merge in any newly added flags without wiping saved preferences.
+      const parsed = JSON.parse(raw) as Partial<PersistedFeatureFlags> &
+        Partial<FeatureFlagState>
+      const legacyActive =
+        'active' in parsed || 'savedDefaults' in parsed
+          ? mergeWithCodeDefaults(parsed.active)
+          : mergeWithCodeDefaults(parsed as Partial<FeatureFlagState>)
+      const legacySaved = mergeWithCodeDefaults(
+        parsed.savedDefaults ?? parsed.active ?? (parsed as Partial<FeatureFlagState>),
+      )
+      const merged = { active: legacyActive, savedDefaults: legacySaved }
+      localStorage.setItem(STORAGE_VERSION_KEY, String(STORAGE_VERSION))
+      persistState(merged)
+      return merged
+    }
+
     if (storedVersion < STORAGE_VERSION) {
-      localStorage.removeItem(STORAGE_KEY)
       localStorage.setItem(STORAGE_VERSION_KEY, String(STORAGE_VERSION))
       const factory = createFactoryState()
       persistState(factory)
       return factory
     }
 
-    const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) {
       return createFactoryState()
     }

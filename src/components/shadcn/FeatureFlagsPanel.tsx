@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import {
+  FEATURE_FLAG_BY_ID,
   FEATURE_FLAG_GROUPS,
   FEATURE_FLAGS,
   type FeatureFlagId,
@@ -71,10 +72,17 @@ export function FeatureFlagsPanel() {
                   {groupFlags.map((flag) => {
                     const parentId =
                       'parent' in flag ? (flag.parent as FeatureFlagId) : undefined
-                    const parentDisabled =
-                      parentId != null && !isEnabled(parentId)
                     const lockedOn = flag.id === 'header.settings'
-                    const isPending = flags[flag.id] !== savedDefaults[flag.id]
+                    const configured = flags[flag.id]
+                    const effective = isEnabled(flag.id)
+                    const inactiveInApp = configured && !effective
+                    const isPending = configured !== savedDefaults[flag.id]
+                    const inactiveHint =
+                      inactiveInApp && parentId
+                        ? `Saved on, but hidden in app until ${FEATURE_FLAG_BY_ID[parentId].label} is enabled.`
+                        : inactiveInApp
+                          ? 'Saved on, but hidden in app until its parent feature is enabled.'
+                          : undefined
 
                     return (
                       <li key={flag.id}>
@@ -84,14 +92,14 @@ export function FeatureFlagsPanel() {
                           description={
                             lockedOn
                               ? 'Always enabled so settings stay accessible.'
-                              : 'description' in flag
-                                ? flag.description
-                                : undefined
+                              : inactiveHint ??
+                                ('description' in flag ? flag.description : undefined)
                           }
                           nested={parentId != null}
                           pending={isPending}
-                          checked={flags[flag.id]}
-                          disabled={parentDisabled || lockedOn}
+                          inactiveInApp={inactiveInApp}
+                          checked={configured}
+                          disabled={lockedOn}
                           onCheckedChange={(checked) => setFlag(flag.id, checked)}
                         />
                       </li>
@@ -193,6 +201,7 @@ function FeatureFlagRow({
   description,
   nested,
   pending,
+  inactiveInApp,
   checked,
   disabled,
   onCheckedChange,
@@ -202,6 +211,7 @@ function FeatureFlagRow({
   description?: string
   nested: boolean
   pending: boolean
+  inactiveInApp: boolean
   checked: boolean
   disabled: boolean
   onCheckedChange: (checked: boolean) => void
@@ -213,16 +223,22 @@ function FeatureFlagRow({
         nested && 'pl-6',
         disabled && 'opacity-50',
         pending && 'bg-amber-50/70',
+        inactiveInApp && !pending && 'bg-muted/40',
       )}
     >
       <div className="min-w-0">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Label htmlFor={id} className="text-sm font-medium">
             {label}
           </Label>
           {pending ? (
             <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-800">
               Changed
+            </span>
+          ) : null}
+          {inactiveInApp ? (
+            <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+              Inactive in app
             </span>
           ) : null}
         </div>
