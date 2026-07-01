@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "updatedAt": "2026-07-01T00:00:00.000Z",
+  "flags": {
+    "game.scoreboard": true,
+    "game.playByPlay": true,
+    "game.riskManagement": true,
+    "game.fieldDirectionDialog": true,
+    "header.connectionStatus": true,
+    "header.takeControl": true,
+    "header.settings": true,
+    "scoreboard.quarterStatus": true,
+    "scoreboard.possessionSwitch": true,
+    "risk.challengeReview": true,
+    "risk.statDelay": true,
+    "risk.bigPlay": true,
+    "risk.penalty": true,
+    "risk.touchdown": true,
+    "risk.playAboutToStart": true,
+    "settings.fieldDirection": true,
+    "settings.actionLog": true,
+    "settings.csvExport": true
+  }
+}

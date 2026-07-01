@@ -5,6 +5,7 @@ import {
   FEATURE_FLAGS,
   type FeatureFlagId,
 } from '@/config/featureFlags'
+import { FeatureFlagDeployError } from '@/lib/featureFlagDeploy'
 import {
   useFeatureFlagStore,
   useFeatureFlagsDirty,
@@ -18,13 +19,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { cn } from '@/lib/utils'
 
 export function FeatureFlagsPanel() {
   const flags = useFeatureFlagStore((state) => state.flags)
-  const savedDefaults = useFeatureFlagStore((state) => state.savedDefaults)
+  const deployedDefaults = useFeatureFlagStore((state) => state.deployedDefaults)
   const setFlag = useFeatureFlagStore((state) => state.setFlag)
   const confirmAsDefault = useFeatureFlagStore((state) => state.confirmAsDefault)
   const discardChanges = useFeatureFlagStore((state) => state.discardChanges)
@@ -35,10 +37,49 @@ export function FeatureFlagsPanel() {
   const isDirty = useFeatureFlagsDirty()
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [factoryResetOpen, setFactoryResetOpen] = useState(false)
+  const [deployPassphrase, setDeployPassphrase] = useState('')
+  const [deployError, setDeployError] = useState<string | null>(null)
+  const [deploying, setDeploying] = useState(false)
 
   const pendingCount = FEATURE_FLAGS.filter(
-    ({ id }) => flags[id] !== savedDefaults[id],
+    ({ id }) => flags[id] !== deployedDefaults[id],
   ).length
+
+  const handleConfirmDeploy = async () => {
+    setDeployError(null)
+    setDeploying(true)
+    try {
+      await confirmAsDefault(deployPassphrase)
+      setConfirmOpen(false)
+      setDeployPassphrase('')
+    } catch (error) {
+      setDeployError(
+        error instanceof FeatureFlagDeployError
+          ? error.message
+          : 'Unable to deploy feature flag defaults.',
+      )
+    } finally {
+      setDeploying(false)
+    }
+  }
+
+  const handleFactoryReset = async () => {
+    setDeployError(null)
+    setDeploying(true)
+    try {
+      await resetToFactoryDefaults(deployPassphrase)
+      setFactoryResetOpen(false)
+      setDeployPassphrase('')
+    } catch (error) {
+      setDeployError(
+        error instanceof FeatureFlagDeployError
+          ? error.message
+          : 'Unable to deploy factory defaults.',
+      )
+    } finally {
+      setDeploying(false)
+    }
+  }
 
   return (
     <>
@@ -48,11 +89,11 @@ export function FeatureFlagsPanel() {
             {isDirty ? (
               <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-950">
                 {pendingCount} unsaved change{pendingCount === 1 ? '' : 's'} —
-                previewing now, not yet saved as default.
+                previewing now, not yet deployed as the app default.
               </div>
             ) : (
               <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-950">
-                Current setup matches your saved default experience.
+                Current setup matches the deployed app default on Vercel.
               </div>
             )}
           </div>
@@ -76,7 +117,7 @@ export function FeatureFlagsPanel() {
                     const configured = flags[flag.id]
                     const effective = isEnabled(flag.id)
                     const inactiveInApp = configured && !effective
-                    const isPending = configured !== savedDefaults[flag.id]
+                    const isPending = configured !== deployedDefaults[flag.id]
                     const inactiveHint =
                       inactiveInApp && parentId
                         ? `Saved on, but hidden in app until ${FEATURE_FLAG_BY_ID[parentId].label} is enabled.`
@@ -133,60 +174,109 @@ export function FeatureFlagsPanel() {
               onClick={() => setConfirmOpen(true)}
               className="bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)] disabled:bg-secondary disabled:text-secondary-foreground disabled:opacity-100"
             >
-              Confirm as default
+              Confirm & deploy
             </Button>
           </div>
         </div>
       </div>
 
-      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+      <Dialog
+        open={confirmOpen}
+        onOpenChange={(open) => {
+          setConfirmOpen(open)
+          if (!open) {
+            setDeployError(null)
+            setDeployPassphrase('')
+          }
+        }}
+      >
         <DialogContent className="sm:max-w-md" showCloseButton={false}>
           <DialogHeader>
-            <DialogTitle>Confirm default experience?</DialogTitle>
+            <DialogTitle>Deploy feature defaults?</DialogTitle>
             <DialogDescription>
-              This will save your current feature setup as the default for this
-              browser. Reset and future sessions will start from this
-              configuration.
+              This saves your current feature setup as the app default, commits
+              it to GitHub, and triggers a new Vercel deployment for everyone.
             </DialogDescription>
           </DialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="deploy-passphrase">Deploy passphrase</Label>
+            <Input
+              id="deploy-passphrase"
+              type="password"
+              autoComplete="off"
+              placeholder="Required on production if configured"
+              value={deployPassphrase}
+              onChange={(event) => setDeployPassphrase(event.target.value)}
+            />
+            {deployError ? (
+              <p className="text-sm text-destructive">{deployError}</p>
+            ) : null}
+          </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setConfirmOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setConfirmOpen(false)}
+              disabled={deploying}
+            >
               Cancel
             </Button>
             <Button
-              onClick={() => {
-                confirmAsDefault()
-                setConfirmOpen(false)
-              }}
+              onClick={() => void handleConfirmDeploy()}
+              disabled={deploying}
               className="bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
             >
-              Confirm
+              {deploying ? 'Deploying…' : 'Confirm & deploy'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      <Dialog open={factoryResetOpen} onOpenChange={setFactoryResetOpen}>
+      <Dialog
+        open={factoryResetOpen}
+        onOpenChange={(open) => {
+          setFactoryResetOpen(open)
+          if (!open) {
+            setDeployError(null)
+            setDeployPassphrase('')
+          }
+        }}
+      >
         <DialogContent className="sm:max-w-md" showCloseButton={false}>
           <DialogHeader>
             <DialogTitle>Reset to factory defaults?</DialogTitle>
             <DialogDescription>
-              This restores the original built-in feature setup and saves it as
-              your default experience.
+              This restores the original built-in feature setup and deploys it
+              to Vercel as the new app default.
             </DialogDescription>
           </DialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="factory-deploy-passphrase">Deploy passphrase</Label>
+            <Input
+              id="factory-deploy-passphrase"
+              type="password"
+              autoComplete="off"
+              placeholder="Required on production if configured"
+              value={deployPassphrase}
+              onChange={(event) => setDeployPassphrase(event.target.value)}
+            />
+            {deployError ? (
+              <p className="text-sm text-destructive">{deployError}</p>
+            ) : null}
+          </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setFactoryResetOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setFactoryResetOpen(false)}
+              disabled={deploying}
+            >
               Cancel
             </Button>
             <Button
               variant="destructive"
-              onClick={() => {
-                resetToFactoryDefaults()
-                setFactoryResetOpen(false)
-              }}
+              onClick={() => void handleFactoryReset()}
+              disabled={deploying}
             >
-              Reset
+              {deploying ? 'Deploying…' : 'Reset & deploy'}
             </Button>
           </DialogFooter>
         </DialogContent>

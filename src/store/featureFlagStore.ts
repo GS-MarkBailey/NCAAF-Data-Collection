@@ -5,28 +5,27 @@ import {
   type FeatureFlagId,
   isFeatureEnabled,
 } from '@/config/featureFlags'
+import {
+  deployFeatureFlags,
+  fetchDeployedFeatureFlags,
+  type FeatureFlagDefaultsFile,
+} from '@/lib/featureFlagDeploy'
 
-const STORAGE_KEY = 'ncaaf-feature-flags'
-const STORAGE_VERSION_KEY = 'ncaaf-feature-flags-version'
-const STORAGE_VERSION = 3
+const STORAGE_KEY = 'ncaaf-feature-flags-draft'
 
 const LOCKED_ON_FLAGS: FeatureFlagId[] = ['header.settings']
 
 type FeatureFlagState = Record<FeatureFlagId, boolean>
 
-interface PersistedFeatureFlags {
-  active: FeatureFlagState
-  savedDefaults: FeatureFlagState
-}
-
 interface FeatureFlagStore {
+  ready: boolean
   flags: FeatureFlagState
-  savedDefaults: FeatureFlagState
+  deployedDefaults: FeatureFlagState
+  deployVersion: number
   setFlag: (id: FeatureFlagId, enabled: boolean) => void
-  confirmAsDefault: () => void
+  confirmAsDefault: (passphrase: string) => Promise<void>
   discardChanges: () => void
-  resetToSavedDefaults: () => void
-  resetToFactoryDefaults: () => void
+  resetToFactoryDefaults: (passphrase: string) => Promise<void>
   hasPendingChanges: () => boolean
   isEnabled: (id: FeatureFlagId) => boolean
 }
@@ -37,81 +36,48 @@ function mergeWithCodeDefaults(
   return { ...DEFAULT_FEATURE_FLAGS, ...partial }
 }
 
-function createFactoryState(): PersistedFeatureFlags {
-  const defaults = { ...DEFAULT_FEATURE_FLAGS }
-  return { active: defaults, savedDefaults: defaults }
-}
-
-function loadPersistedState(): PersistedFeatureFlags {
+function loadDraftFlags(): FeatureFlagState | null {
   try {
-    const storedVersion = Number(localStorage.getItem(STORAGE_VERSION_KEY) ?? 0)
     const raw = localStorage.getItem(STORAGE_KEY)
-
-    if (storedVersion < STORAGE_VERSION && raw) {
-      // Merge in any newly added flags without wiping saved preferences.
-      const parsed = JSON.parse(raw) as Partial<PersistedFeatureFlags> &
-        Partial<FeatureFlagState>
-      const legacyActive =
-        'active' in parsed || 'savedDefaults' in parsed
-          ? mergeWithCodeDefaults(parsed.active)
-          : mergeWithCodeDefaults(parsed as Partial<FeatureFlagState>)
-      const legacySaved = mergeWithCodeDefaults(
-        parsed.savedDefaults ?? parsed.active ?? (parsed as Partial<FeatureFlagState>),
-      )
-      const merged = { active: legacyActive, savedDefaults: legacySaved }
-      localStorage.setItem(STORAGE_VERSION_KEY, String(STORAGE_VERSION))
-      persistState(merged)
-      return merged
-    }
-
-    if (storedVersion < STORAGE_VERSION) {
-      localStorage.setItem(STORAGE_VERSION_KEY, String(STORAGE_VERSION))
-      const factory = createFactoryState()
-      persistState(factory)
-      return factory
-    }
-
-    if (!raw) {
-      return createFactoryState()
-    }
-
-    const parsed = JSON.parse(raw) as Partial<PersistedFeatureFlags> & Partial<FeatureFlagState>
-
-    // Backward compatibility: previously only active flags were stored.
-    if (!('active' in parsed) && !('savedDefaults' in parsed)) {
-      const active = mergeWithCodeDefaults(parsed as Partial<FeatureFlagState>)
-      return { active, savedDefaults: { ...active } }
-    }
-
-    const active = mergeWithCodeDefaults(parsed.active)
-    const savedDefaults = mergeWithCodeDefaults(parsed.savedDefaults ?? parsed.active)
-
-    return { active, savedDefaults }
+    if (!raw) return null
+    return mergeWithCodeDefaults(JSON.parse(raw) as Partial<FeatureFlagState>)
   } catch {
-    return createFactoryState()
+    return null
   }
 }
 
-function persistState(state: PersistedFeatureFlags): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
+function persistDraftFlags(flags: FeatureFlagState): void {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(flags))
+}
+
+function clearDraftFlags(): void {
+  localStorage.removeItem(STORAGE_KEY)
 }
 
 function flagsEqual(a: FeatureFlagState, b: FeatureFlagState): boolean {
   return FEATURE_FLAGS.every(({ id }) => a[id] === b[id])
 }
 
-const initialState = loadPersistedState()
-
-function applyFactoryReset(): void {
-  const factory = createFactoryState()
-  persistState(factory)
+function applyDeployedDefaults(deployed: FeatureFlagDefaultsFile): void {
   useFeatureFlagStore.setState({
-    flags: factory.active,
-    savedDefaults: factory.savedDefaults,
+    ready: true,
+    deployedDefaults: deployed.flags,
+    deployVersion: deployed.version,
+    flags: loadDraftFlags() ?? deployed.flags,
   })
 }
 
-export function initFeatureFlags(): void {
+function applyFactoryReset(): void {
+  const defaults = { ...DEFAULT_FEATURE_FLAGS }
+  useFeatureFlagStore.setState({
+    deployedDefaults: defaults,
+    flags: defaults,
+    deployVersion: Date.now(),
+  })
+  clearDraftFlags()
+}
+
+export async function initFeatureFlags(): Promise<void> {
   const params = new URLSearchParams(window.location.search)
   if (params.has('resetFeatureFlags')) {
     applyFactoryReset()
@@ -120,60 +86,68 @@ export function initFeatureFlags(): void {
     const nextUrl = `${window.location.pathname}${nextSearch ? `?${nextSearch}` : ''}${window.location.hash}`
     window.history.replaceState({}, '', nextUrl)
   }
+
+  const deployed = await fetchDeployedFeatureFlags()
+  applyDeployedDefaults(deployed)
 }
 
 export const useFeatureFlagStore = create<FeatureFlagStore>((set, get) => ({
-  flags: initialState.active,
-  savedDefaults: initialState.savedDefaults,
+  ready: false,
+  flags: { ...DEFAULT_FEATURE_FLAGS },
+  deployedDefaults: { ...DEFAULT_FEATURE_FLAGS },
+  deployVersion: 1,
 
   setFlag: (id, enabled) => {
     if (!enabled && LOCKED_ON_FLAGS.includes(id)) return
 
     set((state) => {
       const flags = { ...state.flags, [id]: enabled }
-      persistState({ active: flags, savedDefaults: state.savedDefaults })
+      persistDraftFlags(flags)
       return { flags }
     })
   },
 
-  confirmAsDefault: () => {
-    set((state) => {
-      persistState({ active: state.flags, savedDefaults: state.flags })
-      return { savedDefaults: { ...state.flags } }
+  confirmAsDefault: async (passphrase) => {
+    const flags = { ...get().flags }
+    const deployed = await deployFeatureFlags(flags, passphrase)
+
+    set({
+      deployedDefaults: deployed.flags,
+      flags: deployed.flags,
+      deployVersion: deployed.version,
     })
+    clearDraftFlags()
   },
 
   discardChanges: () => {
-    set((state) => {
-      persistState({
-        active: state.savedDefaults,
-        savedDefaults: state.savedDefaults,
-      })
-      return { flags: { ...state.savedDefaults } }
+    const deployed = { ...get().deployedDefaults }
+    set({ flags: deployed })
+    clearDraftFlags()
+  },
+
+  resetToFactoryDefaults: async (passphrase) => {
+    const factory = { ...DEFAULT_FEATURE_FLAGS }
+    const deployed = await deployFeatureFlags(factory, passphrase)
+
+    set({
+      deployedDefaults: deployed.flags,
+      flags: deployed.flags,
+      deployVersion: deployed.version,
     })
+    clearDraftFlags()
   },
 
-  resetToSavedDefaults: () => {
-    set((state) => {
-      persistState({
-        active: state.savedDefaults,
-        savedDefaults: state.savedDefaults,
-      })
-      return { flags: { ...state.savedDefaults } }
-    })
-  },
-
-  resetToFactoryDefaults: () => {
-    applyFactoryReset()
-  },
-
-  hasPendingChanges: () => !flagsEqual(get().flags, get().savedDefaults),
+  hasPendingChanges: () => !flagsEqual(get().flags, get().deployedDefaults),
 
   isEnabled: (id) => isFeatureEnabled(get().flags, id),
 }))
 
 export function useFeatureFlagsDirty(): boolean {
   return useFeatureFlagStore(
-    (state) => !flagsEqual(state.flags, state.savedDefaults),
+    (state) => state.ready && !flagsEqual(state.flags, state.deployedDefaults),
   )
+}
+
+export function useDeployedFeatureFlagsReady(): boolean {
+  return useFeatureFlagStore((state) => state.ready)
 }

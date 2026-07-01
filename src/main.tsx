@@ -6,12 +6,26 @@ import { initFeatureFlags } from '@/store/featureFlagStore'
 import App from './App'
 
 initPwa()
-initFeatureFlags()
-
 document.documentElement.dataset.uiVariant = 'shadcn'
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+const rootElement = document.getElementById('root')
+
+if (rootElement) {
+  const root = createRoot(rootElement)
+
+  root.render(
+    <StrictMode>
+      <p className="flex h-dvh items-center justify-center text-sm text-muted-foreground">
+        Loading…
+      </p>
+    </StrictMode>,
+  )
+
+  void initFeatureFlags().then(() => {
+    root.render(
+      <StrictMode>
+        <App />
+      </StrictMode>,
+    )
+  })
+}
