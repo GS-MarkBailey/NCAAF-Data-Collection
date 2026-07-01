@@ -17,7 +17,6 @@ import { useAppStore } from '@/store/gameStore'
 import { getEffectiveHomeAttacksRight } from '@/lib/playSimulation'
 import { BallOnStatCell } from '@/components/game/BallOnStatCell'
 import { ClockWheelEditor } from '@/components/game/ClockWheelEditor'
-import { PeriodControl } from '@/components/game/PeriodControl'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -64,6 +63,7 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
   const showPossessionSwitch = useFeatureFlag('scoreboard.possessionSwitch')
 
   const [editingClock, setEditingClock] = useState(false)
+  const [draftPeriod, setDraftPeriod] = useState(1)
   const [draftMinutes, setDraftMinutes] = useState(0)
   const [draftSeconds, setDraftSeconds] = useState(0)
 
@@ -81,6 +81,7 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
     if (regulationComplete) return
 
     const parts = clockToParts(clockSeconds)
+    setDraftPeriod(clockPeriod)
     setDraftMinutes(parts.minutes)
     setDraftSeconds(parts.seconds)
     setEditingClock(true)
@@ -92,6 +93,7 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
 
   const handleConfirmClockEdit = () => {
     setClockTime(fixtureId, clockFromParts(draftMinutes, draftSeconds))
+    setClockPeriod(fixtureId, draftPeriod)
     setEditingClock(false)
   }
 
@@ -105,15 +107,13 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
       </CardHeader>
       <CardContent className="flex min-h-0 flex-1 flex-col gap-2">
         <div className="flex min-h-0 flex-1 items-stretch overflow-hidden rounded-lg border border-border">
-          <PeriodControl
-            period={clockPeriod}
-            onPeriodChange={(period) => setClockPeriod(fixtureId, period)}
-          />
           {editingClock ? (
             <div className="grid h-full min-h-0 flex-1 grid-rows-[minmax(0,1fr)_auto] overflow-hidden">
               <ClockWheelEditor
+                period={draftPeriod}
                 minutes={draftMinutes}
                 seconds={draftSeconds}
+                onPeriodChange={setDraftPeriod}
                 onMinutesChange={setDraftMinutes}
                 onSecondsChange={setDraftSeconds}
               />
@@ -139,7 +139,7 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
             <button
               type="button"
               className={cn(
-                'flex h-full min-h-0 min-w-0 flex-1 flex-col items-center justify-center gap-2 rounded-none border-0 bg-transparent px-2 transition-colors',
+                'flex h-full min-h-0 flex-1 flex-col items-center justify-center gap-2 rounded-none border-0 bg-transparent px-2 transition-colors',
                 awaitingQuarterStart && 'bg-[var(--color-primary-bg)]',
                 regulationComplete && 'bg-muted',
                 !regulationComplete && 'hover:bg-muted/40 active:bg-muted/60',

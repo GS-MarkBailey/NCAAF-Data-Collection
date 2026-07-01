@@ -1,21 +1,28 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
+import { MAX_PERIOD, MIN_PERIOD } from '@/lib/clock'
 
 const ITEM_HEIGHT = 28
 
 export const CLOCK_MINUTE_VALUES = Array.from({ length: 16 }, (_, index) => index)
 export const CLOCK_SECOND_VALUES = Array.from({ length: 60 }, (_, index) => index)
+export const CLOCK_PERIOD_VALUES = Array.from(
+  { length: MAX_PERIOD - MIN_PERIOD + 1 },
+  (_, index) => MIN_PERIOD + index,
+)
 
 interface ClockWheelColumnProps {
   values: number[]
   value: number
   onChange: (value: number) => void
+  formatValue?: (value: number) => string
 }
 
 export function ClockWheelColumn({
   values,
   value,
   onChange,
+  formatValue = (option) => option.toString().padStart(2, '0'),
 }: ClockWheelColumnProps) {
   const scrollerRef = useRef<HTMLDivElement>(null)
   const viewportRef = useRef<HTMLDivElement>(null)
@@ -121,7 +128,7 @@ export function ClockWheelColumn({
                 )}
                 style={{ height: ITEM_HEIGHT }}
               >
-                {option.toString().padStart(2, '0')}
+                {formatValue(option)}
               </div>
             )
           })}
@@ -133,20 +140,33 @@ export function ClockWheelColumn({
 }
 
 interface ClockWheelEditorProps {
+  period: number
   minutes: number
   seconds: number
+  onPeriodChange: (period: number) => void
   onMinutesChange: (minutes: number) => void
   onSecondsChange: (seconds: number) => void
 }
 
 export function ClockWheelEditor({
+  period,
   minutes,
   seconds,
+  onPeriodChange,
   onMinutesChange,
   onSecondsChange,
 }: ClockWheelEditorProps) {
   return (
     <div className="flex h-full min-h-0 items-center justify-center gap-1.5 overflow-hidden px-1">
+      <ClockWheelColumn
+        values={CLOCK_PERIOD_VALUES}
+        value={period}
+        onChange={onPeriodChange}
+        formatValue={(option) => option.toString()}
+      />
+      <span className="shrink-0 self-center text-xl font-bold leading-none text-muted-foreground">
+        ·
+      </span>
       <ClockWheelColumn
         values={CLOCK_MINUTE_VALUES}
         value={minutes}
