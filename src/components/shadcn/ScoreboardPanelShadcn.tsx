@@ -97,7 +97,7 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
     seconds: clockSeconds,
     period: clockPeriod,
   })
-  const clockLocked = awaitingRegulationDecision || gameEnded
+  const clockLocked = gameEnded
   const inOvertime = isOvertimePeriod(clockPeriod)
 
   const handleOpenClockEditor = () => {
@@ -121,10 +121,15 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
   }
 
   const handleToggleClock = () => {
-    if (clockLocked) return
+    if (gameEnded) return
 
     if (pregame || awaitingQuarterStart) {
       startPeriod(fixtureId)
+      return
+    }
+
+    if (awaitingRegulationDecision) {
+      startOvertime(fixtureId)
       return
     }
 
@@ -136,18 +141,13 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
     endPeriod(fixtureId)
   }
 
-  const handleStartOvertime = (event: MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation()
-    startOvertime(fixtureId)
-  }
-
   const handleEndGame = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation()
     endGame(fixtureId)
   }
 
   const handleContainerKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (clockLocked || event.target !== event.currentTarget) return
+    if (gameEnded || event.target !== event.currentTarget) return
 
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault()
@@ -201,7 +201,7 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
                 gameEnded
                   ? 'Game final'
                   : awaitingRegulationDecision
-                    ? 'End of regulation'
+                    ? 'Start overtime'
                     : pregame
                       ? 'Kick off game'
                       : awaitingQuarterStart
@@ -260,7 +260,7 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
               )}
               {awaitingRegulationDecision && (
                 <Badge className="rounded-full border-[var(--color-primary-border)] bg-[var(--color-primary-chip-bg)] text-[10px] font-bold tracking-wider text-[var(--color-primary-chip-text)] uppercase">
-                  End of regulation
+                  Start overtime
                 </Badge>
               )}
               {gameEnded && (
@@ -281,25 +281,15 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
                 </Button>
               ) : null}
               {awaitingRegulationDecision ? (
-                <div className="absolute top-2 right-2 z-10 flex gap-2">
-                  <Button
-                    type="button"
-                    size="sm"
-                    className="h-7 bg-[var(--color-brand)] text-[10px] font-bold tracking-wider text-white uppercase shadow-sm hover:bg-[var(--color-brand-hover)]"
-                    onClick={handleStartOvertime}
-                  >
-                    Start overtime
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="h-7 border-border bg-background text-[10px] font-bold tracking-wider uppercase shadow-sm"
-                    onClick={handleEndGame}
-                  >
-                    End game
-                  </Button>
-                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="absolute top-2 right-2 z-10 h-7 border-border bg-background text-[10px] font-bold tracking-wider uppercase shadow-sm"
+                  onClick={handleEndGame}
+                >
+                  End game
+                </Button>
               ) : null}
             </div>
           )}
