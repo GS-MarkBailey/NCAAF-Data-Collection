@@ -80,15 +80,29 @@ export function clockToParts(totalSeconds: number): {
   seconds: number
 } {
   const clamped = Math.max(0, totalSeconds)
-  return {
-    minutes: Math.min(CLOCK_EDIT_MAX_MINUTES, Math.floor(clamped / 60)),
-    seconds: Math.min(CLOCK_EDIT_MAX_SECONDS, clamped % 60),
-  }
+  const minutes = Math.min(CLOCK_EDIT_MAX_MINUTES, Math.floor(clamped / 60))
+  const seconds =
+    minutes === CLOCK_EDIT_MAX_MINUTES
+      ? 0
+      : Math.min(CLOCK_EDIT_MAX_SECONDS, clamped % 60)
+
+  return { minutes, seconds }
+}
+
+export function getClockEditSecondValues(minutes: number): number[] {
+  if (minutes >= CLOCK_EDIT_MAX_MINUTES) return [0]
+  return Array.from({ length: CLOCK_EDIT_MAX_SECONDS + 1 }, (_, index) => index)
 }
 
 export function clockFromParts(minutes: number, seconds: number): number {
-  return (
-    Math.max(0, Math.min(CLOCK_EDIT_MAX_MINUTES, minutes)) * 60 +
-    Math.max(0, Math.min(CLOCK_EDIT_MAX_SECONDS, seconds))
+  const clampedMinutes = Math.max(
+    0,
+    Math.min(CLOCK_EDIT_MAX_MINUTES, minutes),
   )
+  const clampedSeconds =
+    clampedMinutes === CLOCK_EDIT_MAX_MINUTES
+      ? 0
+      : Math.max(0, Math.min(CLOCK_EDIT_MAX_SECONDS, seconds))
+
+  return clampedMinutes * 60 + clampedSeconds
 }

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
-import { MAX_PERIOD, MIN_PERIOD } from '@/lib/clock'
+import { MAX_PERIOD, MIN_PERIOD, CLOCK_EDIT_MAX_MINUTES, getClockEditSecondValues } from '@/lib/clock'
 
 const ITEM_HEIGHT = 28
 
@@ -169,6 +169,15 @@ export function ClockWheelEditor({
   onMinutesChange,
   onSecondsChange,
 }: ClockWheelEditorProps) {
+  const secondValues = getClockEditSecondValues(minutes)
+
+  const handleMinutesChange = (nextMinutes: number) => {
+    onMinutesChange(nextMinutes)
+    if (nextMinutes === CLOCK_EDIT_MAX_MINUTES && seconds !== 0) {
+      onSecondsChange(0)
+    }
+  }
+
   return (
     <div className="flex h-full min-h-0 items-center justify-center gap-1.5 overflow-hidden px-1">
       <ClockWheelColumn
@@ -183,14 +192,14 @@ export function ClockWheelEditor({
       <ClockWheelColumn
         values={CLOCK_MINUTE_VALUES}
         value={minutes}
-        onChange={onMinutesChange}
+        onChange={handleMinutesChange}
       />
       <span className="shrink-0 self-center text-xl font-bold leading-none text-muted-foreground">
         :
       </span>
       <ClockWheelColumn
-        values={CLOCK_SECOND_VALUES}
-        value={seconds}
+        values={secondValues}
+        value={minutes === CLOCK_EDIT_MAX_MINUTES ? 0 : seconds}
         onChange={onSecondsChange}
       />
     </div>
