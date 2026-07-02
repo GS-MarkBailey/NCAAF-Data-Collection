@@ -8,6 +8,8 @@ export type UserActionType =
   | 'period_set'
   | 'period_end'
   | 'quarter_start'
+  | 'overtime_start'
+  | 'game_end'
   | 'possession_toggle'
   | 'field_direction_set'
 
@@ -75,6 +77,18 @@ export type QuarterStartAction = UserActionBase & {
   }
 }
 
+export type OvertimeStartAction = UserActionBase & {
+  type: 'overtime_start'
+  payload: {
+    seconds: number
+  }
+}
+
+export type GameEndAction = UserActionBase & {
+  type: 'game_end'
+  payload: Record<string, never>
+}
+
 export type PossessionToggleAction = UserActionBase & {
   type: 'possession_toggle'
   payload: {
@@ -99,6 +113,8 @@ export type UserAction =
   | PeriodSetAction
   | PeriodEndAction
   | QuarterStartAction
+  | OvertimeStartAction
+  | GameEndAction
   | PossessionToggleAction
   | FieldDirectionSetAction
 

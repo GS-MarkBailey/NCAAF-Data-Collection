@@ -21,13 +21,33 @@ export function isAwaitingQuarterStart(clock: {
 
 export function isPeriodInProgress(
   gameStarted: boolean,
+  gameEnded: boolean,
   clock: { seconds: number; period: number },
 ): boolean {
   return (
     gameStarted &&
+    !gameEnded &&
+    !isAwaitingRegulationDecision(gameStarted, gameEnded, clock) &&
     !isAwaitingQuarterStart(clock, gameStarted) &&
-    !isRegulationComplete(clock)
+    clock.seconds > 0
   )
+}
+
+export function isAwaitingRegulationDecision(
+  gameStarted: boolean,
+  gameEnded: boolean,
+  clock: { seconds: number; period: number },
+): boolean {
+  return (
+    gameStarted &&
+    !gameEnded &&
+    clock.seconds === 0 &&
+    clock.period === REGULATION_QUARTERS
+  )
+}
+
+export function isOvertimePeriod(period: number): boolean {
+  return period > REGULATION_QUARTERS
 }
 
 export function isRegulationComplete(clock: {

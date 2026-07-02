@@ -79,6 +79,10 @@ export function formatActionLabel(action: UserAction): string {
       return action.payload.fromPeriod === 0
         ? `Game kicked off — Q${action.payload.toPeriod} (${formatClock(action.payload.seconds)})`
         : `Quarter ${action.payload.toPeriod} started (${formatClock(action.payload.seconds)})`
+    case 'overtime_start':
+      return `Overtime started (${formatClock(action.payload.seconds)})`
+    case 'game_end':
+      return 'Game ended'
     case 'possession_toggle':
       return `Possession → ${action.payload.teamAbbr}`
     case 'field_direction_set':
@@ -102,6 +106,10 @@ export function formatActionType(action: UserAction): string {
       return 'Period End'
     case 'quarter_start':
       return 'Quarter Start'
+    case 'overtime_start':
+      return 'Overtime Start'
+    case 'game_end':
+      return 'Game End'
     case 'possession_toggle':
       return 'Possession'
     case 'field_direction_set':

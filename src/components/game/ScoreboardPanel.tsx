@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 import { formatClock } from '@/lib/format'
 import {
   isAwaitingQuarterStart,
-  isRegulationComplete,
+  isAwaitingRegulationDecision,
   nextQuarterNumber,
 } from '@/lib/clock'
 import { usePushPulse } from '@/hooks/usePushPulse'
@@ -21,6 +21,7 @@ export function ScoreboardPanel({ fixtureId }: ScoreboardPanelProps) {
   const clockRunning = useAppStore((s) => s.games[fixtureId]?.clock.running ?? false)
   const clockPeriod = useAppStore((s) => s.games[fixtureId]?.clock.period ?? 1)
   const gameStarted = useAppStore((s) => s.games[fixtureId]?.gameStarted ?? false)
+  const gameEnded = useAppStore((s) => s.games[fixtureId]?.gameEnded ?? false)
   const down = useAppStore((s) => s.games[fixtureId]?.down ?? 1)
   const distance = useAppStore((s) => s.games[fixtureId]?.distance ?? 10)
   const ballOn = useAppStore((s) => s.games[fixtureId]?.ballOn ?? 25)
@@ -57,12 +58,19 @@ export function ScoreboardPanel({ fixtureId }: ScoreboardPanelProps) {
     },
     gameStarted,
   )
-  const regulationComplete = isRegulationComplete({
-    seconds: clockSeconds,
-    period: clockPeriod,
-  })
+  const awaitingRegulationDecision = isAwaitingRegulationDecision(
+    gameStarted,
+    gameEnded,
+    {
+      seconds: clockSeconds,
+      period: clockPeriod,
+    },
+  )
+  const clockLocked = awaitingRegulationDecision || gameEnded
 
   const handleClockPress = () => {
+    if (clockLocked) return
+
     if (pregame || awaitingQuarterStart) {
       startPeriod(fixtureId)
       return
@@ -92,24 +100,29 @@ export function ScoreboardPanel({ fixtureId }: ScoreboardPanelProps) {
             <button
               type="button"
               onClick={handleClockPress}
-              disabled={regulationComplete}
+              disabled={clockLocked}
               className={cn(
                 'flex h-full flex-1 flex-col items-center justify-center border-r border-[var(--color-panel-border)] px-3 py-2 transition-colors active:opacity-80',
                 awaitingQuarterStart && 'bg-[var(--color-primary-bg)]',
-                regulationComplete && 'bg-[var(--color-primary-bg)]',
+                awaitingRegulationDecision && 'bg-[var(--color-primary-bg)]',
+                gameEnded && 'bg-[var(--color-primary-bg)]',
                 paused &&
                   !awaitingQuarterStart &&
-                  !regulationComplete &&
+                  !clockLocked &&
                   'bg-[var(--color-clock-paused-bg)]',
               )}
               aria-label={
-                awaitingQuarterStart
-                  ? `Start quarter ${nextQuarterNumber(clockPeriod)}`
-                  : paused
-                    ? 'Start clock'
-                    : 'Pause clock'
+                gameEnded
+                  ? 'Game final'
+                  : awaitingRegulationDecision
+                    ? 'End of regulation'
+                    : awaitingQuarterStart
+                      ? `Start quarter ${nextQuarterNumber(clockPeriod)}`
+                      : paused
+                        ? 'Start clock'
+                        : 'Pause clock'
               }
-              aria-pressed={!paused && !awaitingQuarterStart && !regulationComplete}
+              aria-pressed={!paused && !awaitingQuarterStart && !clockLocked}
             >
               <span className="text-[2rem] font-bold leading-none tracking-tight text-[var(--color-text)]">
                 {formatClock(clockSeconds)}
@@ -119,12 +132,17 @@ export function ScoreboardPanel({ fixtureId }: ScoreboardPanelProps) {
                   START Q{nextQuarterNumber(clockPeriod)}
                 </span>
               )}
-              {regulationComplete && (
-                <span className="mt-1.5 rounded-full bg-[var(--color-score-bg)] px-2.5 py-0.5 text-[10px] font-bold tracking-wider text-white">
+              {awaitingRegulationDecision && (
+                <span className="mt-1.5 rounded-full border border-[var(--color-primary-border)] bg-[var(--color-primary-chip-bg)] px-2.5 py-0.5 text-[10px] font-bold tracking-wider text-[var(--color-primary-chip-text)]">
                   END OF REGULATION
                 </span>
               )}
-              {paused && !awaitingQuarterStart && !regulationComplete && (
+              {gameEnded && (
+                <span className="mt-1.5 rounded-full bg-[var(--color-score-bg)] px-2.5 py-0.5 text-[10px] font-bold tracking-wider text-white">
+                  FINAL
+                </span>
+              )}
+              {paused && !awaitingQuarterStart && !clockLocked && (
                 <span className="mt-1.5 rounded-full bg-[var(--color-danger)] px-2.5 py-0.5 text-[10px] font-bold tracking-wider text-white">
                   PAUSED
                 </span>

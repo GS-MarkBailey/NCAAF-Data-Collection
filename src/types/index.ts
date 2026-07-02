@@ -51,6 +51,8 @@ export interface GameState {
   takeControlActive: boolean
   /** False until the operator kicks off Q1 for this fixture session */
   gameStarted: boolean
+  /** True after the operator ends the game at the regulation decision */
+  gameEnded: boolean
   plays: PlayEntry[]
   simulation?: PlaySimulationState
 }

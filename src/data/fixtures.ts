@@ -279,6 +279,7 @@ export function createInitialGameState(fixture: Fixture): GameState {
     },
     takeControlActive: false,
     gameStarted: false,
+    gameEnded: false,
     plays: [],
     simulation: createInitialSimulation(true),
   }

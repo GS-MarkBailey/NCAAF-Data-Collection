@@ -6,9 +6,10 @@ import { appendAction, createUserAction } from '@/lib/actionLog'
 import { tickPlaySimulation, createInitialSimulation, createQuarterStartPlay } from '@/lib/playSimulation'
 import {
   QUARTER_LENGTH_SECONDS,
+  REGULATION_QUARTERS,
   clampPeriod,
   isAwaitingQuarterStart,
-  isRegulationComplete,
+  isAwaitingRegulationDecision,
 } from '@/lib/clock'
 
 interface AppStore {
@@ -28,6 +29,8 @@ interface AppStore {
   setClockPeriod: (fixtureId: string, period: number) => void
   startPeriod: (fixtureId: string) => void
   endPeriod: (fixtureId: string) => void
+  startOvertime: (fixtureId: string) => void
+  endGame: (fixtureId: string) => void
   startNextQuarter: (fixtureId: string) => void
   setPossession: (fixtureId: string, possessionIsHome: boolean) => void
   setHomeAttacksRight: (fixtureId: string, homeAttacksRight: boolean) => void
@@ -123,7 +126,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   toggleClock: (fixtureId) => {
     set((state) => {
       const game = state.games[fixtureId]
-      if (!game || !game.gameStarted) return state
+      if (!game || !game.gameStarted || game.gameEnded) return state
       if (isAwaitingQuarterStart(game.clock, game.gameStarted)) return state
 
       const running = !game.clock.running
@@ -322,9 +325,17 @@ export const useAppStore = create<AppStore>((set, get) => ({
   endPeriod: (fixtureId) => {
     set((state) => {
       const game = state.games[fixtureId]
-      if (!game || !game.gameStarted) return state
+      if (!game || !game.gameStarted || game.gameEnded) return state
       if (isAwaitingQuarterStart(game.clock, game.gameStarted)) return state
-      if (isRegulationComplete(game.clock)) return state
+      if (
+        isAwaitingRegulationDecision(
+          game.gameStarted,
+          game.gameEnded,
+          game.clock,
+        )
+      ) {
+        return state
+      }
 
       const clockBefore = {
         seconds: game.clock.seconds,
@@ -348,6 +359,92 @@ export const useAppStore = create<AppStore>((set, get) => ({
               type: 'period_end',
               payload: { period: game.clock.period },
             },
+            clockBefore,
+          ),
+        ),
+      }
+    })
+  },
+
+  startOvertime: (fixtureId) => {
+    set((state) => {
+      const game = state.games[fixtureId]
+      if (
+        !game ||
+        !isAwaitingRegulationDecision(
+          game.gameStarted,
+          game.gameEnded,
+          game.clock,
+        )
+      ) {
+        return state
+      }
+
+      const toPeriod = REGULATION_QUARTERS + 1
+      const clockBefore = {
+        seconds: game.clock.seconds,
+        period: game.clock.period,
+      }
+
+      return {
+        games: updateGame(state.games, fixtureId, (g) => ({
+          ...g,
+          clock: {
+            period: toPeriod,
+            seconds: QUARTER_LENGTH_SECONDS,
+            running: true,
+          },
+          plays: [...g.plays, createQuarterStartPlay(g, toPeriod)],
+        })),
+        actionLogs: appendAction(
+          state.actionLogs,
+          createUserAction(
+            fixtureId,
+            {
+              type: 'overtime_start',
+              payload: { seconds: QUARTER_LENGTH_SECONDS },
+            },
+            clockBefore,
+          ),
+        ),
+      }
+    })
+  },
+
+  endGame: (fixtureId) => {
+    set((state) => {
+      const game = state.games[fixtureId]
+      if (
+        !game ||
+        !isAwaitingRegulationDecision(
+          game.gameStarted,
+          game.gameEnded,
+          game.clock,
+        )
+      ) {
+        return state
+      }
+
+      const clockBefore = {
+        seconds: game.clock.seconds,
+        period: game.clock.period,
+      }
+
+      return {
+        games: updateGame(state.games, fixtureId, (g) => ({
+          ...g,
+          gameEnded: true,
+          clock: {
+            ...g.clock,
+            seconds: 0,
+            running: false,
+          },
+        })),
+        actionLogs: appendAction(
+          state.actionLogs,
+          createUserAction(
+            fixtureId,
+            { type: 'game_end', payload: {} },
             clockBefore,
           ),
         ),

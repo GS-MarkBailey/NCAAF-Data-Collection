@@ -1,5 +1,5 @@
 import type { GameState, PlayEntry, PlaySimulationState } from '@/types'
-import { QUARTER_LENGTH_SECONDS } from '@/lib/clock'
+import { QUARTER_LENGTH_SECONDS, REGULATION_QUARTERS } from '@/lib/clock'
 import { formatClock } from '@/lib/format'
 
 export type { PlaySimulationState }
@@ -142,7 +142,10 @@ export function createQuarterStartPlay(
     down: game.down,
     distance: game.distance,
     ballOn: formatBallOn(offenseIsHome, game.ballOn, homeAbbr, awayAbbr),
-    description: `Start of quarter ${quarter}`,
+    description:
+      quarter > REGULATION_QUARTERS
+        ? 'Start of overtime'
+        : `Start of quarter ${quarter}`,
     clock: formatClock(QUARTER_LENGTH_SECONDS),
   }
 }
