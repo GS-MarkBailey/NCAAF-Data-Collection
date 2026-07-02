@@ -33,6 +33,9 @@ interface ScoreboardPanelShadcnProps {
   fixtureId: string
 }
 
+const PRIMARY_ACTION_BADGE_CLASS =
+  'rounded-full border-[var(--color-primary-border)] bg-[var(--color-primary-chip-bg)] text-[10px] font-bold tracking-wider text-[var(--color-primary-chip-text)] uppercase'
+
 export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps) {
   const clockSeconds = useAppStore((s) => s.games[fixtureId]?.clock.seconds ?? 0)
   const clockRunning = useAppStore((s) => s.games[fixtureId]?.clock.running ?? false)
@@ -256,19 +259,32 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
                   {inOvertime ? 'OVERTIME' : formatClock(clockSeconds)}
                 </span>
               </button>
-              <div className="pointer-events-none absolute inset-x-2 bottom-2 flex justify-center">
-                {pregame && (
-                  <Badge className="rounded-full border-[var(--color-primary-border)] bg-[var(--color-primary-chip-bg)] text-[10px] font-bold tracking-wider text-[var(--color-primary-chip-text)] uppercase">
-                    Kick off
+              <div className="pointer-events-none absolute inset-x-2 bottom-2 flex justify-center gap-2">
+                {showEndPeriodButton ? (
+                  <Badge
+                    render={
+                      <button
+                        type="button"
+                        className="pointer-events-auto"
+                        onClick={handleEndPeriod}
+                        aria-label="End period"
+                      />
+                    }
+                    className={PRIMARY_ACTION_BADGE_CLASS}
+                  >
+                    End PRD
                   </Badge>
+                ) : null}
+                {pregame && (
+                  <Badge className={PRIMARY_ACTION_BADGE_CLASS}>Kick off</Badge>
                 )}
-                {awaitingQuarterStart && (
-                  <Badge className="rounded-full border-[var(--color-primary-border)] bg-[var(--color-primary-chip-bg)] text-[10px] font-bold tracking-wider text-[var(--color-primary-chip-text)] uppercase">
+                {awaitingQuarterStart && !showEndPeriodButton ? (
+                  <Badge className={PRIMARY_ACTION_BADGE_CLASS}>
                     Start Q{nextQuarterNumber(clockPeriod)}
                   </Badge>
-                )}
+                ) : null}
                 {awaitingRegulationDecision && (
-                  <Badge className="rounded-full border-[var(--color-primary-border)] bg-[var(--color-primary-chip-bg)] text-[10px] font-bold tracking-wider text-[var(--color-primary-chip-text)] uppercase">
+                  <Badge className={PRIMARY_ACTION_BADGE_CLASS}>
                     Start overtime
                   </Badge>
                 )}
@@ -277,17 +293,6 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
                   <Badge variant="destructive">Paused</Badge>
                 )}
               </div>
-              {showEndPeriodButton ? (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="absolute top-2 right-2 z-10 h-7 border-border bg-background text-[10px] font-bold tracking-wider uppercase shadow-sm"
-                  onClick={handleEndPeriod}
-                >
-                  End PRD
-                </Button>
-              ) : null}
               {showEndOvertimeButton ? (
                 <Button
                   type="button"

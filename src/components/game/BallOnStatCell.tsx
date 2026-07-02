@@ -43,7 +43,7 @@ export function BallOnStatCell({
           labelClassName,
         )}
       >
-        BALL ON
+        BL ON
       </span>
       <BallOnValue yardLine={yardLine} arrowSide={arrowSide} className={valueClassName} />
     </div>
