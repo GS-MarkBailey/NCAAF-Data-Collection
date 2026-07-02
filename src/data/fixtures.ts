@@ -1,6 +1,5 @@
 import type { Fixture, GameState } from '@/types'
-import { createDemoPlays } from '@/data/demoPlays'
-import { DEMO_CLOCK_SECONDS, QUARTER_LENGTH_SECONDS } from '@/lib/clock'
+import { QUARTER_LENGTH_SECONDS } from '@/lib/clock'
 import { createInitialSimulation } from '@/lib/playSimulation'
 
 export const FIXTURES: Fixture[] = [
@@ -257,20 +256,18 @@ export const FIXTURES: Fixture[] = [
 ]
 
 export function createInitialGameState(fixture: Fixture): GameState {
-  const isDemo = fixture.id === 'NCAAF-2026-001'
-
-  const base: GameState = {
+  return {
     fixture,
     homeAttacksRight: null,
-    score: isDemo ? { home: 24, away: 17 } : { home: 0, away: 0 },
+    score: { home: 0, away: 0 },
     clock: {
-      seconds: isDemo ? DEMO_CLOCK_SECONDS : QUARTER_LENGTH_SECONDS,
+      seconds: QUARTER_LENGTH_SECONDS,
       running: false,
-      period: isDemo ? 3 : 1,
+      period: 1,
     },
-    down: isDemo ? 2 : 1,
-    distance: isDemo ? 7 : 10,
-    ballOn: isDemo ? 42 : 25,
+    down: 1,
+    distance: 10,
+    ballOn: 25,
     possessionIsHome: true,
     risks: {
       challengeReview: false,
@@ -281,13 +278,8 @@ export function createInitialGameState(fixture: Fixture): GameState {
       playAboutToStart: false,
     },
     takeControlActive: false,
-    gameStarted: isDemo,
+    gameStarted: false,
     plays: [],
     simulation: createInitialSimulation(true),
-  }
-
-  return {
-    ...base,
-    plays: isDemo ? createDemoPlays(fixture) : [],
   }
 }

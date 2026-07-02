@@ -57,7 +57,11 @@ export const useAppStore = create<AppStore>((set, get) => ({
     set((state) => ({
       games: {
         ...state.games,
-        [fixtureId]: state.games[fixtureId] ?? createInitialGameState(fixture),
+        [fixtureId]: createInitialGameState(fixture),
+      },
+      actionLogs: {
+        ...state.actionLogs,
+        [fixtureId]: [],
       },
     }))
   },
