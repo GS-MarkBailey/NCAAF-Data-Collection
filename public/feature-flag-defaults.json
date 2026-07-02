@@ -1,6 +1,6 @@
 {
-  "version": 1,
-  "updatedAt": "2026-07-01T00:00:00.000Z",
+  "version": 1782994355239,
+  "updatedAt": "2026-07-02T12:12:35.239Z",
   "flags": {
     "game.scoreboard": true,
     "game.playByPlay": true,
@@ -12,7 +12,7 @@
     "scoreboard.quarterStatus": true,
     "scoreboard.possessionSwitch": true,
     "risk.challengeReview": true,
-    "risk.statDelay": true,
+    "risk.statDelay": false,
     "risk.bigPlay": true,
     "risk.penalty": true,
     "risk.touchdown": true,
