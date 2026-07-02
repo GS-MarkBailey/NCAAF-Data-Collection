@@ -248,27 +248,27 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
                   {inOvertime ? 'OVERTIME' : formatClock(clockSeconds)}
                 </span>
               </button>
-              {pregame && (
-                <Badge className="rounded-full border-[var(--color-primary-border)] bg-[var(--color-primary-chip-bg)] text-[10px] font-bold tracking-wider text-[var(--color-primary-chip-text)] uppercase">
-                  Kick off
-                </Badge>
-              )}
-              {awaitingQuarterStart && (
-                <Badge className="rounded-full border-[var(--color-primary-border)] bg-[var(--color-primary-chip-bg)] text-[10px] font-bold tracking-wider text-[var(--color-primary-chip-text)] uppercase">
-                  Start Q{nextQuarterNumber(clockPeriod)}
-                </Badge>
-              )}
-              {awaitingRegulationDecision && (
-                <Badge className="rounded-full border-[var(--color-primary-border)] bg-[var(--color-primary-chip-bg)] text-[10px] font-bold tracking-wider text-[var(--color-primary-chip-text)] uppercase">
-                  Start overtime
-                </Badge>
-              )}
-              {gameEnded && (
-                <Badge variant="secondary">Final</Badge>
-              )}
-              {paused && periodInProgress && (
-                <Badge variant="destructive">Paused</Badge>
-              )}
+              <div className="pointer-events-none absolute inset-x-2 bottom-2 flex justify-center">
+                {pregame && (
+                  <Badge className="rounded-full border-[var(--color-primary-border)] bg-[var(--color-primary-chip-bg)] text-[10px] font-bold tracking-wider text-[var(--color-primary-chip-text)] uppercase">
+                    Kick off
+                  </Badge>
+                )}
+                {awaitingQuarterStart && (
+                  <Badge className="rounded-full border-[var(--color-primary-border)] bg-[var(--color-primary-chip-bg)] text-[10px] font-bold tracking-wider text-[var(--color-primary-chip-text)] uppercase">
+                    Start Q{nextQuarterNumber(clockPeriod)}
+                  </Badge>
+                )}
+                {awaitingRegulationDecision && (
+                  <Badge className="rounded-full border-[var(--color-primary-border)] bg-[var(--color-primary-chip-bg)] text-[10px] font-bold tracking-wider text-[var(--color-primary-chip-text)] uppercase">
+                    Start overtime
+                  </Badge>
+                )}
+                {gameEnded && <Badge variant="secondary">Final</Badge>}
+                {paused && periodInProgress && (
+                  <Badge variant="destructive">Paused</Badge>
+                )}
+              </div>
               {periodInProgress && paused ? (
                 <Button
                   type="button"
