@@ -28,6 +28,7 @@ export function ClockWheelColumn({
   const viewportRef = useRef<HTMLDivElement>(null)
   const settleTimerRef = useRef<number | undefined>(undefined)
   const isDraggingRef = useRef(false)
+  const suppressSettleRef = useRef(false)
   const [edgePadding, setEdgePadding] = useState(0)
 
   useEffect(() => {
@@ -52,19 +53,27 @@ export function ClockWheelColumn({
       const index = values.indexOf(nextValue)
       if (index < 0) return
 
+      suppressSettleRef.current = true
       scroller.scrollTo({
         top: index * ITEM_HEIGHT,
         behavior,
       })
+
+      if (behavior === 'auto') {
+        window.setTimeout(() => {
+          suppressSettleRef.current = false
+        }, 150)
+      }
     },
     [values],
   )
 
   useEffect(() => {
+    if (edgePadding <= 0) return
     scrollToValue(value)
   }, [edgePadding, scrollToValue, value])
 
-  const settleSelection = useCallback(() => {
+  const settleSelection = useCallback((smooth = false) => {
     const scroller = scrollerRef.current
     if (!scroller) return
 
@@ -75,14 +84,16 @@ export function ClockWheelColumn({
 
     scroller.scrollTo({
       top: index * ITEM_HEIGHT,
-      behavior: 'smooth',
+      behavior: smooth ? 'smooth' : 'auto',
     })
     onChange(values[index]!)
   }, [onChange, values])
 
   const handleScroll = () => {
+    if (suppressSettleRef.current) return
+
     window.clearTimeout(settleTimerRef.current)
-    settleTimerRef.current = window.setTimeout(settleSelection, 100)
+    settleTimerRef.current = window.setTimeout(() => settleSelection(false), 100)
   }
 
   return (
@@ -95,7 +106,7 @@ export function ClockWheelColumn({
         <div
           ref={scrollerRef}
           className={cn(
-            'h-full overflow-y-auto overscroll-y-contain scroll-smooth snap-y snap-mandatory',
+            'h-full overflow-y-auto overscroll-y-contain snap-y snap-mandatory',
             '[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden',
           )}
           onScroll={handleScroll}
@@ -104,14 +115,16 @@ export function ClockWheelColumn({
           }}
           onPointerUp={() => {
             isDraggingRef.current = false
-            settleSelection()
+            settleSelection(true)
           }}
           onPointerLeave={() => {
-            if (isDraggingRef.current) settleSelection()
+            if (isDraggingRef.current) settleSelection(true)
           }}
           onWheel={() => {
+            if (suppressSettleRef.current) return
+
             window.clearTimeout(settleTimerRef.current)
-            settleTimerRef.current = window.setTimeout(settleSelection, 100)
+            settleTimerRef.current = window.setTimeout(() => settleSelection(false), 100)
           }}
         >
           <div style={{ height: edgePadding }} aria-hidden />
