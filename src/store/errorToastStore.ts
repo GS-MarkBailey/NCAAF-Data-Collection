@@ -3,7 +3,7 @@ import { create } from 'zustand'
 export const DEFAULT_ERROR_TOAST_MESSAGE =
   'Something went wrong. Please try again.'
 
-const AUTO_DISMISS_MS = 3000
+const AUTO_DISMISS_MS = 10_000
 
 interface ErrorToastStore {
   visible: boolean

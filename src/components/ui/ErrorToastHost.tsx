@@ -90,7 +90,7 @@ export function ErrorToastHost() {
       <div
         role="alert"
         className={cn(
-          'pointer-events-auto flex w-[min(20rem,calc(100vw-1.5rem))] items-start gap-3 rounded-xl border border-destructive/20 bg-background px-3 py-3 text-sm shadow-lg ring-1 ring-foreground/10 touch-none select-none',
+          'pointer-events-auto flex w-[min(18rem,calc(100vw-1.5rem))] items-start gap-2 rounded-lg border border-destructive/30 bg-destructive px-2.5 py-2 text-xs shadow-lg touch-none select-none',
           exiting ? 'error-toast-exit' : 'error-toast-enter',
           isDragging && 'transition-none',
         )}
@@ -109,10 +109,10 @@ export function ErrorToastHost() {
         onPointerCancel={handlePointerEnd}
       >
         <TriangleAlert
-          className="mt-0.5 size-5 shrink-0 text-destructive"
+          className="mt-px size-3.5 shrink-0 text-white"
           aria-hidden
         />
-        <p className="min-w-0 flex-1 text-sm leading-snug text-foreground">
+        <p className="min-w-0 flex-1 text-xs leading-snug text-white">
           {message}
         </p>
       </div>
