@@ -275,9 +275,9 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
                   variant="outline"
                   size="sm"
                   className="absolute top-2 right-2 z-10 h-7 border-border bg-background text-[10px] font-bold tracking-wider uppercase shadow-sm"
-                  onClick={handleEndPeriod}
+                  onClick={inOvertime ? handleEndGame : handleEndPeriod}
                 >
-                  End PRD
+                  {inOvertime ? 'End game' : 'End PRD'}
                 </Button>
               ) : null}
               {awaitingRegulationDecision ? (

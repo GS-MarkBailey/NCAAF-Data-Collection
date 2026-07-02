@@ -10,6 +10,7 @@ import {
   clampPeriod,
   isAwaitingQuarterStart,
   isAwaitingRegulationDecision,
+  isOvertimePeriod,
 } from '@/lib/clock'
 
 interface AppStore {
@@ -414,16 +415,19 @@ export const useAppStore = create<AppStore>((set, get) => ({
   endGame: (fixtureId) => {
     set((state) => {
       const game = state.games[fixtureId]
-      if (
-        !game ||
-        !isAwaitingRegulationDecision(
-          game.gameStarted,
-          game.gameEnded,
-          game.clock,
-        )
-      ) {
-        return state
-      }
+      if (!game || !game.gameStarted || game.gameEnded) return state
+
+      const atRegulationDecision = isAwaitingRegulationDecision(
+        game.gameStarted,
+        game.gameEnded,
+        game.clock,
+      )
+      const inPausedOvertime =
+        isOvertimePeriod(game.clock.period) &&
+        !game.clock.running &&
+        game.clock.seconds > 0
+
+      if (!atRegulationDecision && !inPausedOvertime) return state
 
       const clockBefore = {
         seconds: game.clock.seconds,
