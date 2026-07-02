@@ -144,7 +144,7 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
         </CardTitle>
       </CardHeader>
       <CardContent className="flex min-h-0 flex-1 flex-col gap-2">
-        <div className="flex min-h-0 flex-1 items-stretch overflow-hidden rounded-lg border border-border">
+        <div className="relative flex min-h-0 flex-1 items-stretch overflow-hidden rounded-lg border border-border">
           {editingClock ? (
             <div className="grid h-full min-h-0 flex-1 grid-rows-[minmax(0,1fr)_auto] overflow-hidden">
               <ClockWheelEditor
@@ -191,7 +191,7 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
               onClick={handleToggleClock}
               onKeyDown={handleContainerKeyDown}
               className={cn(
-                'flex h-full min-h-0 flex-1 flex-col items-center justify-center gap-2 px-2 transition-colors',
+                'relative flex h-full min-h-0 flex-1 flex-col items-center justify-center gap-2 px-2 transition-colors',
                 (pregame || awaitingQuarterStart) && 'bg-[var(--color-primary-bg)]',
                 regulationComplete && 'bg-muted',
                 !regulationComplete && 'cursor-pointer hover:bg-muted/40 active:bg-muted/60',
@@ -235,7 +235,7 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
                   type="button"
                   variant="outline"
                   size="sm"
-                  className="h-7 border-border bg-background text-[10px] font-bold tracking-wider uppercase"
+                  className="absolute right-2 bottom-2 z-10 h-7 border-border bg-background text-[10px] font-bold tracking-wider uppercase shadow-sm"
                   onClick={handleEndPeriod}
                 >
                   End period
