@@ -98,9 +98,10 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
     period: clockPeriod,
   })
   const clockLocked = awaitingRegulationDecision || gameEnded
+  const inOvertime = isOvertimePeriod(clockPeriod)
 
   const handleOpenClockEditor = () => {
-    if (clockLocked) return
+    if (clockLocked || inOvertime) return
 
     const parts = clockToParts(clockSeconds)
     setDraftPeriod(clockPeriod)
@@ -223,17 +224,28 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
                 type="button"
                 className={cn(
                   'rounded-md border-0 bg-transparent px-2 py-1 transition-colors',
-                  !clockLocked && 'hover:bg-muted/60 active:bg-muted/80',
+                  !clockLocked && !inOvertime && 'hover:bg-muted/60 active:bg-muted/80',
                 )}
                 onClick={(event) => {
                   event.stopPropagation()
                   handleOpenClockEditor()
                 }}
-                disabled={clockLocked}
-                aria-label={`Edit game clock, currently ${formatClock(clockSeconds)}`}
+                disabled={clockLocked || inOvertime}
+                aria-label={
+                  inOvertime
+                    ? 'Overtime in progress'
+                    : `Edit game clock, currently ${formatClock(clockSeconds)}`
+                }
               >
-                <span className="text-[2rem] font-bold leading-none tabular-nums">
-                  {formatClock(clockSeconds)}
+                <span
+                  className={cn(
+                    'font-bold leading-none',
+                    inOvertime
+                      ? 'text-lg tracking-wider uppercase'
+                      : 'text-[2rem] tabular-nums',
+                  )}
+                >
+                  {inOvertime ? 'OVERTIME' : formatClock(clockSeconds)}
                 </span>
               </button>
               {pregame && (
