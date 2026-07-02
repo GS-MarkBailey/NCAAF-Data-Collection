@@ -56,10 +56,9 @@ const STATUS_PRIORITY: Record<ConnectionStatusKind, number> = {
 }
 
 const PROTOTYPE_STATUSES: ConnectionStatusItem[] = [
-  { label: 'heartbeat', status: 'online' },
-  { label: 'match state', status: 'online' },
-  { label: 'platform remote data', status: 'online' },
-  { label: 'stored', status: 'online' },
+  { label: 'Heartbeat', status: 'online' },
+  { label: 'Match State Platform', status: 'online' },
+  { label: 'Remote Data Stored', status: 'online' },
 ]
 
 function getSummaryStatus(
