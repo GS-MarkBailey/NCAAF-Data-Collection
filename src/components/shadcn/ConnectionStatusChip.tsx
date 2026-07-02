@@ -56,10 +56,10 @@ const STATUS_PRIORITY: Record<ConnectionStatusKind, number> = {
 }
 
 const PROTOTYPE_STATUSES: ConnectionStatusItem[] = [
-  { label: 'Live feed', status: 'online' },
-  { label: 'Stats sync', status: 'online' },
-  { label: 'Play clock', status: 'online' },
-  { label: 'Scoreboard', status: 'online' },
+  { label: 'heartbeat', status: 'online' },
+  { label: 'match state', status: 'online' },
+  { label: 'platform remote data', status: 'online' },
+  { label: 'stored', status: 'online' },
 ]
 
 function getSummaryStatus(
@@ -137,7 +137,7 @@ export function ConnectionStatusChip({
         >
           <Popover.Popup
             className={cn(
-              'relative z-[100] min-w-[11rem] rounded-lg bg-popover p-1 text-popover-foreground shadow-md outline-none',
+              'relative z-[100] min-w-[13.5rem] rounded-lg bg-popover p-1 text-popover-foreground shadow-md outline-none',
               'data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95',
               'data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95',
             )}
