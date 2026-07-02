@@ -1,4 +1,4 @@
-import { useState, type CSSProperties, type KeyboardEvent } from 'react'
+import { useState, type CSSProperties, type KeyboardEvent, type MouseEvent } from 'react'
 import { LayoutGrid } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { formatClock } from '@/lib/format'
@@ -7,6 +7,7 @@ import {
   clockToParts,
   getQuarterStatus,
   isAwaitingQuarterStart,
+  isPeriodInProgress,
   isRegulationComplete,
   nextQuarterNumber,
   type QuarterStatus,
@@ -34,6 +35,7 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
   const clockSeconds = useAppStore((s) => s.games[fixtureId]?.clock.seconds ?? 0)
   const clockRunning = useAppStore((s) => s.games[fixtureId]?.clock.running ?? false)
   const clockPeriod = useAppStore((s) => s.games[fixtureId]?.clock.period ?? 1)
+  const gameStarted = useAppStore((s) => s.games[fixtureId]?.gameStarted ?? false)
   const down = useAppStore((s) => s.games[fixtureId]?.down ?? 1)
   const distance = useAppStore((s) => s.games[fixtureId]?.distance ?? 10)
   const ballOn = useAppStore((s) => s.games[fixtureId]?.ballOn ?? 25)
@@ -59,7 +61,8 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
   const setClockTime = useAppStore((s) => s.setClockTime)
   const setClockPeriod = useAppStore((s) => s.setClockPeriod)
   const toggleClock = useAppStore((s) => s.toggleClock)
-  const startNextQuarter = useAppStore((s) => s.startNextQuarter)
+  const startPeriod = useAppStore((s) => s.startPeriod)
+  const endPeriod = useAppStore((s) => s.endPeriod)
   const setPossession = useAppStore((s) => s.setPossession)
   const showQuarterStatus = useFeatureFlag('scoreboard.quarterStatus')
   const showPossessionSwitch = useFeatureFlag('scoreboard.possessionSwitch')
@@ -70,11 +73,19 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
   const [draftSeconds, setDraftSeconds] = useState(0)
 
   const paused = !clockRunning
-  const awaitingQuarterStart = isAwaitingQuarterStart({
+  const pregame = !gameStarted
+  const awaitingQuarterStart = isAwaitingQuarterStart(
+    {
+      seconds: clockSeconds,
+      period: clockPeriod,
+    },
+    gameStarted,
+  )
+  const regulationComplete = isRegulationComplete({
     seconds: clockSeconds,
     period: clockPeriod,
   })
-  const regulationComplete = isRegulationComplete({
+  const periodInProgress = isPeriodInProgress(gameStarted, {
     seconds: clockSeconds,
     period: clockPeriod,
   })
@@ -102,12 +113,17 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
   const handleToggleClock = () => {
     if (regulationComplete) return
 
-    if (awaitingQuarterStart) {
-      startNextQuarter(fixtureId)
+    if (pregame || awaitingQuarterStart) {
+      startPeriod(fixtureId)
       return
     }
 
     toggleClock(fixtureId)
+  }
+
+  const handleEndPeriod = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation()
+    endPeriod(fixtureId)
   }
 
   const handleContainerKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -164,17 +180,19 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
               aria-label={
                 regulationComplete
                   ? 'End of regulation'
-                  : awaitingQuarterStart
-                    ? `Start quarter ${nextQuarterNumber(clockPeriod)}`
-                    : paused
-                      ? 'Start clock'
-                      : 'Pause clock'
+                  : pregame
+                    ? 'Kick off game'
+                    : awaitingQuarterStart
+                      ? `Start quarter ${nextQuarterNumber(clockPeriod)}`
+                      : paused
+                        ? 'Start clock'
+                        : 'Pause clock'
               }
               onClick={handleToggleClock}
               onKeyDown={handleContainerKeyDown}
               className={cn(
                 'flex h-full min-h-0 flex-1 flex-col items-center justify-center gap-2 px-2 transition-colors',
-                awaitingQuarterStart && 'bg-[var(--color-primary-bg)]',
+                (pregame || awaitingQuarterStart) && 'bg-[var(--color-primary-bg)]',
                 regulationComplete && 'bg-muted',
                 !regulationComplete && 'cursor-pointer hover:bg-muted/40 active:bg-muted/60',
               )}
@@ -196,6 +214,11 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
                   {formatClock(clockSeconds)}
                 </span>
               </button>
+              {pregame && (
+                <Badge className="rounded-full border-[var(--color-primary-border)] bg-[var(--color-primary-chip-bg)] text-[10px] font-bold tracking-wider text-[var(--color-primary-chip-text)] uppercase">
+                  Kick off
+                </Badge>
+              )}
               {awaitingQuarterStart && (
                 <Badge className="rounded-full border-[var(--color-primary-border)] bg-[var(--color-primary-chip-bg)] text-[10px] font-bold tracking-wider text-[var(--color-primary-chip-text)] uppercase">
                   Start Q{nextQuarterNumber(clockPeriod)}
@@ -204,9 +227,20 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
               {regulationComplete && (
                 <Badge variant="secondary">End of regulation</Badge>
               )}
-              {paused && !awaitingQuarterStart && !regulationComplete && (
+              {paused && periodInProgress && (
                 <Badge variant="destructive">Paused</Badge>
               )}
+              {periodInProgress ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-7 border-border bg-background text-[10px] font-bold tracking-wider uppercase"
+                  onClick={handleEndPeriod}
+                >
+                  End period
+                </Button>
+              ) : null}
             </div>
           )}
         </div>
@@ -218,10 +252,12 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
               value={clockPeriod}
               status={
                 showQuarterStatus
-                  ? getQuarterStatus({
-                      seconds: clockSeconds,
-                      running: clockRunning,
-                    })
+                  ? pregame
+                    ? 'ended'
+                    : getQuarterStatus({
+                        seconds: clockSeconds,
+                        running: clockRunning,
+                      })
                   : undefined
               }
             />

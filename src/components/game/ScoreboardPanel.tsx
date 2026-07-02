@@ -20,6 +20,7 @@ export function ScoreboardPanel({ fixtureId }: ScoreboardPanelProps) {
   const clockSeconds = useAppStore((s) => s.games[fixtureId]?.clock.seconds ?? 0)
   const clockRunning = useAppStore((s) => s.games[fixtureId]?.clock.running ?? false)
   const clockPeriod = useAppStore((s) => s.games[fixtureId]?.clock.period ?? 1)
+  const gameStarted = useAppStore((s) => s.games[fixtureId]?.gameStarted ?? false)
   const down = useAppStore((s) => s.games[fixtureId]?.down ?? 1)
   const distance = useAppStore((s) => s.games[fixtureId]?.distance ?? 10)
   const ballOn = useAppStore((s) => s.games[fixtureId]?.ballOn ?? 25)
@@ -44,22 +45,26 @@ export function ScoreboardPanel({ fixtureId }: ScoreboardPanelProps) {
 
   const toggleClock = useAppStore((s) => s.toggleClock)
   const adjustClock = useAppStore((s) => s.adjustClock)
-  const startNextQuarter = useAppStore((s) => s.startNextQuarter)
+  const startPeriod = useAppStore((s) => s.startPeriod)
   const setPossession = useAppStore((s) => s.setPossession)
 
   const paused = !clockRunning
-  const awaitingQuarterStart = isAwaitingQuarterStart({
-    seconds: clockSeconds,
-    period: clockPeriod,
-  })
+  const pregame = !gameStarted
+  const awaitingQuarterStart = isAwaitingQuarterStart(
+    {
+      seconds: clockSeconds,
+      period: clockPeriod,
+    },
+    gameStarted,
+  )
   const regulationComplete = isRegulationComplete({
     seconds: clockSeconds,
     period: clockPeriod,
   })
 
   const handleClockPress = () => {
-    if (awaitingQuarterStart) {
-      startNextQuarter(fixtureId)
+    if (pregame || awaitingQuarterStart) {
+      startPeriod(fixtureId)
       return
     }
     toggleClock(fixtureId)

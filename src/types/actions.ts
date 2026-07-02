@@ -6,6 +6,7 @@ export type UserActionType =
   | 'clock_toggle'
   | 'clock_adjust'
   | 'period_set'
+  | 'period_end'
   | 'quarter_start'
   | 'possession_toggle'
   | 'field_direction_set'
@@ -58,6 +59,13 @@ export type PeriodSetAction = UserActionBase & {
   }
 }
 
+export type PeriodEndAction = UserActionBase & {
+  type: 'period_end'
+  payload: {
+    period: number
+  }
+}
+
 export type QuarterStartAction = UserActionBase & {
   type: 'quarter_start'
   payload: {
@@ -89,6 +97,7 @@ export type UserAction =
   | ClockToggleAction
   | ClockAdjustAction
   | PeriodSetAction
+  | PeriodEndAction
   | QuarterStartAction
   | PossessionToggleAction
   | FieldDirectionSetAction

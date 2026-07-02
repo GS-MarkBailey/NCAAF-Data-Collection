@@ -49,6 +49,8 @@ export interface GameState {
   possessionIsHome: boolean
   risks: Record<RiskType, boolean>
   takeControlActive: boolean
+  /** False until the operator kicks off Q1 for this fixture session */
+  gameStarted: boolean
   plays: PlayEntry[]
   simulation?: PlaySimulationState
 }

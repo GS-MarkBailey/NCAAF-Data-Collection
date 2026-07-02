@@ -73,8 +73,12 @@ export function formatActionLabel(action: UserAction): string {
     }
     case 'period_set':
       return `Period Q${action.payload.fromPeriod} → Q${action.payload.toPeriod}`
+    case 'period_end':
+      return `Period Q${action.payload.period} ended`
     case 'quarter_start':
-      return `Quarter ${action.payload.toPeriod} started (${formatClock(action.payload.seconds)})`
+      return action.payload.fromPeriod === 0
+        ? `Game kicked off — Q${action.payload.toPeriod} (${formatClock(action.payload.seconds)})`
+        : `Quarter ${action.payload.toPeriod} started (${formatClock(action.payload.seconds)})`
     case 'possession_toggle':
       return `Possession → ${action.payload.teamAbbr}`
     case 'field_direction_set':
@@ -94,6 +98,8 @@ export function formatActionType(action: UserAction): string {
       return 'Clock Adjust'
     case 'period_set':
       return 'Period'
+    case 'period_end':
+      return 'Period End'
     case 'quarter_start':
       return 'Quarter Start'
     case 'possession_toggle':

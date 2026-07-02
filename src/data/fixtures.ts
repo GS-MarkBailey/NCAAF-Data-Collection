@@ -1,7 +1,7 @@
 import type { Fixture, GameState } from '@/types'
 import { createDemoPlays } from '@/data/demoPlays'
 import { DEMO_CLOCK_SECONDS, QUARTER_LENGTH_SECONDS } from '@/lib/clock'
-import { createInitialSimulation, createQuarterStartPlay } from '@/lib/playSimulation'
+import { createInitialSimulation } from '@/lib/playSimulation'
 
 export const FIXTURES: Fixture[] = [
   {
@@ -281,14 +281,13 @@ export function createInitialGameState(fixture: Fixture): GameState {
       playAboutToStart: false,
     },
     takeControlActive: false,
+    gameStarted: isDemo,
     plays: [],
     simulation: createInitialSimulation(true),
   }
 
   return {
     ...base,
-    plays: isDemo
-      ? createDemoPlays(fixture)
-      : [createQuarterStartPlay(base, base.clock.period)],
+    plays: isDemo ? createDemoPlays(fixture) : [],
   }
 }

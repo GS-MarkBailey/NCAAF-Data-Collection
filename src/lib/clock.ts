@@ -11,8 +11,23 @@ export function clampPeriod(period: number): number {
 export function isAwaitingQuarterStart(clock: {
   seconds: number
   period: number
-}): boolean {
-  return clock.seconds === 0 && clock.period < REGULATION_QUARTERS
+}, gameStarted = true): boolean {
+  return (
+    gameStarted &&
+    clock.seconds === 0 &&
+    clock.period < REGULATION_QUARTERS
+  )
+}
+
+export function isPeriodInProgress(
+  gameStarted: boolean,
+  clock: { seconds: number; period: number },
+): boolean {
+  return (
+    gameStarted &&
+    !isAwaitingQuarterStart(clock, gameStarted) &&
+    !isRegulationComplete(clock)
+  )
 }
 
 export function isRegulationComplete(clock: {

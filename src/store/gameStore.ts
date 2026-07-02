@@ -8,6 +8,7 @@ import {
   QUARTER_LENGTH_SECONDS,
   clampPeriod,
   isAwaitingQuarterStart,
+  isRegulationComplete,
 } from '@/lib/clock'
 
 interface AppStore {
@@ -25,6 +26,8 @@ interface AppStore {
   adjustClock: (fixtureId: string, delta: number) => void
   setClockTime: (fixtureId: string, seconds: number) => void
   setClockPeriod: (fixtureId: string, period: number) => void
+  startPeriod: (fixtureId: string) => void
+  endPeriod: (fixtureId: string) => void
   startNextQuarter: (fixtureId: string) => void
   setPossession: (fixtureId: string, possessionIsHome: boolean) => void
   setHomeAttacksRight: (fixtureId: string, homeAttacksRight: boolean) => void
@@ -116,8 +119,8 @@ export const useAppStore = create<AppStore>((set, get) => ({
   toggleClock: (fixtureId) => {
     set((state) => {
       const game = state.games[fixtureId]
-      if (!game) return state
-      if (isAwaitingQuarterStart(game.clock)) return state
+      if (!game || !game.gameStarted) return state
+      if (isAwaitingQuarterStart(game.clock, game.gameStarted)) return state
 
       const running = !game.clock.running
       const seconds = game.clock.seconds
@@ -238,17 +241,50 @@ export const useAppStore = create<AppStore>((set, get) => ({
     })
   },
 
-  startNextQuarter: (fixtureId) => {
+  startPeriod: (fixtureId) => {
     set((state) => {
       const game = state.games[fixtureId]
-      if (!game || !isAwaitingQuarterStart(game.clock)) return state
+      if (!game) return state
 
-      const fromPeriod = game.clock.period
-      const toPeriod = fromPeriod + 1
       const clockBefore = {
         seconds: game.clock.seconds,
         period: game.clock.period,
       }
+
+      if (!game.gameStarted) {
+        return {
+          games: updateGame(state.games, fixtureId, (g) => ({
+            ...g,
+            gameStarted: true,
+            clock: {
+              period: 1,
+              seconds: QUARTER_LENGTH_SECONDS,
+              running: true,
+            },
+            plays: [...g.plays, createQuarterStartPlay(g, 1)],
+          })),
+          actionLogs: appendAction(
+            state.actionLogs,
+            createUserAction(
+              fixtureId,
+              {
+                type: 'quarter_start',
+                payload: {
+                  fromPeriod: 0,
+                  toPeriod: 1,
+                  seconds: QUARTER_LENGTH_SECONDS,
+                },
+              },
+              clockBefore,
+            ),
+          ),
+        }
+      }
+
+      if (!isAwaitingQuarterStart(game.clock, game.gameStarted)) return state
+
+      const fromPeriod = game.clock.period
+      const toPeriod = fromPeriod + 1
 
       return {
         games: updateGame(state.games, fixtureId, (g) => ({
@@ -277,6 +313,46 @@ export const useAppStore = create<AppStore>((set, get) => ({
         ),
       }
     })
+  },
+
+  endPeriod: (fixtureId) => {
+    set((state) => {
+      const game = state.games[fixtureId]
+      if (!game || !game.gameStarted) return state
+      if (isAwaitingQuarterStart(game.clock, game.gameStarted)) return state
+      if (isRegulationComplete(game.clock)) return state
+
+      const clockBefore = {
+        seconds: game.clock.seconds,
+        period: game.clock.period,
+      }
+
+      return {
+        games: updateGame(state.games, fixtureId, (g) => ({
+          ...g,
+          clock: {
+            ...g.clock,
+            seconds: 0,
+            running: false,
+          },
+        })),
+        actionLogs: appendAction(
+          state.actionLogs,
+          createUserAction(
+            fixtureId,
+            {
+              type: 'period_end',
+              payload: { period: game.clock.period },
+            },
+            clockBefore,
+          ),
+        ),
+      }
+    })
+  },
+
+  startNextQuarter: (fixtureId) => {
+    get().startPeriod(fixtureId)
   },
 
   setPossession: (fixtureId, possessionIsHome) => {
@@ -322,15 +398,10 @@ export const useAppStore = create<AppStore>((set, get) => ({
       const game = state.games[fixtureId]
       if (!game || game.homeAttacksRight === homeAttacksRight) return state
 
-      const isInitialSet = game.homeAttacksRight === null
-
       return {
         games: updateGame(state.games, fixtureId, (g) => ({
           ...g,
           homeAttacksRight,
-          clock: isInitialSet
-            ? { ...g.clock, running: true }
-            : g.clock,
         })),
         actionLogs: appendAction(
           state.actionLogs,
@@ -353,7 +424,9 @@ export const useAppStore = create<AppStore>((set, get) => ({
   tickClock: (fixtureId) => {
     set((state) => ({
       games: updateGame(state.games, fixtureId, (game) => {
-        if (!game.clock.running || game.clock.seconds <= 0) return game
+        if (!game.gameStarted || !game.clock.running || game.clock.seconds <= 0) {
+          return game
+        }
 
         const withSimulation = game.simulation
           ? game
