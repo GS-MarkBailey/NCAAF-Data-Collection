@@ -230,7 +230,7 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
               {paused && periodInProgress && (
                 <Badge variant="destructive">Paused</Badge>
               )}
-              {periodInProgress ? (
+              {periodInProgress && paused ? (
                 <Button
                   type="button"
                   variant="outline"
