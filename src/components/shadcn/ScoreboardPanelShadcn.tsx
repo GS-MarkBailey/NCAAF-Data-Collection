@@ -7,6 +7,7 @@ import {
   clockToParts,
   getQuarterStatus,
   isAwaitingQuarterStart,
+  canEndCurrentPeriod,
   isAwaitingRegulationDecision,
   isOvertimePeriod,
   isPeriodInProgress,
@@ -97,8 +98,15 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
     seconds: clockSeconds,
     period: clockPeriod,
   })
-  const clockLocked = gameEnded
+  const showEndPeriodButton = canEndCurrentPeriod(gameStarted, gameEnded, {
+    seconds: clockSeconds,
+    period: clockPeriod,
+    running: clockRunning,
+  })
   const inOvertime = isOvertimePeriod(clockPeriod)
+  const showEndOvertimeButton =
+    inOvertime && !gameEnded && paused && clockSeconds > 0
+  const clockLocked = gameEnded
 
   const handleOpenClockEditor = () => {
     if (clockLocked || inOvertime) return
@@ -269,15 +277,26 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
                   <Badge variant="destructive">Paused</Badge>
                 )}
               </div>
-              {periodInProgress && paused ? (
+              {showEndPeriodButton ? (
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
                   className="absolute top-2 right-2 z-10 h-7 border-border bg-background text-[10px] font-bold tracking-wider uppercase shadow-sm"
-                  onClick={inOvertime ? handleEndGame : handleEndPeriod}
+                  onClick={handleEndPeriod}
                 >
-                  {inOvertime ? 'End game' : 'End PRD'}
+                  End PRD
+                </Button>
+              ) : null}
+              {showEndOvertimeButton ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="absolute top-2 right-2 z-10 h-7 border-border bg-background text-[10px] font-bold tracking-wider uppercase shadow-sm"
+                  onClick={handleEndGame}
+                >
+                  End game
                 </Button>
               ) : null}
               {awaitingRegulationDecision ? (

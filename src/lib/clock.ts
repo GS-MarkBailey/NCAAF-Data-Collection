@@ -33,6 +33,21 @@ export function isPeriodInProgress(
   )
 }
 
+/** True when the operator can end the current regulation period (End PRD). */
+export function canEndCurrentPeriod(
+  gameStarted: boolean,
+  gameEnded: boolean,
+  clock: { seconds: number; period: number; running: boolean },
+): boolean {
+  if (!gameStarted || gameEnded) return false
+  if (isOvertimePeriod(clock.period)) return false
+  if (isAwaitingRegulationDecision(gameStarted, gameEnded, clock)) return false
+
+  if (clock.seconds === 0) return true
+
+  return !clock.running && clock.seconds > 0
+}
+
 export function isAwaitingRegulationDecision(
   gameStarted: boolean,
   gameEnded: boolean,

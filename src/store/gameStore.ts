@@ -8,6 +8,7 @@ import {
   QUARTER_LENGTH_SECONDS,
   REGULATION_QUARTERS,
   clampPeriod,
+  canEndCurrentPeriod,
   isAwaitingQuarterStart,
   isAwaitingRegulationDecision,
   isOvertimePeriod,
@@ -326,14 +327,9 @@ export const useAppStore = create<AppStore>((set, get) => ({
   endPeriod: (fixtureId) => {
     set((state) => {
       const game = state.games[fixtureId]
-      if (!game || !game.gameStarted || game.gameEnded) return state
-      if (isAwaitingQuarterStart(game.clock, game.gameStarted)) return state
+      if (!game) return state
       if (
-        isAwaitingRegulationDecision(
-          game.gameStarted,
-          game.gameEnded,
-          game.clock,
-        )
+        !canEndCurrentPeriod(game.gameStarted, game.gameEnded, game.clock)
       ) {
         return state
       }
