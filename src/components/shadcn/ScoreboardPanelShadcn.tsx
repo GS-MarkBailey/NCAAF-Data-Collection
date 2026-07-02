@@ -262,10 +262,10 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
                   type="button"
                   variant="outline"
                   size="sm"
-                  className="absolute right-2 bottom-2 z-10 h-7 border-border bg-background text-[10px] font-bold tracking-wider uppercase shadow-sm"
+                  className="absolute top-2 right-2 z-10 h-7 border-border bg-background text-[10px] font-bold tracking-wider uppercase shadow-sm"
                   onClick={handleEndPeriod}
                 >
-                  End period
+                  End PRD
                 </Button>
               ) : null}
               {awaitingRegulationDecision ? (
