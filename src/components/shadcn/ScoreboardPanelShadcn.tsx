@@ -281,7 +281,15 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
                 </Button>
               ) : null}
               {awaitingRegulationDecision ? (
-                <div className="absolute inset-x-2 bottom-2 z-10 flex justify-end gap-2">
+                <div className="absolute top-2 right-2 z-10 flex gap-2">
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="h-7 bg-[var(--color-brand)] text-[10px] font-bold tracking-wider text-white uppercase shadow-sm hover:bg-[var(--color-brand-hover)]"
+                    onClick={handleStartOvertime}
+                  >
+                    Start overtime
+                  </Button>
                   <Button
                     type="button"
                     variant="outline"
@@ -290,14 +298,6 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
                     onClick={handleEndGame}
                   >
                     End game
-                  </Button>
-                  <Button
-                    type="button"
-                    size="sm"
-                    className="h-7 bg-[var(--color-brand)] text-[10px] font-bold tracking-wider text-white uppercase shadow-sm hover:bg-[var(--color-brand-hover)]"
-                    onClick={handleStartOvertime}
-                  >
-                    Start overtime
                   </Button>
                 </div>
               ) : null}
