@@ -21,6 +21,8 @@ export function ErrorToastHost() {
   const dragOffsetYRef = useRef(0)
 
   useEffect(() => {
+    showErrorToast()
+
     const intervalId = window.setInterval(() => {
       showErrorToast()
     }, ERROR_TOAST_INTERVAL_MS)
