@@ -2,11 +2,10 @@ import { useEffect, useRef, useState, type PointerEvent } from 'react'
 import { createPortal } from 'react-dom'
 import { TriangleAlert } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { showErrorToast, useErrorToastStore } from '@/store/errorToastStore'
+import { useErrorToastStore } from '@/store/errorToastStore'
 
 const EXIT_ANIMATION_MS = 280
 const SWIPE_DISMISS_THRESHOLD_PX = 48
-const ERROR_TOAST_INTERVAL_MS = 30_000
 
 export function ErrorToastHost() {
   const visible = useErrorToastStore((s) => s.visible)
@@ -19,16 +18,6 @@ export function ErrorToastHost() {
   const [isDragging, setIsDragging] = useState(false)
   const pointerStartYRef = useRef(0)
   const dragOffsetYRef = useRef(0)
-
-  useEffect(() => {
-    showErrorToast()
-
-    const intervalId = window.setInterval(() => {
-      showErrorToast()
-    }, ERROR_TOAST_INTERVAL_MS)
-
-    return () => window.clearInterval(intervalId)
-  }, [])
 
   useEffect(() => {
     if (!exiting) return

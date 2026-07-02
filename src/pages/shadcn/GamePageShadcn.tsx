@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useFeatureFlag } from '@/hooks/useFeatureFlag'
 import { cn } from '@/lib/utils'
 import { useClockTicker } from '@/hooks/useClockTicker'
+import { useFixtureErrorToast } from '@/hooks/useFixtureErrorToast'
 import { useAppStore } from '@/store/gameStore'
 
 export function GamePageShadcn() {
@@ -38,6 +39,8 @@ export function GamePageShadcn() {
   ).length
 
   useClockTicker(fixtureId)
+
+  useFixtureErrorToast(fixtureId, game?.homeAttacksRight)
 
   useEffect(() => {
     if (fixtureId) initGame(fixtureId)
