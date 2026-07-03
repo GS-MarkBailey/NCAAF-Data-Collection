@@ -33,7 +33,7 @@ export const FEATURE_FLAGS = [
     label: 'Play-by-play panel',
     description: 'Live feed of simulated and recorded plays.',
     group: 'Game Console',
-    defaultEnabled: false,
+    defaultEnabled: true,
   },
   {
     id: 'game.riskManagement',
@@ -98,7 +98,7 @@ export const FEATURE_FLAGS = [
     label: 'Unreliable',
     group: 'Risk Management',
     parent: 'game.riskManagement',
-    defaultEnabled: false,
+    defaultEnabled: true,
   },
   {
     id: 'risk.bigPlay',

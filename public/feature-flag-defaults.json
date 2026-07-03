@@ -3,7 +3,7 @@
   "updatedAt": "2026-07-02T12:12:35.239Z",
   "flags": {
     "game.scoreboard": true,
-    "game.playByPlay": false,
+    "game.playByPlay": true,
     "game.riskManagement": true,
     "game.fieldDirectionDialog": true,
     "header.connectionStatus": true,
