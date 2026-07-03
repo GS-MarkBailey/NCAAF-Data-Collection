@@ -37,6 +37,26 @@ interface ScoreboardPanelShadcnProps {
 const PRIMARY_ACTION_BADGE_CLASS =
   'rounded-full border-[var(--color-primary-border)] bg-[var(--color-primary-chip-bg)] text-[10px] font-bold tracking-wider text-[var(--color-primary-chip-text)] uppercase'
 
+type PendingConfirmation = 'endPeriod' | 'endGame' | 'startOvertime'
+
+const CONFIRMATION_COPY: Record<
+  PendingConfirmation,
+  { title: string; description: string }
+> = {
+  endPeriod: {
+    title: 'End period?',
+    description: 'This ends the current period and logs it in the action log.',
+  },
+  endGame: {
+    title: 'End game?',
+    description: 'This marks the game as final.',
+  },
+  startOvertime: {
+    title: 'Start overtime?',
+    description: 'This begins an overtime period with a fresh 15:00 clock.',
+  },
+}
+
 export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps) {
   const clockSeconds = useAppStore((s) => s.games[fixtureId]?.clock.seconds ?? 0)
   const clockRunning = useAppStore((s) => s.games[fixtureId]?.clock.running ?? false)
@@ -78,6 +98,8 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
   const showPossessionSwitch = useFeatureFlag('scoreboard.possessionSwitch')
 
   const [editingClock, setEditingClock] = useState(false)
+  const [pendingConfirmation, setPendingConfirmation] =
+    useState<PendingConfirmation | null>(null)
   const [draftPeriod, setDraftPeriod] = useState(1)
   const [draftMinutes, setDraftMinutes] = useState(0)
   const [draftSeconds, setDraftSeconds] = useState(0)
@@ -130,7 +152,7 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
   const clockLocked = gameEnded
 
   const handleOpenClockEditor = () => {
-    if (clockLocked || inOvertime) return
+    if (clockLocked || inOvertime || pendingConfirmation) return
 
     const parts = clockToParts(clockSeconds)
     setDraftPeriod(clockPeriod)
@@ -143,6 +165,36 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
     setEditingClock(false)
   }
 
+  const handleCancelConfirmation = () => {
+    setPendingConfirmation(null)
+  }
+
+  const handleConfirmAction = () => {
+    if (!pendingConfirmation) return
+
+    switch (pendingConfirmation) {
+      case 'endPeriod':
+        endPeriod(fixtureId)
+        break
+      case 'endGame':
+        endGame(fixtureId)
+        break
+      case 'startOvertime':
+        startOvertime(fixtureId)
+        break
+    }
+
+    setPendingConfirmation(null)
+  }
+
+  const openConfirmation = (
+    action: PendingConfirmation,
+    event?: MouseEvent<HTMLButtonElement>,
+  ) => {
+    event?.stopPropagation()
+    setPendingConfirmation(action)
+  }
+
   const handleConfirmClockEdit = () => {
     setClockTime(fixtureId, clockFromParts(draftMinutes, draftSeconds))
     setClockPeriod(fixtureId, draftPeriod)
@@ -150,7 +202,7 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
   }
 
   const handleToggleClock = () => {
-    if (gameEnded) return
+    if (gameEnded || pendingConfirmation) return
 
     if (pregame) {
       startPeriod(fixtureId)
@@ -163,7 +215,7 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
     }
 
     if (showStartOvertimeButton) {
-      startOvertime(fixtureId)
+      setPendingConfirmation('startOvertime')
       return
     }
 
@@ -171,8 +223,7 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
   }
 
   const handleEndPeriod = (event: MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation()
-    endPeriod(fixtureId)
+    openConfirmation('endPeriod', event)
   }
 
   const handleStartPeriod = (event: MouseEvent<HTMLButtonElement>) => {
@@ -181,13 +232,11 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
   }
 
   const handleStartOvertime = (event: MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation()
-    startOvertime(fixtureId)
+    openConfirmation('startOvertime', event)
   }
 
   const handleEndGame = (event: MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation()
-    endGame(fixtureId)
+    openConfirmation('endGame', event)
   }
 
   const handleContainerKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -209,7 +258,37 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
       </CardHeader>
       <CardContent className="flex min-h-0 flex-1 flex-col gap-2">
         <div className="relative flex min-h-0 flex-1 items-stretch overflow-hidden rounded-lg border border-border">
-          {editingClock ? (
+          {pendingConfirmation ? (
+            <div className="grid h-full min-h-0 flex-1 grid-rows-[minmax(0,1fr)_auto] overflow-hidden">
+              <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-2 px-4 text-center">
+                <p className="text-sm font-semibold text-foreground">
+                  {pendingConfirmation === 'endPeriod'
+                    ? `End Q${clockPeriod}?`
+                    : CONFIRMATION_COPY[pendingConfirmation].title}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {CONFIRMATION_COPY[pendingConfirmation].description}
+                </p>
+              </div>
+              <div className="flex gap-2 border-t border-border bg-background p-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1"
+                  onClick={handleCancelConfirmation}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  size="sm"
+                  className="flex-1 bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
+                  onClick={handleConfirmAction}
+                >
+                  Confirm
+                </Button>
+              </div>
+            </div>
+          ) : editingClock ? (
             <div className="grid h-full min-h-0 flex-1 grid-rows-[minmax(0,1fr)_auto] overflow-hidden">
               <ClockWheelEditor
                 period={draftPeriod}
