@@ -1,5 +1,5 @@
 import { useState, type CSSProperties, type KeyboardEvent, type MouseEvent } from 'react'
-import { LayoutGrid, Pause, Play } from 'lucide-react'
+import { LayoutGrid } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { formatClock } from '@/lib/format'
 import {
@@ -433,25 +433,23 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
                   </Badge>
                 ) : null}
                 {gameEnded && <Badge variant="secondary">Final</Badge>}
+                {showPlayPauseButton ? (
+                  <Badge
+                    variant="destructive"
+                    render={
+                      <button
+                        type="button"
+                        className="pointer-events-auto"
+                        onClick={handlePlayPause}
+                        aria-label={paused ? 'Start clock' : 'Pause clock'}
+                        aria-pressed={!paused}
+                      />
+                    }
+                  >
+                    {paused ? 'Paused' : 'Pause'}
+                  </Badge>
+                ) : null}
               </div>
-              {showPlayPauseButton ? (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="absolute top-2 left-2 z-10 h-7 gap-1 border-border bg-background px-2 text-[10px] font-bold tracking-wider uppercase shadow-sm"
-                  onClick={handlePlayPause}
-                  aria-label={paused ? 'Start clock' : 'Pause clock'}
-                  aria-pressed={!paused}
-                >
-                  {paused ? (
-                    <Play className="size-3 fill-current" aria-hidden />
-                  ) : (
-                    <Pause className="size-3" aria-hidden />
-                  )}
-                  {paused ? 'Start' : 'Pause'}
-                </Button>
-              ) : null}
               {showEndOvertimeButton ? (
                 <Button
                   type="button"
