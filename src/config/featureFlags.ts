@@ -33,7 +33,7 @@ export const FEATURE_FLAGS = [
     label: 'Play-by-play panel',
     description: 'Live feed of simulated and recorded plays.',
     group: 'Game Console',
-    defaultEnabled: true,
+    defaultEnabled: false,
   },
   {
     id: 'game.riskManagement',
