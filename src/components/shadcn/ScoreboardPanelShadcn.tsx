@@ -395,7 +395,7 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
                     }
                     className={PRIMARY_ACTION_BADGE_CLASS}
                   >
-                    End PRD
+                    End period
                   </Badge>
                 ) : null}
                 {pregame && (
