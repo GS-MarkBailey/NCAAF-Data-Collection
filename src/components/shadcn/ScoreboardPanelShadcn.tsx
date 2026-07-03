@@ -349,22 +349,28 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
                   event.stopPropagation()
                   handleOpenClockEditor()
                 }}
-                disabled={clockLocked || inOvertime}
+                disabled={clockLocked || (inOvertime && !gameEnded)}
                 aria-label={
-                  inOvertime
-                    ? 'Overtime in progress'
-                    : `Edit game clock, currently ${formatClock(clockSeconds)}`
+                  gameEnded
+                    ? 'Match ended'
+                    : inOvertime
+                      ? 'Overtime in progress'
+                      : `Edit game clock, currently ${formatClock(clockSeconds)}`
                 }
               >
                 <span
                   className={cn(
                     'font-bold leading-none',
-                    inOvertime
+                    gameEnded || inOvertime
                       ? 'text-lg tracking-wider uppercase'
                       : 'text-[2rem] tabular-nums',
                   )}
                 >
-                  {inOvertime ? 'OVERTIME' : formatClock(clockSeconds)}
+                  {gameEnded
+                    ? 'Match ended'
+                    : inOvertime
+                      ? 'OVERTIME'
+                      : formatClock(clockSeconds)}
                 </span>
               </button>
               <div className="pointer-events-none absolute inset-x-2 bottom-2 flex justify-center gap-2">
