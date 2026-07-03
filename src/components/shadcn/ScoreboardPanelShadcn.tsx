@@ -39,22 +39,10 @@ const PRIMARY_ACTION_BADGE_CLASS =
 
 type PendingConfirmation = 'endPeriod' | 'endGame' | 'startOvertime'
 
-const CONFIRMATION_COPY: Record<
-  PendingConfirmation,
-  { title: string; description: string }
-> = {
-  endPeriod: {
-    title: 'End period?',
-    description: 'This ends the current period and logs it in the action log.',
-  },
-  endGame: {
-    title: 'End game?',
-    description: 'This marks the game as final.',
-  },
-  startOvertime: {
-    title: 'Start overtime?',
-    description: 'This begins an overtime period with a fresh 15:00 clock.',
-  },
+const CONFIRMATION_TITLE: Record<PendingConfirmation, string> = {
+  endPeriod: 'End period?',
+  endGame: 'End game?',
+  startOvertime: 'Start overtime?',
 }
 
 export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps) {
@@ -267,14 +255,11 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
         <div className="relative flex min-h-0 flex-1 items-stretch overflow-hidden rounded-lg border border-border">
           {pendingConfirmation ? (
             <div className="grid h-full min-h-0 flex-1 grid-rows-[minmax(0,1fr)_auto] overflow-hidden">
-              <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-2 px-4 text-center">
+              <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-4 text-center">
                 <p className="text-sm font-semibold text-foreground">
                   {pendingConfirmation === 'endPeriod'
                     ? `End Q${clockPeriod}?`
-                    : CONFIRMATION_COPY[pendingConfirmation].title}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {CONFIRMATION_COPY[pendingConfirmation].description}
+                    : CONFIRMATION_TITLE[pendingConfirmation]}
                 </p>
               </div>
               <div className="flex gap-2 border-t border-border bg-background p-2">
