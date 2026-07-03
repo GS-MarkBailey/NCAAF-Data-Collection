@@ -53,6 +53,8 @@ export interface GameState {
   gameStarted: boolean
   /** True after the operator ends the game at the regulation decision */
   gameEnded: boolean
+  /** True after the operator ends the current period (before the next starts) */
+  periodEnded: boolean
   plays: PlayEntry[]
   simulation?: PlaySimulationState
 }

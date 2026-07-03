@@ -9,6 +9,8 @@ import {
   REGULATION_QUARTERS,
   clampPeriod,
   canEndCurrentPeriod,
+  canStartNextPeriod,
+  canStartOvertime,
   isAwaitingQuarterStart,
   isAwaitingRegulationDecision,
   isOvertimePeriod,
@@ -199,6 +201,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
       return {
         games: updateGame(state.games, fixtureId, (g) => ({
           ...g,
+          periodEnded: nextSeconds > 0 ? false : g.periodEnded,
           clock: { ...g.clock, seconds: nextSeconds },
         })),
         actionLogs: appendAction(
@@ -265,6 +268,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
           games: updateGame(state.games, fixtureId, (g) => ({
             ...g,
             gameStarted: true,
+            periodEnded: false,
             clock: {
               period: 1,
               seconds: QUARTER_LENGTH_SECONDS,
@@ -290,7 +294,16 @@ export const useAppStore = create<AppStore>((set, get) => ({
         }
       }
 
-      if (!isAwaitingQuarterStart(game.clock, game.gameStarted)) return state
+      if (
+        !canStartNextPeriod(
+          game.gameStarted,
+          game.gameEnded,
+          game.periodEnded,
+          game.clock,
+        )
+      ) {
+        return state
+      }
 
       const fromPeriod = game.clock.period
       const toPeriod = fromPeriod + 1
@@ -298,6 +311,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
       return {
         games: updateGame(state.games, fixtureId, (g) => ({
           ...g,
+          periodEnded: false,
           clock: {
             period: toPeriod,
             seconds: QUARTER_LENGTH_SECONDS,
@@ -329,7 +343,12 @@ export const useAppStore = create<AppStore>((set, get) => ({
       const game = state.games[fixtureId]
       if (!game) return state
       if (
-        !canEndCurrentPeriod(game.gameStarted, game.gameEnded, game.clock)
+        !canEndCurrentPeriod(
+          game.gameStarted,
+          game.gameEnded,
+          game.periodEnded,
+          game.clock,
+        )
       ) {
         return state
       }
@@ -342,6 +361,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
       return {
         games: updateGame(state.games, fixtureId, (g) => ({
           ...g,
+          periodEnded: true,
           clock: {
             ...g.clock,
             seconds: 0,
@@ -368,9 +388,10 @@ export const useAppStore = create<AppStore>((set, get) => ({
       const game = state.games[fixtureId]
       if (
         !game ||
-        !isAwaitingRegulationDecision(
+        !canStartOvertime(
           game.gameStarted,
           game.gameEnded,
+          game.periodEnded,
           game.clock,
         )
       ) {
@@ -386,6 +407,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
       return {
         games: updateGame(state.games, fixtureId, (g) => ({
           ...g,
+          periodEnded: false,
           clock: {
             period: toPeriod,
             seconds: QUARTER_LENGTH_SECONDS,
@@ -413,11 +435,12 @@ export const useAppStore = create<AppStore>((set, get) => ({
       const game = state.games[fixtureId]
       if (!game || !game.gameStarted || game.gameEnded) return state
 
-      const atRegulationDecision = isAwaitingRegulationDecision(
-        game.gameStarted,
-        game.gameEnded,
-        game.clock,
-      )
+      const atRegulationDecision =
+        isAwaitingRegulationDecision(
+          game.gameStarted,
+          game.gameEnded,
+          game.clock,
+        ) && game.periodEnded
       const inPausedOvertime =
         isOvertimePeriod(game.clock.period) &&
         !game.clock.running &&

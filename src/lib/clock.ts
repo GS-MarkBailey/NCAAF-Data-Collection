@@ -37,15 +37,48 @@ export function isPeriodInProgress(
 export function canEndCurrentPeriod(
   gameStarted: boolean,
   gameEnded: boolean,
+  periodEnded: boolean,
   clock: { seconds: number; period: number; running: boolean },
 ): boolean {
-  if (!gameStarted || gameEnded) return false
+  if (!gameStarted || gameEnded || periodEnded) return false
   if (isOvertimePeriod(clock.period)) return false
-  if (isAwaitingRegulationDecision(gameStarted, gameEnded, clock)) return false
+  if (isAwaitingRegulationDecision(gameStarted, gameEnded, clock)) {
+    return true
+  }
 
   if (clock.seconds === 0) return true
 
   return !clock.running && clock.seconds > 0
+}
+
+/** True when the operator can start overtime after Q4. */
+export function canStartOvertime(
+  gameStarted: boolean,
+  gameEnded: boolean,
+  periodEnded: boolean,
+  clock: { seconds: number; period: number },
+): boolean {
+  return (
+    gameStarted &&
+    !gameEnded &&
+    periodEnded &&
+    isAwaitingRegulationDecision(gameStarted, gameEnded, clock)
+  )
+}
+
+/** True when the operator can start the next regulation period. */
+export function canStartNextPeriod(
+  gameStarted: boolean,
+  gameEnded: boolean,
+  periodEnded: boolean,
+  clock: { seconds: number; period: number },
+): boolean {
+  return (
+    gameStarted &&
+    !gameEnded &&
+    periodEnded &&
+    isAwaitingQuarterStart(clock, gameStarted)
+  )
 }
 
 export function isAwaitingRegulationDecision(
