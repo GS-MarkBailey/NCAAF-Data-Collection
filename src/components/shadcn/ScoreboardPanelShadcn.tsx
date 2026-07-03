@@ -135,8 +135,7 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
     },
   )
   const inOvertime = isOvertimePeriod(clockPeriod)
-  const showEndOvertimeButton =
-    inOvertime && !gameEnded && paused && clockSeconds > 0
+  const showEndOvertimeButton = inOvertime && !gameEnded
   const showPlayPauseButton =
     gameStarted && !gameEnded && periodInProgress
   const clockLocked = gameEnded
@@ -417,6 +416,21 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
                     Start overtime
                   </Badge>
                 ) : null}
+                {showEndOvertimeButton ? (
+                  <Badge
+                    render={
+                      <button
+                        type="button"
+                        className="pointer-events-auto"
+                        onClick={handleEndGame}
+                        aria-label="End game"
+                      />
+                    }
+                    className={PRIMARY_ACTION_BADGE_CLASS}
+                  >
+                    End game
+                  </Badge>
+                ) : null}
                 {gameEnded && <Badge variant="secondary">Final</Badge>}
                 {showPlayPauseButton ? (
                   <Badge
@@ -435,17 +449,6 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
                   </Badge>
                 ) : null}
               </div>
-              {showEndOvertimeButton ? (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="absolute top-2 right-2 z-10 h-7 border-border bg-background text-[10px] font-bold tracking-wider uppercase shadow-sm"
-                  onClick={handleEndGame}
-                >
-                  End game
-                </Button>
-              ) : null}
               {awaitingRegulationDecision && periodEnded ? (
                 <Button
                   type="button"

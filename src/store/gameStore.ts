@@ -441,12 +441,9 @@ export const useAppStore = create<AppStore>((set, get) => ({
           game.gameEnded,
           game.clock,
         ) && game.periodEnded
-      const inPausedOvertime =
-        isOvertimePeriod(game.clock.period) &&
-        !game.clock.running &&
-        game.clock.seconds > 0
+      const inOvertime = isOvertimePeriod(game.clock.period)
 
-      if (!atRegulationDecision && !inPausedOvertime) return state
+      if (!atRegulationDecision && !inOvertime) return state
 
       const clockBefore = {
         seconds: game.clock.seconds,
