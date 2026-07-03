@@ -446,7 +446,7 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
                       />
                     }
                   >
-                    {paused ? 'Paused' : 'Pause'}
+                    {paused ? 'Start' : 'Pause'}
                   </Badge>
                 ) : null}
               </div>
