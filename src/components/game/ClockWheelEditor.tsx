@@ -4,6 +4,8 @@ import { MAX_PERIOD, MIN_PERIOD, CLOCK_EDIT_MAX_MINUTES, getClockEditSecondValue
 
 const ITEM_HEIGHT = 28
 const INITIAL_SCROLL_SUPPRESS_MS = 400
+/** Visible wheel height: selected row plus one above and below. */
+export const CLOCK_WHEEL_VIEWPORT_HEIGHT = ITEM_HEIGHT * 3
 
 export const CLOCK_MINUTE_VALUES = Array.from({ length: 16 }, (_, index) => index)
 export const CLOCK_SECOND_VALUES = Array.from({ length: 60 }, (_, index) => index)
@@ -117,10 +119,11 @@ export function ClockWheelColumn({
   }
 
   return (
-    <div className="flex h-full min-h-0 flex-1 flex-col items-center overflow-hidden">
+    <div className="flex min-h-0 flex-1 flex-col items-center overflow-hidden">
       <div
         ref={viewportRef}
-        className="relative h-full min-h-[5.5rem] w-full max-w-[4rem] overflow-hidden"
+        className="relative w-full max-w-[4rem] overflow-hidden"
+        style={{ height: CLOCK_WHEEL_VIEWPORT_HEIGHT }}
       >
         <div className="pointer-events-none absolute inset-x-0 top-1/2 z-10 h-7 -translate-y-1/2 rounded-md border-y border-border bg-muted/40" />
         <div
@@ -204,7 +207,10 @@ export function ClockWheelEditor({
   }
 
   return (
-    <div className="flex h-full min-h-[5.5rem] items-center justify-center gap-1.5 overflow-hidden px-1">
+    <div
+      className="flex w-full items-center justify-center gap-1.5 overflow-hidden px-1"
+      style={{ height: CLOCK_WHEEL_VIEWPORT_HEIGHT }}
+    >
       <ClockWheelColumn
         values={CLOCK_PERIOD_VALUES}
         value={period}

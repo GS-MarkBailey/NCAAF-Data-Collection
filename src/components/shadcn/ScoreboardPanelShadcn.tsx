@@ -464,17 +464,19 @@ export function ScoreboardPanelShadcn({
               </div>
             </div>
           ) : editingClock ? (
-            <div className="grid h-full min-h-0 flex-1 grid-rows-[minmax(0,1fr)_auto] overflow-hidden">
-              <ClockWheelEditor
-                key={clockEditSession}
-                period={draftPeriod}
-                minutes={draftMinutes}
-                seconds={draftSeconds}
-                onPeriodChange={setDraftPeriod}
-                onMinutesChange={setDraftMinutes}
-                onSecondsChange={setDraftSeconds}
-              />
-              <div className="flex gap-2 border-t border-border bg-background p-2">
+            <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
+              <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden">
+                <ClockWheelEditor
+                  key={clockEditSession}
+                  period={draftPeriod}
+                  minutes={draftMinutes}
+                  seconds={draftSeconds}
+                  onPeriodChange={setDraftPeriod}
+                  onMinutesChange={setDraftMinutes}
+                  onSecondsChange={setDraftSeconds}
+                />
+              </div>
+              <div className="relative z-10 flex shrink-0 gap-2 border-t border-border bg-background p-2">
                 <Button
                   variant="outline"
                   size="sm"
