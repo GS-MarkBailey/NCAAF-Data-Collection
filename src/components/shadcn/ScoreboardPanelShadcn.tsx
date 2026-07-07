@@ -620,7 +620,7 @@ export function ScoreboardPanelShadcn({
           </div>
 
           {showPossessionSwitch ? (
-            <div className="grid min-h-0 flex-1 grid-cols-2 border-t border-border">
+            <div className="grid min-h-0 flex-1 grid-cols-2 gap-1 border-t border-border p-1">
               <Button
                 type="button"
                 variant="ghost"
@@ -629,11 +629,11 @@ export function ScoreboardPanelShadcn({
                 aria-pressed={gameEnded ? false : possessionIsHome}
                 aria-label={`Give possession to ${homeAbbr}`}
                 className={cn(
-                  'h-full min-h-0 rounded-none border-0 border-r border-border py-0 font-semibold',
+                  'h-full min-h-0 border-0 py-0 font-semibold',
                   stacked ? 'text-base' : 'text-lg',
-                  !gameEnded &&
-                    possessionIsHome &&
-                    'bg-[var(--color-score-bg)] text-white hover:bg-[var(--color-score-bg)] hover:text-white',
+                  !gameEnded && possessionIsHome
+                    ? 'rounded-md bg-[var(--color-score-bg)] text-white hover:bg-[var(--color-score-bg)] hover:text-white'
+                    : 'rounded-none',
                 )}
               >
                 {homeAbbr}
@@ -646,11 +646,11 @@ export function ScoreboardPanelShadcn({
                 aria-pressed={gameEnded ? false : !possessionIsHome}
                 aria-label={`Give possession to ${awayAbbr}`}
                 className={cn(
-                  'h-full min-h-0 rounded-none border-0 py-0 font-semibold',
+                  'h-full min-h-0 border-0 py-0 font-semibold',
                   stacked ? 'text-base' : 'text-lg',
-                  !gameEnded &&
-                    !possessionIsHome &&
-                    'bg-[var(--color-score-bg)] text-white hover:bg-[var(--color-score-bg)] hover:text-white',
+                  !gameEnded && !possessionIsHome
+                    ? 'rounded-md bg-[var(--color-score-bg)] text-white hover:bg-[var(--color-score-bg)] hover:text-white'
+                    : 'rounded-none',
                 )}
               >
                 {awayAbbr}
