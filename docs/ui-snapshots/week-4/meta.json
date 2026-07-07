@@ -1,12 +1,10 @@
 {
   "label": "week-4",
   "portrait": true,
-  "capturedAt": "2026-07-07T22:56:02.403Z",
+  "capturedAt": "2026-07-07T23:10:09.748Z",
   "baseUrl": "http://127.0.0.1:4173",
   "views": [
-    "fixtures-portrait",
     "fixtures-landscape",
-    "game-portrait",
     "game-landscape"
   ],
   "routes": [

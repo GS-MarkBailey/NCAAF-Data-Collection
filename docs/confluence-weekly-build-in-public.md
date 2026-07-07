@@ -36,17 +36,9 @@ Development moved in a clear arc: first map requirements and explore responsive 
 Live Vercel build — [`docs/ui-snapshots/`](./ui-snapshots/README.md). Re-run `npm run capture:current-week`, push to GitHub, then refresh this page.
 
 <!-- AUTO-SNAPSHOTS:ui-evolution:START -->
-**Fixtures (portrait)**
-
-![Fixtures portrait](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/fixtures-portrait.png)
-
 **Fixtures (landscape)**
 
 ![Fixtures landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/fixtures-landscape.png)
-
-**Game console (portrait)**
-
-![Game portrait](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/game-portrait.png)
 
 **Game console (landscape)**
 

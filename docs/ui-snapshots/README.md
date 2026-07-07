@@ -26,11 +26,9 @@ npm run capture:snapshots -- --commit 1cbc5bb --label week-1
 
 Each run writes PNGs under `docs/ui-snapshots/<label>/`:
 
-- `fixtures-portrait.png` — iPhone 14, `/fixtures`
 - `fixtures-landscape.png` — landscape, `/fixtures`
-- `game-portrait.png` — iPhone 14, `/game/NCAAF-2026-001`
 - `game-landscape.png` — landscape game view
-- `features/*.png` — feature-specific states for that week
+- `features/*.png` — feature-specific states for that week (week 4 includes one portrait shot: `portrait-stack.png`)
 - `meta.json` — capture timestamp, URLs, and feature list
 
 Game screenshots dismiss the field-direction dialog and error toast by default. Only the **`field-direction-dialog`** and **`error-toast`** feature shots intentionally show those overlays.
@@ -41,7 +39,7 @@ Snapshot **tables and image embeds** in `docs/confluence-weekly-build-in-public.
 
 | Marker | Content |
 |--------|---------|
-| `ui-evolution` | Latest fixtures + game console overview screens (executive summary only) |
+| `ui-evolution` | Latest fixtures + game console overview screens, landscape only (executive summary) |
 | `week-N-interactions` | Feature screenshots inline with Core / Key interactions copy |
 | `week-N-shipped-<key>` | Feature screenshots inline in Shipped subsections |
 
@@ -103,12 +101,13 @@ Override the host with `CONFLUENCE_IMAGE_BASE_URL` if needed.
 
 ## Feature scenarios per week
 
-| Week | `portrait` | Overview captures |
-|------|------------|-------------------|
-| 1–3 | `false` | Landscape fixtures + game only |
-| 4+ | `true` | Portrait + landscape fixtures and game |
+Overview captures are **landscape only** for every week. The only **portrait** screenshot is the `portrait-stack` feature in week 4.
 
-Set `portrait: true` in `scripts/ui-snapshot-weeks.mjs` when that week ships portrait iPhone layout.
+| Week | Overview captures |
+|------|-------------------|
+| All | Landscape fixtures + game |
+
+Week 4 also sets `portrait: true` in config to mark portrait iPhone layout shipping; portrait overview PNGs are not captured.
 
 ### Feature scenarios
 

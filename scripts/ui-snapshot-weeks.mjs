@@ -24,16 +24,8 @@ export function resolveWeekConfig(label) {
   return { label, portrait: false }
 }
 
-/** Base overview screenshot keys per week (excludes feature scenarios). */
-export function baseViewKeys(week) {
-  if (includesPortrait(week)) {
-    return [
-      'fixtures-portrait',
-      'fixtures-landscape',
-      'game-portrait',
-      'game-landscape',
-    ]
-  }
+/** Base overview screenshot keys per week (landscape only; portrait is feature-specific). */
+export function baseViewKeys(_week) {
   return ['fixtures-landscape', 'game-landscape']
 }
 

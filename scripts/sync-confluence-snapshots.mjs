@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url'
 import { resolveSnapshotImageBase, snapshotImageUrl } from './github-raw-url.mjs'
 import { WEEK_INTERACTIONS, WEEK_SHIPPED } from './ui-snapshot-doc-content.mjs'
 import { WEEK_FEATURES } from './ui-snapshot-features.mjs'
-import { SNAPSHOT_WEEKS, includesPortrait } from './ui-snapshot-weeks.mjs'
+import { SNAPSHOT_WEEKS } from './ui-snapshot-weeks.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
@@ -71,39 +71,15 @@ function latestWeek() {
 
 function renderLatestScreens(imageBase, week) {
   const label = week.label
-  const lines = []
-
-  if (includesPortrait(week)) {
-    lines.push(
-      `**Fixtures (portrait)**`,
-      '',
-      img(imageBase, `${label}/fixtures-portrait.png`, 'Fixtures portrait'),
-      '',
-      `**Fixtures (landscape)**`,
-      '',
-      img(imageBase, `${label}/fixtures-landscape.png`, 'Fixtures landscape'),
-      '',
-      `**Game console (portrait)**`,
-      '',
-      img(imageBase, `${label}/game-portrait.png`, 'Game portrait'),
-      '',
-      `**Game console (landscape)**`,
-      '',
-      img(imageBase, `${label}/game-landscape.png`, 'Game landscape'),
-    )
-  } else {
-    lines.push(
-      `**Fixtures (landscape)**`,
-      '',
-      img(imageBase, `${label}/fixtures-landscape.png`, 'Fixtures landscape'),
-      '',
-      `**Game console (landscape)**`,
-      '',
-      img(imageBase, `${label}/game-landscape.png`, 'Game landscape'),
-    )
-  }
-
-  return lines.join('\n')
+  return [
+    `**Fixtures (landscape)**`,
+    '',
+    img(imageBase, `${label}/fixtures-landscape.png`, 'Fixtures landscape'),
+    '',
+    `**Game console (landscape)**`,
+    '',
+    img(imageBase, `${label}/game-landscape.png`, 'Game landscape'),
+  ].join('\n')
 }
 
 async function featureImage(imageBase, weekLabel, featureId, title) {

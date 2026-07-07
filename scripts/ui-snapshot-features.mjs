@@ -149,7 +149,7 @@ export const WEEK_FEATURES = {
       id: 'fixtures-filters',
       title: 'Fixtures filters and search',
       path: '/fixtures',
-      viewport: 'fixtures-portrait',
+      viewport: 'fixtures-landscape',
       async prepare(page) {
         await page.locator('#fixture-filter-date').waitFor({ state: 'visible' })
       },
@@ -158,7 +158,7 @@ export const WEEK_FEATURES = {
       id: 'fixture-status-chips',
       title: 'Scheduled and past fixture chips',
       path: '/fixtures',
-      viewport: 'fixtures-portrait',
+      viewport: 'fixtures-landscape',
       async prepare(page) {
         const past = page.getByText('Past', { exact: true }).first()
         try {

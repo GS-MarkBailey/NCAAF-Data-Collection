@@ -364,10 +364,7 @@ async function captureScreens(baseUrl, label) {
   const week = resolveWeekConfig(label)
   const views = viewsForWeek(label)
   await mkdir(featuresDir, { recursive: true })
-
-  if (!week.portrait) {
-    await removePortraitOverviewFiles(outPath)
-  }
+  await removePortraitOverviewFiles(outPath)
 
   const browser = await chromium.launch()
   const capturedFeatures = []
