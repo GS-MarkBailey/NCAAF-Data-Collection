@@ -12,7 +12,7 @@
 
 This document is a week-by-week record of the NCAAF Data Collection prototype — a mobile web app built for live game operators who need to manage clock, scoreboard, and risk state from a phone or tablet at the sideline. Work started from a blank repository on 16 June 2026 and progressed through four active development weeks, with each push to GitHub triggering an automatic deploy to Vercel so stakeholders can try changes on a real device within minutes.
 
-The prototype is intentionally demo-driven today: fixtures, scores, and play-by-play events use in-memory sample data rather than a live backend. That lets us validate layout, interaction design, and operator workflows on iPhone and landscape mobile before wiring up production APIs. This write-up is structured for a **build in public** audience — what shipped each week, why it mattered, and where the product stands now.
+The prototype is intentionally demo-driven today: fixtures, scores, and play-by-play events use in-memory sample data rather than a live backend. That lets us validate layout, interaction design, and operator workflows on iPhone and landscape mobile before wiring up production APIs. Week 1 also included upfront product design work — a requirements phasing spreadsheet and Figma prototypes for mobile-first responsive components — that is not reflected in git history but shaped what was built. This write-up is structured for a **build in public** audience — what shipped each week, why it mattered, and where the product stands now.
 
 ---
 
@@ -20,11 +20,11 @@ The prototype is intentionally demo-driven today: fixtures, scores, and play-by-
 
 We built a mobile-first NCAAF data collection prototype from scratch in four weeks of active development. The app lets operators select a fixture, take control of a live game console, manage the clock and scoreboard, toggle risk flags, and review an action log — optimised for landscape and portrait phones, installable as a PWA, and configurable via deployable feature flags.
 
-Development moved in a clear arc: first establish the three-panel game console and deployment pipeline, then add operator-grade clock and period controls, then open up remote feature configuration, and finally polish the fixtures list and portrait iPhone experience. The heaviest weeks were Week 1 (foundation) and Week 3 (game logic), with Week 4 focused on real-device testing feedback from iPhone users.
+Development moved in a clear arc: first map requirements and explore responsive layout in Figma, then establish the three-panel game console and deployment pipeline, then add operator-grade clock and period controls, then open up remote feature configuration, and finally polish the fixtures list and portrait iPhone experience. The heaviest weeks were Week 1 (foundation) and Week 3 (game logic), with Week 4 focused on real-device testing feedback from iPhone users.
 
 | Week | Dates | Theme | Highlights |
 |------|-------|-------|------------|
-| 1 | 16–22 Jun 2026 | Foundation | App scaffold, three-panel game console, PWA, Vercel deploy pipeline |
+| 1 | 16–22 Jun 2026 | Foundation | Requirements phasing spreadsheet, Figma mobile-first exploration, app scaffold, three-panel game console, PWA, Vercel deploy pipeline |
 | 2 | 23–29 Jun 2026 | Config groundwork | Feature flags panel polish |
 | 3 | 30 Jun–5 Jul 2026 | Game logic & platform | Clock editor, period flow, field direction, feature flag deploy, error toasts |
 | 4 | 6–12 Jul 2026 | Fixtures & mobile | Filters, pull-to-refresh, portrait layout, iOS fixes |
@@ -39,11 +39,18 @@ Development moved in a clear arc: first establish the three-panel game console a
 
 ### Overview
 
-Week 1 took the project from an empty repository to a working prototype deployed at a public URL. The goal was to match the uploaded UI designs for a landscape-mobile data collection console: three side-by-side panels (scoreboard, play-by-play, risk management), a fixtures picker, and the signature “Take Control” operator mode with its red visual state. Alongside the UI, we invested early in installability (PWA), safe-area handling for notched iPhones, and a repeatable deploy path so every Cursor session could ship to Vercel without manual steps.
+Week 1 combined product planning, design exploration, and rapid prototyping in code. Before and in parallel with development, a **requirements spreadsheet** mapped every capability to a delivery phase — clarifying what belonged in the first prototype versus later iterations. In **Figma**, key screens and components were built out to test how a **mobile-first, responsive** layout would behave across phone orientations and panel sizes, especially for the three-panel game console on a small landscape viewport.
+
+That design work informed what went into the repository: a landscape-mobile data collection console with three side-by-side panels (scoreboard, play-by-play, risk management), a fixtures picker, and the signature “Take Control” operator mode with its red visual state. Alongside the UI, we invested early in installability (PWA), safe-area handling for notched iPhones, and a repeatable deploy path so every Cursor session could ship to Vercel without manual steps.
 
 By the end of the week, a reviewer could add the app to their home screen, open the Concordia vs Rockford demo fixture, pause the clock, toggle risks, and export an action log — the core loop the product is built around.
 
 ### Shipped
+
+**Discovery & design (pre-code / parallel to build)**
+- **Requirements phasing spreadsheet** — full mapping of product requirements to delivery phases (what to build now vs later)
+- **Figma exploration** — screens and components prototyped to validate mobile-first responsive behaviour before implementation
+- Tested how panels, headers, and controls reflow or stack on small viewports; findings carried into the React layout and `landscape-mobile` breakpoint strategy
 
 **Application foundation**
 - React + Vite + TypeScript app with Tailwind CSS and shadcn/ui component library
