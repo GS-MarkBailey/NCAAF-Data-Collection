@@ -3,16 +3,16 @@
  * Regenerate auto-managed snapshot sections in the Confluence markdown doc.
  *
  * Sections:
- *   - ui-evolution: latest week screens only
- *   - week-N-screens: overview screenshots after each week's theme line
+ *   - ui-evolution: latest week screens only (Current screens)
  *   - week-N-interactions: feature images inline with interaction copy
+ *   - week-N-shipped-<key>: feature images inline in Shipped subsections
  */
 
 import { access, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { resolveSnapshotImageBase, snapshotImageUrl } from './github-raw-url.mjs'
-import { WEEK_INTERACTIONS } from './ui-snapshot-doc-content.mjs'
+import { WEEK_INTERACTIONS, WEEK_SHIPPED } from './ui-snapshot-doc-content.mjs'
 import { WEEK_FEATURES } from './ui-snapshot-features.mjs'
 import { SNAPSHOT_WEEKS, includesPortrait } from './ui-snapshot-weeks.mjs'
 
@@ -106,28 +106,6 @@ function renderLatestScreens(imageBase, week) {
   return lines.join('\n')
 }
 
-function renderWeekScreensAfterTheme(imageBase, week) {
-  const label = week.label
-
-  if (includesPortrait(week)) {
-    return `**Fixtures (portrait)**
-
-${img(imageBase, `${label}/fixtures-portrait.png`, `${label} fixtures portrait`)}
-
-**Game console (portrait)**
-
-${img(imageBase, `${label}/game-portrait.png`, `${label} game portrait`)}`
-  }
-
-  return `**Fixtures (landscape)**
-
-${img(imageBase, `${label}/fixtures-landscape.png`, `${label} fixtures landscape`)}
-
-**Game console (landscape)**
-
-${img(imageBase, `${label}/game-landscape.png`, `${label} game landscape`)}`
-}
-
 async function featureImage(imageBase, weekLabel, featureId, title) {
   const filePath = path.join(
     SNAPSHOTS_DIR,
@@ -137,6 +115,39 @@ async function featureImage(imageBase, weekLabel, featureId, title) {
   )
   if (!(await fileExists(filePath))) return null
   return img(imageBase, `${weekLabel}/features/${featureId}.png`, title)
+}
+
+async function overviewImage(imageBase, weekLabel, fileName) {
+  const filePath = path.join(SNAPSHOTS_DIR, weekLabel, fileName)
+  if (!(await fileExists(filePath))) return null
+  const alt = fileName.replace(/\.png$/, '').replace(/-/g, ' ')
+  return img(imageBase, `${weekLabel}/${fileName}`, alt)
+}
+
+async function renderSnapshotBlock(imageBase, weekLabel, block) {
+  const featureTitles = Object.fromEntries(
+    (WEEK_FEATURES[weekLabel] ?? []).map((f) => [f.id, f.title]),
+  )
+
+  const images = []
+
+  for (const fileName of block.overviewFiles ?? []) {
+    const image = await overviewImage(imageBase, weekLabel, fileName)
+    if (image) images.push(image)
+  }
+
+  for (const featureId of block.featureIds ?? []) {
+    const image = await featureImage(
+      imageBase,
+      weekLabel,
+      featureId,
+      featureTitles[featureId] ?? featureId,
+    )
+    if (image) images.push(image)
+  }
+
+  if (images.length === 0) return ''
+  return images.join(' ')
 }
 
 async function renderInteractions(imageBase, weekLabel) {
@@ -182,16 +193,27 @@ async function main() {
   )
 
   for (const week of SNAPSHOT_WEEKS) {
-    content = replaceMarkedBlock(
-      content,
-      `${week.label}-screens`,
-      renderWeekScreensAfterTheme(imageBase, week),
-    )
-    content = replaceMarkedBlock(
-      content,
-      `${week.label}-interactions`,
-      await renderInteractions(imageBase, week.label),
-    )
+    const interactionsMarker = `${week.label}-interactions`
+    if (content.includes(MARKER(interactionsMarker, 'START'))) {
+      content = replaceMarkedBlock(
+        content,
+        interactionsMarker,
+        await renderInteractions(imageBase, week.label),
+      )
+    }
+
+    for (const [key, block] of Object.entries(WEEK_SHIPPED[week.label] ?? {})) {
+      const markerId = `${week.label}-shipped-${key}`
+      if (!content.includes(MARKER(markerId, 'START'))) {
+        console.warn(`Skipping ${markerId}: no markers in doc`)
+        continue
+      }
+      content = replaceMarkedBlock(
+        content,
+        markerId,
+        await renderSnapshotBlock(imageBase, week.label, block),
+      )
+    }
   }
 
   const stamp = new Date().toISOString().slice(0, 10)

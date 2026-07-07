@@ -5,6 +5,8 @@
 
 /** @typedef {{ text: string, featureIds: string[] }} InteractionLine */
 
+/** @typedef {{ featureIds?: string[], overviewFiles?: string[] }} ShippedSnapshotBlock */
+
 /** @type {Record<string, InteractionLine[]>} */
 export const WEEK_INTERACTIONS = {
   'week-1': [
@@ -67,4 +69,29 @@ export const WEEK_INTERACTIONS = {
       featureIds: ['portrait-stack'],
     },
   ],
+}
+
+/**
+ * Feature / overview screenshots for Shipped subsections (marker key → images).
+ * Marker id in doc: `week-N-shipped-<key>`
+ *
+ * @type {Record<string, Record<string, ShippedSnapshotBlock>>}
+ */
+export const WEEK_SHIPPED = {
+  'week-2': {
+    'feature-flags': { featureIds: ['feature-flags-panel'] },
+  },
+  'week-3': {
+    'feature-flags': { featureIds: ['settings-tabs'] },
+    'field-direction': { featureIds: ['field-direction-dialog'] },
+    clock: { featureIds: ['clock-editor'] },
+    'connection-status': { featureIds: ['connection-status'] },
+    'error-toast': { featureIds: ['error-toast'] },
+    settings: { featureIds: ['settings-tabs'] },
+  },
+  'week-4': {
+    'fixtures-page': { featureIds: ['fixtures-filters', 'fixture-status-chips'] },
+    'match-ended': { featureIds: ['past-fixture-ended'] },
+    'portrait-game': { featureIds: ['portrait-stack'] },
+  },
 }

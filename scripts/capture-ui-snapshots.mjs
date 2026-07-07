@@ -133,6 +133,25 @@ const OVERLAY_FEATURE_IDS = {
 }
 
 const DEFAULT_GAME_SETUP = { fieldDirection: 'dismiss', errorToast: 'dismiss' }
+const ERROR_TOAST_EXIT_MS = 350
+const ERROR_TOAST_STABLE_MS = 600
+
+function appendGameQuery(path, { snapshot = false, demoErrorToast = false } = {}) {
+  const [pathname, search = ''] = path.split('?')
+  const params = new URLSearchParams(search)
+  if (snapshot) params.set('snapshot', '1')
+  if (demoErrorToast) params.set('demoErrorToast', '1')
+  const query = params.toString()
+  return query ? `${pathname}?${query}` : pathname
+}
+
+function gamePathForCapture(path, feature) {
+  const setup = mergeGameSetup(feature)
+  if (setup.errorToast === 'keep') {
+    return appendGameQuery(path, { demoErrorToast: true })
+  }
+  return appendGameQuery(path, { snapshot: true })
+}
 
 function overlayOptsForFeature(feature) {
   if (!feature) {
@@ -167,30 +186,68 @@ async function dismissFieldDirectionDialog(page) {
   await directionDialog.waitFor({ state: 'hidden', timeout: 4000 }).catch(() => {})
 }
 
+function errorToastAlert(page) {
+  return page
+    .getByRole('alert')
+    .filter({ hasText: /something went wrong|please try again/i })
+}
+
+async function errorToastVisible(page) {
+  return errorToastAlert(page).isVisible().catch(() => false)
+}
+
+async function clickDismissErrorToast(page) {
+  const dismiss = page.getByRole('button', { name: /dismiss notification/i })
+  if (!(await dismiss.isVisible().catch(() => false))) return false
+  await dismiss.click({ force: true })
+  return true
+}
+
+async function waitForErrorToastHidden(page) {
+  await errorToastAlert(page)
+    .waitFor({ state: 'hidden', timeout: 4000 })
+    .catch(() => {})
+  await page.waitForTimeout(ERROR_TOAST_EXIT_MS)
+}
+
+async function forceRemoveErrorToastDom(page) {
+  await page.evaluate(() => {
+    for (const alert of document.querySelectorAll('[role="alert"]')) {
+      const text = alert.textContent ?? ''
+      if (/something went wrong|please try again/i.test(text)) {
+        alert.remove()
+      }
+    }
+  })
+}
+
 async function dismissErrorToast(page) {
   // Toast mounts in a useEffect after field direction is saved — give React time to render
-  await page.waitForTimeout(900)
+  await page.waitForTimeout(1200)
 
-  for (let attempt = 0; attempt < 10; attempt++) {
-    const dismiss = page.getByRole('button', { name: /dismiss notification/i })
-    try {
-      if (await dismiss.isVisible().catch(() => false)) {
-        await dismiss.click()
-        await page.waitForTimeout(500)
+  let stableMs = 0
+
+  for (let attempt = 0; attempt < 20; attempt++) {
+    if (await errorToastVisible(page)) {
+      stableMs = 0
+      if (await clickDismissErrorToast(page)) {
+        await waitForErrorToastHidden(page)
         continue
       }
-    } catch {
-      break
+      await forceRemoveErrorToastDom(page)
+      await page.waitForTimeout(ERROR_TOAST_EXIT_MS)
+      continue
     }
 
-    if (!(await page.getByRole('alert').isVisible().catch(() => false))) {
-      return
-    }
-
-    await page.waitForTimeout(300)
+    stableMs += 200
+    if (stableMs >= ERROR_TOAST_STABLE_MS) return
+    await page.waitForTimeout(200)
   }
 
-  await page.getByRole('alert').waitFor({ state: 'hidden', timeout: 3000 }).catch(() => {})
+  if (await errorToastVisible(page)) {
+    await forceRemoveErrorToastDom(page)
+    console.warn('  ⚠ removed lingering error toast before screenshot')
+  }
 }
 
 async function dismissBlockingOverlays(page, opts = {}) {
@@ -204,9 +261,9 @@ async function dismissBlockingOverlays(page, opts = {}) {
     await dismissErrorToast(page)
   } else {
     try {
-      await page.getByRole('alert').waitFor({ state: 'visible', timeout: 4000 })
+      await errorToastAlert(page).waitFor({ state: 'visible', timeout: 5000 })
     } catch {
-      await page.waitForTimeout(800)
+      await page.waitForTimeout(1200)
     }
   }
 }
@@ -232,7 +289,10 @@ async function capturePageScreenshot(page, file, overlayOpts) {
   if (overlayOpts) {
     await dismissBlockingOverlays(page, overlayOpts)
   }
-  await page.waitForTimeout(500)
+  if (!overlayOpts?.allowErrorToast) {
+    await dismissErrorToast(page)
+  }
+  await page.waitForTimeout(300)
   await page.screenshot({ path: file, fullPage: true })
   console.log(`  ✓ ${file}`)
 }
@@ -240,7 +300,10 @@ async function capturePageScreenshot(page, file, overlayOpts) {
 async function captureView(browser, baseUrl, view, outPath) {
   const context = await browser.newContext(contextOptionsFor(view))
   const page = await context.newPage()
-  const target = `${baseUrl.replace(/\/$/, '')}${view.path}`
+  const route = view.path.startsWith('/game/')
+    ? gamePathForCapture(view.path)
+    : view.path
+  const target = `${baseUrl.replace(/\/$/, '')}${route}`
 
   try {
     await page.goto(target, { waitUntil: 'networkidle', timeout: 30_000 })
@@ -268,7 +331,10 @@ async function captureFeature(browser, baseUrl, feature, featuresDir) {
 
   const context = await browser.newContext(contextOptionsFor(view))
   const page = await context.newPage()
-  const target = `${baseUrl.replace(/\/$/, '')}${feature.path}`
+  const route = feature.path.startsWith('/game/')
+    ? gamePathForCapture(feature.path, feature)
+    : feature.path
+  const target = `${baseUrl.replace(/\/$/, '')}${route}`
 
   try {
     await page.goto(target, { waitUntil: 'networkidle', timeout: 30_000 })
@@ -277,6 +343,9 @@ async function captureFeature(browser, baseUrl, feature, featuresDir) {
     }
     if (feature.prepare) {
       await feature.prepare(page)
+    }
+    if (feature.path.startsWith('/game/') && mergeGameSetup(feature).errorToast !== 'keep') {
+      await dismissErrorToast(page)
     }
     const file = path.join(featuresDir, `${feature.id}.png`)
     await capturePageScreenshot(page, file, overlayOptsForFeature(feature))
