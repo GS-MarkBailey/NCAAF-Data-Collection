@@ -8,9 +8,19 @@
 
 ---
 
+## Overview
+
+This document is a week-by-week record of the NCAAF Data Collection prototype — a mobile web app built for live game operators who need to manage clock, scoreboard, and risk state from a phone or tablet at the sideline. Work started from a blank repository on 16 June 2026 and progressed through four active development weeks, with each push to GitHub triggering an automatic deploy to Vercel so stakeholders can try changes on a real device within minutes.
+
+The prototype is intentionally demo-driven today: fixtures, scores, and play-by-play events use in-memory sample data rather than a live backend. That lets us validate layout, interaction design, and operator workflows on iPhone and landscape mobile before wiring up production APIs. This write-up is structured for a **build in public** audience — what shipped each week, why it mattered, and where the product stands now.
+
+---
+
 ## Executive summary
 
 We built a mobile-first NCAAF data collection prototype from scratch in four weeks of active development. The app lets operators select a fixture, take control of a live game console, manage the clock and scoreboard, toggle risk flags, and review an action log — optimised for landscape and portrait phones, installable as a PWA, and configurable via deployable feature flags.
+
+Development moved in a clear arc: first establish the three-panel game console and deployment pipeline, then add operator-grade clock and period controls, then open up remote feature configuration, and finally polish the fixtures list and portrait iPhone experience. The heaviest weeks were Week 1 (foundation) and Week 3 (game logic), with Week 4 focused on real-device testing feedback from iPhone users.
 
 | Week | Dates | Theme | Highlights |
 |------|-------|-------|------------|
@@ -26,6 +36,12 @@ We built a mobile-first NCAAF data collection prototype from scratch in four wee
 ## Week 1 — 16 to 22 June 2026
 
 **Theme:** From zero to deployable prototype
+
+### Overview
+
+Week 1 took the project from an empty repository to a working prototype deployed at a public URL. The goal was to match the uploaded UI designs for a landscape-mobile data collection console: three side-by-side panels (scoreboard, play-by-play, risk management), a fixtures picker, and the signature “Take Control” operator mode with its red visual state. Alongside the UI, we invested early in installability (PWA), safe-area handling for notched iPhones, and a repeatable deploy path so every Cursor session could ship to Vercel without manual steps.
+
+By the end of the week, a reviewer could add the app to their home screen, open the Concordia vs Rockford demo fixture, pause the clock, toggle risks, and export an action log — the core loop the product is built around.
 
 ### Shipped
 
@@ -86,6 +102,12 @@ We built a mobile-first NCAAF data collection prototype from scratch in four wee
 
 **Theme:** Feature configuration groundwork
 
+### Overview
+
+Week 2 was a shorter iteration cycle with only a handful of commits. The main focus was preparing a **feature flags** panel inside Settings so product and engineering could turn panels and behaviours on or off without code changes — a requirement that became critical once stakeholders wanted to demo different configurations (e.g. hide play-by-play, show connection status) to different audiences.
+
+Work this week was mostly wiring and UI polish on the flags panel and its connection to app bootstrap. The full flag catalogue, deploy-to-Vercel flow, and published defaults landed in Week 3.
+
 ### Shipped
 
 - Refinements to the **Feature Flags panel** in Settings (UI tab)
@@ -101,6 +123,12 @@ We built a mobile-first NCAAF data collection prototype from scratch in four wee
 ## Week 3 — 30 June to 5 July 2026
 
 **Theme:** Production-grade game controls and remote configuration
+
+### Overview
+
+Week 3 was the largest functional leap: the scoreboard went from a simple pause/adjust clock to a full **period lifecycle** (kick off, end period, start next period, overtime, end game) with iOS-style wheel editing and confirmation steps for destructive actions. We also added **field direction** — operators must set which way the home team attacks on first open, which drives the ball-on arrow and flips each quarter — and shipped a **feature flag deploy pipeline** so confirmed flag changes update the live Vercel app for all users via a published JSON defaults file.
+
+Supporting work included the connection status chip, fixture-scoped error toasts, a consolidated Settings dialog (Log / Field / UI tabs), and retiring the dual custom/shadcn UI toggle in favour of shadcn-only. This week established most of the behaviour operators would expect from a real collection tool, even though data remains mocked.
 
 ### Shipped
 
@@ -172,6 +200,12 @@ We built a mobile-first NCAAF data collection prototype from scratch in four wee
 
 **Theme:** Fixtures experience and portrait iPhone readiness
 
+### Overview
+
+Week 4 shifted attention from the game console to the **fixtures entry point** and to **portrait iPhone** usage — feedback showed operators often hold the phone vertically and need to find the right match quickly. We rebuilt the fixtures page with filters, unified search, scheduled/past status chips, pull-to-refresh, and sensible sort order (upcoming fixtures first). Past fixtures now open in a post-match state with final scores and em-dash placeholders on live stat cells, mirroring what collectors see after ending a game.
+
+On the game page, portrait mode dropped tabs in favour of a vertical stack of panels, reworked the header for thumb reach, separated clock from action chips to prevent mis-taps, and fixed several iOS-specific issues including a blank-screen regression and clock editor layout overlap. Most of this work landed in a concentrated session on 7 July, with live Vercel verification on device.
+
 ### Shipped
 
 **Fixtures page**
@@ -219,6 +253,10 @@ We built a mobile-first NCAAF data collection prototype from scratch in four wee
 
 ## Current product capabilities (as of 7 July 2026)
 
+### Overview
+
+The table below is a checklist of what the prototype supports today on the live Vercel build. Items marked complete are implemented and deployable; several depend on feature flags (e.g. play-by-play is built but off by default in published defaults). Nothing in this list implies backend integration — all state is client-side and resets on refresh except deployed feature flag defaults.
+
 | Area | Status |
 |------|--------|
 | Fixtures list with filters, search, sort, pull-to-refresh | ✅ |
@@ -243,6 +281,10 @@ We built a mobile-first NCAAF data collection prototype from scratch in four wee
 
 ## Architecture snapshot
 
+### Overview
+
+The app is a single-page React application with no server-side rendering. Game and fixture state live in the browser; the only server interaction today is fetching published feature flag defaults and optionally posting new defaults through the deploy API. This keeps the prototype fast to iterate and easy to host on Vercel, at the cost of no persistence or multi-user sync until a backend is added.
+
 | Layer | Technology |
 |-------|------------|
 | Frontend | React 19, Vite, TypeScript |
@@ -257,6 +299,10 @@ We built a mobile-first NCAAF data collection prototype from scratch in four wee
 
 ## Known limitations & follow-ups
 
+### Overview
+
+These are deliberate prototype boundaries or open items identified during the four-week build. They are useful context for anyone evaluating the demo: the UI and flows are largely representative of target operator experience, but data, connectivity, and configuration security are not production-ready yet.
+
 - Demo data only — no live feed or backend integration yet
 - Feature flag deploy requires passphrase (not end-user self-service)
 - Clock wheel initialisation on iPhone may need further device testing
@@ -266,6 +312,10 @@ We built a mobile-first NCAAF data collection prototype from scratch in four wee
 ---
 
 ## How to try it
+
+### Overview
+
+The fastest way to evaluate the build is on a physical phone — especially iPhone in portrait — since much of Week 4’s work targets that form factor. Desktop and landscape mobile also work; the game console was originally designed for landscape sideline use.
 
 1. Open https://ncaaf-data-collection.vercel.app on a phone or desktop
 2. On iPhone: Safari → Share → Add to Home Screen for full-screen PWA
