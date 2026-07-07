@@ -14,6 +14,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { chromium, devices } from 'playwright'
 import { WEEK_FEATURES } from './ui-snapshot-features.mjs'
+import { SNAPSHOT_WEEKS } from './ui-snapshot-weeks.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
@@ -22,12 +23,7 @@ const GAME_ID = 'NCAAF-2026-001'
 const PREVIEW_PORT = 4173
 const PREVIEW_URL = `http://127.0.0.1:${PREVIEW_PORT}`
 
-const MILESTONES = [
-  { label: 'week-1', commit: '1cbc5bb', date: '2026-06-18' },
-  { label: 'week-2', commit: '615f79c', date: '2026-06-23' },
-  { label: 'week-3', commit: 'dd1f58f', date: '2026-07-03' },
-  { label: 'week-4', commit: 'HEAD', date: '2026-07-07' },
-]
+const MILESTONES = SNAPSHOT_WEEKS
 
 const VIEWPORTS = {
   'fixtures-portrait': { name: 'fixtures-portrait', path: '/fixtures', device: 'iPhone 14' },
@@ -58,10 +54,11 @@ const BASE_VIEWS = [
 ]
 
 function parseArgs(argv) {
-  const opts = { milestones: false, label: null, url: null, commit: null }
+  const opts = { milestones: false, current: false, label: null, url: null, commit: null }
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i]
     if (arg === '--milestones') opts.milestones = true
+    else if (arg === '--current') opts.current = true
     else if (arg === '--label') opts.label = argv[++i]
     else if (arg === '--url') opts.url = argv[++i]
     else if (arg === '--commit') opts.commit = argv[++i]
@@ -276,7 +273,8 @@ Options:
   --url <base>       Live or preview URL (default: production)
   --commit <ref>     Build this git ref in a temporary worktree first
   --label <name>     Output folder under docs/ui-snapshots/ (required unless --milestones)
-  --milestones       Capture week-1 … week-4 milestone commits from git history
+  --milestones       Capture week-1 … week-N milestone commits from git history
+  --current          Capture only the latest week (last entry in ui-snapshot-weeks.mjs)
 
 Each milestone also captures feature-specific shots under features/ (see ui-snapshot-features.mjs).
 
@@ -302,6 +300,23 @@ async function main() {
       await captureOne({ label: m.label, commit, baseUrl: PREVIEW_URL })
     }
     console.log(`\nDone. Snapshots in ${OUT_DIR}`)
+    return
+  }
+
+  if (opts.current) {
+    const current = MILESTONES[MILESTONES.length - 1]
+    if (!current) {
+      console.error('No weeks configured in ui-snapshot-weeks.mjs')
+      process.exit(1)
+    }
+    const commit = current.commit === 'HEAD' ? 'HEAD' : current.commit
+    const baseUrl =
+      opts.url ??
+      (commit === 'HEAD' && !opts.commit
+        ? 'https://ncaaf-data-collection.vercel.app'
+        : PREVIEW_URL)
+    await captureOne({ label: current.label, baseUrl, commit: opts.commit ? commit : null })
+    console.log(`\nDone. Snapshots in ${path.join(OUT_DIR, current.label)}`)
     return
   }
 

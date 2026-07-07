@@ -48,7 +48,11 @@ jobs:
 
       - name: Capture weekly milestones
         if: github.event_name == 'workflow_dispatch' && inputs.mode == 'milestones'
-        run: npm run capture:snapshots -- --milestones
+        run: npm run capture:and-sync
+
+      - name: Regenerate Confluence markdown (production only)
+        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'production')
+        run: npm run sync:confluence-doc
 
       - name: Upload snapshot artifacts
         uses: actions/upload-artifact@v4

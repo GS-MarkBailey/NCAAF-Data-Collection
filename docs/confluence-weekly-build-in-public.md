@@ -4,7 +4,7 @@
 **Live demo:** https://ncaaf-data-collection.vercel.app  
 **Repository:** GitHub (auto-deployed to Vercel on each change)  
 **Period covered:** 16 June 2026 – 12 July 2026  
-**Last updated:** 7 July 2026
+**Last updated:** 7 Jul 2026 (snapshots synced automatically)
 
 ---
 
@@ -33,14 +33,16 @@ Development moved in a clear arc: first map requirements and explore responsive 
 
 ### UI evolution (snapshots)
 
-Automated Playwright captures at each week-end git commit live in [`docs/ui-snapshots/`](./ui-snapshots/README.md). Re-run with `npm run capture:snapshots -- --milestones`.
+Automated Playwright captures at each week-end git commit live in [`docs/ui-snapshots/`](./ui-snapshots/README.md). Re-run with `npm run capture:and-sync` to refresh PNGs and regenerate the sections below.
 
+<!-- AUTO-SNAPSHOTS:ui-evolution:START -->
 | Week | Fixtures (portrait) | Game (landscape) |
-|------|---------------------|------------------|
-| 1 | ![Week 1 fixtures](./ui-snapshots/week-1/fixtures-portrait.png) | ![Week 1 game](./ui-snapshots/week-1/game-landscape.png) |
-| 2 | ![Week 2 fixtures](./ui-snapshots/week-2/fixtures-portrait.png) | ![Week 2 game](./ui-snapshots/week-2/game-landscape.png) |
-| 3 | ![Week 3 fixtures](./ui-snapshots/week-3/fixtures-portrait.png) | ![Week 3 game](./ui-snapshots/week-3/game-landscape.png) |
-| 4 | ![Week 4 fixtures](./ui-snapshots/week-4/fixtures-portrait.png) | ![Week 4 game](./ui-snapshots/week-4/game-landscape.png) |
+| --- | --- | --- |
+| Week 1 | ![week-1 fixtures](./ui-snapshots/week-1/fixtures-portrait.png) | ![week-1 game](./ui-snapshots/week-1/game-landscape.png) |
+| Week 2 | ![week-2 fixtures](./ui-snapshots/week-2/fixtures-portrait.png) | ![week-2 game](./ui-snapshots/week-2/game-landscape.png) |
+| Week 3 | ![week-3 fixtures](./ui-snapshots/week-3/fixtures-portrait.png) | ![week-3 game](./ui-snapshots/week-3/game-landscape.png) |
+| Week 4 | ![week-4 fixtures](./ui-snapshots/week-4/fixtures-portrait.png) | ![week-4 game](./ui-snapshots/week-4/game-landscape.png) |
+<!-- AUTO-SNAPSHOTS:ui-evolution:END -->
 
 ---
 
@@ -114,23 +116,25 @@ By the end of the week, a reviewer could add the app to their home screen, open 
 - ~65 commits this week
 - ~47 files touched; net +2,034 / −737 lines vs initial commit
 
+<!-- AUTO-SNAPSHOTS:week-1:START -->
 ### UI snapshots
 
-Commit `1cbc5bb` (18 Jun 2026).
+Commit `1cbc5bb` (7 Jul 2026).
 
 | Fixtures (portrait) | Fixtures (landscape) | Game (portrait) | Game (landscape) |
-|---------------------|----------------------|-----------------|------------------|
-| ![Week 1 fixtures portrait](./ui-snapshots/week-1/fixtures-portrait.png) | ![Week 1 fixtures landscape](./ui-snapshots/week-1/fixtures-landscape.png) | ![Week 1 game portrait](./ui-snapshots/week-1/game-portrait.png) | ![Week 1 game landscape](./ui-snapshots/week-1/game-landscape.png) |
+| --- | --- | --- | --- |
+| ![week-1 fixtures portrait](./ui-snapshots/week-1/fixtures-portrait.png) | ![week-1 fixtures landscape](./ui-snapshots/week-1/fixtures-landscape.png) | ![week-1 game portrait](./ui-snapshots/week-1/game-portrait.png) | ![week-1 game landscape](./ui-snapshots/week-1/game-landscape.png) |
 
 ### Feature highlights
 
-| Take Control confirm | Take Control active | Action log |
-|----------------------|---------------------|------------|
-| ![Take Control confirm](./ui-snapshots/week-1/features/take-control-confirm.png) | ![Take Control active](./ui-snapshots/week-1/features/take-control-active.png) | ![Action log](./ui-snapshots/week-1/features/action-log.png) |
+| Take Control confirmation | Take Control active state | Action log |
+| --- | --- | --- |
+| ![Take Control confirmation](./ui-snapshots/week-1/features/take-control-confirm.png) | ![Take Control active state](./ui-snapshots/week-1/features/take-control-active.png) | ![Action log](./ui-snapshots/week-1/features/action-log.png) |
 
-| Risk toggle | Clock adjust |
-|-------------|--------------|
-| ![Risk toggle](./ui-snapshots/week-1/features/risk-challenge-active.png) | ![Clock adjust](./ui-snapshots/week-1/features/clock-adjust.png) |
+| Risk toggle (Challenge / Review) | Clock pause and ±1 second adjust |
+| --- | --- |
+| ![Risk toggle (Challenge / Review)](./ui-snapshots/week-1/features/risk-challenge-active.png) | ![Clock pause and ±1 second adjust](./ui-snapshots/week-1/features/clock-adjust.png) |
+<!-- AUTO-SNAPSHOTS:week-1:END -->
 
 ---
 
@@ -154,19 +158,21 @@ Work this week was mostly wiring and UI polish on the flags panel and its connec
 - Quiet week in terms of commits (4 total); larger feature-flag architecture landed in Week 3
 - Focus was stabilising the flags UI before adding deploy capability
 
+<!-- AUTO-SNAPSHOTS:week-2:START -->
 ### UI snapshots
 
-Commit `615f79c` (23 Jun 2026).
+Commit `615f79c` (7 Jul 2026).
 
 | Fixtures (portrait) | Fixtures (landscape) | Game (portrait) | Game (landscape) |
-|---------------------|----------------------|-----------------|------------------|
-| ![Week 2 fixtures portrait](./ui-snapshots/week-2/fixtures-portrait.png) | ![Week 2 fixtures landscape](./ui-snapshots/week-2/fixtures-landscape.png) | ![Week 2 game portrait](./ui-snapshots/week-2/game-portrait.png) | ![Week 2 game landscape](./ui-snapshots/week-2/game-landscape.png) |
+| --- | --- | --- | --- |
+| ![week-2 fixtures portrait](./ui-snapshots/week-2/fixtures-portrait.png) | ![week-2 fixtures landscape](./ui-snapshots/week-2/fixtures-landscape.png) | ![week-2 game portrait](./ui-snapshots/week-2/game-portrait.png) | ![week-2 game landscape](./ui-snapshots/week-2/game-landscape.png) |
 
 ### Feature highlights
 
-| Feature flags panel (Settings → Features) |
-|-------------------------------------------|
-| ![Feature flags](./ui-snapshots/week-2/features/feature-flags-panel.png) |
+| Feature flags panel |
+| --- |
+| ![Feature flags panel](./ui-snapshots/week-2/features/feature-flags-panel.png) |
+<!-- AUTO-SNAPSHOTS:week-2:END -->
 
 ---
 
@@ -244,23 +250,25 @@ Supporting work included the connection status chip, fixture-scoped error toasts
 - ~30 files touched; net +1,996 / −304 lines
 - Key new modules: `ClockWheelEditor`, `ConnectionStatusChip`, `ErrorToastHost`, `featureFlagDeploy`, `api/deploy-feature-flags`
 
+<!-- AUTO-SNAPSHOTS:week-3:START -->
 ### UI snapshots
 
-Commit `dd1f58f` (3 Jul 2026).
+Commit `dd1f58f` (7 Jul 2026).
 
 | Fixtures (portrait) | Fixtures (landscape) | Game (portrait) | Game (landscape) |
-|---------------------|----------------------|-----------------|------------------|
-| ![Week 3 fixtures portrait](./ui-snapshots/week-3/fixtures-portrait.png) | ![Week 3 fixtures landscape](./ui-snapshots/week-3/fixtures-landscape.png) | ![Week 3 game portrait](./ui-snapshots/week-3/game-portrait.png) | ![Week 3 game landscape](./ui-snapshots/week-3/game-landscape.png) |
+| --- | --- | --- | --- |
+| ![week-3 fixtures portrait](./ui-snapshots/week-3/fixtures-portrait.png) | ![week-3 fixtures landscape](./ui-snapshots/week-3/fixtures-landscape.png) | ![week-3 game portrait](./ui-snapshots/week-3/game-portrait.png) | ![week-3 game landscape](./ui-snapshots/week-3/game-landscape.png) |
 
 ### Feature highlights
 
-| Field direction dialog | Clock wheel editor | Connection status |
-|------------------------|--------------------|-------------------|
-| ![Field direction](./ui-snapshots/week-3/features/field-direction-dialog.png) | ![Clock editor](./ui-snapshots/week-3/features/clock-editor.png) | ![Connection status](./ui-snapshots/week-3/features/connection-status.png) |
+| Field direction dialog (first open) | Clock wheel editor | Connection status chip |
+| --- | --- | --- |
+| ![Field direction dialog (first open)](./ui-snapshots/week-3/features/field-direction-dialog.png) | ![Clock wheel editor](./ui-snapshots/week-3/features/clock-editor.png) | ![Connection status chip](./ui-snapshots/week-3/features/connection-status.png) |
 
-| Error toast | Settings dialog |
-|-------------|-----------------|
-| ![Error toast](./ui-snapshots/week-3/features/error-toast.png) | ![Settings tabs](./ui-snapshots/week-3/features/settings-tabs.png) |
+| Fixture error toast | Settings dialog (Log / Field / Features) |
+| --- | --- |
+| ![Fixture error toast](./ui-snapshots/week-3/features/error-toast.png) | ![Settings dialog (Log / Field / Features)](./ui-snapshots/week-3/features/settings-tabs.png) |
+<!-- AUTO-SNAPSHOTS:week-3:END -->
 
 ---
 
@@ -317,23 +325,25 @@ On the game page, portrait mode dropped tabs in favour of a vertical stack of pa
 - ~32 commits this week (heavy session 7 July)
 - ~26 files touched; net +1,507 / −365 lines
 
+<!-- AUTO-SNAPSHOTS:week-4:START -->
 ### UI snapshots
 
-Commit `f019e68` (7 Jul 2026). Production build also captured at [`week-4-prod/`](./ui-snapshots/week-4-prod/).
+Commit `HEAD` (7 Jul 2026).
 
 | Fixtures (portrait) | Fixtures (landscape) | Game (portrait) | Game (landscape) |
-|---------------------|----------------------|-----------------|------------------|
-| ![Week 4 fixtures portrait](./ui-snapshots/week-4/fixtures-portrait.png) | ![Week 4 fixtures landscape](./ui-snapshots/week-4/fixtures-landscape.png) | ![Week 4 game portrait](./ui-snapshots/week-4/game-portrait.png) | ![Week 4 game landscape](./ui-snapshots/week-4/game-landscape.png) |
+| --- | --- | --- | --- |
+| ![week-4 fixtures portrait](./ui-snapshots/week-4/fixtures-portrait.png) | ![week-4 fixtures landscape](./ui-snapshots/week-4/fixtures-landscape.png) | ![week-4 game portrait](./ui-snapshots/week-4/game-portrait.png) | ![week-4 game landscape](./ui-snapshots/week-4/game-landscape.png) |
 
 ### Feature highlights
 
-| Fixtures filters & search | Scheduled / past chips | Portrait stacked panels |
-|----------------------------|------------------------|-------------------------|
-| ![Fixtures filters](./ui-snapshots/week-4/features/fixtures-filters.png) | ![Status chips](./ui-snapshots/week-4/features/fixture-status-chips.png) | ![Portrait stack](./ui-snapshots/week-4/features/portrait-stack.png) |
+| Fixtures filters and search | Scheduled and past fixture chips | Portrait game console (stacked panels) |
+| --- | --- | --- |
+| ![Fixtures filters and search](./ui-snapshots/week-4/features/fixtures-filters.png) | ![Scheduled and past fixture chips](./ui-snapshots/week-4/features/fixture-status-chips.png) | ![Portrait game console (stacked panels)](./ui-snapshots/week-4/features/portrait-stack.png) |
 
-| Past fixture match-ended |
-|--------------------------|
-| ![Past fixture](./ui-snapshots/week-4/features/past-fixture-ended.png) |
+| Past fixture match-ended scoreboard |
+| --- |
+| ![Past fixture match-ended scoreboard](./ui-snapshots/week-4/features/past-fixture-ended.png) |
+<!-- AUTO-SNAPSHOTS:week-4:END -->
 
 ---
 
