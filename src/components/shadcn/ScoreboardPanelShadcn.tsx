@@ -1,4 +1,4 @@
-import { useState, type CSSProperties, type KeyboardEvent, type MouseEvent } from 'react'
+import { useState, useEffect, type CSSProperties, type KeyboardEvent, type MouseEvent } from 'react'
 import { LayoutGrid } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { formatClock } from '@/lib/format'
@@ -157,6 +157,15 @@ export function ScoreboardPanelShadcn({
     setDraftSeconds(parts.seconds)
     setEditingClock(true)
   }
+
+  useEffect(() => {
+    if (!editingClock) return
+
+    const parts = clockToParts(clockSeconds)
+    setDraftPeriod(clockPeriod)
+    setDraftMinutes(parts.minutes)
+    setDraftSeconds(parts.seconds)
+  }, [editingClock, clockPeriod, clockSeconds])
 
   const handleCancelClockEdit = () => {
     setEditingClock(false)
@@ -464,6 +473,7 @@ export function ScoreboardPanelShadcn({
           ) : editingClock ? (
             <div className="grid h-full min-h-0 flex-1 grid-rows-[minmax(0,1fr)_auto] overflow-hidden">
               <ClockWheelEditor
+                key={`${clockPeriod}-${clockSeconds}`}
                 period={draftPeriod}
                 minutes={draftMinutes}
                 seconds={draftSeconds}

@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils'
 import { MAX_PERIOD, MIN_PERIOD, CLOCK_EDIT_MAX_MINUTES, getClockEditSecondValues } from '@/lib/clock'
 
 const ITEM_HEIGHT = 28
+const INITIAL_SCROLL_SUPPRESS_MS = 350
 
 export const CLOCK_MINUTE_VALUES = Array.from({ length: 16 }, (_, index) => index)
 export const CLOCK_SECOND_VALUES = Array.from({ length: 60 }, (_, index) => index)
@@ -29,7 +30,14 @@ export function ClockWheelColumn({
   const settleTimerRef = useRef<number | undefined>(undefined)
   const isDraggingRef = useRef(false)
   const suppressSettleRef = useRef(false)
+  const pendingInitialScrollRef = useRef(true)
+  const userInteractedRef = useRef(false)
   const [edgePadding, setEdgePadding] = useState(0)
+
+  useEffect(() => {
+    pendingInitialScrollRef.current = true
+    userInteractedRef.current = false
+  }, [value])
 
   useEffect(() => {
     const viewport = viewportRef.current
@@ -53,41 +61,54 @@ export function ClockWheelColumn({
       const index = values.indexOf(nextValue)
       if (index < 0) return
 
+      const top = index * ITEM_HEIGHT
       suppressSettleRef.current = true
+      scroller.scrollTop = top
       scroller.scrollTo({
-        top: index * ITEM_HEIGHT,
+        top,
         behavior,
       })
 
-      if (behavior === 'auto') {
-        window.setTimeout(() => {
-          suppressSettleRef.current = false
-        }, 150)
-      }
+      window.setTimeout(() => {
+        suppressSettleRef.current = false
+        pendingInitialScrollRef.current = false
+      }, INITIAL_SCROLL_SUPPRESS_MS)
     },
     [values],
   )
 
   useEffect(() => {
     if (edgePadding <= 0) return
+
     scrollToValue(value)
+
+    const retryId = window.requestAnimationFrame(() => {
+      scrollToValue(value)
+    })
+
+    return () => window.cancelAnimationFrame(retryId)
   }, [edgePadding, scrollToValue, value])
 
-  const settleSelection = useCallback((smooth = false) => {
-    const scroller = scrollerRef.current
-    if (!scroller) return
+  const settleSelection = useCallback(
+    (smooth = false) => {
+      if (pendingInitialScrollRef.current && !userInteractedRef.current) return
 
-    const index = Math.max(
-      0,
-      Math.min(values.length - 1, Math.round(scroller.scrollTop / ITEM_HEIGHT)),
-    )
+      const scroller = scrollerRef.current
+      if (!scroller) return
 
-    scroller.scrollTo({
-      top: index * ITEM_HEIGHT,
-      behavior: smooth ? 'smooth' : 'auto',
-    })
-    onChange(values[index]!)
-  }, [onChange, values])
+      const index = Math.max(
+        0,
+        Math.min(values.length - 1, Math.round(scroller.scrollTop / ITEM_HEIGHT)),
+      )
+
+      scroller.scrollTo({
+        top: index * ITEM_HEIGHT,
+        behavior: smooth ? 'smooth' : 'auto',
+      })
+      onChange(values[index]!)
+    },
+    [onChange, values],
+  )
 
   const handleScroll = () => {
     if (suppressSettleRef.current) return
@@ -111,6 +132,7 @@ export function ClockWheelColumn({
           )}
           onScroll={handleScroll}
           onPointerDown={() => {
+            userInteractedRef.current = true
             isDraggingRef.current = true
           }}
           onPointerUp={() => {
@@ -121,6 +143,7 @@ export function ClockWheelColumn({
             if (isDraggingRef.current) settleSelection(true)
           }}
           onWheel={() => {
+            userInteractedRef.current = true
             if (suppressSettleRef.current) return
 
             window.clearTimeout(settleTimerRef.current)
