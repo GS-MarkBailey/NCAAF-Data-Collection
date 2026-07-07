@@ -87,8 +87,16 @@ export async function initFeatureFlags(): Promise<void> {
     window.history.replaceState({}, '', nextUrl)
   }
 
-  const deployed = await fetchDeployedFeatureFlags()
-  applyDeployedDefaults(deployed)
+  try {
+    const deployed = await fetchDeployedFeatureFlags()
+    applyDeployedDefaults(deployed)
+  } catch {
+    applyDeployedDefaults({
+      version: 1,
+      updatedAt: new Date().toISOString(),
+      flags: { ...DEFAULT_FEATURE_FLAGS },
+    })
+  }
 }
 
 export const useFeatureFlagStore = create<FeatureFlagStore>((set, get) => ({

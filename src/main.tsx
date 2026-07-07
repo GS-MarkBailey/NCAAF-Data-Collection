@@ -21,11 +21,15 @@ if (rootElement) {
     </StrictMode>,
   )
 
-  void initFeatureFlags().then(() => {
-    root.render(
-      <StrictMode>
-        <App />
-      </StrictMode>,
-    )
-  })
+  void initFeatureFlags()
+    .catch(() => {
+      // Still mount the app if flag fetch fails (offline / cache issues).
+    })
+    .finally(() => {
+      root.render(
+        <StrictMode>
+          <App />
+        </StrictMode>,
+      )
+    })
 }
