@@ -250,6 +250,161 @@ export function ScoreboardPanelShadcn({
     }
   }
 
+  const clockDisplayLabel =
+    gameEnded || inOvertime
+      ? stacked
+        ? 'text-base tracking-wider uppercase'
+        : 'text-lg tracking-wider uppercase'
+      : stacked
+        ? 'text-[1.75rem] tabular-nums'
+        : 'text-[2rem] tabular-nums'
+
+  const clockDisplayText = gameEnded
+    ? 'Match ended'
+    : inOvertime
+      ? 'OVERTIME'
+      : formatClock(clockSeconds)
+
+  const clockAreaClassName = cn(
+    'relative flex min-h-0 flex-1 flex-col items-center justify-center gap-2 px-2 transition-colors',
+    (pregame ||
+      showEndPeriodButton ||
+      showStartPeriodButton ||
+      showStartOvertimeButton) &&
+      'bg-[var(--color-primary-bg)]',
+    gameEnded && 'bg-muted',
+    !stacked && !clockLocked && 'cursor-pointer hover:bg-muted/40 active:bg-muted/60',
+  )
+
+  const actionBadges = (
+    <>
+      {showStartPeriodButton ? (
+        <Badge
+          render={
+            <button
+              type="button"
+              onClick={handleStartPeriod}
+              aria-label={`Start quarter ${nextQuarterNumber(clockPeriod)}`}
+            />
+          }
+          className={PRIMARY_ACTION_BADGE_CLASS}
+        >
+          Start Q{nextQuarterNumber(clockPeriod)}
+        </Badge>
+      ) : null}
+      {showEndPeriodButton ? (
+        <Badge
+          render={
+            <button
+              type="button"
+              onClick={handleEndPeriod}
+              aria-label="End period"
+            />
+          }
+          className={PRIMARY_ACTION_BADGE_CLASS}
+        >
+          End period
+        </Badge>
+      ) : null}
+      {pregame ? (
+        <Badge
+          render={
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation()
+                startPeriod(fixtureId)
+              }}
+              aria-label="Kick off game"
+            />
+          }
+          className={PRIMARY_ACTION_BADGE_CLASS}
+        >
+          Kick off
+        </Badge>
+      ) : null}
+      {showStartOvertimeButton ? (
+        <Badge
+          render={
+            <button
+              type="button"
+              onClick={handleStartOvertime}
+              aria-label="Start overtime"
+            />
+          }
+          className={PRIMARY_ACTION_BADGE_CLASS}
+        >
+          Start overtime
+        </Badge>
+      ) : null}
+      {showEndOvertimeButton ? (
+        <Badge
+          render={
+            <button
+              type="button"
+              onClick={handleEndGame}
+              aria-label="End game"
+            />
+          }
+          className={PRIMARY_ACTION_BADGE_CLASS}
+        >
+          End game
+        </Badge>
+      ) : null}
+      {gameEnded ? <Badge variant="secondary">Final</Badge> : null}
+      {showPlayPauseButton ? (
+        <Badge
+          variant="destructive"
+          render={
+            <button
+              type="button"
+              onClick={handlePlayPause}
+              aria-label={paused ? 'Start clock' : 'Pause clock'}
+              aria-pressed={!paused}
+            />
+          }
+        >
+          {paused ? 'Start' : 'Pause'}
+        </Badge>
+      ) : null}
+    </>
+  )
+
+  const showActionBar =
+    showStartPeriodButton ||
+    showEndPeriodButton ||
+    pregame ||
+    showStartOvertimeButton ||
+    showEndOvertimeButton ||
+    gameEnded ||
+    showPlayPauseButton
+
+  const clockEditButton = (
+    <button
+      type="button"
+      className={cn(
+        'rounded-md border-0 bg-transparent px-2 py-1 transition-colors',
+        !clockLocked && !inOvertime && 'hover:bg-muted/60 active:bg-muted/80',
+      )}
+      onClick={(event) => {
+        event.stopPropagation()
+        handleOpenClockEditor()
+      }}
+      disabled={clockLocked || (inOvertime && !gameEnded)}
+      aria-label={
+        gameEnded
+          ? 'Match ended'
+          : inOvertime
+            ? 'Overtime in progress'
+            : `Edit game clock, currently ${formatClock(clockSeconds)}`
+      }
+    >
+      <span className={cn('font-bold leading-none', clockDisplayLabel)}>
+        {clockDisplayText}
+      </span>
+    </button>
+  )
+
   return (
     <Card
       size="compact"
@@ -330,6 +485,28 @@ export function ScoreboardPanelShadcn({
                 </Button>
               </div>
             </div>
+          ) : stacked ? (
+            <div className="grid h-full min-h-0 flex-1 grid-rows-[minmax(0,1fr)_auto] overflow-hidden">
+              <div className={clockAreaClassName}>
+                {clockEditButton}
+                {awaitingRegulationDecision && periodEnded ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="absolute top-2 right-2 z-10 h-7 border-border bg-background text-[10px] font-bold tracking-wider uppercase shadow-sm"
+                    onClick={handleEndGame}
+                  >
+                    End game
+                  </Button>
+                ) : null}
+              </div>
+              {showActionBar ? (
+                <div className="flex shrink-0 flex-wrap items-center justify-center gap-2 border-t border-border bg-background px-2 py-2">
+                  {actionBadges}
+                </div>
+              ) : null}
+            </div>
           ) : (
             <div
               role="presentation"
@@ -351,136 +528,13 @@ export function ScoreboardPanelShadcn({
               }
               onClick={handleToggleClock}
               onKeyDown={handleContainerKeyDown}
-              className={cn(
-                'relative flex h-full min-h-0 flex-1 flex-col items-center justify-center gap-2 px-2 transition-colors',
-                (pregame ||
-                  showEndPeriodButton ||
-                  showStartPeriodButton ||
-                  showStartOvertimeButton) &&
-                  'bg-[var(--color-primary-bg)]',
-                gameEnded && 'bg-muted',
-                !clockLocked && 'cursor-pointer hover:bg-muted/40 active:bg-muted/60',
-              )}
+              className={clockAreaClassName}
             >
-              <button
-                type="button"
-                className={cn(
-                  'rounded-md border-0 bg-transparent px-2 py-1 transition-colors',
-                  !clockLocked && !inOvertime && 'hover:bg-muted/60 active:bg-muted/80',
-                )}
-                onClick={(event) => {
-                  event.stopPropagation()
-                  handleOpenClockEditor()
-                }}
-                disabled={clockLocked || (inOvertime && !gameEnded)}
-                aria-label={
-                  gameEnded
-                    ? 'Match ended'
-                    : inOvertime
-                      ? 'Overtime in progress'
-                      : `Edit game clock, currently ${formatClock(clockSeconds)}`
-                }
-              >
-                <span
-                  className={cn(
-                    'font-bold leading-none',
-                    gameEnded || inOvertime
-                      ? stacked
-                        ? 'text-base tracking-wider uppercase'
-                        : 'text-lg tracking-wider uppercase'
-                      : stacked
-                        ? 'text-[1.75rem] tabular-nums'
-                        : 'text-[2rem] tabular-nums',
-                  )}
-                >
-                  {gameEnded
-                    ? 'Match ended'
-                    : inOvertime
-                      ? 'OVERTIME'
-                      : formatClock(clockSeconds)}
-                </span>
-              </button>
+              {clockEditButton}
               <div className="pointer-events-none absolute inset-x-2 bottom-2 flex justify-center gap-2">
-                {showStartPeriodButton ? (
-                  <Badge
-                    render={
-                      <button
-                        type="button"
-                        className="pointer-events-auto"
-                        onClick={handleStartPeriod}
-                        aria-label={`Start quarter ${nextQuarterNumber(clockPeriod)}`}
-                      />
-                    }
-                    className={PRIMARY_ACTION_BADGE_CLASS}
-                  >
-                    Start Q{nextQuarterNumber(clockPeriod)}
-                  </Badge>
-                ) : null}
-                {showEndPeriodButton ? (
-                  <Badge
-                    render={
-                      <button
-                        type="button"
-                        className="pointer-events-auto"
-                        onClick={handleEndPeriod}
-                        aria-label="End period"
-                      />
-                    }
-                    className={PRIMARY_ACTION_BADGE_CLASS}
-                  >
-                    End period
-                  </Badge>
-                ) : null}
-                {pregame && (
-                  <Badge className={PRIMARY_ACTION_BADGE_CLASS}>Kick off</Badge>
-                )}
-                {showStartOvertimeButton ? (
-                  <Badge
-                    render={
-                      <button
-                        type="button"
-                        className="pointer-events-auto"
-                        onClick={handleStartOvertime}
-                        aria-label="Start overtime"
-                      />
-                    }
-                    className={PRIMARY_ACTION_BADGE_CLASS}
-                  >
-                    Start overtime
-                  </Badge>
-                ) : null}
-                {showEndOvertimeButton ? (
-                  <Badge
-                    render={
-                      <button
-                        type="button"
-                        className="pointer-events-auto"
-                        onClick={handleEndGame}
-                        aria-label="End game"
-                      />
-                    }
-                    className={PRIMARY_ACTION_BADGE_CLASS}
-                  >
-                    End game
-                  </Badge>
-                ) : null}
-                {gameEnded && <Badge variant="secondary">Final</Badge>}
-                {showPlayPauseButton ? (
-                  <Badge
-                    variant="destructive"
-                    render={
-                      <button
-                        type="button"
-                        className="pointer-events-auto"
-                        onClick={handlePlayPause}
-                        aria-label={paused ? 'Start clock' : 'Pause clock'}
-                        aria-pressed={!paused}
-                      />
-                    }
-                  >
-                    {paused ? 'Start' : 'Pause'}
-                  </Badge>
-                ) : null}
+                <div className="pointer-events-auto flex flex-wrap items-center justify-center gap-2">
+                  {actionBadges}
+                </div>
               </div>
               {awaitingRegulationDecision && periodEnded ? (
                 <Button
