@@ -95,6 +95,8 @@ Example URL shape:
 
 `https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/game-landscape.png`
 
+Image URLs include a `?v=` query param derived from each PNG’s file modification time, so markdown preview tools and Confluence refetch after re-capture. Re-run `npm run sync:confluence-doc` after updating PNGs.
+
 Override the host with `CONFLUENCE_IMAGE_BASE_URL` if needed.
 
 **Note:** Confluence must be allowed to fetch external images (usually on by default). Private repos require readers to have GitHub access; for org-wide Confluence, a **public** repo or GitHub attachment sync is more reliable.
