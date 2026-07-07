@@ -65,7 +65,7 @@ export function RiskManagementPanelShadcn({
         stacked && portraitPanelClass,
       )}
     >
-      <CardHeader className="border-b border-border py-2.5">
+      <CardHeader className="border-b border-border">
         <CardTitle className="flex items-center gap-2 text-sm">
           <AlertTriangle className="size-4 text-muted-foreground" />
           Risk Management

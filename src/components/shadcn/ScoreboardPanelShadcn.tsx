@@ -258,7 +258,7 @@ export function ScoreboardPanelShadcn({
         stacked && PORTRAIT_PANEL_CLASS,
       )}
     >
-      <CardHeader className="border-b border-border py-2.5">
+      <CardHeader className="border-b border-border">
         <CardTitle className="flex items-center gap-2 text-sm">
           <LayoutGrid className="size-4 text-muted-foreground" />
           Scoreboard
