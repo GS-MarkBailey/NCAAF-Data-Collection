@@ -1,11 +1,14 @@
 {
   "label": "week-3",
-  "capturedAt": "2026-07-07T21:09:09.892Z",
+  "portrait": false,
+  "capturedAt": "2026-07-07T23:16:56.352Z",
   "baseUrl": "http://127.0.0.1:4173",
+  "views": [
+    "fixtures-landscape",
+    "game-landscape"
+  ],
   "routes": [
     "/fixtures",
-    "/fixtures",
-    "/game/NCAAF-2026-001",
     "/game/NCAAF-2026-001"
   ],
   "features": [

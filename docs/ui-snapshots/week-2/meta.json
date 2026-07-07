@@ -1,11 +1,14 @@
 {
   "label": "week-2",
-  "capturedAt": "2026-07-07T21:08:04.478Z",
+  "portrait": false,
+  "capturedAt": "2026-07-07T23:16:01.417Z",
   "baseUrl": "http://127.0.0.1:4173",
+  "views": [
+    "fixtures-landscape",
+    "game-landscape"
+  ],
   "routes": [
     "/fixtures",
-    "/fixtures",
-    "/game/NCAAF-2026-001",
     "/game/NCAAF-2026-001"
   ],
   "features": [

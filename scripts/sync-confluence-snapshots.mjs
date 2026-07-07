@@ -2,19 +2,17 @@
 /**
  * Regenerate auto-managed snapshot sections in the Confluence markdown doc.
  *
- * Image embeds use GitHub raw URLs so Confluence can load them after you push PNGs to main.
- *
- * Usage:
- *   npm run sync:confluence-doc
- *
- * Override image host:
- *   CONFLUENCE_IMAGE_BASE_URL=https://raw.githubusercontent.com/org/repo/main/docs/ui-snapshots
+ * Sections:
+ *   - ui-evolution: latest week screens only (Current screens)
+ *   - week-N-interactions: feature images inline with interaction copy
+ *   - week-N-shipped-<key>: feature images inline in Shipped subsections
  */
 
-import { access, readFile, writeFile } from 'node:fs/promises'
+import { access, readFile, stat, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { resolveSnapshotImageBase, snapshotImageUrl } from './github-raw-url.mjs'
+import { WEEK_INTERACTIONS, WEEK_SHIPPED } from './ui-snapshot-doc-content.mjs'
 import { WEEK_FEATURES } from './ui-snapshot-features.mjs'
 import { SNAPSHOT_WEEKS } from './ui-snapshot-weeks.mjs'
 
@@ -39,90 +37,17 @@ function formatCommitDate(isoDate) {
   return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
-function img(imageBase, relPath, alt) {
-  return `![${alt}](${snapshotImageUrl(imageBase, relPath)})`
-}
-
-function chunk(items, size) {
-  const rows = []
-  for (let i = 0; i < items.length; i += size) {
-    rows.push(items.slice(i, i + size))
+async function cacheBustToken(absPath) {
+  try {
+    const { mtimeMs } = await stat(absPath)
+    return String(Math.floor(mtimeMs / 1000))
+  } catch {
+    return null
   }
-  return rows
 }
 
-function renderTable(headers, rows) {
-  const lines = [
-    `| ${headers.join(' | ')} |`,
-    `| ${headers.map(() => '---').join(' | ')} |`,
-  ]
-  for (const row of rows) {
-    lines.push(`| ${row.join(' | ')} |`)
-  }
-  return lines.join('\n')
-}
-
-async function loadWeekMeta(label) {
-  const metaPath = path.join(SNAPSHOTS_DIR, label, 'meta.json')
-  if (!(await fileExists(metaPath))) return null
-  return JSON.parse(await readFile(metaPath, 'utf8'))
-}
-
-function weekCommitLine(week, meta) {
-  const commit = week.commit === 'HEAD' ? (meta?.commit ?? 'HEAD') : week.commit
-  const date = meta?.capturedAt
-    ? formatCommitDate(meta.capturedAt.slice(0, 10))
-    : formatCommitDate(week.date)
-  return `Commit \`${commit}\` (${date}).`
-}
-
-function renderOverviewScreens(imageBase, label) {
-  const base = `${label}`
-  return renderTable(
-    ['Fixtures (portrait)', 'Fixtures (landscape)', 'Game (portrait)', 'Game (landscape)'],
-    [[
-      img(imageBase, `${base}/fixtures-portrait.png`, `${label} fixtures portrait`),
-      img(imageBase, `${base}/fixtures-landscape.png`, `${label} fixtures landscape`),
-      img(imageBase, `${base}/game-portrait.png`, `${label} game portrait`),
-      img(imageBase, `${base}/game-landscape.png`, `${label} game landscape`),
-    ]],
-  )
-}
-
-async function renderFeatureHighlights(imageBase, label, features) {
-  if (features.length === 0) {
-    return '_No feature snapshots configured — add scenarios in `scripts/ui-snapshot-features.mjs`._'
-  }
-
-  const available = []
-  for (const feature of features) {
-    const filePath = path.join(SNAPSHOTS_DIR, label, 'features', `${feature.id}.png`)
-    if (await fileExists(filePath)) available.push(feature)
-  }
-
-  if (available.length === 0) {
-    return '_Feature snapshots pending — run `npm run capture:and-sync`, then push to GitHub._'
-  }
-
-  const rows = chunk(available, 3)
-  const blocks = rows.map((row) => {
-    const headers = row.map((f) => f.title)
-    const images = row.map((f) =>
-      img(imageBase, `${label}/features/${f.id}.png`, f.title),
-    )
-    return `${renderTable(headers, [images])}\n`
-  })
-
-  return blocks.join('\n').trim()
-}
-
-function renderUiEvolution(imageBase, weeks) {
-  const rows = weeks.map((week) => [
-    week.label.replace('week-', 'Week '),
-    img(imageBase, `${week.label}/fixtures-portrait.png`, `${week.label} fixtures`),
-    img(imageBase, `${week.label}/game-landscape.png`, `${week.label} game`),
-  ])
-  return renderTable(['Week', 'Fixtures (portrait)', 'Game (landscape)'], rows)
+function img(imageBase, relPath, alt, cacheBust) {
+  return `![${alt}](${snapshotImageUrl(imageBase, relPath, cacheBust)})`
 }
 
 function replaceMarkedBlock(content, id, replacement) {
@@ -149,38 +74,160 @@ function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
+function latestWeek() {
+  return SNAPSHOT_WEEKS[SNAPSHOT_WEEKS.length - 1]
+}
+
+function renderLatestScreens(imageBase, week, cacheBustFor) {
+  const label = week.label
+  return [
+    `**Fixtures (landscape)**`,
+    '',
+    img(
+      imageBase,
+      `${label}/fixtures-landscape.png`,
+      'Fixtures landscape',
+      cacheBustFor(`${label}/fixtures-landscape.png`),
+    ),
+    '',
+    `**Game console (landscape)**`,
+    '',
+    img(
+      imageBase,
+      `${label}/game-landscape.png`,
+      'Game landscape',
+      cacheBustFor(`${label}/game-landscape.png`),
+    ),
+  ].join('\n')
+}
+
+async function featureImage(imageBase, weekLabel, featureId, title, cacheBustFor) {
+  const relPath = `${weekLabel}/features/${featureId}.png`
+  const filePath = path.join(SNAPSHOTS_DIR, relPath)
+  if (!(await fileExists(filePath))) return null
+  return img(imageBase, relPath, title, cacheBustFor(relPath))
+}
+
+async function overviewImage(imageBase, weekLabel, fileName, cacheBustFor) {
+  const relPath = `${weekLabel}/${fileName}`
+  const filePath = path.join(SNAPSHOTS_DIR, relPath)
+  if (!(await fileExists(filePath))) return null
+  const alt = fileName.replace(/\.png$/, '').replace(/-/g, ' ')
+  return img(imageBase, relPath, alt, cacheBustFor(relPath))
+}
+
+async function renderSnapshotBlock(imageBase, weekLabel, block, cacheBustFor) {
+  const featureTitles = Object.fromEntries(
+    (WEEK_FEATURES[weekLabel] ?? []).map((f) => [f.id, f.title]),
+  )
+
+  const images = []
+
+  for (const fileName of block.overviewFiles ?? []) {
+    const image = await overviewImage(imageBase, weekLabel, fileName, cacheBustFor)
+    if (image) images.push(image)
+  }
+
+  for (const featureId of block.featureIds ?? []) {
+    const image = await featureImage(
+      imageBase,
+      weekLabel,
+      featureId,
+      featureTitles[featureId] ?? featureId,
+      cacheBustFor,
+    )
+    if (image) images.push(image)
+  }
+
+  if (images.length === 0) return ''
+  return images.join(' ')
+}
+
+async function renderInteractions(imageBase, weekLabel, cacheBustFor) {
+  const lines = WEEK_INTERACTIONS[weekLabel] ?? []
+  if (lines.length === 0) {
+    return '_No interaction screenshots configured for this week._'
+  }
+
+  const featureTitles = Object.fromEntries(
+    (WEEK_FEATURES[weekLabel] ?? []).map((f) => [f.id, f.title]),
+  )
+
+  const blocks = []
+  for (const line of lines) {
+    blocks.push(`- ${line.text}`)
+    const images = []
+    for (const featureId of line.featureIds) {
+      const image = await featureImage(
+        imageBase,
+        weekLabel,
+        featureId,
+        featureTitles[featureId] ?? featureId,
+        cacheBustFor,
+      )
+      if (image) images.push(image)
+    }
+    if (images.length > 0) {
+      blocks.push('', images.join(' '), '')
+    }
+  }
+
+  return blocks.join('\n').trim()
+}
+
 async function main() {
   const imageBase = resolveSnapshotImageBase(ROOT)
   let content = await readFile(DOC_PATH, 'utf8')
 
+  const cacheBustByRelPath = new Map()
+  async function resolveCacheBust(relPath) {
+    if (cacheBustByRelPath.has(relPath)) {
+      return cacheBustByRelPath.get(relPath)
+    }
+    const token = await cacheBustToken(path.join(SNAPSHOTS_DIR, relPath))
+    cacheBustByRelPath.set(relPath, token)
+    return token
+  }
+  const cacheBustFor = (relPath) => cacheBustByRelPath.get(relPath) ?? null
+
+  for (const week of SNAPSHOT_WEEKS) {
+    for (const fileName of ['fixtures-landscape.png', 'game-landscape.png']) {
+      await resolveCacheBust(`${week.label}/${fileName}`)
+    }
+    for (const feature of WEEK_FEATURES[week.label] ?? []) {
+      await resolveCacheBust(`${week.label}/features/${feature.id}.png`)
+    }
+  }
+
+  const latest = latestWeek()
   content = replaceMarkedBlock(
     content,
     'ui-evolution',
-    renderUiEvolution(imageBase, SNAPSHOT_WEEKS),
+    renderLatestScreens(imageBase, latest, cacheBustFor),
   )
 
   for (const week of SNAPSHOT_WEEKS) {
-    const meta = await loadWeekMeta(week.label)
-    const commitLine = weekCommitLine(week, meta)
-    const features =
-      meta?.features?.length > 0
-        ? meta.features
-        : (WEEK_FEATURES[week.label] ?? []).map((f) => ({
-            id: f.id,
-            title: f.title,
-          }))
+    const interactionsMarker = `${week.label}-interactions`
+    if (content.includes(MARKER(interactionsMarker, 'START'))) {
+      content = replaceMarkedBlock(
+        content,
+        interactionsMarker,
+        await renderInteractions(imageBase, week.label, cacheBustFor),
+      )
+    }
 
-    const block = `### UI snapshots
-
-${commitLine}
-
-${renderOverviewScreens(imageBase, week.label)}
-
-### Feature highlights
-
-${await renderFeatureHighlights(imageBase, week.label, features)}`
-
-    content = replaceMarkedBlock(content, week.label, block)
+    for (const [key, block] of Object.entries(WEEK_SHIPPED[week.label] ?? {})) {
+      const markerId = `${week.label}-shipped-${key}`
+      if (!content.includes(MARKER(markerId, 'START'))) {
+        console.warn(`Skipping ${markerId}: no markers in doc`)
+        continue
+      }
+      content = replaceMarkedBlock(
+        content,
+        markerId,
+        await renderSnapshotBlock(imageBase, week.label, block, cacheBustFor),
+      )
+    }
   }
 
   const stamp = new Date().toISOString().slice(0, 10)
