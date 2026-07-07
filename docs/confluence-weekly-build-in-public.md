@@ -441,7 +441,3 @@ The fastest way to evaluate the build is on a physical phone — especially iPho
 3. Select a fixture from the list
 4. Set field direction on first open (if enabled)
 5. Use Take Control, clock, scoreboard, and risk panels as an operator would
-
----
-
-*Document generated from git history and development sessions. For internal Confluence: paste this page or import the markdown file. Adjust audience wording as needed for external vs internal “build in public” posts.*
