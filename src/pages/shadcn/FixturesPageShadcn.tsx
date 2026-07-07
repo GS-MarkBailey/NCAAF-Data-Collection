@@ -1,5 +1,8 @@
 import { useNavigate } from 'react-router-dom'
 import { Calendar } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { isFixtureScheduled } from '@/lib/fixtures'
+import { Badge } from '@/components/ui/badge'
 import {
   Card,
   CardContent,
@@ -30,7 +33,10 @@ export function FixturesPageShadcn() {
       <Separator />
 
       <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-4 pb-4">
-        {fixtures.map((fixture) => (
+        {fixtures.map((fixture) => {
+          const scheduled = isFixtureScheduled(fixture)
+
+          return (
           <Card
             key={fixture.id}
             role="button"
@@ -45,16 +51,28 @@ export function FixturesPageShadcn() {
             }}
           >
             <CardHeader className="pb-2">
-              <div className="flex min-w-0 items-center gap-2">
-                <span className="truncate text-sm font-semibold">
-                  {fixture.homeTeam}
-                </span>
-                <span className="shrink-0 text-xs text-muted-foreground">
-                  vs
-                </span>
-                <span className="truncate text-sm font-semibold">
-                  {fixture.awayTeam}
-                </span>
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex min-w-0 flex-1 items-center gap-2">
+                  <span className="truncate text-sm font-semibold">
+                    {fixture.homeTeam}
+                  </span>
+                  <span className="shrink-0 text-xs text-muted-foreground">
+                    vs
+                  </span>
+                  <span className="truncate text-sm font-semibold">
+                    {fixture.awayTeam}
+                  </span>
+                </div>
+                <Badge
+                  variant={scheduled ? 'outline' : 'secondary'}
+                  className={cn(
+                    'shrink-0',
+                    scheduled &&
+                      'border-emerald-200 bg-emerald-50 text-emerald-800',
+                  )}
+                >
+                  {scheduled ? 'Scheduled' : 'Past'}
+                </Badge>
               </div>
             </CardHeader>
             <CardContent>
@@ -64,7 +82,7 @@ export function FixturesPageShadcn() {
               </div>
             </CardContent>
           </Card>
-        ))}
+        )})}
       </div>
     </div>
   )
