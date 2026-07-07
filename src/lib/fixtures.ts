@@ -20,80 +20,31 @@ export function sortFixturesByKickoffDesc(fixtures: Fixture[]): Fixture[] {
   )
 }
 
-export interface FixtureFilters {
-  startDate: string
-  startTime: string
-  teams: string
-  fixtureId: string
-}
-
-export const EMPTY_FIXTURE_FILTERS: FixtureFilters = {
-  startDate: 'all',
-  startTime: 'all',
-  teams: '',
-  fixtureId: '',
-}
-
-export function hasActiveFixtureFilters(filters: FixtureFilters): boolean {
-  return (
-    filters.startDate !== 'all' ||
-    filters.startTime !== 'all' ||
-    filters.teams.trim().length > 0 ||
-    filters.fixtureId.trim().length > 0
-  )
-}
-
-export function getUniqueFixtureDates(fixtures: Fixture[]): string[] {
-  return [...new Set(fixtures.map((fixture) => fixture.startDate))].sort(
-    (a, b) => b.localeCompare(a),
-  )
-}
-
-export function getUniqueFixtureTimes(fixtures: Fixture[]): string[] {
-  return [...new Set(fixtures.map((fixture) => fixture.startTime))].sort()
+function getFixtureSearchValues(fixture: Fixture): string[] {
+  return [
+    fixture.homeTeam,
+    fixture.awayTeam,
+    fixture.homeAbbr,
+    fixture.awayAbbr,
+    fixture.id,
+    fixture.eventId,
+    fixture.startDate,
+    fixture.startTime,
+    `${fixture.startDate} ${fixture.startTime}`,
+    `#${fixture.eventId}`,
+  ]
 }
 
 export function filterFixtures(
   fixtures: Fixture[],
-  filters: FixtureFilters,
+  query: string,
 ): Fixture[] {
-  const teamsQuery = filters.teams.trim().toLowerCase()
-  const fixtureIdQuery = filters.fixtureId.trim().toLowerCase()
+  const normalizedQuery = query.trim().toLowerCase()
+  if (!normalizedQuery) return fixtures
 
-  return fixtures.filter((fixture) => {
-    if (
-      filters.startDate !== 'all' &&
-      fixture.startDate !== filters.startDate
-    ) {
-      return false
-    }
-
-    if (
-      filters.startTime !== 'all' &&
-      fixture.startTime !== filters.startTime
-    ) {
-      return false
-    }
-
-    if (teamsQuery) {
-      const matchesTeam = [
-        fixture.homeTeam,
-        fixture.awayTeam,
-        fixture.homeAbbr,
-        fixture.awayAbbr,
-      ].some((value) => value.toLowerCase().includes(teamsQuery))
-
-      if (!matchesTeam) return false
-    }
-
-    if (fixtureIdQuery) {
-      const matchesFixtureId =
-        fixture.id.toLowerCase().includes(fixtureIdQuery) ||
-        fixture.eventId.toLowerCase().includes(fixtureIdQuery)
-
-      if (!matchesFixtureId) return false
-    }
-
-    return true
-  })
+  return fixtures.filter((fixture) =>
+    getFixtureSearchValues(fixture).some((value) =>
+      value.toLowerCase().includes(normalizedQuery),
+    ),
+  )
 }
