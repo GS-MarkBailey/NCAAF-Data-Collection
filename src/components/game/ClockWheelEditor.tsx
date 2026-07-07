@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { MAX_PERIOD, MIN_PERIOD, CLOCK_EDIT_MAX_MINUTES, getClockEditSecondValues } from '@/lib/clock'
 
 const ITEM_HEIGHT = 28
-const INITIAL_SCROLL_SUPPRESS_MS = 350
+const INITIAL_SCROLL_SUPPRESS_MS = 400
 
 export const CLOCK_MINUTE_VALUES = Array.from({ length: 16 }, (_, index) => index)
 export const CLOCK_SECOND_VALUES = Array.from({ length: 60 }, (_, index) => index)
@@ -30,14 +30,8 @@ export function ClockWheelColumn({
   const settleTimerRef = useRef<number | undefined>(undefined)
   const isDraggingRef = useRef(false)
   const suppressSettleRef = useRef(false)
-  const pendingInitialScrollRef = useRef(true)
   const userInteractedRef = useRef(false)
   const [edgePadding, setEdgePadding] = useState(0)
-
-  useEffect(() => {
-    pendingInitialScrollRef.current = true
-    userInteractedRef.current = false
-  }, [value])
 
   useEffect(() => {
     const viewport = viewportRef.current
@@ -54,45 +48,47 @@ export function ClockWheelColumn({
   }, [])
 
   const scrollToValue = useCallback(
-    (nextValue: number, behavior: ScrollBehavior = 'auto') => {
+    (nextValue: number) => {
       const scroller = scrollerRef.current
-      if (!scroller) return
+      if (!scroller) return false
 
       const index = values.indexOf(nextValue)
-      if (index < 0) return
+      if (index < 0) return false
 
       const top = index * ITEM_HEIGHT
       suppressSettleRef.current = true
       scroller.scrollTop = top
-      scroller.scrollTo({
-        top,
-        behavior,
-      })
 
       window.setTimeout(() => {
         suppressSettleRef.current = false
-        pendingInitialScrollRef.current = false
       }, INITIAL_SCROLL_SUPPRESS_MS)
+
+      return true
     },
     [values],
   )
 
-  useEffect(() => {
-    if (edgePadding <= 0) return
-
+  const syncScrollPosition = useCallback(() => {
     scrollToValue(value)
+  }, [scrollToValue, value])
 
-    const retryId = window.requestAnimationFrame(() => {
-      scrollToValue(value)
-    })
+  useLayoutEffect(() => {
+    userInteractedRef.current = false
+    syncScrollPosition()
 
-    return () => window.cancelAnimationFrame(retryId)
-  }, [edgePadding, scrollToValue, value])
+    const rafId = window.requestAnimationFrame(syncScrollPosition)
+    const timeoutIds = [0, 50, 150, 300].map((delay) =>
+      window.setTimeout(syncScrollPosition, delay),
+    )
+
+    return () => {
+      window.cancelAnimationFrame(rafId)
+      timeoutIds.forEach((id) => window.clearTimeout(id))
+    }
+  }, [syncScrollPosition])
 
   const settleSelection = useCallback(
     (smooth = false) => {
-      if (pendingInitialScrollRef.current && !userInteractedRef.current) return
-
       const scroller = scrollerRef.current
       if (!scroller) return
 
@@ -101,17 +97,20 @@ export function ClockWheelColumn({
         Math.min(values.length - 1, Math.round(scroller.scrollTop / ITEM_HEIGHT)),
       )
 
-      scroller.scrollTo({
-        top: index * ITEM_HEIGHT,
-        behavior: smooth ? 'smooth' : 'auto',
-      })
+      const top = index * ITEM_HEIGHT
+      if (smooth) {
+        scroller.scrollTo({ top, behavior: 'smooth' })
+      } else {
+        scroller.scrollTop = top
+      }
+
       onChange(values[index]!)
     },
     [onChange, values],
   )
 
   const handleScroll = () => {
-    if (suppressSettleRef.current) return
+    if (suppressSettleRef.current || !userInteractedRef.current) return
 
     window.clearTimeout(settleTimerRef.current)
     settleTimerRef.current = window.setTimeout(() => settleSelection(false), 100)
@@ -121,7 +120,7 @@ export function ClockWheelColumn({
     <div className="flex h-full min-h-0 flex-1 flex-col items-center overflow-hidden">
       <div
         ref={viewportRef}
-        className="relative h-full min-h-0 w-full max-w-[4rem] overflow-hidden"
+        className="relative h-full min-h-[5.5rem] w-full max-w-[4rem] overflow-hidden"
       >
         <div className="pointer-events-none absolute inset-x-0 top-1/2 z-10 h-7 -translate-y-1/2 rounded-md border-y border-border bg-muted/40" />
         <div
@@ -137,10 +136,12 @@ export function ClockWheelColumn({
           }}
           onPointerUp={() => {
             isDraggingRef.current = false
-            settleSelection(true)
+            if (userInteractedRef.current) settleSelection(true)
           }}
           onPointerLeave={() => {
-            if (isDraggingRef.current) settleSelection(true)
+            if (isDraggingRef.current && userInteractedRef.current) {
+              settleSelection(true)
+            }
           }}
           onWheel={() => {
             userInteractedRef.current = true
@@ -193,6 +194,7 @@ export function ClockWheelEditor({
   onSecondsChange,
 }: ClockWheelEditorProps) {
   const secondValues = getClockEditSecondValues(minutes)
+  const clampedSeconds = minutes === CLOCK_EDIT_MAX_MINUTES ? 0 : seconds
 
   const handleMinutesChange = (nextMinutes: number) => {
     onMinutesChange(nextMinutes)
@@ -202,7 +204,7 @@ export function ClockWheelEditor({
   }
 
   return (
-    <div className="flex h-full min-h-0 items-center justify-center gap-1.5 overflow-hidden px-1">
+    <div className="flex h-full min-h-[5.5rem] items-center justify-center gap-1.5 overflow-hidden px-1">
       <ClockWheelColumn
         values={CLOCK_PERIOD_VALUES}
         value={period}
@@ -222,7 +224,7 @@ export function ClockWheelEditor({
       </span>
       <ClockWheelColumn
         values={secondValues}
-        value={minutes === CLOCK_EDIT_MAX_MINUTES ? 0 : seconds}
+        value={clampedSeconds}
         onChange={onSecondsChange}
       />
     </div>
