@@ -21,6 +21,8 @@ const RISKS: { key: RiskType; label: string; fullWidth?: boolean }[] = [
   { key: 'playAboutToStart', label: 'Play About to Start' },
 ]
 
+const PORTRAIT_PANEL_CLASS = 'min-h-0 flex-1 border border-border ring-0'
+
 interface RiskManagementPanelShadcnProps {
   game: GameState
   layout?: 'stack' | 'column'
@@ -45,6 +47,7 @@ export function RiskManagementPanelShadcn({
   )
   const rowCount = Math.max(1, Math.ceil(visibleRisks.length / 2))
   const stacked = layout === 'stack'
+  const portraitPanelClass = PORTRAIT_PANEL_CLASS
 
   const handleValueChange = (values: string[]) => {
     for (const { key } of visibleRisks) {
@@ -59,7 +62,7 @@ export function RiskManagementPanelShadcn({
       size="compact"
       className={cn(
         'flex min-h-0 flex-1 flex-col',
-        stacked && 'shrink-0 flex-none',
+        stacked && portraitPanelClass,
       )}
     >
       <CardHeader className="border-b border-border py-2.5">
@@ -68,12 +71,7 @@ export function RiskManagementPanelShadcn({
           Risk Management
         </CardTitle>
       </CardHeader>
-      <CardContent
-        className={cn(
-          'flex min-h-0 flex-1 flex-col',
-          stacked && 'flex-none',
-        )}
-      >
+      <CardContent className="flex min-h-0 flex-1 flex-col">
         {visibleRisks.length === 0 ? (
           <p className="flex flex-1 items-center justify-center px-2 text-center text-sm text-muted-foreground">
             All risk flags are disabled in Settings → Features.
@@ -86,25 +84,18 @@ export function RiskManagementPanelShadcn({
             value={activeValues}
             onValueChange={handleValueChange}
             aria-label="Risk flags"
-            className={cn(
-              'grid w-full grid-cols-2 gap-2',
-              stacked ? 'h-auto' : 'h-full min-h-0',
-            )}
-            style={
-              stacked
-                ? undefined
-                : { gridTemplateRows: `repeat(${rowCount}, minmax(0, 1fr))` }
-            }
+            className="grid h-full min-h-0 w-full grid-cols-2 gap-2"
+            style={{ gridTemplateRows: `repeat(${rowCount}, minmax(0, 1fr))` }}
           >
             {visibleRisks.map(({ key, label, fullWidth }) => (
               <ToggleGroupItem
                 key={key}
                 value={key}
                 className={cn(
-                  'w-full justify-center whitespace-normal px-2 text-center leading-tight',
+                  'h-full w-full justify-center whitespace-normal px-2 text-center leading-tight',
                   stacked
                     ? 'min-h-11 text-xs'
-                    : 'h-full min-h-12 text-sm landscape-mobile:text-xs',
+                    : 'min-h-12 text-sm landscape-mobile:text-xs',
                   'border-border bg-secondary text-secondary-foreground hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)]',
                   'data-pressed:border-destructive data-pressed:bg-destructive data-pressed:text-white data-pressed:hover:bg-destructive',
                   fullWidth && 'col-span-2',

@@ -46,7 +46,7 @@ export function PlayByPlayPanelShadcn({ game }: PlayByPlayPanelShadcnProps) {
   const latestPlayId = game.plays.at(-1)?.id
 
   return (
-    <Card size="compact" className="flex min-h-0 flex-1 flex-col">
+    <Card size="compact" className="flex min-h-0 flex-1 flex-col border border-border ring-0 md:border-0 md:ring-1">
       <CardHeader className="border-b border-border">
         <CardTitle className="flex items-center gap-2 text-sm">
           <List className="size-4 text-muted-foreground" />

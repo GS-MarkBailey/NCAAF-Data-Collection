@@ -39,6 +39,8 @@ interface ScoreboardPanelShadcnProps {
 const PRIMARY_ACTION_BADGE_CLASS =
   'rounded-full border-[var(--color-primary-border)] bg-[var(--color-primary-chip-bg)] text-[10px] font-bold tracking-wider text-[var(--color-primary-chip-text)] uppercase'
 
+const PORTRAIT_PANEL_CLASS = 'min-h-0 flex-1 border border-border ring-0'
+
 type PendingConfirmation = 'endPeriod' | 'endGame' | 'startOvertime'
 
 const CONFIRMATION_TITLE: Record<PendingConfirmation, string> = {
@@ -253,7 +255,7 @@ export function ScoreboardPanelShadcn({
       size="compact"
       className={cn(
         'flex min-h-0 flex-1 flex-col',
-        stacked && 'shrink-0 flex-none',
+        stacked && PORTRAIT_PANEL_CLASS,
       )}
     >
       <CardHeader className="border-b border-border py-2.5">
@@ -265,13 +267,12 @@ export function ScoreboardPanelShadcn({
       <CardContent
         className={cn(
           'flex min-h-0 flex-1 flex-col gap-2',
-          stacked && 'flex-none gap-1.5',
+          stacked && 'gap-1.5',
         )}
       >
         <div
           className={cn(
             'relative flex min-h-0 flex-1 items-stretch overflow-hidden rounded-lg border border-border',
-            stacked && 'min-h-[6.75rem] flex-none',
           )}
         >
           {pendingConfirmation ? (
@@ -496,12 +497,7 @@ export function ScoreboardPanelShadcn({
           )}
         </div>
 
-        <div
-          className={cn(
-            'flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-border',
-            stacked && 'flex-none',
-          )}
-        >
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-border">
           <div className="flex min-h-0 flex-1 items-stretch">
             <StatCell
               label="QTR"
@@ -556,12 +552,7 @@ export function ScoreboardPanelShadcn({
           </div>
 
           {showPossessionSwitch ? (
-            <div
-              className={cn(
-                'grid min-h-0 grid-cols-2 border-t border-border',
-                stacked ? 'min-h-10' : 'flex-1',
-              )}
-            >
+            <div className="grid min-h-0 flex-1 grid-cols-2 border-t border-border">
               <Button
                 type="button"
                 variant="ghost"

@@ -79,21 +79,25 @@ export function GamePageShadcn() {
           )}
         >
           {portraitPanelCount > 0 ? (
-            <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overscroll-y-contain md:hidden landscape-mobile:hidden">
+            <div className="flex min-h-0 flex-1 flex-col gap-2 md:hidden landscape-mobile:hidden">
               {showScoreboard ? (
-                <ScoreboardPanelShadcn fixtureId={fixtureId} layout="stack" />
+                <div className="flex min-h-0 flex-1 flex-col">
+                  <ScoreboardPanelShadcn fixtureId={fixtureId} layout="stack" />
+                </div>
               ) : null}
               {showPlayByPlay ? (
-                <div className="flex min-h-[11rem] shrink-0 flex-col">
+                <div className="flex min-h-0 flex-1 flex-col">
                   <PlayByPlayPanelShadcn game={game} />
                 </div>
               ) : null}
               {showRiskManagement ? (
-                <RiskManagementPanelShadcn
-                  game={game}
-                  layout="stack"
-                  onToggleRisk={(risk) => toggleRisk(fixtureId, risk)}
-                />
+                <div className="flex min-h-0 flex-1 flex-col">
+                  <RiskManagementPanelShadcn
+                    game={game}
+                    layout="stack"
+                    onToggleRisk={(risk) => toggleRisk(fixtureId, risk)}
+                  />
+                </div>
               ) : null}
             </div>
           ) : (
