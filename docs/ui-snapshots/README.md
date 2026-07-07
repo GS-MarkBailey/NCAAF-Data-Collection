@@ -92,6 +92,15 @@ Override the host with `CONFLUENCE_IMAGE_BASE_URL` if needed.
 
 ## Feature scenarios per week
 
+| Week | `portrait` | Overview captures |
+|------|------------|-------------------|
+| 1–3 | `false` | Landscape fixtures + game only |
+| 4+ | `true` | Portrait + landscape fixtures and game |
+
+Set `portrait: true` in `scripts/ui-snapshot-weeks.mjs` when that week ships portrait iPhone layout.
+
+### Feature scenarios
+
 | Week | Features captured |
 |------|-------------------|
 | 1 | Take Control confirm/active, action log, risk toggle, clock ±1s |

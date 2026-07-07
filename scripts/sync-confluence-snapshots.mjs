@@ -16,7 +16,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { resolveSnapshotImageBase, snapshotImageUrl } from './github-raw-url.mjs'
 import { WEEK_FEATURES } from './ui-snapshot-features.mjs'
-import { SNAPSHOT_WEEKS } from './ui-snapshot-weeks.mjs'
+import { SNAPSHOT_WEEKS, includesPortrait } from './ui-snapshot-weeks.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
@@ -76,14 +76,26 @@ function weekCommitLine(week, meta) {
   return `Commit \`${commit}\` (${date}).`
 }
 
-function renderOverviewScreens(imageBase, label) {
-  const base = `${label}`
+function renderOverviewScreens(imageBase, week) {
+  const label = week.label
+  const base = label
+
+  if (includesPortrait(week)) {
+    return renderTable(
+      ['Fixtures (portrait)', 'Fixtures (landscape)', 'Game (portrait)', 'Game (landscape)'],
+      [[
+        img(imageBase, `${base}/fixtures-portrait.png`, `${label} fixtures portrait`),
+        img(imageBase, `${base}/fixtures-landscape.png`, `${label} fixtures landscape`),
+        img(imageBase, `${base}/game-portrait.png`, `${label} game portrait`),
+        img(imageBase, `${base}/game-landscape.png`, `${label} game landscape`),
+      ]],
+    )
+  }
+
   return renderTable(
-    ['Fixtures (portrait)', 'Fixtures (landscape)', 'Game (portrait)', 'Game (landscape)'],
+    ['Fixtures (landscape)', 'Game (landscape)'],
     [[
-      img(imageBase, `${base}/fixtures-portrait.png`, `${label} fixtures portrait`),
       img(imageBase, `${base}/fixtures-landscape.png`, `${label} fixtures landscape`),
-      img(imageBase, `${base}/game-portrait.png`, `${label} game portrait`),
       img(imageBase, `${base}/game-landscape.png`, `${label} game landscape`),
     ]],
   )
@@ -117,12 +129,25 @@ async function renderFeatureHighlights(imageBase, label, features) {
 }
 
 function renderUiEvolution(imageBase, weeks) {
-  const rows = weeks.map((week) => [
-    week.label.replace('week-', 'Week '),
-    img(imageBase, `${week.label}/fixtures-portrait.png`, `${week.label} fixtures`),
-    img(imageBase, `${week.label}/game-landscape.png`, `${week.label} game`),
-  ])
-  return renderTable(['Week', 'Fixtures (portrait)', 'Game (landscape)'], rows)
+  const rows = weeks.map((week) => {
+    const fixturesKey = includesPortrait(week)
+      ? 'fixtures-portrait'
+      : 'fixtures-landscape'
+    const fixturesLabel = includesPortrait(week)
+      ? 'Fixtures (portrait)'
+      : 'Fixtures (landscape)'
+    return {
+      week: week.label.replace('week-', 'Week '),
+      fixturesLabel,
+      fixtures: img(imageBase, `${week.label}/${fixturesKey}.png`, `${week.label} fixtures`),
+      game: img(imageBase, `${week.label}/game-landscape.png`, `${week.label} game`),
+    }
+  })
+
+  return renderTable(
+    ['Week', 'Fixtures', 'Game (landscape)'],
+    rows.map((row) => [row.week, row.fixtures, row.game]),
+  )
 }
 
 function replaceMarkedBlock(content, id, replacement) {
@@ -174,7 +199,7 @@ async function main() {
 
 ${commitLine}
 
-${renderOverviewScreens(imageBase, week.label)}
+${renderOverviewScreens(imageBase, week)}
 
 ### Feature highlights
 

@@ -14,7 +14,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { chromium, devices } from 'playwright'
 import { WEEK_FEATURES } from './ui-snapshot-features.mjs'
-import { SNAPSHOT_WEEKS } from './ui-snapshot-weeks.mjs'
+import { SNAPSHOT_WEEKS, PORTRAIT_OVERVIEW_FILES, baseViewKeys, resolveWeekConfig } from './ui-snapshot-weeks.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
@@ -46,12 +46,16 @@ const VIEWPORTS = {
   },
 }
 
-const BASE_VIEWS = [
-  VIEWPORTS['fixtures-portrait'],
-  VIEWPORTS['fixtures-landscape'],
-  VIEWPORTS['game-portrait'],
-  VIEWPORTS['game-landscape'],
-]
+function viewsForWeek(label) {
+  const week = resolveWeekConfig(label)
+  return baseViewKeys(week).map((key) => VIEWPORTS[key])
+}
+
+async function removePortraitOverviewFiles(outPath) {
+  for (const file of PORTRAIT_OVERVIEW_FILES) {
+    await rm(path.join(outPath, file), { force: true })
+  }
+}
 
 function parseArgs(argv) {
   const opts = { milestones: false, current: false, label: null, url: null, commit: null }
@@ -224,13 +228,19 @@ async function captureFeature(browser, baseUrl, feature, featuresDir) {
 async function captureScreens(baseUrl, label) {
   const outPath = path.join(OUT_DIR, label)
   const featuresDir = path.join(outPath, 'features')
+  const week = resolveWeekConfig(label)
+  const views = viewsForWeek(label)
   await mkdir(featuresDir, { recursive: true })
+
+  if (!week.portrait) {
+    await removePortraitOverviewFiles(outPath)
+  }
 
   const browser = await chromium.launch()
   const capturedFeatures = []
 
   try {
-    for (const view of BASE_VIEWS) {
+    for (const view of views) {
       await captureView(browser, baseUrl, view, outPath)
     }
 
@@ -245,9 +255,11 @@ async function captureScreens(baseUrl, label) {
 
     const meta = {
       label,
+      portrait: week.portrait,
       capturedAt: new Date().toISOString(),
       baseUrl,
-      routes: BASE_VIEWS.map((v) => v.path),
+      views: views.map((v) => v.name),
+      routes: [...new Set(views.map((v) => v.path))],
       features: capturedFeatures,
     }
     await writeFile(path.join(outPath, 'meta.json'), JSON.stringify(meta, null, 2))

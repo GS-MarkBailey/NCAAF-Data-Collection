@@ -36,11 +36,11 @@ Development moved in a clear arc: first map requirements and explore responsive 
 Automated Playwright captures at each week-end git commit live in [`docs/ui-snapshots/`](./ui-snapshots/README.md). Re-run with `npm run capture:current-week`, **push PNGs to GitHub**, then paste/import this page into Confluence — images load from GitHub raw URLs.
 
 <!-- AUTO-SNAPSHOTS:ui-evolution:START -->
-| Week | Fixtures (portrait) | Game (landscape) |
+| Week | Fixtures | Game (landscape) |
 | --- | --- | --- |
-| Week 1 | ![week-1 fixtures](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/fixtures-portrait.png) | ![week-1 game](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/game-landscape.png) |
-| Week 2 | ![week-2 fixtures](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-2/fixtures-portrait.png) | ![week-2 game](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-2/game-landscape.png) |
-| Week 3 | ![week-3 fixtures](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/fixtures-portrait.png) | ![week-3 game](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/game-landscape.png) |
+| Week 1 | ![week-1 fixtures](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/fixtures-landscape.png) | ![week-1 game](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/game-landscape.png) |
+| Week 2 | ![week-2 fixtures](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-2/fixtures-landscape.png) | ![week-2 game](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-2/game-landscape.png) |
+| Week 3 | ![week-3 fixtures](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/fixtures-landscape.png) | ![week-3 game](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/game-landscape.png) |
 | Week 4 | ![week-4 fixtures](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/fixtures-portrait.png) | ![week-4 game](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/game-landscape.png) |
 <!-- AUTO-SNAPSHOTS:ui-evolution:END -->
 
@@ -121,9 +121,9 @@ By the end of the week, a reviewer could add the app to their home screen, open 
 
 Commit `1cbc5bb` (7 Jul 2026).
 
-| Fixtures (portrait) | Fixtures (landscape) | Game (portrait) | Game (landscape) |
-| --- | --- | --- | --- |
-| ![week-1 fixtures portrait](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/fixtures-portrait.png) | ![week-1 fixtures landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/fixtures-landscape.png) | ![week-1 game portrait](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/game-portrait.png) | ![week-1 game landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/game-landscape.png) |
+| Fixtures (landscape) | Game (landscape) |
+| --- | --- |
+| ![week-1 fixtures landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/fixtures-landscape.png) | ![week-1 game landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/game-landscape.png) |
 
 ### Feature highlights
 
@@ -163,9 +163,9 @@ Work this week was mostly wiring and UI polish on the flags panel and its connec
 
 Commit `615f79c` (7 Jul 2026).
 
-| Fixtures (portrait) | Fixtures (landscape) | Game (portrait) | Game (landscape) |
-| --- | --- | --- | --- |
-| ![week-2 fixtures portrait](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-2/fixtures-portrait.png) | ![week-2 fixtures landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-2/fixtures-landscape.png) | ![week-2 game portrait](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-2/game-portrait.png) | ![week-2 game landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-2/game-landscape.png) |
+| Fixtures (landscape) | Game (landscape) |
+| --- | --- |
+| ![week-2 fixtures landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-2/fixtures-landscape.png) | ![week-2 game landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-2/game-landscape.png) |
 
 ### Feature highlights
 
@@ -255,9 +255,9 @@ Supporting work included the connection status chip, fixture-scoped error toasts
 
 Commit `dd1f58f` (7 Jul 2026).
 
-| Fixtures (portrait) | Fixtures (landscape) | Game (portrait) | Game (landscape) |
-| --- | --- | --- | --- |
-| ![week-3 fixtures portrait](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/fixtures-portrait.png) | ![week-3 fixtures landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/fixtures-landscape.png) | ![week-3 game portrait](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/game-portrait.png) | ![week-3 game landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/game-landscape.png) |
+| Fixtures (landscape) | Game (landscape) |
+| --- | --- |
+| ![week-3 fixtures landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/fixtures-landscape.png) | ![week-3 game landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/game-landscape.png) |
 
 ### Feature highlights
 
