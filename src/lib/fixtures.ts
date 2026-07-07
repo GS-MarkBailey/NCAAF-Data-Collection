@@ -30,7 +30,7 @@ export interface FixtureFilters {
 export const EMPTY_FIXTURE_FILTERS: FixtureFilters = {
   startDate: 'all',
   startTime: 'all',
-  teams: '',
+  teams: 'all',
   query: '',
 }
 
@@ -38,7 +38,7 @@ export function hasActiveFixtureFilters(filters: FixtureFilters): boolean {
   return (
     filters.startDate !== 'all' ||
     filters.startTime !== 'all' ||
-    filters.teams.trim().length > 0 ||
+    filters.teams !== 'all' ||
     filters.query.trim().length > 0
   )
 }
@@ -51,6 +51,17 @@ export function getUniqueFixtureDates(fixtures: Fixture[]): string[] {
 
 export function getUniqueFixtureTimes(fixtures: Fixture[]): string[] {
   return [...new Set(fixtures.map((fixture) => fixture.startTime))].sort()
+}
+
+export function getUniqueFixtureTeams(fixtures: Fixture[]): string[] {
+  const teams = new Set<string>()
+
+  for (const fixture of fixtures) {
+    teams.add(fixture.homeTeam)
+    teams.add(fixture.awayTeam)
+  }
+
+  return [...teams].sort((a, b) => a.localeCompare(b))
 }
 
 function getFixtureSearchValues(fixture: Fixture): string[] {
@@ -68,7 +79,6 @@ export function filterFixtures(
   fixtures: Fixture[],
   filters: FixtureFilters,
 ): Fixture[] {
-  const teamsQuery = filters.teams.trim().toLowerCase()
   const searchQuery = filters.query.trim().toLowerCase()
 
   return fixtures.filter((fixture) => {
@@ -86,15 +96,12 @@ export function filterFixtures(
       return false
     }
 
-    if (teamsQuery) {
-      const matchesTeam = [
-        fixture.homeTeam,
-        fixture.awayTeam,
-        fixture.homeAbbr,
-        fixture.awayAbbr,
-      ].some((value) => value.toLowerCase().includes(teamsQuery))
-
-      if (!matchesTeam) return false
+    if (
+      filters.teams !== 'all' &&
+      fixture.homeTeam !== filters.teams &&
+      fixture.awayTeam !== filters.teams
+    ) {
+      return false
     }
 
     if (searchQuery) {

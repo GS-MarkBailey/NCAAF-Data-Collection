@@ -6,6 +6,7 @@ import {
   EMPTY_FIXTURE_FILTERS,
   filterFixtures,
   getUniqueFixtureDates,
+  getUniqueFixtureTeams,
   getUniqueFixtureTimes,
   hasActiveFixtureFilters,
   isFixtureScheduled,
@@ -34,6 +35,7 @@ export function FixturesPageShadcn() {
 
   const uniqueDates = useMemo(() => getUniqueFixtureDates(fixtures), [fixtures])
   const uniqueTimes = useMemo(() => getUniqueFixtureTimes(fixtures), [fixtures])
+  const uniqueTeams = useMemo(() => getUniqueFixtureTeams(fixtures), [fixtures])
 
   const filteredFixtures = useMemo(() => {
     const filtered = filterFixtures(fixtures, filters)
@@ -65,7 +67,7 @@ export function FixturesPageShadcn() {
         </div>
 
         <div className="overflow-x-auto">
-          <div className="grid min-w-[40rem] grid-cols-[8.5rem_7rem_minmax(0,1fr)_minmax(0,1fr)_auto] items-center gap-2">
+          <div className="grid min-w-[44rem] grid-cols-[8.5rem_7rem_minmax(11rem,1.5fr)_minmax(0,1fr)_auto] items-center gap-2">
           <select
             id="fixture-filter-date"
             value={filters.startDate}
@@ -96,14 +98,20 @@ export function FixturesPageShadcn() {
             ))}
           </select>
 
-          <Input
+          <select
             id="fixture-filter-teams"
             value={filters.teams}
             onChange={(event) => updateFilter('teams', event.target.value)}
-            placeholder="Teams"
             aria-label="Teams"
-            className="min-w-0"
-          />
+            className={cn(SELECT_FILTER_CLASS, 'min-w-0 w-full')}
+          >
+            <option value="all">All teams</option>
+            {uniqueTeams.map((team) => (
+              <option key={team} value={team}>
+                {team}
+              </option>
+            ))}
+          </select>
 
           <div className="relative min-w-0">
             <Search className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
