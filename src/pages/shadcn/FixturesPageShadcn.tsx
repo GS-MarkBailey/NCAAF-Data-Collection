@@ -20,7 +20,6 @@ import {
   CardHeader,
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { useAppStore } from '@/store/gameStore'
 
@@ -57,7 +56,7 @@ export function FixturesPageShadcn() {
 
   return (
     <div className="flex h-dvh flex-col bg-background safe-x safe-t safe-b">
-      <header className="shrink-0 space-y-4 px-4 py-6">
+      <header className="shrink-0 space-y-3 px-4 py-4">
         <div className="space-y-1">
           <h1 className="text-lg font-semibold tracking-tight">Fixtures</h1>
           <p className="text-sm text-muted-foreground">
@@ -65,87 +64,69 @@ export function FixturesPageShadcn() {
           </p>
         </div>
 
-        <div className="space-y-3">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              Filters
-            </p>
-            {filtersActive ? (
-              <Button
-                type="button"
-                variant="ghost"
-                size="xs"
-                className="h-6 px-2 text-xs"
-                onClick={() => setFilters(EMPTY_FIXTURE_FILTERS)}
-              >
-                Clear filters
-              </Button>
-            ) : null}
+        <div className="flex min-w-0 items-center gap-2 overflow-x-auto pb-0.5">
+          <select
+            id="fixture-filter-date"
+            value={filters.startDate}
+            onChange={(event) => updateFilter('startDate', event.target.value)}
+            aria-label="Start date"
+            className={cn(FILTER_FIELD_CLASS, 'min-w-[8.5rem] shrink-0')}
+          >
+            <option value="all">All dates</option>
+            {uniqueDates.map((date) => (
+              <option key={date} value={date}>
+                {date}
+              </option>
+            ))}
+          </select>
+
+          <select
+            id="fixture-filter-time"
+            value={filters.startTime}
+            onChange={(event) => updateFilter('startTime', event.target.value)}
+            aria-label="Start time"
+            className={cn(FILTER_FIELD_CLASS, 'min-w-[7rem] shrink-0')}
+          >
+            <option value="all">All times</option>
+            {uniqueTimes.map((time) => (
+              <option key={time} value={time}>
+                {time}
+              </option>
+            ))}
+          </select>
+
+          <Input
+            id="fixture-filter-teams"
+            value={filters.teams}
+            onChange={(event) => updateFilter('teams', event.target.value)}
+            placeholder="Teams"
+            aria-label="Teams"
+            className="min-w-[6rem] flex-1"
+          />
+
+          <div className="relative min-w-[7rem] flex-1">
+            <Search className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              id="fixture-search"
+              value={filters.query}
+              onChange={(event) => updateFilter('query', event.target.value)}
+              placeholder="ID, date, time"
+              aria-label="Search fixtures"
+              className="pl-8"
+            />
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div className="space-y-1.5">
-              <Label htmlFor="fixture-filter-date">Start date</Label>
-              <select
-                id="fixture-filter-date"
-                value={filters.startDate}
-                onChange={(event) =>
-                  updateFilter('startDate', event.target.value)
-                }
-                className={FILTER_FIELD_CLASS}
-              >
-                <option value="all">All dates</option>
-                {uniqueDates.map((date) => (
-                  <option key={date} value={date}>
-                    {date}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="fixture-filter-time">Start time</Label>
-              <select
-                id="fixture-filter-time"
-                value={filters.startTime}
-                onChange={(event) =>
-                  updateFilter('startTime', event.target.value)
-                }
-                className={FILTER_FIELD_CLASS}
-              >
-                <option value="all">All times</option>
-                {uniqueTimes.map((time) => (
-                  <option key={time} value={time}>
-                    {time}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="space-y-1.5 sm:col-span-2">
-              <Label htmlFor="fixture-filter-teams">Teams</Label>
-              <Input
-                id="fixture-filter-teams"
-                value={filters.teams}
-                onChange={(event) => updateFilter('teams', event.target.value)}
-                placeholder="Search team name or abbreviation"
-              />
-            </div>
-
-            <div className="space-y-1.5 sm:col-span-2">
-              <Label htmlFor="fixture-search">Search</Label>
-              <div className="relative">
-                <Search className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  id="fixture-search"
-                  value={filters.query}
-                  onChange={(event) => updateFilter('query', event.target.value)}
-                  placeholder="Fixture ID, start date, or kickoff time"
-                  className="pl-8"
-                />
-              </div>
-            </div>
-          </div>
+          {filtersActive ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="xs"
+              className="h-8 shrink-0 px-2 text-xs"
+              onClick={() => setFilters(EMPTY_FIXTURE_FILTERS)}
+            >
+              Clear
+            </Button>
+          ) : null}
         </div>
       </header>
 
