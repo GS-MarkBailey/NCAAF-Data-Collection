@@ -3,13 +3,21 @@ import { create } from 'zustand'
 export const DEFAULT_ERROR_TOAST_MESSAGE =
   'Something went wrong. Please try again.'
 
-const AUTO_DISMISS_MS = 10_000
+export const DEFAULT_SUCCESS_TOAST_MESSAGE = 'Fixtures refreshed'
+
+export type ToastVariant = 'error' | 'success'
+
+const AUTO_DISMISS_MS: Record<ToastVariant, number> = {
+  error: 10_000,
+  success: 4_000,
+}
 
 interface ErrorToastStore {
   visible: boolean
   exiting: boolean
   message: string
-  show: (message?: string) => void
+  variant: ToastVariant
+  show: (message?: string, variant?: ToastVariant) => void
   dismiss: () => void
   finishExit: () => void
 }
@@ -27,14 +35,24 @@ export const useErrorToastStore = create<ErrorToastStore>((set, get) => ({
   visible: false,
   exiting: false,
   message: DEFAULT_ERROR_TOAST_MESSAGE,
+  variant: 'error',
 
-  show: (message = DEFAULT_ERROR_TOAST_MESSAGE) => {
+  show: (message, variant = 'error') => {
     clearDismissTimer()
-    set({ visible: true, exiting: false, message })
+    set({
+      visible: true,
+      exiting: false,
+      variant,
+      message:
+        message ??
+        (variant === 'success'
+          ? DEFAULT_SUCCESS_TOAST_MESSAGE
+          : DEFAULT_ERROR_TOAST_MESSAGE),
+    })
 
     dismissTimer = window.setTimeout(() => {
       get().dismiss()
-    }, AUTO_DISMISS_MS)
+    }, AUTO_DISMISS_MS[variant])
   },
 
   dismiss: () => {
@@ -51,5 +69,9 @@ export const useErrorToastStore = create<ErrorToastStore>((set, get) => ({
 }))
 
 export function showErrorToast(message?: string) {
-  useErrorToastStore.getState().show(message)
+  useErrorToastStore.getState().show(message, 'error')
+}
+
+export function showSuccessToast(message?: string) {
+  useErrorToastStore.getState().show(message, 'success')
 }

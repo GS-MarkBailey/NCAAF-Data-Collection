@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Calendar, Search } from 'lucide-react'
+import { Calendar, Loader2, Search } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { usePullToRefresh } from '@/hooks/usePullToRefresh'
 import {
   EMPTY_FIXTURE_FILTERS,
   filterFixtures,
@@ -22,6 +23,7 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
+import { showSuccessToast } from '@/store/errorToastStore'
 import { useAppStore } from '@/store/gameStore'
 
 const SELECT_FILTER_CLASS =
@@ -31,7 +33,17 @@ export function FixturesPageShadcn() {
   const navigate = useNavigate()
   const fixtures = useAppStore((s) => s.fixtures)
   const initGame = useAppStore((s) => s.initGame)
+  const refreshFixtures = useAppStore((s) => s.refreshFixtures)
   const [filters, setFilters] = useState<FixtureFilters>(EMPTY_FIXTURE_FILTERS)
+
+  const handleRefresh = useCallback(async () => {
+    await refreshFixtures()
+    showSuccessToast('Fixtures list refreshed')
+  }, [refreshFixtures])
+
+  const { scrollRef, pullDistance, refreshing, pullReady } = usePullToRefresh({
+    onRefresh: handleRefresh,
+  })
 
   const uniqueDates = useMemo(() => getUniqueFixtureDates(fixtures), [fixtures])
   const uniqueTimes = useMemo(() => getUniqueFixtureTimes(fixtures), [fixtures])
@@ -144,7 +156,30 @@ export function FixturesPageShadcn() {
 
       <Separator />
 
-      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-4 pb-4">
+      <div
+        ref={scrollRef}
+        className="relative flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-y-contain p-4 pb-4"
+      >
+        <div
+          className={cn(
+            'pointer-events-none flex shrink-0 items-center justify-center overflow-hidden text-xs font-medium text-muted-foreground transition-[height,opacity] duration-150',
+            pullDistance > 0 || refreshing ? 'opacity-100' : 'opacity-0',
+          )}
+          style={{ height: refreshing ? 40 : pullDistance }}
+          aria-hidden={!pullDistance && !refreshing}
+        >
+          {refreshing ? (
+            <span className="inline-flex items-center gap-1.5">
+              <Loader2 className="size-3.5 animate-spin" />
+              Refreshing…
+            </span>
+          ) : pullReady ? (
+            'Release to refresh'
+          ) : (
+            'Pull down to refresh'
+          )}
+        </div>
+
         {filteredFixtures.length === 0 ? (
           <div className="flex flex-1 items-center justify-center rounded-lg border border-dashed border-border px-4 py-10 text-center">
             <p className="text-sm text-muted-foreground">

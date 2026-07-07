@@ -22,6 +22,7 @@ interface AppStore {
   actionLogs: ActionLogsByFixture
 
   initGame: (fixtureId: string) => void
+  refreshFixtures: () => Promise<void>
   getGame: (fixtureId: string) => GameState | undefined
   getActionLog: (fixtureId: string) => UserAction[]
 
@@ -71,6 +72,15 @@ export const useAppStore = create<AppStore>((set, get) => ({
         [fixtureId]: [],
       },
     }))
+  },
+
+  refreshFixtures: async () => {
+    await new Promise<void>((resolve) => {
+      window.setTimeout(() => {
+        set({ fixtures: [...FIXTURES] })
+        resolve()
+      }, 350)
+    })
   },
 
   getGame: (fixtureId) => get().games[fixtureId],

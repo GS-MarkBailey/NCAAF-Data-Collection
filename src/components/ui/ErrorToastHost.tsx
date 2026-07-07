@@ -1,20 +1,39 @@
 import { useEffect, useRef, useState, type PointerEvent } from 'react'
 import { createPortal } from 'react-dom'
-import { TriangleAlert, X } from 'lucide-react'
+import { TriangleAlert, CheckCircle2, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useErrorToastStore } from '@/store/errorToastStore'
+import { useErrorToastStore, type ToastVariant } from '@/store/errorToastStore'
 
 const EXIT_ANIMATION_MS = 280
 const SWIPE_DISMISS_THRESHOLD_PX = 48
 
 type ExitDirection = 'up' | 'right'
 
+const TOAST_STYLES: Record<
+  ToastVariant,
+  { container: string; icon: typeof TriangleAlert }
+> = {
+  error: {
+    container:
+      'border-destructive/30 bg-destructive text-white',
+    icon: TriangleAlert,
+  },
+  success: {
+    container:
+      'border-emerald-300/40 bg-emerald-600 text-white',
+    icon: CheckCircle2,
+  },
+}
+
 export function ErrorToastHost() {
   const visible = useErrorToastStore((s) => s.visible)
   const exiting = useErrorToastStore((s) => s.exiting)
   const message = useErrorToastStore((s) => s.message)
+  const variant = useErrorToastStore((s) => s.variant)
   const dismiss = useErrorToastStore((s) => s.dismiss)
   const finishExit = useErrorToastStore((s) => s.finishExit)
+  const toastStyle = TOAST_STYLES[variant]
+  const Icon = toastStyle.icon
 
   const [dragOffsetX, setDragOffsetX] = useState(0)
   const [dragOffsetY, setDragOffsetY] = useState(0)
@@ -118,7 +137,8 @@ export function ErrorToastHost() {
       <div
         role="alert"
         className={cn(
-          'pointer-events-auto flex w-[min(18rem,calc(100vw-1.5rem))] items-start gap-2 rounded-lg border border-destructive/30 bg-destructive px-2.5 py-2 text-xs shadow-lg touch-none select-none',
+          'pointer-events-auto flex w-[min(18rem,calc(100vw-1.5rem))] items-start gap-2 rounded-lg border px-2.5 py-2 text-xs shadow-lg touch-none select-none',
+          toastStyle.container,
           exiting
             ? exitDirection === 'right'
               ? 'error-toast-exit-right'
@@ -141,7 +161,7 @@ export function ErrorToastHost() {
         onPointerUp={handlePointerEnd}
         onPointerCancel={handlePointerEnd}
       >
-        <TriangleAlert
+        <Icon
           className="mt-px size-3.5 shrink-0 text-white"
           aria-hidden
         />
@@ -151,7 +171,7 @@ export function ErrorToastHost() {
         <button
           type="button"
           className="mt-px inline-flex size-5 shrink-0 items-center justify-center rounded-sm text-white/90 transition-colors hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
-          aria-label="Dismiss error"
+          aria-label="Dismiss notification"
           onPointerDown={(event) => event.stopPropagation()}
           onClick={(event) => {
             event.stopPropagation()
