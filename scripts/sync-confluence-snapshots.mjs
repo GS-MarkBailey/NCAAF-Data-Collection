@@ -2,19 +2,17 @@
 /**
  * Regenerate auto-managed snapshot sections in the Confluence markdown doc.
  *
- * Image embeds use GitHub raw URLs so Confluence can load them after you push PNGs to main.
- *
- * Usage:
- *   npm run sync:confluence-doc
- *
- * Override image host:
- *   CONFLUENCE_IMAGE_BASE_URL=https://raw.githubusercontent.com/org/repo/main/docs/ui-snapshots
+ * Sections:
+ *   - ui-evolution: latest week screens only
+ *   - week-N-screens: overview screenshots after each week's theme line
+ *   - week-N-interactions: feature images inline with interaction copy
  */
 
 import { access, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { resolveSnapshotImageBase, snapshotImageUrl } from './github-raw-url.mjs'
+import { WEEK_INTERACTIONS } from './ui-snapshot-doc-content.mjs'
 import { WEEK_FEATURES } from './ui-snapshot-features.mjs'
 import { SNAPSHOT_WEEKS, includesPortrait } from './ui-snapshot-weeks.mjs'
 
@@ -43,124 +41,6 @@ function img(imageBase, relPath, alt) {
   return `![${alt}](${snapshotImageUrl(imageBase, relPath)})`
 }
 
-function chunk(items, size) {
-  const rows = []
-  for (let i = 0; i < items.length; i += size) {
-    rows.push(items.slice(i, i + size))
-  }
-  return rows
-}
-
-function renderTable(headers, rows) {
-  const lines = [
-    `| ${headers.join(' | ')} |`,
-    `| ${headers.map(() => '---').join(' | ')} |`,
-  ]
-  for (const row of rows) {
-    lines.push(`| ${row.join(' | ')} |`)
-  }
-  return lines.join('\n')
-}
-
-async function loadWeekMeta(label) {
-  const metaPath = path.join(SNAPSHOTS_DIR, label, 'meta.json')
-  if (!(await fileExists(metaPath))) return null
-  return JSON.parse(await readFile(metaPath, 'utf8'))
-}
-
-function weekCommitLine(week, meta) {
-  const commit = week.commit === 'HEAD' ? (meta?.commit ?? 'HEAD') : week.commit
-  const date = meta?.capturedAt
-    ? formatCommitDate(meta.capturedAt.slice(0, 10))
-    : formatCommitDate(week.date)
-  return `Commit \`${commit}\` (${date}).`
-}
-
-function renderOverviewScreens(imageBase, week) {
-  const label = week.label
-  const base = label
-
-  if (includesPortrait(week)) {
-    return renderTable(
-      ['Fixtures (portrait)', 'Fixtures (landscape)', 'Game (portrait)', 'Game (landscape)'],
-      [[
-        img(imageBase, `${base}/fixtures-portrait.png`, `${label} fixtures portrait`),
-        img(imageBase, `${base}/fixtures-landscape.png`, `${label} fixtures landscape`),
-        img(imageBase, `${base}/game-portrait.png`, `${label} game portrait`),
-        img(imageBase, `${base}/game-landscape.png`, `${label} game landscape`),
-      ]],
-    )
-  }
-
-  return renderTable(
-    ['Fixtures (landscape)', 'Game (landscape)'],
-    [[
-      img(imageBase, `${base}/fixtures-landscape.png`, `${label} fixtures landscape`),
-      img(imageBase, `${base}/game-landscape.png`, `${label} game landscape`),
-    ]],
-  )
-}
-
-async function renderFeatureHighlights(imageBase, label, features) {
-  if (features.length === 0) {
-    return '_No feature snapshots configured — add scenarios in `scripts/ui-snapshot-features.mjs`._'
-  }
-
-  const available = []
-  for (const feature of features) {
-    const filePath = path.join(SNAPSHOTS_DIR, label, 'features', `${feature.id}.png`)
-    if (await fileExists(filePath)) available.push(feature)
-  }
-
-  if (available.length === 0) {
-    return '_Feature snapshots pending — run `npm run capture:and-sync`, then push to GitHub._'
-  }
-
-  const rows = chunk(available, 3)
-  const blocks = rows.map((row) => {
-    const headers = row.map((f) => f.title)
-    const images = row.map((f) =>
-      img(imageBase, `${label}/features/${f.id}.png`, f.title),
-    )
-    return `${renderTable(headers, [images])}\n`
-  })
-
-  return blocks.join('\n').trim()
-}
-
-function evolutionFixturesFile(week) {
-  return includesPortrait(week) ? 'fixtures-portrait.png' : 'fixtures-landscape.png'
-}
-
-function evolutionFixturesLabel(week) {
-  return includesPortrait(week) ? 'Fixtures (portrait)' : 'Fixtures (landscape)'
-}
-
-function evolutionGameFile(week) {
-  return includesPortrait(week) ? 'game-portrait.png' : 'game-landscape.png'
-}
-
-function evolutionGameLabel(week) {
-  return includesPortrait(week) ? 'Game console (portrait)' : 'Game console (landscape)'
-}
-
-function renderUiEvolution(imageBase, weeks) {
-  return weeks
-    .map((week) => {
-      const title = week.label.replace('week-', 'Week ')
-      return `#### ${title}
-
-**${evolutionFixturesLabel(week)}**
-
-${img(imageBase, `${week.label}/${evolutionFixturesFile(week)}`, `${title} fixtures`)}
-
-**${evolutionGameLabel(week)}**
-
-${img(imageBase, `${week.label}/${evolutionGameFile(week)}`, `${title} game`)}`
-    })
-    .join('\n\n')
-}
-
 function replaceMarkedBlock(content, id, replacement) {
   const start = MARKER(id, 'START')
   const end = MARKER(id, 'END')
@@ -185,38 +65,133 @@ function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
+function latestWeek() {
+  return SNAPSHOT_WEEKS[SNAPSHOT_WEEKS.length - 1]
+}
+
+function renderLatestScreens(imageBase, week) {
+  const label = week.label
+  const lines = []
+
+  if (includesPortrait(week)) {
+    lines.push(
+      `**Fixtures (portrait)**`,
+      '',
+      img(imageBase, `${label}/fixtures-portrait.png`, 'Fixtures portrait'),
+      '',
+      `**Fixtures (landscape)**`,
+      '',
+      img(imageBase, `${label}/fixtures-landscape.png`, 'Fixtures landscape'),
+      '',
+      `**Game console (portrait)**`,
+      '',
+      img(imageBase, `${label}/game-portrait.png`, 'Game portrait'),
+      '',
+      `**Game console (landscape)**`,
+      '',
+      img(imageBase, `${label}/game-landscape.png`, 'Game landscape'),
+    )
+  } else {
+    lines.push(
+      `**Fixtures (landscape)**`,
+      '',
+      img(imageBase, `${label}/fixtures-landscape.png`, 'Fixtures landscape'),
+      '',
+      `**Game console (landscape)**`,
+      '',
+      img(imageBase, `${label}/game-landscape.png`, 'Game landscape'),
+    )
+  }
+
+  return lines.join('\n')
+}
+
+function renderWeekScreensAfterTheme(imageBase, week) {
+  const label = week.label
+
+  if (includesPortrait(week)) {
+    return `**Fixtures (portrait)**
+
+${img(imageBase, `${label}/fixtures-portrait.png`, `${label} fixtures portrait`)}
+
+**Game console (portrait)**
+
+${img(imageBase, `${label}/game-portrait.png`, `${label} game portrait`)}`
+  }
+
+  return `**Fixtures (landscape)**
+
+${img(imageBase, `${label}/fixtures-landscape.png`, `${label} fixtures landscape`)}
+
+**Game console (landscape)**
+
+${img(imageBase, `${label}/game-landscape.png`, `${label} game landscape`)}`
+}
+
+async function featureImage(imageBase, weekLabel, featureId, title) {
+  const filePath = path.join(
+    SNAPSHOTS_DIR,
+    weekLabel,
+    'features',
+    `${featureId}.png`,
+  )
+  if (!(await fileExists(filePath))) return null
+  return img(imageBase, `${weekLabel}/features/${featureId}.png`, title)
+}
+
+async function renderInteractions(imageBase, weekLabel) {
+  const lines = WEEK_INTERACTIONS[weekLabel] ?? []
+  if (lines.length === 0) {
+    return '_No interaction screenshots configured for this week._'
+  }
+
+  const featureTitles = Object.fromEntries(
+    (WEEK_FEATURES[weekLabel] ?? []).map((f) => [f.id, f.title]),
+  )
+
+  const blocks = []
+  for (const line of lines) {
+    blocks.push(`- ${line.text}`)
+    const images = []
+    for (const featureId of line.featureIds) {
+      const image = await featureImage(
+        imageBase,
+        weekLabel,
+        featureId,
+        featureTitles[featureId] ?? featureId,
+      )
+      if (image) images.push(image)
+    }
+    if (images.length > 0) {
+      blocks.push('', images.join(' '), '')
+    }
+  }
+
+  return blocks.join('\n').trim()
+}
+
 async function main() {
   const imageBase = resolveSnapshotImageBase(ROOT)
   let content = await readFile(DOC_PATH, 'utf8')
 
+  const latest = latestWeek()
   content = replaceMarkedBlock(
     content,
     'ui-evolution',
-    renderUiEvolution(imageBase, SNAPSHOT_WEEKS),
+    renderLatestScreens(imageBase, latest),
   )
 
   for (const week of SNAPSHOT_WEEKS) {
-    const meta = await loadWeekMeta(week.label)
-    const commitLine = weekCommitLine(week, meta)
-    const features =
-      meta?.features?.length > 0
-        ? meta.features
-        : (WEEK_FEATURES[week.label] ?? []).map((f) => ({
-            id: f.id,
-            title: f.title,
-          }))
-
-    const block = `### UI snapshots
-
-${commitLine}
-
-${renderOverviewScreens(imageBase, week)}
-
-### Feature highlights
-
-${await renderFeatureHighlights(imageBase, week.label, features)}`
-
-    content = replaceMarkedBlock(content, week.label, block)
+    content = replaceMarkedBlock(
+      content,
+      `${week.label}-screens`,
+      renderWeekScreensAfterTheme(imageBase, week),
+    )
+    content = replaceMarkedBlock(
+      content,
+      `${week.label}-interactions`,
+      await renderInteractions(imageBase, week.label),
+    )
   }
 
   const stamp = new Date().toISOString().slice(0, 10)

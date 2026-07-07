@@ -31,50 +31,26 @@ Development moved in a clear arc: first map requirements and explore responsive 
 
 **Total:** ~154 commits · React + Vite + TypeScript · shadcn/ui · Zustand
 
-### UI evolution (snapshots)
+### Current screens (latest build)
 
-Automated Playwright captures at each week-end git commit live in [`docs/ui-snapshots/`](./ui-snapshots/README.md). Re-run with `npm run capture:current-week`, **push PNGs to GitHub**, then paste/import this page into Confluence — images load from GitHub raw URLs.
+Live Vercel build — [`docs/ui-snapshots/`](./ui-snapshots/README.md). Re-run `npm run capture:current-week`, push to GitHub, then refresh this page.
 
 <!-- AUTO-SNAPSHOTS:ui-evolution:START -->
-#### Week 1
-
-**Fixtures (landscape)**
-
-![Week 1 fixtures](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/fixtures-landscape.png)
-
-**Game console (landscape)**
-
-![Week 1 game](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/game-landscape.png)
-
-#### Week 2
-
-**Fixtures (landscape)**
-
-![Week 2 fixtures](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-2/fixtures-landscape.png)
-
-**Game console (landscape)**
-
-![Week 2 game](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-2/game-landscape.png)
-
-#### Week 3
-
-**Fixtures (landscape)**
-
-![Week 3 fixtures](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/fixtures-landscape.png)
-
-**Game console (landscape)**
-
-![Week 3 game](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/game-landscape.png)
-
-#### Week 4
-
 **Fixtures (portrait)**
 
-![Week 4 fixtures](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/fixtures-portrait.png)
+![Fixtures portrait](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/fixtures-portrait.png)
+
+**Fixtures (landscape)**
+
+![Fixtures landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/fixtures-landscape.png)
 
 **Game console (portrait)**
 
-![Week 4 game](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/game-portrait.png)
+![Game portrait](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/game-portrait.png)
+
+**Game console (landscape)**
+
+![Game landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/game-landscape.png)
 <!-- AUTO-SNAPSHOTS:ui-evolution:END -->
 
 ---
@@ -82,6 +58,16 @@ Automated Playwright captures at each week-end git commit live in [`docs/ui-snap
 ## Week 1 — 16 to 22 June 2026
 
 **Theme:** From zero to deployable prototype
+
+<!-- AUTO-SNAPSHOTS:week-1-screens:START -->
+**Fixtures (landscape)**
+
+![week-1 fixtures landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/fixtures-landscape.png)
+
+**Game console (landscape)**
+
+![week-1 game landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/game-landscape.png)
+<!-- AUTO-SNAPSHOTS:week-1-screens:END -->
 
 ### Overview
 
@@ -115,14 +101,29 @@ By the end of the week, a reviewer could add the app to their home screen, open 
 - **Risk management panel** — toggle chips for challenge, stat delay, big play, penalty, touchdown, play about to start, etc.
 
 **Core interactions**
+
+<!-- AUTO-SNAPSHOTS:week-1-interactions:START -->
 - **Take Control** — operator override mode with red border/background; confirmation before activating
+
+![Take Control confirmation](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/features/take-control-confirm.png) ![Take Control active state](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/features/take-control-active.png)
+
 - **Clock** — tap to pause/start; ±1 second adjustment; visual pause state (faint red background)
+
+![Clock pause and ±1 second adjust](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/features/clock-adjust.png)
+
 - **Risk toggles** — tap to activate/deactivate individual risk flags
+
+![Risk toggle (Challenge / Review)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/features/risk-challenge-active.png)
+
+- **Action log** — all operator actions recorded with game clock timestamp; CSV export
+
+![Action log](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/features/action-log.png)
+<!-- AUTO-SNAPSHOTS:week-1-interactions:END -->
+
 - **Play-by-play simulation** — events generated as clock runs; pulse highlight on new entries; quarter-start events
 
 **Action log & audit**
 - All operator actions recorded with game clock timestamp
-- Action log dialog with CSV export
 
 **Mobile & PWA**
 - Optimised for landscape mobile (`landscape-mobile` breakpoint)
@@ -149,31 +150,21 @@ By the end of the week, a reviewer could add the app to their home screen, open 
 - ~65 commits this week
 - ~47 files touched; net +2,034 / −737 lines vs initial commit
 
-<!-- AUTO-SNAPSHOTS:week-1:START -->
-### UI snapshots
-
-Commit `1cbc5bb` (7 Jul 2026).
-
-| Fixtures (landscape) | Game (landscape) |
-| --- | --- |
-| ![week-1 fixtures landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/fixtures-landscape.png) | ![week-1 game landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/game-landscape.png) |
-
-### Feature highlights
-
-| Take Control confirmation | Take Control active state | Action log |
-| --- | --- | --- |
-| ![Take Control confirmation](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/features/take-control-confirm.png) | ![Take Control active state](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/features/take-control-active.png) | ![Action log](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/features/action-log.png) |
-
-| Risk toggle (Challenge / Review) | Clock pause and ±1 second adjust |
-| --- | --- |
-| ![Risk toggle (Challenge / Review)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/features/risk-challenge-active.png) | ![Clock pause and ±1 second adjust](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/features/clock-adjust.png) |
-<!-- AUTO-SNAPSHOTS:week-1:END -->
-
 ---
 
 ## Week 2 — 23 to 29 June 2026
 
 **Theme:** Feature configuration groundwork
+
+<!-- AUTO-SNAPSHOTS:week-2-screens:START -->
+**Fixtures (landscape)**
+
+![week-2 fixtures landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-2/fixtures-landscape.png)
+
+**Game console (landscape)**
+
+![week-2 game landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-2/game-landscape.png)
+<!-- AUTO-SNAPSHOTS:week-2-screens:END -->
 
 ### Overview
 
@@ -183,6 +174,12 @@ Work this week was mostly wiring and UI polish on the flags panel and its connec
 
 ### Shipped
 
+<!-- AUTO-SNAPSHOTS:week-2-interactions:START -->
+- **Feature flags panel** — Settings → Features tab; groundwork for toggling panels and behaviours without code changes
+
+![Feature flags panel](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-2/features/feature-flags-panel.png)
+<!-- AUTO-SNAPSHOTS:week-2-interactions:END -->
+
 - Refinements to the **Feature Flags panel** in Settings (UI tab)
 - Updates to action log dialog and feature flag store wiring
 - Minor integration fixes in app bootstrap (`main.tsx`)
@@ -191,27 +188,21 @@ Work this week was mostly wiring and UI polish on the flags panel and its connec
 - Quiet week in terms of commits (4 total); larger feature-flag architecture landed in Week 3
 - Focus was stabilising the flags UI before adding deploy capability
 
-<!-- AUTO-SNAPSHOTS:week-2:START -->
-### UI snapshots
-
-Commit `615f79c` (7 Jul 2026).
-
-| Fixtures (landscape) | Game (landscape) |
-| --- | --- |
-| ![week-2 fixtures landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-2/fixtures-landscape.png) | ![week-2 game landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-2/game-landscape.png) |
-
-### Feature highlights
-
-| Feature flags panel |
-| --- |
-| ![Feature flags panel](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-2/features/feature-flags-panel.png) |
-<!-- AUTO-SNAPSHOTS:week-2:END -->
-
 ---
 
 ## Week 3 — 30 June to 5 July 2026
 
 **Theme:** Production-grade game controls and remote configuration
+
+<!-- AUTO-SNAPSHOTS:week-3-screens:START -->
+**Fixtures (landscape)**
+
+![week-3 fixtures landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/fixtures-landscape.png)
+
+**Game console (landscape)**
+
+![week-3 game landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/game-landscape.png)
+<!-- AUTO-SNAPSHOTS:week-3-screens:END -->
 
 ### Overview
 
@@ -278,36 +269,50 @@ Supporting work included the connection status chip, fixture-scoped error toasts
 **DevOps**
 - Auto-deploy hook fix when GitHub CLI credential helper unavailable (macOS keychain fallback)
 
+### Key interactions
+
+<!-- AUTO-SNAPSHOTS:week-3-interactions:START -->
+- **Field direction** — first-open dialog sets home team attacking direction; drives ball-on arrow each quarter
+
+![Field direction dialog (first open)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/features/field-direction-dialog.png)
+
+- **Clock wheel editor** — iOS-style scroll pickers for period · minutes : seconds
+
+![Clock wheel editor](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/features/clock-editor.png)
+
+- **Connection status** — chip beside back button with Heartbeat, Match State Platform, Remote Data Store
+
+![Connection status chip](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/features/connection-status.png)
+
+- **Error toast** — fixture-scoped demo notification; swipe or close to dismiss
+
+![Fixture error toast](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/features/error-toast.png)
+
+- **Settings dialog** — Log | Field | Features tabs in a single gear entry point
+
+![Settings dialog (Log / Field / Features)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/features/settings-tabs.png)
+<!-- AUTO-SNAPSHOTS:week-3-interactions:END -->
+
 ### Technical notes
 - ~53 commits this week
 - ~30 files touched; net +1,996 / −304 lines
 - Key new modules: `ClockWheelEditor`, `ConnectionStatusChip`, `ErrorToastHost`, `featureFlagDeploy`, `api/deploy-feature-flags`
-
-<!-- AUTO-SNAPSHOTS:week-3:START -->
-### UI snapshots
-
-Commit `dd1f58f` (7 Jul 2026).
-
-| Fixtures (landscape) | Game (landscape) |
-| --- | --- |
-| ![week-3 fixtures landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/fixtures-landscape.png) | ![week-3 game landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/game-landscape.png) |
-
-### Feature highlights
-
-| Field direction dialog (first open) | Clock wheel editor | Connection status chip |
-| --- | --- | --- |
-| ![Field direction dialog (first open)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/features/field-direction-dialog.png) | ![Clock wheel editor](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/features/clock-editor.png) | ![Connection status chip](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/features/connection-status.png) |
-
-| Fixture error toast | Settings dialog (Log / Field / Features) |
-| --- | --- |
-| ![Fixture error toast](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/features/error-toast.png) | ![Settings dialog (Log / Field / Features)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/features/settings-tabs.png) |
-<!-- AUTO-SNAPSHOTS:week-3:END -->
 
 ---
 
 ## Week 4 — 6 to 12 July 2026
 
 **Theme:** Fixtures experience and portrait iPhone readiness
+
+<!-- AUTO-SNAPSHOTS:week-4-screens:START -->
+**Fixtures (portrait)**
+
+![week-4 fixtures portrait](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/fixtures-portrait.png)
+
+**Game console (portrait)**
+
+![week-4 game portrait](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/game-portrait.png)
+<!-- AUTO-SNAPSHOTS:week-4-screens:END -->
 
 ### Overview
 
@@ -354,29 +359,25 @@ On the game page, portrait mode dropped tabs in favour of a vertical stack of pa
 - Wheel picker initialises to current period/time on open
 - Fixed layout: picker no longer overlaps Cancel / Confirm buttons (fixed 84px viewport height)
 
+### Key interactions
+
+<!-- AUTO-SNAPSHOTS:week-4-interactions:START -->
+- **Fixtures filters & search** — date, time, team, and unified search on one compact row
+
+![Fixtures filters and search](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/fixtures-filters.png)
+
+- **Scheduled / past chips** — status at a glance; past fixtures open in match-ended state
+
+![Scheduled and past fixture chips](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/fixture-status-chips.png) ![Past fixture match-ended scoreboard](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/past-fixture-ended.png)
+
+- **Portrait game console** — scoreboard, play-by-play, and risks stacked vertically on iPhone
+
+![Portrait game console (stacked panels)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/portrait-stack.png)
+<!-- AUTO-SNAPSHOTS:week-4-interactions:END -->
+
 ### Technical notes
 - ~32 commits this week (heavy session 7 July)
 - ~26 files touched; net +1,507 / −365 lines
-
-<!-- AUTO-SNAPSHOTS:week-4:START -->
-### UI snapshots
-
-Commit `HEAD` (7 Jul 2026).
-
-| Fixtures (portrait) | Fixtures (landscape) | Game (portrait) | Game (landscape) |
-| --- | --- | --- | --- |
-| ![week-4 fixtures portrait](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/fixtures-portrait.png) | ![week-4 fixtures landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/fixtures-landscape.png) | ![week-4 game portrait](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/game-portrait.png) | ![week-4 game landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/game-landscape.png) |
-
-### Feature highlights
-
-| Fixtures filters and search | Scheduled and past fixture chips | Portrait game console (stacked panels) |
-| --- | --- | --- |
-| ![Fixtures filters and search](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/fixtures-filters.png) | ![Scheduled and past fixture chips](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/fixture-status-chips.png) | ![Portrait game console (stacked panels)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/portrait-stack.png) |
-
-| Past fixture match-ended scoreboard |
-| --- |
-| ![Past fixture match-ended scoreboard](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/past-fixture-ended.png) |
-<!-- AUTO-SNAPSHOTS:week-4:END -->
 
 ---
 
