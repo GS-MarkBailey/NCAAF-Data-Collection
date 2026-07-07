@@ -23,8 +23,8 @@ import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { useAppStore } from '@/store/gameStore'
 
-const FILTER_FIELD_CLASS =
-  'h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30'
+const SELECT_FILTER_CLASS =
+  'h-8 shrink-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30'
 
 export function FixturesPageShadcn() {
   const navigate = useNavigate()
@@ -64,13 +64,14 @@ export function FixturesPageShadcn() {
           </p>
         </div>
 
-        <div className="flex min-w-0 items-center gap-2 overflow-x-auto pb-0.5">
+        <div className="overflow-x-auto">
+          <div className="grid min-w-[40rem] grid-cols-[8.5rem_7rem_minmax(0,1fr)_minmax(0,1fr)_auto] items-center gap-2">
           <select
             id="fixture-filter-date"
             value={filters.startDate}
             onChange={(event) => updateFilter('startDate', event.target.value)}
             aria-label="Start date"
-            className={cn(FILTER_FIELD_CLASS, 'min-w-[8.5rem] shrink-0')}
+            className={cn(SELECT_FILTER_CLASS, 'w-[8.5rem]')}
           >
             <option value="all">All dates</option>
             {uniqueDates.map((date) => (
@@ -85,7 +86,7 @@ export function FixturesPageShadcn() {
             value={filters.startTime}
             onChange={(event) => updateFilter('startTime', event.target.value)}
             aria-label="Start time"
-            className={cn(FILTER_FIELD_CLASS, 'min-w-[7rem] shrink-0')}
+            className={cn(SELECT_FILTER_CLASS, 'w-[7rem]')}
           >
             <option value="all">All times</option>
             {uniqueTimes.map((time) => (
@@ -101,10 +102,10 @@ export function FixturesPageShadcn() {
             onChange={(event) => updateFilter('teams', event.target.value)}
             placeholder="Teams"
             aria-label="Teams"
-            className="min-w-[6rem] flex-1"
+            className="min-w-0"
           />
 
-          <div className="relative min-w-[7rem] flex-1">
+          <div className="relative min-w-0">
             <Search className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
             <Input
               id="fixture-search"
@@ -126,7 +127,10 @@ export function FixturesPageShadcn() {
             >
               Clear
             </Button>
-          ) : null}
+          ) : (
+            <span aria-hidden className="size-0" />
+          )}
+          </div>
         </div>
       </header>
 
