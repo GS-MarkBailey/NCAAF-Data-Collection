@@ -171,6 +171,8 @@ body,
 #root {
   height: 100%;
   margin: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 
 html.standalone-app,
@@ -184,6 +186,9 @@ html[data-display-mode='standalone'] body,
 html.standalone-app #root,
 html[data-display-mode='standalone'] #root {
   min-height: 100dvh;
+  height: 100dvh;
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 
 html {
@@ -197,11 +202,19 @@ body {
   -webkit-font-smoothing: antialiased;
   touch-action: manipulation;
   overscroll-behavior: none;
+  position: fixed;
+  inset: 0;
+  width: 100%;
 }
 
 html[data-ui-variant='shadcn'] body {
   background: var(--background);
   color: var(--foreground);
+}
+
+#root {
+  width: 100%;
+  background: inherit;
 }
 
 button,

@@ -69,7 +69,7 @@ export function FixturesPageShadcn() {
   }
 
   return (
-    <div className="flex h-dvh flex-col bg-background safe-x safe-t safe-b">
+    <div className="flex h-dvh flex-col overflow-hidden overscroll-none bg-background safe-x safe-t safe-b">
       <header className="shrink-0 space-y-3 px-4 py-3 md:py-4">
         <div className="space-y-1">
           <h1 className="text-lg font-semibold tracking-tight">Fixtures</h1>
