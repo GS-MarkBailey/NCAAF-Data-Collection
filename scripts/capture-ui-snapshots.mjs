@@ -23,26 +23,32 @@ const GAME_ID = 'NCAAF-2026-001'
 const PREVIEW_PORT = 4173
 const PREVIEW_URL = `http://127.0.0.1:${PREVIEW_PORT}`
 
+/** iPhone 13 logical viewport (390×844 portrait, 844×390 landscape @3x). */
+const IPHONE_13 = {
+  portrait: { width: 390, height: 844 },
+  landscape: { width: 844, height: 390 },
+  deviceScaleFactor: 3,
+  userAgent: devices['iPhone 13'].userAgent,
+}
+
 const MILESTONES = SNAPSHOT_WEEKS
 
 const VIEWPORTS = {
-  'fixtures-portrait': { name: 'fixtures-portrait', path: '/fixtures', device: 'iPhone 14' },
+  'fixtures-portrait': { name: 'fixtures-portrait', path: '/fixtures', device: 'iPhone 13' },
   'fixtures-landscape': {
     name: 'fixtures-landscape',
     path: '/fixtures',
-    width: 844,
-    height: 390,
+    ...IPHONE_13.landscape,
   },
   'game-portrait': {
     name: 'game-portrait',
     path: `/game/${GAME_ID}`,
-    device: 'iPhone 14',
+    device: 'iPhone 13',
   },
   'game-landscape': {
     name: 'game-landscape',
     path: `/game/${GAME_ID}`,
-    width: 844,
-    height: 390,
+    ...IPHONE_13.landscape,
   },
 }
 
@@ -134,7 +140,8 @@ const OVERLAY_FEATURE_IDS = {
 
 const DEFAULT_GAME_SETUP = { fieldDirection: 'dismiss', errorToast: 'dismiss' }
 const ERROR_TOAST_EXIT_MS = 350
-const ERROR_TOAST_STABLE_MS = 600
+const ERROR_TOAST_STABLE_MS = 800
+const ERROR_TOAST_POLL_MS = 150
 
 function appendGameQuery(path, { snapshot = false, demoErrorToast = false } = {}) {
   const [pathname, search = ''] = path.split('?')
@@ -222,12 +229,10 @@ async function forceRemoveErrorToastDom(page) {
 }
 
 async function dismissErrorToast(page) {
-  // Toast mounts in a useEffect after field direction is saved — give React time to render
-  await page.waitForTimeout(1200)
-
+  const deadline = Date.now() + 10_000
   let stableMs = 0
 
-  for (let attempt = 0; attempt < 20; attempt++) {
+  while (Date.now() < deadline) {
     if (await errorToastVisible(page)) {
       stableMs = 0
       if (await clickDismissErrorToast(page)) {
@@ -239,15 +244,51 @@ async function dismissErrorToast(page) {
       continue
     }
 
-    stableMs += 200
+    stableMs += ERROR_TOAST_POLL_MS
     if (stableMs >= ERROR_TOAST_STABLE_MS) return
-    await page.waitForTimeout(200)
+    await page.waitForTimeout(ERROR_TOAST_POLL_MS)
   }
 
   if (await errorToastVisible(page)) {
-    await forceRemoveErrorToastDom(page)
-    console.warn('  ⚠ removed lingering error toast before screenshot')
+    await clickDismissErrorToast(page)
+    await waitForErrorToastHidden(page)
   }
+}
+
+async function installErrorToastSuppressor(context) {
+  await context.addInitScript(() => {
+    if (window.__ncaafErrorToastSuppressor) return
+
+    const shouldSuppress = () => {
+      const params = new URLSearchParams(window.location.search)
+      return params.get('demoErrorToast') !== '1'
+    }
+
+    const suppress = () => {
+      if (!shouldSuppress()) return
+      for (const alert of document.querySelectorAll('[role="alert"]')) {
+        const text = alert.textContent ?? ''
+        if (!/something went wrong|please try again/i.test(text)) continue
+        alert.querySelector('[aria-label="Dismiss notification"]')?.click()
+        alert.remove()
+      }
+    }
+
+    suppress()
+    window.__ncaafErrorToastSuppressor = new MutationObserver(suppress)
+    window.__ncaafErrorToastSuppressor.observe(document.documentElement, {
+      childList: true,
+      subtree: true,
+    })
+  })
+}
+
+async function createCaptureContext(browser, view, { suppressErrorToast = false } = {}) {
+  const context = await browser.newContext(contextOptionsFor(view))
+  if (suppressErrorToast) {
+    await installErrorToastSuppressor(context)
+  }
+  return context
 }
 
 async function dismissBlockingOverlays(page, opts = {}) {
@@ -276,10 +317,23 @@ async function prepareGamePage(page, setup = DEFAULT_GAME_SETUP) {
 }
 
 function contextOptionsFor(view) {
-  if (view.device) return devices[view.device]
+  if (view.device) {
+    return {
+      userAgent: IPHONE_13.userAgent,
+      viewport: IPHONE_13.portrait,
+      deviceScaleFactor: IPHONE_13.deviceScaleFactor,
+      isMobile: true,
+      hasTouch: true,
+    }
+  }
+
   return {
-    viewport: { width: view.width, height: view.height },
-    userAgent: devices['iPhone 14'].userAgent,
+    viewport: {
+      width: view.width ?? IPHONE_13.landscape.width,
+      height: view.height ?? IPHONE_13.landscape.height,
+    },
+    userAgent: IPHONE_13.userAgent,
+    deviceScaleFactor: IPHONE_13.deviceScaleFactor,
     isMobile: true,
     hasTouch: true,
   }
@@ -291,14 +345,16 @@ async function capturePageScreenshot(page, file, overlayOpts) {
   }
   if (!overlayOpts?.allowErrorToast) {
     await dismissErrorToast(page)
+    await forceRemoveErrorToastDom(page)
   }
-  await page.waitForTimeout(300)
+  await page.waitForTimeout(200)
   await page.screenshot({ path: file, fullPage: true })
   console.log(`  ✓ ${file}`)
 }
 
 async function captureView(browser, baseUrl, view, outPath) {
-  const context = await browser.newContext(contextOptionsFor(view))
+  const suppressErrorToast = view.path.startsWith('/game/')
+  const context = await createCaptureContext(browser, view, { suppressErrorToast })
   const page = await context.newPage()
   const route = view.path.startsWith('/game/')
     ? gamePathForCapture(view.path)
@@ -329,7 +385,10 @@ async function captureFeature(browser, baseUrl, feature, featuresDir) {
     return null
   }
 
-  const context = await browser.newContext(contextOptionsFor(view))
+  const setup = mergeGameSetup(feature)
+  const suppressErrorToast =
+    feature.path.startsWith('/game/') && setup.errorToast !== 'keep'
+  const context = await createCaptureContext(browser, view, { suppressErrorToast })
   const page = await context.newPage()
   const route = feature.path.startsWith('/game/')
     ? gamePathForCapture(feature.path, feature)
@@ -344,8 +403,9 @@ async function captureFeature(browser, baseUrl, feature, featuresDir) {
     if (feature.prepare) {
       await feature.prepare(page)
     }
-    if (feature.path.startsWith('/game/') && mergeGameSetup(feature).errorToast !== 'keep') {
+    if (suppressErrorToast) {
       await dismissErrorToast(page)
+      await forceRemoveErrorToastDom(page)
     }
     const file = path.join(featuresDir, `${feature.id}.png`)
     await capturePageScreenshot(page, file, overlayOptsForFeature(feature))

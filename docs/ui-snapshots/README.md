@@ -26,9 +26,9 @@ npm run capture:snapshots -- --commit 1cbc5bb --label week-1
 
 Each run writes PNGs under `docs/ui-snapshots/<label>/`:
 
-- `fixtures-landscape.png` — landscape, `/fixtures`
-- `game-landscape.png` — landscape game view
-- `features/*.png` — feature-specific states for that week (week 4 includes one portrait shot: `portrait-stack.png`)
+- `fixtures-landscape.png` — iPhone 13 landscape (844×390 logical, @3x), `/fixtures`
+- `game-landscape.png` — iPhone 13 landscape game view
+- `features/*.png` — feature-specific states for that week (week 4 includes one portrait shot: `portrait-stack.png` at iPhone 13 390×844)
 - `meta.json` — capture timestamp, URLs, and feature list
 
 Game screenshots dismiss the field-direction dialog and error toast by default. Only the **`field-direction-dialog`** and **`error-toast`** feature shots intentionally show those overlays.
