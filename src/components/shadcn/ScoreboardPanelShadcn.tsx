@@ -538,10 +538,11 @@ export function ScoreboardPanelShadcn({
               offenseIsHome={offenseIsHome}
               homeAttacksRight={homeAttacksRight}
               inactive={gameEnded}
+              compact={stacked}
               pulseEndColor="var(--card)"
               shellClassName={cn(
                 'border-border landscape-mobile:py-3',
-                stacked ? 'py-2.5' : 'py-4',
+                stacked ? 'py-1.5' : 'py-4',
               )}
               labelClassName="text-muted-foreground"
               valueClassName={cn(
@@ -626,7 +627,7 @@ function StatCell({
     <div
       className={cn(
         'flex h-full min-h-0 flex-1 flex-col items-center justify-center border-r border-border px-1 last:border-r-0 landscape-mobile:py-3',
-        compact ? 'py-2.5' : 'py-4',
+        compact ? 'py-1.5' : 'py-4',
         statusStyle?.className,
         pulsing && 'push-data-pulse',
       )}
@@ -636,13 +637,13 @@ function StatCell({
         } as CSSProperties
       }
     >
-      <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+      <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground leading-none">
         {label}
       </span>
       <span
         className={cn(
-          'mt-1 font-bold leading-none',
-          compact ? 'text-xl landscape-mobile:text-lg' : 'text-2xl landscape-mobile:text-xl',
+          'font-bold leading-none',
+          compact ? 'mt-0.5 text-xl landscape-mobile:text-lg' : 'mt-1 text-2xl landscape-mobile:text-xl',
         )}
       >
         {displayValue ?? value}

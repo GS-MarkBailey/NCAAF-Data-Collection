@@ -9,6 +9,7 @@ interface BallOnStatCellProps {
   offenseIsHome: boolean
   homeAttacksRight: boolean
   inactive?: boolean
+  compact?: boolean
   pulseEndColor?: string
   shellClassName?: string
   labelClassName?: string
@@ -20,6 +21,7 @@ export function BallOnStatCell({
   offenseIsHome,
   homeAttacksRight,
   inactive = false,
+  compact = false,
   pulseEndColor = 'var(--color-panel)',
   shellClassName,
   labelClassName,
@@ -42,7 +44,7 @@ export function BallOnStatCell({
     >
       <span
         className={cn(
-          'text-[10px] font-medium uppercase tracking-wide text-[var(--color-text-muted)]',
+          'text-[10px] font-medium uppercase tracking-wide leading-none text-[var(--color-text-muted)]',
           labelClassName,
         )}
       >
@@ -51,7 +53,8 @@ export function BallOnStatCell({
       {inactive ? (
         <span
           className={cn(
-            'mt-1 font-bold leading-none',
+            'font-bold leading-none',
+            compact ? 'mt-0.5' : 'mt-1',
             valueClassName ?? 'text-2xl landscape-mobile:text-xl',
           )}
         >
@@ -61,6 +64,7 @@ export function BallOnStatCell({
         <BallOnValue
           yardLine={yardLine}
           arrowSide={arrowSide}
+          compact={compact}
           valueClassName={valueClassName ?? 'text-2xl landscape-mobile:text-xl'}
         />
       )}
@@ -71,16 +75,23 @@ export function BallOnStatCell({
 interface BallOnValueProps {
   yardLine: number
   arrowSide: BallOnArrowSide
+  compact?: boolean
   valueClassName?: string
 }
 
 export function BallOnValue({
   yardLine,
   arrowSide,
+  compact = false,
   valueClassName,
 }: BallOnValueProps) {
   return (
-    <div className="mt-1 flex w-full min-w-0 items-center justify-center gap-[0.12em] px-0.5 text-[var(--color-text)]">
+    <div
+      className={cn(
+        'flex w-full min-w-0 items-center justify-center gap-[0.12em] px-0.5 text-[var(--color-text)]',
+        compact ? 'mt-0.5' : 'mt-1',
+      )}
+    >
       {arrowSide === 'left' && <FieldArrow direction="left" />}
       <span
         className={cn(
