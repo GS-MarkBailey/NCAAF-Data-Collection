@@ -265,14 +265,18 @@ export function ScoreboardPanelShadcn({
       ? 'OVERTIME'
       : formatClock(clockSeconds)
 
-  const clockAreaClassName = cn(
-    'relative flex min-h-0 flex-1 flex-col items-center justify-center gap-2 px-2 transition-colors',
+  const clockSurfaceClassName = cn(
     (pregame ||
       showEndPeriodButton ||
       showStartPeriodButton ||
       showStartOvertimeButton) &&
       'bg-[var(--color-primary-bg)]',
     gameEnded && 'bg-muted',
+  )
+
+  const clockAreaClassName = cn(
+    'relative flex min-h-0 flex-1 flex-col items-center justify-center gap-2 px-2 transition-colors',
+    clockSurfaceClassName,
     !stacked && !clockLocked && 'cursor-pointer hover:bg-muted/40 active:bg-muted/60',
   )
 
@@ -486,8 +490,13 @@ export function ScoreboardPanelShadcn({
               </div>
             </div>
           ) : stacked ? (
-            <div className="grid h-full min-h-0 flex-1 grid-rows-[minmax(0,1fr)_auto] overflow-hidden">
-              <div className={clockAreaClassName}>
+            <div
+              className={cn(
+                'grid h-full min-h-0 flex-1 grid-rows-[minmax(0,1fr)_auto] overflow-hidden',
+                clockSurfaceClassName,
+              )}
+            >
+              <div className="relative flex min-h-0 flex-1 items-center justify-center px-2">
                 {clockEditButton}
                 {awaitingRegulationDecision && periodEnded ? (
                   <Button
@@ -502,7 +511,7 @@ export function ScoreboardPanelShadcn({
                 ) : null}
               </div>
               {showActionBar ? (
-                <div className="flex shrink-0 flex-wrap items-center justify-center gap-2 border-t border-border bg-background px-2 py-2">
+                <div className="flex shrink-0 flex-wrap items-center justify-center gap-2 px-2 pb-2">
                   {actionBadges}
                 </div>
               ) : null}
