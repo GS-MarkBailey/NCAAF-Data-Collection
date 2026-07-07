@@ -546,7 +546,9 @@ export function ScoreboardPanelShadcn({
               labelClassName="text-muted-foreground"
               valueClassName={cn(
                 'text-foreground',
-                stacked && 'landscape-mobile:text-lg text-xl',
+                stacked
+                  ? 'text-xl landscape-mobile:text-lg'
+                  : 'text-2xl landscape-mobile:text-xl',
               )}
             />
           </div>

@@ -51,14 +51,18 @@ export function BallOnStatCell({
       {inactive ? (
         <span
           className={cn(
-            'mt-1 text-2xl font-bold leading-none landscape-mobile:text-xl',
-            valueClassName,
+            'mt-1 font-bold leading-none',
+            valueClassName ?? 'text-2xl landscape-mobile:text-xl',
           )}
         >
           {MATCH_ENDED_STAT}
         </span>
       ) : (
-        <BallOnValue yardLine={yardLine} arrowSide={arrowSide} className={valueClassName} />
+        <BallOnValue
+          yardLine={yardLine}
+          arrowSide={arrowSide}
+          valueClassName={valueClassName ?? 'text-2xl landscape-mobile:text-xl'}
+        />
       )}
     </div>
   )
@@ -67,19 +71,23 @@ export function BallOnStatCell({
 interface BallOnValueProps {
   yardLine: number
   arrowSide: BallOnArrowSide
-  className?: string
+  valueClassName?: string
 }
 
-export function BallOnValue({ yardLine, arrowSide, className }: BallOnValueProps) {
+export function BallOnValue({
+  yardLine,
+  arrowSide,
+  valueClassName,
+}: BallOnValueProps) {
   return (
-    <div
-      className={cn(
-        'mt-1 flex w-full min-w-0 items-center justify-center gap-[0.12em] px-0.5 text-[var(--color-text)]',
-        className,
-      )}
-    >
+    <div className="mt-1 flex w-full min-w-0 items-center justify-center gap-[0.12em] px-0.5 text-[var(--color-text)]">
       {arrowSide === 'left' && <FieldArrow direction="left" />}
-      <span className="shrink-0 text-2xl font-bold leading-none text-current landscape-mobile:text-xl">
+      <span
+        className={cn(
+          'shrink-0 font-bold leading-none text-current',
+          valueClassName ?? 'text-2xl landscape-mobile:text-xl',
+        )}
+      >
         {yardLine}
       </span>
       {arrowSide === 'right' && <FieldArrow direction="right" />}
