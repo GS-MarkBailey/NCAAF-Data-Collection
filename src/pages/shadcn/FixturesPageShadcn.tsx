@@ -1,7 +1,8 @@
+import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Calendar } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { isFixtureScheduled } from '@/lib/fixtures'
+import { isFixtureScheduled, sortFixturesByKickoffDesc } from '@/lib/fixtures'
 import { Badge } from '@/components/ui/badge'
 import {
   Card,
@@ -15,6 +16,10 @@ export function FixturesPageShadcn() {
   const navigate = useNavigate()
   const fixtures = useAppStore((s) => s.fixtures)
   const initGame = useAppStore((s) => s.initGame)
+  const sortedFixtures = useMemo(
+    () => sortFixturesByKickoffDesc(fixtures),
+    [fixtures],
+  )
 
   const openFixture = (fixtureId: string) => {
     initGame(fixtureId)
@@ -33,7 +38,7 @@ export function FixturesPageShadcn() {
       <Separator />
 
       <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-4 pb-4">
-        {fixtures.map((fixture) => {
+        {sortedFixtures.map((fixture) => {
           const scheduled = isFixtureScheduled(fixture)
 
           return (
