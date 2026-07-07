@@ -1,11 +1,16 @@
 {
   "label": "week-4",
-  "capturedAt": "2026-07-07T21:10:28.461Z",
+  "portrait": true,
+  "capturedAt": "2026-07-07T21:44:19.848Z",
   "baseUrl": "https://ncaaf-data-collection.vercel.app",
+  "views": [
+    "fixtures-portrait",
+    "fixtures-landscape",
+    "game-portrait",
+    "game-landscape"
+  ],
   "routes": [
     "/fixtures",
-    "/fixtures",
-    "/game/NCAAF-2026-001",
     "/game/NCAAF-2026-001"
   ],
   "features": [

@@ -99,7 +99,7 @@ export const WEEK_FEATURES = {
       title: 'Field direction dialog (first open)',
       path: '/game/NCAAF-2026-001',
       viewport: 'game-landscape',
-      gameSetup: { fieldDirection: 'keep', errorToast: 'keep' },
+      gameSetup: { fieldDirection: 'keep', errorToast: 'dismiss' },
     },
     {
       id: 'clock-editor',

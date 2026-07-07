@@ -127,6 +127,97 @@ async function withWorktree(commit, fn) {
   }
 }
 
+const OVERLAY_FEATURE_IDS = {
+  fieldDirection: 'field-direction-dialog',
+  errorToast: 'error-toast',
+}
+
+const DEFAULT_GAME_SETUP = { fieldDirection: 'dismiss', errorToast: 'dismiss' }
+
+function overlayOptsForFeature(feature) {
+  if (!feature) {
+    return { allowFieldDirection: false, allowErrorToast: false }
+  }
+  if (feature.id === OVERLAY_FEATURE_IDS.fieldDirection) {
+    return { allowFieldDirection: true, allowErrorToast: false }
+  }
+  if (feature.id === OVERLAY_FEATURE_IDS.errorToast) {
+    return { allowFieldDirection: false, allowErrorToast: true }
+  }
+  return { allowFieldDirection: false, allowErrorToast: false }
+}
+
+function mergeGameSetup(feature) {
+  return { ...DEFAULT_GAME_SETUP, ...(feature?.gameSetup ?? {}) }
+}
+
+async function dismissFieldDirectionDialog(page) {
+  const attacksRight = page.getByRole('button', { name: /attacks right/i })
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      if (!(await attacksRight.isVisible().catch(() => false))) break
+      await attacksRight.click()
+      await page.waitForTimeout(450)
+    } catch {
+      break
+    }
+  }
+
+  const directionDialog = page.getByRole('dialog').filter({ hasText: /field direction/i })
+  await directionDialog.waitFor({ state: 'hidden', timeout: 4000 }).catch(() => {})
+}
+
+async function dismissErrorToast(page) {
+  // Toast mounts in a useEffect after field direction is saved — give React time to render
+  await page.waitForTimeout(900)
+
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const dismiss = page.getByRole('button', { name: /dismiss notification/i })
+    try {
+      if (await dismiss.isVisible().catch(() => false)) {
+        await dismiss.click()
+        await page.waitForTimeout(500)
+        continue
+      }
+    } catch {
+      break
+    }
+
+    if (!(await page.getByRole('alert').isVisible().catch(() => false))) {
+      return
+    }
+
+    await page.waitForTimeout(300)
+  }
+
+  await page.getByRole('alert').waitFor({ state: 'hidden', timeout: 3000 }).catch(() => {})
+}
+
+async function dismissBlockingOverlays(page, opts = {}) {
+  const { allowFieldDirection = false, allowErrorToast = false } = opts
+
+  if (!allowFieldDirection) {
+    await dismissFieldDirectionDialog(page)
+  }
+
+  if (!allowErrorToast) {
+    await dismissErrorToast(page)
+  } else {
+    try {
+      await page.getByRole('alert').waitFor({ state: 'visible', timeout: 4000 })
+    } catch {
+      await page.waitForTimeout(800)
+    }
+  }
+}
+
+async function prepareGamePage(page, setup = DEFAULT_GAME_SETUP) {
+  await dismissBlockingOverlays(page, {
+    allowFieldDirection: setup.fieldDirection === 'keep',
+    allowErrorToast: setup.errorToast === 'keep',
+  })
+}
+
 function contextOptionsFor(view) {
   if (view.device) return devices[view.device]
   return {
@@ -137,40 +228,10 @@ function contextOptionsFor(view) {
   }
 }
 
-async function prepareGamePage(page, setup = {}) {
-  const { fieldDirection = 'dismiss', errorToast = 'dismiss' } = setup
-
-  if (fieldDirection === 'dismiss') {
-    const attacksRight = page.getByRole('button', { name: /attacks right/i })
-    try {
-      await attacksRight.waitFor({ state: 'visible', timeout: 3000 })
-      await attacksRight.click()
-      await page.waitForTimeout(500)
-    } catch {
-      /* Field direction dialog not shown */
-    }
+async function capturePageScreenshot(page, file, overlayOpts) {
+  if (overlayOpts) {
+    await dismissBlockingOverlays(page, overlayOpts)
   }
-
-  if (errorToast === 'dismiss') {
-    const dismissToast = page.getByRole('button', { name: /dismiss notification/i })
-    try {
-      await dismissToast.waitFor({ state: 'visible', timeout: 3000 })
-      await dismissToast.click()
-      await page.waitForTimeout(350)
-    } catch {
-      /* Demo error toast not shown */
-    }
-  } else if (errorToast === 'keep') {
-    try {
-      await page.getByRole('alert').waitFor({ state: 'visible', timeout: 3000 })
-    } catch {
-      /* Toast may appear slightly later */
-      await page.waitForTimeout(800)
-    }
-  }
-}
-
-async function capturePageScreenshot(page, file) {
   await page.waitForTimeout(500)
   await page.screenshot({ path: file, fullPage: true })
   console.log(`  ✓ ${file}`)
@@ -187,7 +248,10 @@ async function captureView(browser, baseUrl, view, outPath) {
       await prepareGamePage(page)
     }
     const file = path.join(outPath, `${view.name}.png`)
-    await capturePageScreenshot(page, file)
+    await capturePageScreenshot(page, file, {
+      allowFieldDirection: false,
+      allowErrorToast: false,
+    })
   } catch (err) {
     console.warn(`  ✗ ${view.name}: ${err.message}`)
   } finally {
@@ -209,13 +273,13 @@ async function captureFeature(browser, baseUrl, feature, featuresDir) {
   try {
     await page.goto(target, { waitUntil: 'networkidle', timeout: 30_000 })
     if (feature.path.startsWith('/game/')) {
-      await prepareGamePage(page, feature.gameSetup ?? {})
+      await prepareGamePage(page, mergeGameSetup(feature))
     }
     if (feature.prepare) {
       await feature.prepare(page)
     }
     const file = path.join(featuresDir, `${feature.id}.png`)
-    await capturePageScreenshot(page, file)
+    await capturePageScreenshot(page, file, overlayOptsForFeature(feature))
     return { id: feature.id, title: feature.title, file: `features/${feature.id}.png` }
   } catch (err) {
     console.warn(`  ✗ feature ${feature.id}: ${err.message}`)

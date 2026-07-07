@@ -33,7 +33,7 @@ Each run writes PNGs under `docs/ui-snapshots/<label>/`:
 - `features/*.png` — feature-specific states for that week
 - `meta.json` — capture timestamp, URLs, and feature list
 
-Game screenshots dismiss the field-direction dialog first (clicks “Attacks right”), then close the demo error toast — except for deliberate feature shots (`field-direction-dialog`, `error-toast`).
+Game screenshots dismiss the field-direction dialog and error toast by default. Only the **`field-direction-dialog`** and **`error-toast`** feature shots intentionally show those overlays.
 
 ## Keeping the Confluence doc in sync
 
