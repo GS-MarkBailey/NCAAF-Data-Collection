@@ -1,11 +1,18 @@
 {
   "label": "week-2",
-  "capturedAt": "2026-07-07T20:09:57.381Z",
+  "capturedAt": "2026-07-07T21:08:04.478Z",
   "baseUrl": "http://127.0.0.1:4173",
   "routes": [
     "/fixtures",
     "/fixtures",
     "/game/NCAAF-2026-001",
     "/game/NCAAF-2026-001"
+  ],
+  "features": [
+    {
+      "id": "feature-flags-panel",
+      "title": "Feature flags panel",
+      "file": "features/feature-flags-panel.png"
+    }
   ]
 }

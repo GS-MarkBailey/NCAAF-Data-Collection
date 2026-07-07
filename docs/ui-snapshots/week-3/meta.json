@@ -1,11 +1,38 @@
 {
   "label": "week-3",
-  "capturedAt": "2026-07-07T20:10:53.657Z",
+  "capturedAt": "2026-07-07T21:09:09.892Z",
   "baseUrl": "http://127.0.0.1:4173",
   "routes": [
     "/fixtures",
     "/fixtures",
     "/game/NCAAF-2026-001",
     "/game/NCAAF-2026-001"
+  ],
+  "features": [
+    {
+      "id": "field-direction-dialog",
+      "title": "Field direction dialog (first open)",
+      "file": "features/field-direction-dialog.png"
+    },
+    {
+      "id": "clock-editor",
+      "title": "Clock wheel editor",
+      "file": "features/clock-editor.png"
+    },
+    {
+      "id": "connection-status",
+      "title": "Connection status chip",
+      "file": "features/connection-status.png"
+    },
+    {
+      "id": "error-toast",
+      "title": "Fixture error toast",
+      "file": "features/error-toast.png"
+    },
+    {
+      "id": "settings-tabs",
+      "title": "Settings dialog (Log / Field / Features)",
+      "file": "features/settings-tabs.png"
+    }
   ]
 }
