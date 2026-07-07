@@ -1,5 +1,6 @@
 import type { Fixture, GameState } from '@/types'
-import { QUARTER_LENGTH_SECONDS } from '@/lib/clock'
+import { QUARTER_LENGTH_SECONDS, REGULATION_QUARTERS } from '@/lib/clock'
+import { isFixtureScheduled } from '@/lib/fixtures'
 import { createInitialSimulation } from '@/lib/playSimulation'
 
 export const FIXTURES: Fixture[] = [
@@ -334,4 +335,26 @@ export function createInitialGameState(fixture: Fixture): GameState {
     plays: [],
     simulation: createInitialSimulation(true),
   }
+}
+
+/** Post-match state for past fixtures — mirrors endGame after regulation. */
+export function createPostMatchGameState(fixture: Fixture): GameState {
+  return {
+    ...createInitialGameState(fixture),
+    homeAttacksRight: true,
+    gameStarted: true,
+    gameEnded: true,
+    periodEnded: true,
+    clock: {
+      period: REGULATION_QUARTERS,
+      seconds: 0,
+      running: false,
+    },
+  }
+}
+
+export function createGameStateForFixture(fixture: Fixture): GameState {
+  return isFixtureScheduled(fixture)
+    ? createInitialGameState(fixture)
+    : createPostMatchGameState(fixture)
 }

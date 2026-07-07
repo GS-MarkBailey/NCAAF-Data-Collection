@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import type { Fixture, GameState, RiskType } from '@/types'
 import type { ActionLogsByFixture, UserAction } from '@/types/actions'
-import { FIXTURES, createInitialGameState } from '@/data/fixtures'
+import { FIXTURES, createGameStateForFixture } from '@/data/fixtures'
 import { appendAction, createUserAction } from '@/lib/actionLog'
 import { tickPlaySimulation, createInitialSimulation, createQuarterStartPlay } from '@/lib/playSimulation'
 import {
@@ -64,7 +64,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
     set((state) => ({
       games: {
         ...state.games,
-        [fixtureId]: createInitialGameState(fixture),
+        [fixtureId]: createGameStateForFixture(fixture),
       },
       actionLogs: {
         ...state.actionLogs,
