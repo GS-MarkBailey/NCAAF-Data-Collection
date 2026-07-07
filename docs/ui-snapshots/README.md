@@ -43,6 +43,8 @@ Snapshot **tables and image embeds** in `docs/confluence-weekly-build-in-public.
 | `week-N-interactions` | Feature screenshots inline with Core / Key interactions copy |
 | `week-N-shipped-<key>` | Feature screenshots inline in Shipped subsections |
 
+Default image mode: **Confluence attachments** (flat filenames). Set `CONFLUENCE_IMAGE_MODE=github` for raw GitHub URLs.
+
 Edit interaction text in `WEEK_INTERACTIONS` and shipped image mappings in `WEEK_SHIPPED` (`scripts/ui-snapshot-doc-content.mjs`).
 
 ```markdown
@@ -85,21 +87,42 @@ Download PNGs from the run’s **Artifacts** tab when not committing images to g
 
 ## Publishing to Confluence
 
-Images in the auto-generated sections use **GitHub raw URLs** (detected from `git remote origin` + current branch). Minimal workflow:
+**Recommended:** reference **page attachments** (default). Avoids editor flicker and GitHub rate limits while editing.
 
-1. `npm run capture:current-week` (or `capture:and-sync` for all weeks)
-2. **Commit and push** `docs/ui-snapshots/` and `docs/confluence-weekly-build-in-public.md` to `main`
-3. Import or paste the markdown into Confluence — images load from GitHub (no manual uploads)
+### Workflow
 
-Example URL shape:
+```bash
+# After capture — stage flat attachment filenames + refresh markdown
+npm run publish:confluence
 
-`https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/game-landscape.png`
+# Option A: drag docs/confluence-attachments/*.png onto the Confluence page
+# Option B: upload via API (set env vars once)
+export CONFLUENCE_BASE_URL=https://yoursite.atlassian.net/wiki
+export CONFLUENCE_EMAIL=you@company.com
+export CONFLUENCE_API_TOKEN=...
+export CONFLUENCE_PAGE_ID=123456789
+npm run upload:confluence-attachments
+```
 
-Image URLs use stable GitHub raw paths (no query params) so Confluence can cache them and avoid hammering GitHub on every editor re-render. After re-capturing PNGs, push to `main` and republish the Confluence page to pick up new files.
+Then **reimport** `docs/confluence-weekly-build-in-public.md` (replace page content, don’t append).
 
-Override the host with `CONFLUENCE_IMAGE_BASE_URL` if needed.
+Auto-generated image lines look like:
 
-**Note:** Confluence must be allowed to fetch external images (usually on by default). Private repos require readers to have GitHub access; for org-wide Confluence, a **public** repo or GitHub attachment sync is more reliable.
+```markdown
+![Connection status chip](week-3--connection-status.png)
+```
+
+Flat names map from repo paths: `week-3/features/connection-status.png` → `week-3--connection-status.png`.
+
+### GitHub URLs (optional)
+
+For GitHub markdown preview only:
+
+```bash
+CONFLUENCE_IMAGE_MODE=github npm run sync:confluence-doc
+```
+
+Override branch/host with `CONFLUENCE_IMAGE_BASE_URL` if needed.
 
 ## Feature scenarios per week
 

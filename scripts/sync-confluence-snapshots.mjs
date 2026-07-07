@@ -11,7 +11,11 @@
 import { access, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { resolveSnapshotImageBase, snapshotImageUrl } from './github-raw-url.mjs'
+import {
+  resolveImageMode,
+  resolveSnapshotImageBase,
+  snapshotImageMarkdown,
+} from './confluence-image.mjs'
 import { WEEK_INTERACTIONS, WEEK_SHIPPED } from './ui-snapshot-doc-content.mjs'
 import { WEEK_FEATURES } from './ui-snapshot-features.mjs'
 import { SNAPSHOT_WEEKS } from './ui-snapshot-weeks.mjs'
@@ -37,8 +41,8 @@ function formatCommitDate(isoDate) {
   return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
-function img(imageBase, relPath, alt) {
-  return `![${alt}](${snapshotImageUrl(imageBase, relPath)})`
+function img(imageBase, relPath, alt, mode) {
+  return snapshotImageMarkdown(mode, imageBase, relPath, alt)
 }
 
 function replaceMarkedBlock(content, id, replacement) {
@@ -69,35 +73,35 @@ function latestWeek() {
   return SNAPSHOT_WEEKS[SNAPSHOT_WEEKS.length - 1]
 }
 
-function renderLatestScreens(imageBase, week) {
+function renderLatestScreens(imageBase, week, mode) {
   const label = week.label
   return [
     `**Fixtures (landscape)**`,
     '',
-    img(imageBase, `${label}/fixtures-landscape.png`, 'Fixtures landscape'),
+    img(imageBase, `${label}/fixtures-landscape.png`, 'Fixtures landscape', mode),
     '',
     `**Game console (landscape)**`,
     '',
-    img(imageBase, `${label}/game-landscape.png`, 'Game landscape'),
+    img(imageBase, `${label}/game-landscape.png`, 'Game landscape', mode),
   ].join('\n')
 }
 
-async function featureImage(imageBase, weekLabel, featureId, title) {
+async function featureImage(imageBase, weekLabel, featureId, title, mode) {
   const relPath = `${weekLabel}/features/${featureId}.png`
   const filePath = path.join(SNAPSHOTS_DIR, relPath)
   if (!(await fileExists(filePath))) return null
-  return img(imageBase, relPath, title)
+  return img(imageBase, relPath, title, mode)
 }
 
-async function overviewImage(imageBase, weekLabel, fileName) {
+async function overviewImage(imageBase, weekLabel, fileName, mode) {
   const relPath = `${weekLabel}/${fileName}`
   const filePath = path.join(SNAPSHOTS_DIR, relPath)
   if (!(await fileExists(filePath))) return null
   const alt = fileName.replace(/\.png$/, '').replace(/-/g, ' ')
-  return img(imageBase, relPath, alt)
+  return img(imageBase, relPath, alt, mode)
 }
 
-async function renderSnapshotBlock(imageBase, weekLabel, block) {
+async function renderSnapshotBlock(imageBase, weekLabel, block, mode) {
   const featureTitles = Object.fromEntries(
     (WEEK_FEATURES[weekLabel] ?? []).map((f) => [f.id, f.title]),
   )
@@ -105,7 +109,7 @@ async function renderSnapshotBlock(imageBase, weekLabel, block) {
   const images = []
 
   for (const fileName of block.overviewFiles ?? []) {
-    const image = await overviewImage(imageBase, weekLabel, fileName)
+    const image = await overviewImage(imageBase, weekLabel, fileName, mode)
     if (image) images.push(image)
   }
 
@@ -115,6 +119,7 @@ async function renderSnapshotBlock(imageBase, weekLabel, block) {
       weekLabel,
       featureId,
       featureTitles[featureId] ?? featureId,
+      mode,
     )
     if (image) images.push(image)
   }
@@ -123,7 +128,7 @@ async function renderSnapshotBlock(imageBase, weekLabel, block) {
   return images.join(' ')
 }
 
-async function renderInteractions(imageBase, weekLabel) {
+async function renderInteractions(imageBase, weekLabel, mode) {
   const lines = WEEK_INTERACTIONS[weekLabel] ?? []
   if (lines.length === 0) {
     return '_No interaction screenshots configured for this week._'
@@ -143,6 +148,7 @@ async function renderInteractions(imageBase, weekLabel) {
         weekLabel,
         featureId,
         featureTitles[featureId] ?? featureId,
+        mode,
       )
       if (image) images.push(image)
     }
@@ -155,6 +161,7 @@ async function renderInteractions(imageBase, weekLabel) {
 }
 
 async function main() {
+  const mode = resolveImageMode()
   const imageBase = resolveSnapshotImageBase(ROOT)
   let content = await readFile(DOC_PATH, 'utf8')
 
@@ -162,7 +169,7 @@ async function main() {
   content = replaceMarkedBlock(
     content,
     'ui-evolution',
-    renderLatestScreens(imageBase, latest),
+    renderLatestScreens(imageBase, latest, mode),
   )
 
   for (const week of SNAPSHOT_WEEKS) {
@@ -171,7 +178,7 @@ async function main() {
       content = replaceMarkedBlock(
         content,
         interactionsMarker,
-        await renderInteractions(imageBase, week.label),
+        await renderInteractions(imageBase, week.label, mode),
       )
     }
 
@@ -184,7 +191,7 @@ async function main() {
       content = replaceMarkedBlock(
         content,
         markerId,
-        await renderSnapshotBlock(imageBase, week.label, block),
+        await renderSnapshotBlock(imageBase, week.label, block, mode),
       )
     }
   }
@@ -197,7 +204,7 @@ async function main() {
 
   await writeFile(DOC_PATH, content)
   console.log(`Updated ${DOC_PATH}`)
-  console.log(`Image base: ${imageBase}`)
+  console.log(`Image mode: ${mode}${mode === 'github' ? ` (${imageBase})` : ' (Confluence page attachments)'}`)
 }
 
 main().catch((err) => {

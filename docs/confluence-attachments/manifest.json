@@ -1,0 +1,97 @@
+{
+  "stagedAt": "2026-07-07T23:58:35.110Z",
+  "files": [
+    {
+      "relPath": "week-1/features/action-log.png",
+      "attachmentName": "week-1--features--action-log.png"
+    },
+    {
+      "relPath": "week-1/features/clock-adjust.png",
+      "attachmentName": "week-1--features--clock-adjust.png"
+    },
+    {
+      "relPath": "week-1/features/risk-challenge-active.png",
+      "attachmentName": "week-1--features--risk-challenge-active.png"
+    },
+    {
+      "relPath": "week-1/features/take-control-active.png",
+      "attachmentName": "week-1--features--take-control-active.png"
+    },
+    {
+      "relPath": "week-1/features/take-control-confirm.png",
+      "attachmentName": "week-1--features--take-control-confirm.png"
+    },
+    {
+      "relPath": "week-1/fixtures-landscape.png",
+      "attachmentName": "week-1--fixtures-landscape.png"
+    },
+    {
+      "relPath": "week-1/game-landscape.png",
+      "attachmentName": "week-1--game-landscape.png"
+    },
+    {
+      "relPath": "week-2/features/feature-flags-panel.png",
+      "attachmentName": "week-2--features--feature-flags-panel.png"
+    },
+    {
+      "relPath": "week-2/fixtures-landscape.png",
+      "attachmentName": "week-2--fixtures-landscape.png"
+    },
+    {
+      "relPath": "week-2/game-landscape.png",
+      "attachmentName": "week-2--game-landscape.png"
+    },
+    {
+      "relPath": "week-3/features/clock-editor.png",
+      "attachmentName": "week-3--features--clock-editor.png"
+    },
+    {
+      "relPath": "week-3/features/connection-status.png",
+      "attachmentName": "week-3--features--connection-status.png"
+    },
+    {
+      "relPath": "week-3/features/error-toast.png",
+      "attachmentName": "week-3--features--error-toast.png"
+    },
+    {
+      "relPath": "week-3/features/field-direction-dialog.png",
+      "attachmentName": "week-3--features--field-direction-dialog.png"
+    },
+    {
+      "relPath": "week-3/features/settings-tabs.png",
+      "attachmentName": "week-3--features--settings-tabs.png"
+    },
+    {
+      "relPath": "week-3/fixtures-landscape.png",
+      "attachmentName": "week-3--fixtures-landscape.png"
+    },
+    {
+      "relPath": "week-3/game-landscape.png",
+      "attachmentName": "week-3--game-landscape.png"
+    },
+    {
+      "relPath": "week-4/features/fixture-status-chips.png",
+      "attachmentName": "week-4--features--fixture-status-chips.png"
+    },
+    {
+      "relPath": "week-4/features/fixtures-filters.png",
+      "attachmentName": "week-4--features--fixtures-filters.png"
+    },
+    {
+      "relPath": "week-4/features/past-fixture-ended.png",
+      "attachmentName": "week-4--features--past-fixture-ended.png"
+    },
+    {
+      "relPath": "week-4/features/portrait-stack.png",
+      "attachmentName": "week-4--features--portrait-stack.png"
+    },
+    {
+      "relPath": "week-4/fixtures-landscape.png",
+      "attachmentName": "week-4--fixtures-landscape.png"
+    },
+    {
+      "relPath": "week-4/game-landscape.png",
+      "attachmentName": "week-4--game-landscape.png"
+    }
+  ]
+}

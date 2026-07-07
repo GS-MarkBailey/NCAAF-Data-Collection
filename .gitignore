@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Staged Confluence attachment copies (regenerate with npm run stage:confluence-attachments)
+docs/confluence-attachments/*.png
