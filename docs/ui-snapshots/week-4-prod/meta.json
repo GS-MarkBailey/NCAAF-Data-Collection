@@ -1,6 +1,6 @@
 {
   "label": "week-4-prod",
-  "capturedAt": "2026-07-07T20:08:03.716Z",
+  "capturedAt": "2026-07-07T20:40:09.451Z",
   "baseUrl": "https://ncaaf-data-collection.vercel.app",
   "routes": [
     "/fixtures",

@@ -23,6 +23,8 @@ Each run writes PNGs under `docs/ui-snapshots/<label>/`:
 - `game-landscape.png` — landscape game view
 - `meta.json` — capture timestamp and URLs
 
+Game screenshots dismiss the field-direction dialog first (clicks “Attacks right”), then close the demo error toast so the console is unobstructed.
+
 ## CI (GitHub Actions)
 
 Workflow: `.github/workflows/ui-snapshots.yml`

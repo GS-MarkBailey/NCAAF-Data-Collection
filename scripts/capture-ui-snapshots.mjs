@@ -113,6 +113,26 @@ async function withWorktree(commit, fn) {
   }
 }
 
+async function prepareGamePage(page) {
+  const attacksRight = page.getByRole('button', { name: /attacks right/i })
+  try {
+    await attacksRight.waitFor({ state: 'visible', timeout: 3000 })
+    await attacksRight.click()
+    await page.waitForTimeout(500)
+  } catch {
+    /* Field direction dialog not shown (older builds or flag off) */
+  }
+
+  const dismissToast = page.getByRole('button', { name: /dismiss notification/i })
+  try {
+    await dismissToast.waitFor({ state: 'visible', timeout: 3000 })
+    await dismissToast.click()
+    await page.waitForTimeout(350)
+  } catch {
+    /* Demo error toast not shown yet */
+  }
+}
+
 async function captureScreens(baseUrl, label) {
   const outPath = path.join(OUT_DIR, label)
   await mkdir(outPath, { recursive: true })
@@ -135,6 +155,9 @@ async function captureScreens(baseUrl, label) {
 
       try {
         await page.goto(target, { waitUntil: 'networkidle', timeout: 30_000 })
+        if (view.path.startsWith('/game/')) {
+          await prepareGamePage(page)
+        }
         await page.waitForTimeout(800)
         const file = path.join(outPath, `${view.name}.png`)
         await page.screenshot({ path: file, fullPage: true })
