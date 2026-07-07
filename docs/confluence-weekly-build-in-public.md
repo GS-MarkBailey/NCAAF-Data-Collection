@@ -31,6 +31,17 @@ Development moved in a clear arc: first map requirements and explore responsive 
 
 **Total:** ~154 commits · React + Vite + TypeScript · shadcn/ui · Zustand
 
+### UI evolution (snapshots)
+
+Automated Playwright captures at each week-end git commit live in [`docs/ui-snapshots/`](./ui-snapshots/README.md). Re-run with `npm run capture:snapshots -- --milestones`.
+
+| Week | Fixtures (portrait) | Game (landscape) |
+|------|---------------------|------------------|
+| 1 | ![Week 1 fixtures](./ui-snapshots/week-1/fixtures-portrait.png) | ![Week 1 game](./ui-snapshots/week-1/game-landscape.png) |
+| 2 | ![Week 2 fixtures](./ui-snapshots/week-2/fixtures-portrait.png) | ![Week 2 game](./ui-snapshots/week-2/game-landscape.png) |
+| 3 | ![Week 3 fixtures](./ui-snapshots/week-3/fixtures-portrait.png) | ![Week 3 game](./ui-snapshots/week-3/game-landscape.png) |
+| 4 | ![Week 4 fixtures](./ui-snapshots/week-4/fixtures-portrait.png) | ![Week 4 game](./ui-snapshots/week-4/game-landscape.png) |
+
 ---
 
 ## Week 1 — 16 to 22 June 2026
@@ -103,6 +114,14 @@ By the end of the week, a reviewer could add the app to their home screen, open 
 - ~65 commits this week
 - ~47 files touched; net +2,034 / −737 lines vs initial commit
 
+### UI snapshots
+
+Commit `1cbc5bb` (18 Jun 2026).
+
+| Fixtures (portrait) | Fixtures (landscape) | Game (portrait) | Game (landscape) |
+|---------------------|----------------------|-----------------|------------------|
+| ![Week 1 fixtures portrait](./ui-snapshots/week-1/fixtures-portrait.png) | ![Week 1 fixtures landscape](./ui-snapshots/week-1/fixtures-landscape.png) | ![Week 1 game portrait](./ui-snapshots/week-1/game-portrait.png) | ![Week 1 game landscape](./ui-snapshots/week-1/game-landscape.png) |
+
 ---
 
 ## Week 2 — 23 to 29 June 2026
@@ -124,6 +143,14 @@ Work this week was mostly wiring and UI polish on the flags panel and its connec
 ### Notes
 - Quiet week in terms of commits (4 total); larger feature-flag architecture landed in Week 3
 - Focus was stabilising the flags UI before adding deploy capability
+
+### UI snapshots
+
+Commit `615f79c` (23 Jun 2026).
+
+| Fixtures (portrait) | Fixtures (landscape) | Game (portrait) | Game (landscape) |
+|---------------------|----------------------|-----------------|------------------|
+| ![Week 2 fixtures portrait](./ui-snapshots/week-2/fixtures-portrait.png) | ![Week 2 fixtures landscape](./ui-snapshots/week-2/fixtures-landscape.png) | ![Week 2 game portrait](./ui-snapshots/week-2/game-portrait.png) | ![Week 2 game landscape](./ui-snapshots/week-2/game-landscape.png) |
 
 ---
 
@@ -201,6 +228,14 @@ Supporting work included the connection status chip, fixture-scoped error toasts
 - ~30 files touched; net +1,996 / −304 lines
 - Key new modules: `ClockWheelEditor`, `ConnectionStatusChip`, `ErrorToastHost`, `featureFlagDeploy`, `api/deploy-feature-flags`
 
+### UI snapshots
+
+Commit `dd1f58f` (3 Jul 2026).
+
+| Fixtures (portrait) | Fixtures (landscape) | Game (portrait) | Game (landscape) |
+|---------------------|----------------------|-----------------|------------------|
+| ![Week 3 fixtures portrait](./ui-snapshots/week-3/fixtures-portrait.png) | ![Week 3 fixtures landscape](./ui-snapshots/week-3/fixtures-landscape.png) | ![Week 3 game portrait](./ui-snapshots/week-3/game-portrait.png) | ![Week 3 game landscape](./ui-snapshots/week-3/game-landscape.png) |
+
 ---
 
 ## Week 4 — 6 to 12 July 2026
@@ -255,6 +290,14 @@ On the game page, portrait mode dropped tabs in favour of a vertical stack of pa
 ### Technical notes
 - ~32 commits this week (heavy session 7 July)
 - ~26 files touched; net +1,507 / −365 lines
+
+### UI snapshots
+
+Commit `f019e68` (7 Jul 2026). Production build also captured at [`week-4-prod/`](./ui-snapshots/week-4-prod/).
+
+| Fixtures (portrait) | Fixtures (landscape) | Game (portrait) | Game (landscape) |
+|---------------------|----------------------|-----------------|------------------|
+| ![Week 4 fixtures portrait](./ui-snapshots/week-4/fixtures-portrait.png) | ![Week 4 fixtures landscape](./ui-snapshots/week-4/fixtures-landscape.png) | ![Week 4 game portrait](./ui-snapshots/week-4/game-portrait.png) | ![Week 4 game landscape](./ui-snapshots/week-4/game-landscape.png) |
 
 ---
 

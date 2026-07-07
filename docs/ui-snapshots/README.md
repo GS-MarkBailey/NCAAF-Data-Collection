@@ -23,8 +23,19 @@ Each run writes PNGs under `docs/ui-snapshots/<label>/`:
 - `game-landscape.png` — landscape game view
 - `meta.json` — capture timestamp and URLs
 
+## CI (GitHub Actions)
+
+Workflow: `.github/workflows/ui-snapshots.yml`
+
+- **On push to `main`** (when `src/` changes): captures production and uploads artifacts (`deploy-<sha>` label).
+- **Manual run** (Actions → UI snapshots → Run workflow):
+  - `production` — current Vercel only
+  - `milestones` — rebuilds week-1 … week-4 from git (~4 min)
+
+Download PNGs from the run’s **Artifacts** tab. They are not committed automatically.
+
 ## Other ways to get history
 
 - **Vercel → Deployments** — open an old deployment URL and screenshot manually.
 - **Visual diff tools** — Percy, Chromatic, or Lost Pixel on top of this script in CI.
-- **Going forward** — run `--milestones` weekly or add a GitHub Action that uploads artifacts on each deploy.
+- **Confluence doc** — weekly images are embedded in `docs/confluence-weekly-build-in-public.md`.
