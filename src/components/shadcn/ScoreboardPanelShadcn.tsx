@@ -560,12 +560,7 @@ export function ScoreboardPanelShadcn({
           )}
         </div>
 
-        <div
-          className={cn(
-            'flex min-h-0 flex-1 flex-col rounded-lg border border-border',
-            stacked ? 'overflow-visible' : 'overflow-hidden',
-          )}
-        >
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-border">
           <div
             className={cn(
               'flex items-stretch',
@@ -633,7 +628,7 @@ export function ScoreboardPanelShadcn({
                   stacked ? 'text-base' : 'text-lg',
                   !gameEnded &&
                     possessionIsHome &&
-                    'bg-[var(--color-score-bg)] text-white hover:bg-[var(--color-score-bg)] hover:text-white',
+                    'rounded-bl-lg bg-[var(--color-score-bg)] text-white hover:bg-[var(--color-score-bg)] hover:text-white',
                 )}
               >
                 {homeAbbr}
@@ -650,7 +645,7 @@ export function ScoreboardPanelShadcn({
                   stacked ? 'text-base' : 'text-lg',
                   !gameEnded &&
                     !possessionIsHome &&
-                    'bg-[var(--color-score-bg)] text-white hover:bg-[var(--color-score-bg)] hover:text-white',
+                    'rounded-br-lg bg-[var(--color-score-bg)] text-white hover:bg-[var(--color-score-bg)] hover:text-white',
                 )}
               >
                 {awayAbbr}
