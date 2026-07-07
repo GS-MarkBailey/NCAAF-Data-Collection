@@ -3,9 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import { Calendar, Search } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
+  EMPTY_FIXTURE_FILTERS,
   filterFixtures,
+  getUniqueFixtureDates,
+  getUniqueFixtureTimes,
+  hasActiveFixtureFilters,
   isFixtureScheduled,
   sortFixturesByKickoffDesc,
+  type FixtureFilters,
 } from '@/lib/fixtures'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -19,22 +24,35 @@ import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { useAppStore } from '@/store/gameStore'
 
+const FILTER_FIELD_CLASS =
+  'h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30'
+
 export function FixturesPageShadcn() {
   const navigate = useNavigate()
   const fixtures = useAppStore((s) => s.fixtures)
   const initGame = useAppStore((s) => s.initGame)
-  const [searchQuery, setSearchQuery] = useState('')
+  const [filters, setFilters] = useState<FixtureFilters>(EMPTY_FIXTURE_FILTERS)
+
+  const uniqueDates = useMemo(() => getUniqueFixtureDates(fixtures), [fixtures])
+  const uniqueTimes = useMemo(() => getUniqueFixtureTimes(fixtures), [fixtures])
 
   const filteredFixtures = useMemo(() => {
-    const filtered = filterFixtures(fixtures, searchQuery)
+    const filtered = filterFixtures(fixtures, filters)
     return sortFixturesByKickoffDesc(filtered)
-  }, [fixtures, searchQuery])
+  }, [fixtures, filters])
 
-  const searchActive = searchQuery.trim().length > 0
+  const filtersActive = hasActiveFixtureFilters(filters)
 
   const openFixture = (fixtureId: string) => {
     initGame(fixtureId)
     navigate(`/game/${fixtureId}`)
+  }
+
+  const updateFilter = <K extends keyof FixtureFilters>(
+    key: K,
+    value: FixtureFilters[K],
+  ) => {
+    setFilters((current) => ({ ...current, [key]: value }))
   }
 
   return (
@@ -47,30 +65,86 @@ export function FixturesPageShadcn() {
           </p>
         </div>
 
-        <div className="space-y-1.5">
+        <div className="space-y-3">
           <div className="flex items-center justify-between gap-2">
-            <Label htmlFor="fixture-search">Search fixtures</Label>
-            {searchActive ? (
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Filters
+            </p>
+            {filtersActive ? (
               <Button
                 type="button"
                 variant="ghost"
                 size="xs"
                 className="h-6 px-2 text-xs"
-                onClick={() => setSearchQuery('')}
+                onClick={() => setFilters(EMPTY_FIXTURE_FILTERS)}
               >
-                Clear
+                Clear filters
               </Button>
             ) : null}
           </div>
-          <div className="relative">
-            <Search className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              id="fixture-search"
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Team, fixture ID, start date, or kickoff time"
-              className="pl-8"
-            />
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="fixture-filter-date">Start date</Label>
+              <select
+                id="fixture-filter-date"
+                value={filters.startDate}
+                onChange={(event) =>
+                  updateFilter('startDate', event.target.value)
+                }
+                className={FILTER_FIELD_CLASS}
+              >
+                <option value="all">All dates</option>
+                {uniqueDates.map((date) => (
+                  <option key={date} value={date}>
+                    {date}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="fixture-filter-time">Start time</Label>
+              <select
+                id="fixture-filter-time"
+                value={filters.startTime}
+                onChange={(event) =>
+                  updateFilter('startTime', event.target.value)
+                }
+                className={FILTER_FIELD_CLASS}
+              >
+                <option value="all">All times</option>
+                {uniqueTimes.map((time) => (
+                  <option key={time} value={time}>
+                    {time}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label htmlFor="fixture-filter-teams">Teams</Label>
+              <Input
+                id="fixture-filter-teams"
+                value={filters.teams}
+                onChange={(event) => updateFilter('teams', event.target.value)}
+                placeholder="Search team name or abbreviation"
+              />
+            </div>
+
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label htmlFor="fixture-search">Search</Label>
+              <div className="relative">
+                <Search className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  id="fixture-search"
+                  value={filters.query}
+                  onChange={(event) => updateFilter('query', event.target.value)}
+                  placeholder="Fixture ID, start date, or kickoff time"
+                  className="pl-8"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </header>
@@ -81,7 +155,7 @@ export function FixturesPageShadcn() {
         {filteredFixtures.length === 0 ? (
           <div className="flex flex-1 items-center justify-center rounded-lg border border-dashed border-border px-4 py-10 text-center">
             <p className="text-sm text-muted-foreground">
-              No fixtures match your search.
+              No fixtures match your filters.
             </p>
           </div>
         ) : (
