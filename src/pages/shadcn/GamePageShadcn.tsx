@@ -1,11 +1,10 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { FieldDirectionDialog } from '@/components/game/FieldDirectionDialog'
 import { GameHeaderShadcn } from '@/components/shadcn/GameHeaderShadcn'
 import { PlayByPlayPanelShadcn } from '@/components/shadcn/PlayByPlayPanelShadcn'
 import { RiskManagementPanelShadcn } from '@/components/shadcn/RiskManagementPanelShadcn'
 import { ScoreboardPanelShadcn } from '@/components/shadcn/ScoreboardPanelShadcn'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useFeatureFlag } from '@/hooks/useFeatureFlag'
 import { cn } from '@/lib/utils'
 import { useClockTicker } from '@/hooks/useClockTicker'
@@ -24,19 +23,10 @@ export function GamePageShadcn() {
   const showRiskManagement = useFeatureFlag('game.riskManagement')
   const showFieldDirectionDialog = useFeatureFlag('game.fieldDirectionDialog')
 
-  const mobileTabs = useMemo(
-    () =>
-      [
-        showScoreboard ? { value: 'scoreboard', label: 'Scoreboard' } : null,
-        showPlayByPlay ? { value: 'plays', label: 'Plays' } : null,
-        showRiskManagement ? { value: 'risks', label: 'Risks' } : null,
-      ].filter(Boolean) as { value: string; label: string }[],
-    [showScoreboard, showPlayByPlay, showRiskManagement],
-  )
-
   const desktopPanelCount = [showScoreboard, showPlayByPlay, showRiskManagement].filter(
     Boolean,
   ).length
+  const portraitPanelCount = desktopPanelCount
 
   useClockTicker(fixtureId)
 
@@ -88,38 +78,32 @@ export function GamePageShadcn() {
               : 'border-border/30 bg-card',
           )}
         >
-          {mobileTabs.length > 0 ? (
-            <Tabs
-              defaultValue={mobileTabs[0]?.value}
-              className="flex min-h-0 flex-1 flex-col md:hidden landscape-mobile:hidden"
-            >
-              <TabsList className="w-full">
-                {mobileTabs.map((tab) => (
-                  <TabsTrigger key={tab.value} value={tab.value} className="flex-1">
-                    {tab.label}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
+          {portraitPanelCount > 0 ? (
+            <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overscroll-y-contain md:hidden landscape-mobile:hidden">
               {showScoreboard ? (
-                <TabsContent value="scoreboard" className="min-h-0 flex-1">
-                  <ScoreboardPanelShadcn fixtureId={fixtureId} />
-                </TabsContent>
+                <ScoreboardPanelShadcn fixtureId={fixtureId} layout="stack" />
               ) : null}
               {showPlayByPlay ? (
-                <TabsContent value="plays" className="min-h-0 flex-1">
+                <div className="flex min-h-[11rem] shrink-0 flex-col">
                   <PlayByPlayPanelShadcn game={game} />
-                </TabsContent>
+                </div>
               ) : null}
               {showRiskManagement ? (
-                <TabsContent value="risks" className="min-h-0 flex-1">
-                  <RiskManagementPanelShadcn
-                    game={game}
-                    onToggleRisk={(risk) => toggleRisk(fixtureId, risk)}
-                  />
-                </TabsContent>
+                <RiskManagementPanelShadcn
+                  game={game}
+                  layout="stack"
+                  onToggleRisk={(risk) => toggleRisk(fixtureId, risk)}
+                />
               ) : null}
-            </Tabs>
-          ) : null}
+            </div>
+          ) : (
+            <div className="flex min-h-0 flex-1 items-center justify-center rounded-lg border border-dashed border-border md:hidden landscape-mobile:hidden">
+              <p className="px-4 text-center text-sm text-muted-foreground">
+                All game console panels are disabled. Re-enable them in Settings →
+                Features.
+              </p>
+            </div>
+          )}
 
           {desktopPanelCount > 0 ? (
             <div
@@ -131,12 +115,13 @@ export function GamePageShadcn() {
               )}
             >
               {showScoreboard ? (
-                <ScoreboardPanelShadcn fixtureId={fixtureId} />
+                <ScoreboardPanelShadcn fixtureId={fixtureId} layout="column" />
               ) : null}
               {showPlayByPlay ? <PlayByPlayPanelShadcn game={game} /> : null}
               {showRiskManagement ? (
                 <RiskManagementPanelShadcn
                   game={game}
+                  layout="column"
                   onToggleRisk={(risk) => toggleRisk(fixtureId, risk)}
                 />
               ) : null}

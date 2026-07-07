@@ -33,6 +33,7 @@ import {
 
 interface ScoreboardPanelShadcnProps {
   fixtureId: string
+  layout?: 'stack' | 'column'
 }
 
 const PRIMARY_ACTION_BADGE_CLASS =
@@ -46,7 +47,10 @@ const CONFIRMATION_TITLE: Record<PendingConfirmation, string> = {
   startOvertime: 'Start overtime?',
 }
 
-export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps) {
+export function ScoreboardPanelShadcn({
+  fixtureId,
+  layout = 'column',
+}: ScoreboardPanelShadcnProps) {
   const clockSeconds = useAppStore((s) => s.games[fixtureId]?.clock.seconds ?? 0)
   const clockRunning = useAppStore((s) => s.games[fixtureId]?.clock.running ?? false)
   const clockPeriod = useAppStore((s) => s.games[fixtureId]?.clock.period ?? 1)
@@ -85,6 +89,7 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
   const setPossession = useAppStore((s) => s.setPossession)
   const showQuarterStatus = useFeatureFlag('scoreboard.quarterStatus')
   const showPossessionSwitch = useFeatureFlag('scoreboard.possessionSwitch')
+  const stacked = layout === 'stack'
 
   const [editingClock, setEditingClock] = useState(false)
   const [pendingConfirmation, setPendingConfirmation] =
@@ -244,15 +249,31 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
   }
 
   return (
-    <Card size="compact" className="flex min-h-0 flex-1 flex-col">
-      <CardHeader className="border-b border-border">
+    <Card
+      size="compact"
+      className={cn(
+        'flex min-h-0 flex-1 flex-col',
+        stacked && 'shrink-0 flex-none',
+      )}
+    >
+      <CardHeader className="border-b border-border py-2.5">
         <CardTitle className="flex items-center gap-2 text-sm">
           <LayoutGrid className="size-4 text-muted-foreground" />
           Scoreboard
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex min-h-0 flex-1 flex-col gap-2">
-        <div className="relative flex min-h-0 flex-1 items-stretch overflow-hidden rounded-lg border border-border">
+      <CardContent
+        className={cn(
+          'flex min-h-0 flex-1 flex-col gap-2',
+          stacked && 'flex-none gap-1.5',
+        )}
+      >
+        <div
+          className={cn(
+            'relative flex min-h-0 flex-1 items-stretch overflow-hidden rounded-lg border border-border',
+            stacked && 'min-h-[6.75rem] flex-none',
+          )}
+        >
           {pendingConfirmation ? (
             <div className="grid h-full min-h-0 flex-1 grid-rows-[minmax(0,1fr)_auto] overflow-hidden">
               <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-4 text-center">
@@ -363,8 +384,12 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
                   className={cn(
                     'font-bold leading-none',
                     gameEnded || inOvertime
-                      ? 'text-lg tracking-wider uppercase'
-                      : 'text-[2rem] tabular-nums',
+                      ? stacked
+                        ? 'text-base tracking-wider uppercase'
+                        : 'text-lg tracking-wider uppercase'
+                      : stacked
+                        ? 'text-[1.75rem] tabular-nums'
+                        : 'text-[2rem] tabular-nums',
                   )}
                 >
                   {gameEnded
@@ -471,7 +496,12 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
           )}
         </div>
 
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-border">
+        <div
+          className={cn(
+            'flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-border',
+            stacked && 'flex-none',
+          )}
+        >
           <div className="flex min-h-0 flex-1 items-stretch">
             <StatCell
               label="QTR"
@@ -483,6 +513,7 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
                     ? 'OT'
                     : undefined
               }
+              compact={stacked}
               status={
                 showQuarterStatus
                   ? pregame || gameEnded
@@ -498,11 +529,13 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
               label="DOWN"
               value={down}
               displayValue={gameEnded ? MATCH_ENDED_STAT : undefined}
+              compact={stacked}
             />
             <StatCell
               label="TO GO"
               value={distance}
               displayValue={gameEnded ? MATCH_ENDED_STAT : undefined}
+              compact={stacked}
             />
             <BallOnStatCell
               ballOn={ballOn}
@@ -510,14 +543,25 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
               homeAttacksRight={homeAttacksRight}
               inactive={gameEnded}
               pulseEndColor="var(--card)"
-              shellClassName="border-border py-4 landscape-mobile:py-3"
+              shellClassName={cn(
+                'border-border landscape-mobile:py-3',
+                stacked ? 'py-2.5' : 'py-4',
+              )}
               labelClassName="text-muted-foreground"
-              valueClassName="text-foreground"
+              valueClassName={cn(
+                'text-foreground',
+                stacked && 'landscape-mobile:text-lg text-xl',
+              )}
             />
           </div>
 
           {showPossessionSwitch ? (
-            <div className="grid min-h-0 flex-1 grid-cols-2 border-t border-border">
+            <div
+              className={cn(
+                'grid min-h-0 grid-cols-2 border-t border-border',
+                stacked ? 'min-h-10' : 'flex-1',
+              )}
+            >
               <Button
                 type="button"
                 variant="ghost"
@@ -526,7 +570,8 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
                 aria-pressed={gameEnded ? false : possessionIsHome}
                 aria-label={`Give possession to ${homeAbbr}`}
                 className={cn(
-                  'h-full min-h-0 rounded-none border-0 border-r border-border py-0 text-lg font-semibold',
+                  'h-full min-h-0 rounded-none border-0 border-r border-border py-0 font-semibold',
+                  stacked ? 'text-base' : 'text-lg',
                   !gameEnded &&
                     possessionIsHome &&
                     'bg-[var(--color-score-bg)] text-white hover:bg-[var(--color-score-bg)] hover:text-white',
@@ -542,7 +587,8 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
                 aria-pressed={gameEnded ? false : !possessionIsHome}
                 aria-label={`Give possession to ${awayAbbr}`}
                 className={cn(
-                  'h-full min-h-0 rounded-none border-0 py-0 text-lg font-semibold',
+                  'h-full min-h-0 rounded-none border-0 py-0 font-semibold',
+                  stacked ? 'text-base' : 'text-lg',
                   !gameEnded &&
                     !possessionIsHome &&
                     'bg-[var(--color-score-bg)] text-white hover:bg-[var(--color-score-bg)] hover:text-white',
@@ -572,11 +618,13 @@ function StatCell({
   value,
   displayValue,
   status,
+  compact = false,
 }: {
   label: string
   value: number
   displayValue?: string
   status?: QuarterStatus
+  compact?: boolean
 }) {
   const pulsing = usePushPulse(value)
   const statusStyle = status ? QUARTER_STATUS_CLASS[status] : undefined
@@ -584,7 +632,8 @@ function StatCell({
   return (
     <div
       className={cn(
-        'flex h-full min-h-0 flex-1 flex-col items-center justify-center border-r border-border px-1 py-4 last:border-r-0 landscape-mobile:py-3',
+        'flex h-full min-h-0 flex-1 flex-col items-center justify-center border-r border-border px-1 last:border-r-0 landscape-mobile:py-3',
+        compact ? 'py-2.5' : 'py-4',
         statusStyle?.className,
         pulsing && 'push-data-pulse',
       )}
@@ -597,7 +646,12 @@ function StatCell({
       <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
         {label}
       </span>
-      <span className="mt-1 text-2xl font-bold leading-none landscape-mobile:text-xl">
+      <span
+        className={cn(
+          'mt-1 font-bold leading-none',
+          compact ? 'text-xl landscape-mobile:text-lg' : 'text-2xl landscape-mobile:text-xl',
+        )}
+      >
         {displayValue ?? value}
       </span>
     </div>
