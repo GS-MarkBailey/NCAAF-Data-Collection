@@ -73,9 +73,6 @@ export function FixturesPageShadcn() {
       <header className="shrink-0 space-y-3 px-4 py-4">
         <div className="space-y-1">
           <h1 className="text-lg font-semibold tracking-tight">Fixtures</h1>
-          <p className="text-sm text-muted-foreground">
-            Select a match to open the data collection console
-          </p>
         </div>
 
         <div className="overflow-x-auto">
