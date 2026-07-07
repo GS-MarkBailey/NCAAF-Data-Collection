@@ -1,11 +1,38 @@
 {
   "label": "week-1",
-  "capturedAt": "2026-07-07T20:36:08.567Z",
+  "capturedAt": "2026-07-07T21:07:22.696Z",
   "baseUrl": "http://127.0.0.1:4173",
   "routes": [
     "/fixtures",
     "/fixtures",
     "/game/NCAAF-2026-001",
     "/game/NCAAF-2026-001"
+  ],
+  "features": [
+    {
+      "id": "take-control-confirm",
+      "title": "Take Control confirmation",
+      "file": "features/take-control-confirm.png"
+    },
+    {
+      "id": "take-control-active",
+      "title": "Take Control active state",
+      "file": "features/take-control-active.png"
+    },
+    {
+      "id": "action-log",
+      "title": "Action log",
+      "file": "features/action-log.png"
+    },
+    {
+      "id": "risk-challenge-active",
+      "title": "Risk toggle (Challenge / Review)",
+      "file": "features/risk-challenge-active.png"
+    },
+    {
+      "id": "clock-adjust",
+      "title": "Clock pause and ±1 second adjust",
+      "file": "features/clock-adjust.png"
+    }
   ]
 }

@@ -122,6 +122,16 @@ Commit `1cbc5bb` (18 Jun 2026).
 |---------------------|----------------------|-----------------|------------------|
 | ![Week 1 fixtures portrait](./ui-snapshots/week-1/fixtures-portrait.png) | ![Week 1 fixtures landscape](./ui-snapshots/week-1/fixtures-landscape.png) | ![Week 1 game portrait](./ui-snapshots/week-1/game-portrait.png) | ![Week 1 game landscape](./ui-snapshots/week-1/game-landscape.png) |
 
+### Feature highlights
+
+| Take Control confirm | Take Control active | Action log |
+|----------------------|---------------------|------------|
+| ![Take Control confirm](./ui-snapshots/week-1/features/take-control-confirm.png) | ![Take Control active](./ui-snapshots/week-1/features/take-control-active.png) | ![Action log](./ui-snapshots/week-1/features/action-log.png) |
+
+| Risk toggle | Clock adjust |
+|-------------|--------------|
+| ![Risk toggle](./ui-snapshots/week-1/features/risk-challenge-active.png) | ![Clock adjust](./ui-snapshots/week-1/features/clock-adjust.png) |
+
 ---
 
 ## Week 2 — 23 to 29 June 2026
@@ -151,6 +161,12 @@ Commit `615f79c` (23 Jun 2026).
 | Fixtures (portrait) | Fixtures (landscape) | Game (portrait) | Game (landscape) |
 |---------------------|----------------------|-----------------|------------------|
 | ![Week 2 fixtures portrait](./ui-snapshots/week-2/fixtures-portrait.png) | ![Week 2 fixtures landscape](./ui-snapshots/week-2/fixtures-landscape.png) | ![Week 2 game portrait](./ui-snapshots/week-2/game-portrait.png) | ![Week 2 game landscape](./ui-snapshots/week-2/game-landscape.png) |
+
+### Feature highlights
+
+| Feature flags panel (Settings → Features) |
+|-------------------------------------------|
+| ![Feature flags](./ui-snapshots/week-2/features/feature-flags-panel.png) |
 
 ---
 
@@ -236,6 +252,16 @@ Commit `dd1f58f` (3 Jul 2026).
 |---------------------|----------------------|-----------------|------------------|
 | ![Week 3 fixtures portrait](./ui-snapshots/week-3/fixtures-portrait.png) | ![Week 3 fixtures landscape](./ui-snapshots/week-3/fixtures-landscape.png) | ![Week 3 game portrait](./ui-snapshots/week-3/game-portrait.png) | ![Week 3 game landscape](./ui-snapshots/week-3/game-landscape.png) |
 
+### Feature highlights
+
+| Field direction dialog | Clock wheel editor | Connection status |
+|------------------------|--------------------|-------------------|
+| ![Field direction](./ui-snapshots/week-3/features/field-direction-dialog.png) | ![Clock editor](./ui-snapshots/week-3/features/clock-editor.png) | ![Connection status](./ui-snapshots/week-3/features/connection-status.png) |
+
+| Error toast | Settings dialog |
+|-------------|-----------------|
+| ![Error toast](./ui-snapshots/week-3/features/error-toast.png) | ![Settings tabs](./ui-snapshots/week-3/features/settings-tabs.png) |
+
 ---
 
 ## Week 4 — 6 to 12 July 2026
@@ -298,6 +324,16 @@ Commit `f019e68` (7 Jul 2026). Production build also captured at [`week-4-prod/`
 | Fixtures (portrait) | Fixtures (landscape) | Game (portrait) | Game (landscape) |
 |---------------------|----------------------|-----------------|------------------|
 | ![Week 4 fixtures portrait](./ui-snapshots/week-4/fixtures-portrait.png) | ![Week 4 fixtures landscape](./ui-snapshots/week-4/fixtures-landscape.png) | ![Week 4 game portrait](./ui-snapshots/week-4/game-portrait.png) | ![Week 4 game landscape](./ui-snapshots/week-4/game-landscape.png) |
+
+### Feature highlights
+
+| Fixtures filters & search | Scheduled / past chips | Portrait stacked panels |
+|----------------------------|------------------------|-------------------------|
+| ![Fixtures filters](./ui-snapshots/week-4/features/fixtures-filters.png) | ![Status chips](./ui-snapshots/week-4/features/fixture-status-chips.png) | ![Portrait stack](./ui-snapshots/week-4/features/portrait-stack.png) |
+
+| Past fixture match-ended |
+|--------------------------|
+| ![Past fixture](./ui-snapshots/week-4/features/past-fixture-ended.png) |
 
 ---
 

@@ -21,9 +21,21 @@ Each run writes PNGs under `docs/ui-snapshots/<label>/`:
 - `fixtures-landscape.png` — landscape, `/fixtures`
 - `game-portrait.png` — iPhone 14, `/game/NCAAF-2026-001`
 - `game-landscape.png` — landscape game view
-- `meta.json` — capture timestamp and URLs
+- `features/*.png` — feature-specific states for that week (see `scripts/ui-snapshot-features.mjs`)
+- `meta.json` — capture timestamp, URLs, and feature list
 
-Game screenshots dismiss the field-direction dialog first (clicks “Attacks right”), then close the demo error toast so the console is unobstructed.
+Game screenshots dismiss the field-direction dialog first (clicks “Attacks right”), then close the demo error toast so the console is unobstructed — except for deliberate feature shots (`field-direction-dialog`, `error-toast`).
+
+### Feature scenarios per week
+
+| Week | Features captured |
+|------|-------------------|
+| 1 | Take Control confirm/active, action log, risk toggle, clock ±1s |
+| 2 | Feature flags panel |
+| 3 | Field direction dialog, clock wheel editor, connection status, error toast, settings |
+| 4 | Fixtures filters, status chips, portrait stack, past fixture ended |
+
+Edit scenarios in `scripts/ui-snapshot-features.mjs`.
 
 ## CI (GitHub Actions)
 

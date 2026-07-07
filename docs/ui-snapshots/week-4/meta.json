@@ -1,11 +1,33 @@
 {
   "label": "week-4",
-  "capturedAt": "2026-07-07T20:39:34.822Z",
-  "baseUrl": "http://127.0.0.1:4173",
+  "capturedAt": "2026-07-07T21:10:28.461Z",
+  "baseUrl": "https://ncaaf-data-collection.vercel.app",
   "routes": [
     "/fixtures",
     "/fixtures",
     "/game/NCAAF-2026-001",
     "/game/NCAAF-2026-001"
+  ],
+  "features": [
+    {
+      "id": "fixtures-filters",
+      "title": "Fixtures filters and search",
+      "file": "features/fixtures-filters.png"
+    },
+    {
+      "id": "fixture-status-chips",
+      "title": "Scheduled and past fixture chips",
+      "file": "features/fixture-status-chips.png"
+    },
+    {
+      "id": "portrait-stack",
+      "title": "Portrait game console (stacked panels)",
+      "file": "features/portrait-stack.png"
+    },
+    {
+      "id": "past-fixture-ended",
+      "title": "Past fixture match-ended scoreboard",
+      "file": "features/past-fixture-ended.png"
+    }
   ]
 }
