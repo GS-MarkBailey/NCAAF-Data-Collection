@@ -1,12 +1,14 @@
 import { type CSSProperties } from 'react'
 import { cn } from '@/lib/utils'
 import { getBallOnDisplay, yardsFromHomeGoal, type BallOnArrowSide } from '@/lib/playSimulation'
+import { MATCH_ENDED_STAT } from '@/lib/scoreboard'
 import { usePushPulse } from '@/hooks/usePushPulse'
 
 interface BallOnStatCellProps {
   ballOn: number
   offenseIsHome: boolean
   homeAttacksRight: boolean
+  inactive?: boolean
   pulseEndColor?: string
   shellClassName?: string
   labelClassName?: string
@@ -17,6 +19,7 @@ export function BallOnStatCell({
   ballOn,
   offenseIsHome,
   homeAttacksRight,
+  inactive = false,
   pulseEndColor = 'var(--color-panel)',
   shellClassName,
   labelClassName,
@@ -26,7 +29,7 @@ export function BallOnStatCell({
     yardsFromHomeGoal(ballOn, offenseIsHome),
     homeAttacksRight,
   )
-  const pulsing = usePushPulse(ballOn)
+  const pulsing = usePushPulse(inactive ? null : ballOn)
 
   return (
     <div
@@ -45,7 +48,18 @@ export function BallOnStatCell({
       >
         BL ON
       </span>
-      <BallOnValue yardLine={yardLine} arrowSide={arrowSide} className={valueClassName} />
+      {inactive ? (
+        <span
+          className={cn(
+            'mt-1 text-2xl font-bold leading-none landscape-mobile:text-xl',
+            valueClassName,
+          )}
+        >
+          {MATCH_ENDED_STAT}
+        </span>
+      ) : (
+        <BallOnValue yardLine={yardLine} arrowSide={arrowSide} className={valueClassName} />
+      )}
     </div>
   )
 }

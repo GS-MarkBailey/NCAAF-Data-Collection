@@ -230,6 +230,14 @@ export function FixturesPageShadcn() {
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                     <Calendar className="size-3.5" />
                     {fixture.startDate} · {fixture.startTime} · #{fixture.eventId}
+                    {!scheduled && fixture.finalScore ? (
+                      <>
+                        <span aria-hidden>·</span>
+                        <span className="font-medium text-foreground">
+                          {fixture.finalScore.home}–{fixture.finalScore.away}
+                        </span>
+                      </>
+                    ) : null}
                   </div>
                 </CardContent>
               </Card>

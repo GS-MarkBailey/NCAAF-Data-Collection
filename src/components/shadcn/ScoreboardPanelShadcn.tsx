@@ -19,6 +19,7 @@ import { usePushPulse } from '@/hooks/usePushPulse'
 import { useFeatureFlag } from '@/hooks/useFeatureFlag'
 import { useAppStore } from '@/store/gameStore'
 import { getEffectiveHomeAttacksRight } from '@/lib/playSimulation'
+import { MATCH_ENDED_STAT } from '@/lib/scoreboard'
 import { BallOnStatCell } from '@/components/game/BallOnStatCell'
 import { ClockWheelEditor } from '@/components/game/ClockWheelEditor'
 import { Badge } from '@/components/ui/badge'
@@ -475,7 +476,13 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
             <StatCell
               label="QTR"
               value={clockPeriod}
-              displayValue={isOvertimePeriod(clockPeriod) ? 'OT' : undefined}
+              displayValue={
+                gameEnded
+                  ? MATCH_ENDED_STAT
+                  : isOvertimePeriod(clockPeriod)
+                    ? 'OT'
+                    : undefined
+              }
               status={
                 showQuarterStatus
                   ? pregame || gameEnded
@@ -487,12 +494,21 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
                   : undefined
               }
             />
-            <StatCell label="DOWN" value={down} />
-            <StatCell label="TO GO" value={distance} />
+            <StatCell
+              label="DOWN"
+              value={down}
+              displayValue={gameEnded ? MATCH_ENDED_STAT : undefined}
+            />
+            <StatCell
+              label="TO GO"
+              value={distance}
+              displayValue={gameEnded ? MATCH_ENDED_STAT : undefined}
+            />
             <BallOnStatCell
               ballOn={ballOn}
               offenseIsHome={offenseIsHome}
               homeAttacksRight={homeAttacksRight}
+              inactive={gameEnded}
               pulseEndColor="var(--card)"
               shellClassName="border-border py-4 landscape-mobile:py-3"
               labelClassName="text-muted-foreground"
@@ -505,12 +521,15 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
               <Button
                 type="button"
                 variant="ghost"
+                disabled={gameEnded}
                 onClick={() => setPossession(fixtureId, true)}
-                aria-pressed={possessionIsHome}
+                aria-pressed={gameEnded ? false : possessionIsHome}
                 aria-label={`Give possession to ${homeAbbr}`}
                 className={cn(
                   'h-full min-h-0 rounded-none border-0 border-r border-border py-0 text-lg font-semibold',
-                  possessionIsHome && 'bg-[var(--color-score-bg)] text-white hover:bg-[var(--color-score-bg)] hover:text-white',
+                  !gameEnded &&
+                    possessionIsHome &&
+                    'bg-[var(--color-score-bg)] text-white hover:bg-[var(--color-score-bg)] hover:text-white',
                 )}
               >
                 {homeAbbr}
@@ -518,12 +537,15 @@ export function ScoreboardPanelShadcn({ fixtureId }: ScoreboardPanelShadcnProps)
               <Button
                 type="button"
                 variant="ghost"
+                disabled={gameEnded}
                 onClick={() => setPossession(fixtureId, false)}
-                aria-pressed={!possessionIsHome}
+                aria-pressed={gameEnded ? false : !possessionIsHome}
                 aria-label={`Give possession to ${awayAbbr}`}
                 className={cn(
                   'h-full min-h-0 rounded-none border-0 py-0 text-lg font-semibold',
-                  !possessionIsHome && 'bg-[var(--color-score-bg)] text-white hover:bg-[var(--color-score-bg)] hover:text-white',
+                  !gameEnded &&
+                    !possessionIsHome &&
+                    'bg-[var(--color-score-bg)] text-white hover:bg-[var(--color-score-bg)] hover:text-white',
                 )}
               >
                 {awayAbbr}

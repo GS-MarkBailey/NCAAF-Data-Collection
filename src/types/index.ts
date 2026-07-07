@@ -15,6 +15,8 @@ export interface Fixture {
   awayAbbr: string
   startDate: string
   startTime: string
+  /** Final score for completed fixtures */
+  finalScore?: { home: number; away: number }
 }
 
 export interface PlayEntry {

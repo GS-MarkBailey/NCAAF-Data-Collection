@@ -263,6 +263,7 @@ export const FIXTURES: Fixture[] = [
     awayAbbr: 'COLO',
     startDate: '2025-11-29',
     startTime: '15:00',
+    finalScore: { home: 28, away: 21 },
   },
   {
     id: 'NCAAF-2026-027',
@@ -273,6 +274,7 @@ export const FIXTURES: Fixture[] = [
     awayAbbr: 'CAL',
     startDate: '2026-04-18',
     startTime: '14:00',
+    finalScore: { home: 17, away: 20 },
   },
   {
     id: 'NCAAF-2026-028',
@@ -283,6 +285,7 @@ export const FIXTURES: Fixture[] = [
     awayAbbr: 'NAVY',
     startDate: '2026-05-02',
     startTime: '12:00',
+    finalScore: { home: 24, away: 17 },
   },
   {
     id: 'NCAAF-2026-029',
@@ -293,6 +296,7 @@ export const FIXTURES: Fixture[] = [
     awayAbbr: 'CLEM',
     startDate: '2026-06-14',
     startTime: '19:00',
+    finalScore: { home: 31, away: 27 },
   },
   {
     id: 'NCAAF-2026-030',
@@ -303,6 +307,7 @@ export const FIXTURES: Fixture[] = [
     awayAbbr: 'WIS',
     startDate: '2026-07-01',
     startTime: '13:30',
+    finalScore: { home: 21, away: 24 },
   },
 ]
 
@@ -342,6 +347,7 @@ export function createPostMatchGameState(fixture: Fixture): GameState {
   return {
     ...createInitialGameState(fixture),
     homeAttacksRight: true,
+    score: fixture.finalScore ?? { home: 0, away: 0 },
     gameStarted: true,
     gameEnded: true,
     periodEnded: true,
@@ -350,6 +356,7 @@ export function createPostMatchGameState(fixture: Fixture): GameState {
       seconds: 0,
       running: false,
     },
+    simulation: undefined,
   }
 }
 

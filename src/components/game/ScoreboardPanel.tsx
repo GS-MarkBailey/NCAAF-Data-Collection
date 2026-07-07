@@ -10,6 +10,7 @@ import {
 import { usePushPulse } from '@/hooks/usePushPulse'
 import { useAppStore } from '@/store/gameStore'
 import { getEffectiveHomeAttacksRight } from '@/lib/playSimulation'
+import { MATCH_ENDED_STAT } from '@/lib/scoreboard'
 import { BallOnStatCell } from '@/components/game/BallOnStatCell'
 
 interface ScoreboardPanelProps {
@@ -163,19 +164,33 @@ export function ScoreboardPanel({ fixtureId }: ScoreboardPanelProps) {
         <div className="flex min-h-0 flex-1">
           <div className="flex h-full w-full flex-col overflow-hidden rounded-[10px] border border-[var(--color-panel-border)] bg-[var(--color-panel)]">
             <div className="flex shrink-0 items-stretch">
-              <StatCell label="QTR" value={clockPeriod} />
-              <StatCell label="DOWN" value={down} />
-              <StatCell label="TO GO" value={distance} />
+              <StatCell
+                label="QTR"
+                value={clockPeriod}
+                displayValue={gameEnded ? MATCH_ENDED_STAT : undefined}
+              />
+              <StatCell
+                label="DOWN"
+                value={down}
+                displayValue={gameEnded ? MATCH_ENDED_STAT : undefined}
+              />
+              <StatCell
+                label="TO GO"
+                value={distance}
+                displayValue={gameEnded ? MATCH_ENDED_STAT : undefined}
+              />
               <BallOnStatCell
                 ballOn={ballOn}
                 offenseIsHome={offenseIsHome}
                 homeAttacksRight={homeAttacksRight}
+                inactive={gameEnded}
               />
             </div>
             <PossessionSwitch
               awayAbbr={awayAbbr}
               homeAbbr={homeAbbr}
               possessionIsHome={possessionIsHome}
+              gameEnded={gameEnded}
               onSelect={(isHome) => setPossession(fixtureId, isHome)}
             />
           </div>
@@ -185,8 +200,16 @@ export function ScoreboardPanel({ fixtureId }: ScoreboardPanelProps) {
   )
 }
 
-function StatCell({ label, value }: { label: string; value: number }) {
-  const pulsing = usePushPulse(value)
+function StatCell({
+  label,
+  value,
+  displayValue,
+}: {
+  label: string
+  value: number
+  displayValue?: string
+}) {
+  const pulsing = usePushPulse(displayValue ?? value)
 
   return (
     <div
@@ -200,7 +223,7 @@ function StatCell({ label, value }: { label: string; value: number }) {
         {label}
       </span>
       <span className="mt-1 text-2xl font-bold leading-none text-[var(--color-text)] landscape-mobile:text-xl">
-        {value}
+        {displayValue ?? value}
       </span>
     </div>
   )
@@ -210,6 +233,7 @@ interface PossessionSwitchProps {
   awayAbbr: string
   homeAbbr: string
   possessionIsHome: boolean
+  gameEnded: boolean
   onSelect: (possessionIsHome: boolean) => void
 }
 
@@ -217,19 +241,22 @@ function PossessionSwitch({
   awayAbbr,
   homeAbbr,
   possessionIsHome,
+  gameEnded,
   onSelect,
 }: PossessionSwitchProps) {
   return (
     <div className="flex min-h-0 flex-1 w-full border-t border-[var(--color-panel-border)]">
       <PossessionOption
         label={homeAbbr}
-        active={possessionIsHome}
+        active={!gameEnded && possessionIsHome}
+        disabled={gameEnded}
         onClick={() => onSelect(true)}
         ariaLabel={`Give possession to ${homeAbbr}`}
       />
       <PossessionOption
         label={awayAbbr}
-        active={!possessionIsHome}
+        active={!gameEnded && !possessionIsHome}
+        disabled={gameEnded}
         onClick={() => onSelect(false)}
         ariaLabel={`Give possession to ${awayAbbr}`}
         isLast
@@ -241,12 +268,14 @@ function PossessionSwitch({
 function PossessionOption({
   label,
   active,
+  disabled,
   onClick,
   ariaLabel,
   isLast,
 }: {
   label: string
   active: boolean
+  disabled?: boolean
   onClick: () => void
   ariaLabel: string
   isLast?: boolean
@@ -257,6 +286,7 @@ function PossessionOption({
     <button
       type="button"
       onClick={onClick}
+      disabled={disabled}
       aria-label={ariaLabel}
       aria-pressed={active}
       className={cn(
@@ -265,6 +295,7 @@ function PossessionOption({
         active
           ? 'bg-[var(--color-score-bg)] text-white'
           : 'bg-[var(--color-panel)] text-[var(--color-text)]',
+        disabled && 'cursor-default opacity-100',
         pulsing && active && 'push-data-pulse',
       )}
       style={
