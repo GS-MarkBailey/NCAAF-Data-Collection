@@ -99,7 +99,7 @@ export const WEEK_FEATURES = {
       title: 'Field direction dialog (first open)',
       path: '/game/NCAAF-2026-001',
       viewport: 'game-landscape',
-      gameSetup: { fieldDirection: 'keep', errorToast: 'keep' },
+      gameSetup: { fieldDirection: 'keep', errorToast: 'dismiss' },
     },
     {
       id: 'clock-editor',
@@ -149,7 +149,7 @@ export const WEEK_FEATURES = {
       id: 'fixtures-filters',
       title: 'Fixtures filters and search',
       path: '/fixtures',
-      viewport: 'fixtures-portrait',
+      viewport: 'fixtures-landscape',
       async prepare(page) {
         await page.locator('#fixture-filter-date').waitFor({ state: 'visible' })
       },
@@ -158,7 +158,7 @@ export const WEEK_FEATURES = {
       id: 'fixture-status-chips',
       title: 'Scheduled and past fixture chips',
       path: '/fixtures',
-      viewport: 'fixtures-portrait',
+      viewport: 'fixtures-landscape',
       async prepare(page) {
         const past = page.getByText('Past', { exact: true }).first()
         try {

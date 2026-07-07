@@ -33,6 +33,9 @@ export function resolveSnapshotImageBase(rootDir) {
   }
 }
 
-export function snapshotImageUrl(base, relPath) {
-  return `${base}/${relPath.replace(/^\.\//, '')}`
+export function snapshotImageUrl(base, relPath, cacheBust) {
+  const url = `${base}/${relPath.replace(/^\.\//, '')}`
+  if (!cacheBust) return url
+  const separator = url.includes('?') ? '&' : '?'
+  return `${url}${separator}v=${encodeURIComponent(cacheBust)}`
 }
