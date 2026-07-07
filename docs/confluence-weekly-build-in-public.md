@@ -36,12 +36,45 @@ Development moved in a clear arc: first map requirements and explore responsive 
 Automated Playwright captures at each week-end git commit live in [`docs/ui-snapshots/`](./ui-snapshots/README.md). Re-run with `npm run capture:current-week`, **push PNGs to GitHub**, then paste/import this page into Confluence — images load from GitHub raw URLs.
 
 <!-- AUTO-SNAPSHOTS:ui-evolution:START -->
-| Week | Fixtures | Game (landscape) |
-| --- | --- | --- |
-| Week 1 | ![week-1 fixtures](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/fixtures-landscape.png) | ![week-1 game](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/game-landscape.png) |
-| Week 2 | ![week-2 fixtures](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-2/fixtures-landscape.png) | ![week-2 game](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-2/game-landscape.png) |
-| Week 3 | ![week-3 fixtures](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/fixtures-landscape.png) | ![week-3 game](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/game-landscape.png) |
-| Week 4 | ![week-4 fixtures](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/fixtures-portrait.png) | ![week-4 game](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/game-landscape.png) |
+#### Week 1
+
+**Fixtures (landscape)**
+
+![Week 1 fixtures](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/fixtures-landscape.png)
+
+**Game console (landscape)**
+
+![Week 1 game](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/game-landscape.png)
+
+#### Week 2
+
+**Fixtures (landscape)**
+
+![Week 2 fixtures](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-2/fixtures-landscape.png)
+
+**Game console (landscape)**
+
+![Week 2 game](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-2/game-landscape.png)
+
+#### Week 3
+
+**Fixtures (landscape)**
+
+![Week 3 fixtures](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/fixtures-landscape.png)
+
+**Game console (landscape)**
+
+![Week 3 game](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/game-landscape.png)
+
+#### Week 4
+
+**Fixtures (portrait)**
+
+![Week 4 fixtures](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/fixtures-portrait.png)
+
+**Game console (portrait)**
+
+![Week 4 game](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/game-portrait.png)
 <!-- AUTO-SNAPSHOTS:ui-evolution:END -->
 
 ---

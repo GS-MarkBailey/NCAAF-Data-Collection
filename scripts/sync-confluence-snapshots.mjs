@@ -128,26 +128,37 @@ async function renderFeatureHighlights(imageBase, label, features) {
   return blocks.join('\n').trim()
 }
 
-function renderUiEvolution(imageBase, weeks) {
-  const rows = weeks.map((week) => {
-    const fixturesKey = includesPortrait(week)
-      ? 'fixtures-portrait'
-      : 'fixtures-landscape'
-    const fixturesLabel = includesPortrait(week)
-      ? 'Fixtures (portrait)'
-      : 'Fixtures (landscape)'
-    return {
-      week: week.label.replace('week-', 'Week '),
-      fixturesLabel,
-      fixtures: img(imageBase, `${week.label}/${fixturesKey}.png`, `${week.label} fixtures`),
-      game: img(imageBase, `${week.label}/game-landscape.png`, `${week.label} game`),
-    }
-  })
+function evolutionFixturesFile(week) {
+  return includesPortrait(week) ? 'fixtures-portrait.png' : 'fixtures-landscape.png'
+}
 
-  return renderTable(
-    ['Week', 'Fixtures', 'Game (landscape)'],
-    rows.map((row) => [row.week, row.fixtures, row.game]),
-  )
+function evolutionFixturesLabel(week) {
+  return includesPortrait(week) ? 'Fixtures (portrait)' : 'Fixtures (landscape)'
+}
+
+function evolutionGameFile(week) {
+  return includesPortrait(week) ? 'game-portrait.png' : 'game-landscape.png'
+}
+
+function evolutionGameLabel(week) {
+  return includesPortrait(week) ? 'Game console (portrait)' : 'Game console (landscape)'
+}
+
+function renderUiEvolution(imageBase, weeks) {
+  return weeks
+    .map((week) => {
+      const title = week.label.replace('week-', 'Week ')
+      return `#### ${title}
+
+**${evolutionFixturesLabel(week)}**
+
+${img(imageBase, `${week.label}/${evolutionFixturesFile(week)}`, `${title} fixtures`)}
+
+**${evolutionGameLabel(week)}**
+
+${img(imageBase, `${week.label}/${evolutionGameFile(week)}`, `${title} game`)}`
+    })
+    .join('\n\n')
 }
 
 function replaceMarkedBlock(content, id, replacement) {
