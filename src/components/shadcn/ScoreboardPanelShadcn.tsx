@@ -560,8 +560,18 @@ export function ScoreboardPanelShadcn({
           )}
         </div>
 
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-border">
-          <div className="flex min-h-0 flex-1 items-stretch">
+        <div
+          className={cn(
+            'flex min-h-0 flex-1 flex-col rounded-lg border border-border',
+            stacked ? 'overflow-visible' : 'overflow-hidden',
+          )}
+        >
+          <div
+            className={cn(
+              'flex items-stretch',
+              stacked ? 'min-h-10 shrink-0' : 'min-h-0 flex-1',
+            )}
+          >
             <StatCell
               label="QTR"
               value={clockPeriod}
@@ -603,17 +613,9 @@ export function ScoreboardPanelShadcn({
               inactive={gameEnded}
               compact={stacked}
               pulseEndColor="var(--card)"
-              shellClassName={cn(
-                'border-border landscape-mobile:py-3',
-                stacked ? 'py-1.5' : 'py-4',
-              )}
+              shellClassName="border-border"
               labelClassName="text-muted-foreground"
-              valueClassName={cn(
-                'text-foreground',
-                stacked
-                  ? 'text-xl landscape-mobile:text-lg'
-                  : 'text-2xl landscape-mobile:text-xl',
-              )}
+              valueClassName="text-foreground"
             />
           </div>
 
@@ -689,8 +691,10 @@ function StatCell({
   return (
     <div
       className={cn(
-        'flex h-full min-h-0 flex-1 flex-col items-center justify-center border-r border-border px-1 last:border-r-0 landscape-mobile:py-3',
-        compact ? 'py-1.5' : 'py-4',
+        'flex h-full min-h-0 flex-1 flex-col items-center border-r border-border px-1 last:border-r-0 landscape-mobile:py-3',
+        compact
+          ? 'min-h-10 shrink-0 justify-center gap-0.5 py-1'
+          : 'justify-center gap-1 py-4',
         statusStyle?.className,
         pulsing && 'push-data-pulse',
       )}
@@ -700,13 +704,18 @@ function StatCell({
         } as CSSProperties
       }
     >
-      <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground leading-none">
+      <span
+        className={cn(
+          'font-medium uppercase tracking-wide text-muted-foreground leading-none',
+          compact ? 'text-[9px]' : 'text-[10px]',
+        )}
+      >
         {label}
       </span>
       <span
         className={cn(
           'font-bold leading-none',
-          compact ? 'mt-0.5 text-xl landscape-mobile:text-lg' : 'mt-1 text-2xl landscape-mobile:text-xl',
+          compact ? 'text-lg' : 'text-2xl landscape-mobile:text-xl',
         )}
       >
         {displayValue ?? value}

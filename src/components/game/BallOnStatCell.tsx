@@ -36,7 +36,8 @@ export function BallOnStatCell({
   return (
     <div
       className={cn(
-        'flex h-full min-h-0 flex-1 flex-col items-center justify-center border-r border-[var(--color-panel-border)] px-1 py-4 last:border-r-0 landscape-mobile:py-3',
+        'flex h-full min-h-0 flex-1 flex-col items-center border-r border-[var(--color-panel-border)] px-1 last:border-r-0 landscape-mobile:py-3',
+        compact ? 'min-h-10 shrink-0 justify-center gap-0.5 py-1' : 'justify-center gap-1 py-4 landscape-mobile:py-3',
         pulsing && 'push-data-pulse',
         shellClassName,
       )}
@@ -44,7 +45,8 @@ export function BallOnStatCell({
     >
       <span
         className={cn(
-          'text-[10px] font-medium uppercase tracking-wide leading-none text-[var(--color-text-muted)]',
+          'font-medium uppercase tracking-wide leading-none text-[var(--color-text-muted)]',
+          compact ? 'text-[9px]' : 'text-[10px]',
           labelClassName,
         )}
       >
@@ -54,8 +56,8 @@ export function BallOnStatCell({
         <span
           className={cn(
             'font-bold leading-none',
-            compact ? 'mt-0.5' : 'mt-1',
-            valueClassName ?? 'text-2xl landscape-mobile:text-xl',
+            compact ? 'text-lg' : 'text-2xl landscape-mobile:text-xl',
+            valueClassName,
           )}
         >
           {MATCH_ENDED_STAT}
@@ -65,7 +67,7 @@ export function BallOnStatCell({
           yardLine={yardLine}
           arrowSide={arrowSide}
           compact={compact}
-          valueClassName={valueClassName ?? 'text-2xl landscape-mobile:text-xl'}
+          valueClassName={valueClassName}
         />
       )}
     </div>
@@ -86,32 +88,39 @@ export function BallOnValue({
   valueClassName,
 }: BallOnValueProps) {
   return (
-    <div
-      className={cn(
-        'flex w-full min-w-0 items-center justify-center gap-[0.12em] px-0.5 text-[var(--color-text)]',
-        compact ? 'mt-0.5' : 'mt-1',
-      )}
-    >
-      {arrowSide === 'left' && <FieldArrow direction="left" />}
+    <div className="flex w-full min-w-0 items-center justify-center gap-[0.12em] px-0.5 text-[var(--color-text)]">
+      {arrowSide === 'left' && <FieldArrow direction="left" compact={compact} />}
       <span
         className={cn(
           'shrink-0 font-bold leading-none text-current',
-          valueClassName ?? 'text-2xl landscape-mobile:text-xl',
+          compact ? 'text-lg' : 'text-2xl landscape-mobile:text-xl',
+          valueClassName,
         )}
       >
         {yardLine}
       </span>
-      {arrowSide === 'right' && <FieldArrow direction="right" />}
+      {arrowSide === 'right' && <FieldArrow direction="right" compact={compact} />}
     </div>
   )
 }
 
-function FieldArrow({ direction }: { direction: BallOnArrowSide }) {
+function FieldArrow({
+  direction,
+  compact = false,
+}: {
+  direction: BallOnArrowSide
+  compact?: boolean
+}) {
   return (
     <svg
       viewBox="0 0 10 14"
       aria-hidden
-      className="h-auto w-[clamp(0.35rem,22%,0.8rem)] shrink-0 text-current"
+      className={cn(
+        'h-auto shrink-0 text-current',
+        compact
+          ? 'w-[0.35rem]'
+          : 'w-[clamp(0.35rem,22%,0.8rem)]',
+      )}
       fill="currentColor"
     >
       {direction === 'left' ? (
