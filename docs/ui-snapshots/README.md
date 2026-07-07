@@ -76,15 +76,19 @@ Download PNGs from the run’s **Artifacts** tab when not committing images to g
 
 ## Publishing to Confluence
 
-**Today:** paste or import the markdown file. Attach images if relative paths do not resolve (Confluence prefers uploaded attachments).
+Images in the auto-generated sections use **GitHub raw URLs** (detected from `git remote origin` + current branch). Minimal workflow:
 
-**Later (optional):** Confluence Cloud REST API can create/update pages and upload attachments programmatically. You would need:
+1. `npm run capture:current-week` (or `capture:and-sync` for all weeks)
+2. **Commit and push** `docs/ui-snapshots/` and `docs/confluence-weekly-build-in-public.md` to `main`
+3. Import or paste the markdown into Confluence — images load from GitHub (no manual uploads)
 
-- `CONFLUENCE_BASE_URL`, `CONFLUENCE_EMAIL`, `CONFLUENCE_API_TOKEN`
-- Page ID for the build-in-public doc
-- A publish script that converts markdown → Confluence storage format and uploads `docs/ui-snapshots/**/*.png`
+Example URL shape:
 
-That is not wired up yet — say if you want it and which Confluence space/page to target.
+`https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/game-landscape.png`
+
+Override the host with `CONFLUENCE_IMAGE_BASE_URL` if needed.
+
+**Note:** Confluence must be allowed to fetch external images (usually on by default). Private repos require readers to have GitHub access; for org-wide Confluence, a **public** repo or GitHub attachment sync is more reliable.
 
 ## Feature scenarios per week
 

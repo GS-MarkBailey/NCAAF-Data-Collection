@@ -2,18 +2,19 @@
 /**
  * Regenerate auto-managed snapshot sections in the Confluence markdown doc.
  *
- * Reads:
- *   - scripts/ui-snapshot-weeks.mjs
- *   - scripts/ui-snapshot-features.mjs
- *   - docs/ui-snapshots/<week>/meta.json (when present)
+ * Image embeds use GitHub raw URLs so Confluence can load them after you push PNGs to main.
  *
  * Usage:
  *   npm run sync:confluence-doc
+ *
+ * Override image host:
+ *   CONFLUENCE_IMAGE_BASE_URL=https://raw.githubusercontent.com/org/repo/main/docs/ui-snapshots
  */
 
 import { access, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { resolveSnapshotImageBase, snapshotImageUrl } from './github-raw-url.mjs'
 import { WEEK_FEATURES } from './ui-snapshot-features.mjs'
 import { SNAPSHOT_WEEKS } from './ui-snapshot-weeks.mjs'
 
@@ -38,8 +39,8 @@ function formatCommitDate(isoDate) {
   return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
-function img(relPath, alt) {
-  return `![${alt}](./ui-snapshots/${relPath})`
+function img(imageBase, relPath, alt) {
+  return `![${alt}](${snapshotImageUrl(imageBase, relPath)})`
 }
 
 function chunk(items, size) {
@@ -75,20 +76,20 @@ function weekCommitLine(week, meta) {
   return `Commit \`${commit}\` (${date}).`
 }
 
-function renderOverviewScreens(label) {
+function renderOverviewScreens(imageBase, label) {
   const base = `${label}`
   return renderTable(
     ['Fixtures (portrait)', 'Fixtures (landscape)', 'Game (portrait)', 'Game (landscape)'],
     [[
-      img(`${base}/fixtures-portrait.png`, `${label} fixtures portrait`),
-      img(`${base}/fixtures-landscape.png`, `${label} fixtures landscape`),
-      img(`${base}/game-portrait.png`, `${label} game portrait`),
-      img(`${base}/game-landscape.png`, `${label} game landscape`),
+      img(imageBase, `${base}/fixtures-portrait.png`, `${label} fixtures portrait`),
+      img(imageBase, `${base}/fixtures-landscape.png`, `${label} fixtures landscape`),
+      img(imageBase, `${base}/game-portrait.png`, `${label} game portrait`),
+      img(imageBase, `${base}/game-landscape.png`, `${label} game landscape`),
     ]],
   )
 }
 
-async function renderFeatureHighlights(label, features) {
+async function renderFeatureHighlights(imageBase, label, features) {
   if (features.length === 0) {
     return '_No feature snapshots configured — add scenarios in `scripts/ui-snapshot-features.mjs`._'
   }
@@ -100,14 +101,14 @@ async function renderFeatureHighlights(label, features) {
   }
 
   if (available.length === 0) {
-    return '_Feature snapshots pending — run `npm run capture:and-sync`._'
+    return '_Feature snapshots pending — run `npm run capture:and-sync`, then push to GitHub._'
   }
 
   const rows = chunk(available, 3)
   const blocks = rows.map((row) => {
     const headers = row.map((f) => f.title)
     const images = row.map((f) =>
-      img(`${label}/features/${f.id}.png`, f.title),
+      img(imageBase, `${label}/features/${f.id}.png`, f.title),
     )
     return `${renderTable(headers, [images])}\n`
   })
@@ -115,11 +116,11 @@ async function renderFeatureHighlights(label, features) {
   return blocks.join('\n').trim()
 }
 
-function renderUiEvolution(weeks) {
+function renderUiEvolution(imageBase, weeks) {
   const rows = weeks.map((week) => [
     week.label.replace('week-', 'Week '),
-    img(`${week.label}/fixtures-portrait.png`, `${week.label} fixtures`),
-    img(`${week.label}/game-landscape.png`, `${week.label} game`),
+    img(imageBase, `${week.label}/fixtures-portrait.png`, `${week.label} fixtures`),
+    img(imageBase, `${week.label}/game-landscape.png`, `${week.label} game`),
   ])
   return renderTable(['Week', 'Fixtures (portrait)', 'Game (landscape)'], rows)
 }
@@ -149,12 +150,13 @@ function escapeRegExp(value) {
 }
 
 async function main() {
+  const imageBase = resolveSnapshotImageBase(ROOT)
   let content = await readFile(DOC_PATH, 'utf8')
 
   content = replaceMarkedBlock(
     content,
     'ui-evolution',
-    renderUiEvolution(SNAPSHOT_WEEKS),
+    renderUiEvolution(imageBase, SNAPSHOT_WEEKS),
   )
 
   for (const week of SNAPSHOT_WEEKS) {
@@ -172,11 +174,11 @@ async function main() {
 
 ${commitLine}
 
-${renderOverviewScreens(week.label)}
+${renderOverviewScreens(imageBase, week.label)}
 
 ### Feature highlights
 
-${await renderFeatureHighlights(week.label, features)}`
+${await renderFeatureHighlights(imageBase, week.label, features)}`
 
     content = replaceMarkedBlock(content, week.label, block)
   }
@@ -189,6 +191,7 @@ ${await renderFeatureHighlights(week.label, features)}`
 
   await writeFile(DOC_PATH, content)
   console.log(`Updated ${DOC_PATH}`)
+  console.log(`Image base: ${imageBase}`)
 }
 
 main().catch((err) => {

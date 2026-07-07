@@ -33,15 +33,15 @@ Development moved in a clear arc: first map requirements and explore responsive 
 
 ### UI evolution (snapshots)
 
-Automated Playwright captures at each week-end git commit live in [`docs/ui-snapshots/`](./ui-snapshots/README.md). Re-run with `npm run capture:and-sync` to refresh PNGs and regenerate the sections below.
+Automated Playwright captures at each week-end git commit live in [`docs/ui-snapshots/`](./ui-snapshots/README.md). Re-run with `npm run capture:current-week`, **push PNGs to GitHub**, then paste/import this page into Confluence — images load from GitHub raw URLs.
 
 <!-- AUTO-SNAPSHOTS:ui-evolution:START -->
 | Week | Fixtures (portrait) | Game (landscape) |
 | --- | --- | --- |
-| Week 1 | ![week-1 fixtures](./ui-snapshots/week-1/fixtures-portrait.png) | ![week-1 game](./ui-snapshots/week-1/game-landscape.png) |
-| Week 2 | ![week-2 fixtures](./ui-snapshots/week-2/fixtures-portrait.png) | ![week-2 game](./ui-snapshots/week-2/game-landscape.png) |
-| Week 3 | ![week-3 fixtures](./ui-snapshots/week-3/fixtures-portrait.png) | ![week-3 game](./ui-snapshots/week-3/game-landscape.png) |
-| Week 4 | ![week-4 fixtures](./ui-snapshots/week-4/fixtures-portrait.png) | ![week-4 game](./ui-snapshots/week-4/game-landscape.png) |
+| Week 1 | ![week-1 fixtures](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/fixtures-portrait.png) | ![week-1 game](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/game-landscape.png) |
+| Week 2 | ![week-2 fixtures](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-2/fixtures-portrait.png) | ![week-2 game](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-2/game-landscape.png) |
+| Week 3 | ![week-3 fixtures](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/fixtures-portrait.png) | ![week-3 game](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/game-landscape.png) |
+| Week 4 | ![week-4 fixtures](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/fixtures-portrait.png) | ![week-4 game](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/game-landscape.png) |
 <!-- AUTO-SNAPSHOTS:ui-evolution:END -->
 
 ---
@@ -123,17 +123,17 @@ Commit `1cbc5bb` (7 Jul 2026).
 
 | Fixtures (portrait) | Fixtures (landscape) | Game (portrait) | Game (landscape) |
 | --- | --- | --- | --- |
-| ![week-1 fixtures portrait](./ui-snapshots/week-1/fixtures-portrait.png) | ![week-1 fixtures landscape](./ui-snapshots/week-1/fixtures-landscape.png) | ![week-1 game portrait](./ui-snapshots/week-1/game-portrait.png) | ![week-1 game landscape](./ui-snapshots/week-1/game-landscape.png) |
+| ![week-1 fixtures portrait](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/fixtures-portrait.png) | ![week-1 fixtures landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/fixtures-landscape.png) | ![week-1 game portrait](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/game-portrait.png) | ![week-1 game landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/game-landscape.png) |
 
 ### Feature highlights
 
 | Take Control confirmation | Take Control active state | Action log |
 | --- | --- | --- |
-| ![Take Control confirmation](./ui-snapshots/week-1/features/take-control-confirm.png) | ![Take Control active state](./ui-snapshots/week-1/features/take-control-active.png) | ![Action log](./ui-snapshots/week-1/features/action-log.png) |
+| ![Take Control confirmation](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/features/take-control-confirm.png) | ![Take Control active state](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/features/take-control-active.png) | ![Action log](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/features/action-log.png) |
 
 | Risk toggle (Challenge / Review) | Clock pause and ±1 second adjust |
 | --- | --- |
-| ![Risk toggle (Challenge / Review)](./ui-snapshots/week-1/features/risk-challenge-active.png) | ![Clock pause and ±1 second adjust](./ui-snapshots/week-1/features/clock-adjust.png) |
+| ![Risk toggle (Challenge / Review)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/features/risk-challenge-active.png) | ![Clock pause and ±1 second adjust](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-1/features/clock-adjust.png) |
 <!-- AUTO-SNAPSHOTS:week-1:END -->
 
 ---
@@ -165,13 +165,13 @@ Commit `615f79c` (7 Jul 2026).
 
 | Fixtures (portrait) | Fixtures (landscape) | Game (portrait) | Game (landscape) |
 | --- | --- | --- | --- |
-| ![week-2 fixtures portrait](./ui-snapshots/week-2/fixtures-portrait.png) | ![week-2 fixtures landscape](./ui-snapshots/week-2/fixtures-landscape.png) | ![week-2 game portrait](./ui-snapshots/week-2/game-portrait.png) | ![week-2 game landscape](./ui-snapshots/week-2/game-landscape.png) |
+| ![week-2 fixtures portrait](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-2/fixtures-portrait.png) | ![week-2 fixtures landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-2/fixtures-landscape.png) | ![week-2 game portrait](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-2/game-portrait.png) | ![week-2 game landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-2/game-landscape.png) |
 
 ### Feature highlights
 
 | Feature flags panel |
 | --- |
-| ![Feature flags panel](./ui-snapshots/week-2/features/feature-flags-panel.png) |
+| ![Feature flags panel](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-2/features/feature-flags-panel.png) |
 <!-- AUTO-SNAPSHOTS:week-2:END -->
 
 ---
@@ -257,17 +257,17 @@ Commit `dd1f58f` (7 Jul 2026).
 
 | Fixtures (portrait) | Fixtures (landscape) | Game (portrait) | Game (landscape) |
 | --- | --- | --- | --- |
-| ![week-3 fixtures portrait](./ui-snapshots/week-3/fixtures-portrait.png) | ![week-3 fixtures landscape](./ui-snapshots/week-3/fixtures-landscape.png) | ![week-3 game portrait](./ui-snapshots/week-3/game-portrait.png) | ![week-3 game landscape](./ui-snapshots/week-3/game-landscape.png) |
+| ![week-3 fixtures portrait](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/fixtures-portrait.png) | ![week-3 fixtures landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/fixtures-landscape.png) | ![week-3 game portrait](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/game-portrait.png) | ![week-3 game landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/game-landscape.png) |
 
 ### Feature highlights
 
 | Field direction dialog (first open) | Clock wheel editor | Connection status chip |
 | --- | --- | --- |
-| ![Field direction dialog (first open)](./ui-snapshots/week-3/features/field-direction-dialog.png) | ![Clock wheel editor](./ui-snapshots/week-3/features/clock-editor.png) | ![Connection status chip](./ui-snapshots/week-3/features/connection-status.png) |
+| ![Field direction dialog (first open)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/features/field-direction-dialog.png) | ![Clock wheel editor](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/features/clock-editor.png) | ![Connection status chip](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/features/connection-status.png) |
 
 | Fixture error toast | Settings dialog (Log / Field / Features) |
 | --- | --- |
-| ![Fixture error toast](./ui-snapshots/week-3/features/error-toast.png) | ![Settings dialog (Log / Field / Features)](./ui-snapshots/week-3/features/settings-tabs.png) |
+| ![Fixture error toast](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/features/error-toast.png) | ![Settings dialog (Log / Field / Features)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/features/settings-tabs.png) |
 <!-- AUTO-SNAPSHOTS:week-3:END -->
 
 ---
@@ -332,17 +332,17 @@ Commit `HEAD` (7 Jul 2026).
 
 | Fixtures (portrait) | Fixtures (landscape) | Game (portrait) | Game (landscape) |
 | --- | --- | --- | --- |
-| ![week-4 fixtures portrait](./ui-snapshots/week-4/fixtures-portrait.png) | ![week-4 fixtures landscape](./ui-snapshots/week-4/fixtures-landscape.png) | ![week-4 game portrait](./ui-snapshots/week-4/game-portrait.png) | ![week-4 game landscape](./ui-snapshots/week-4/game-landscape.png) |
+| ![week-4 fixtures portrait](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/fixtures-portrait.png) | ![week-4 fixtures landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/fixtures-landscape.png) | ![week-4 game portrait](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/game-portrait.png) | ![week-4 game landscape](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/game-landscape.png) |
 
 ### Feature highlights
 
 | Fixtures filters and search | Scheduled and past fixture chips | Portrait game console (stacked panels) |
 | --- | --- | --- |
-| ![Fixtures filters and search](./ui-snapshots/week-4/features/fixtures-filters.png) | ![Scheduled and past fixture chips](./ui-snapshots/week-4/features/fixture-status-chips.png) | ![Portrait game console (stacked panels)](./ui-snapshots/week-4/features/portrait-stack.png) |
+| ![Fixtures filters and search](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/fixtures-filters.png) | ![Scheduled and past fixture chips](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/fixture-status-chips.png) | ![Portrait game console (stacked panels)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/portrait-stack.png) |
 
 | Past fixture match-ended scoreboard |
 | --- |
-| ![Past fixture match-ended scoreboard](./ui-snapshots/week-4/features/past-fixture-ended.png) |
+| ![Past fixture match-ended scoreboard](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/past-fixture-ended.png) |
 <!-- AUTO-SNAPSHOTS:week-4:END -->
 
 ---
