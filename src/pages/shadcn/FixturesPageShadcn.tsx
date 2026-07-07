@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom'
 import { Calendar } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
 import {
   Card,
   CardContent,
@@ -46,27 +45,22 @@ export function FixturesPageShadcn() {
             }}
           >
             <CardHeader className="pb-2">
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex min-w-0 flex-1 items-center gap-2">
-                  <span className="truncate text-sm font-semibold">
-                    {fixture.homeTeam}
-                  </span>
-                  <span className="shrink-0 text-xs text-muted-foreground">
-                    vs
-                  </span>
-                  <span className="truncate text-sm font-semibold">
-                    {fixture.awayTeam}
-                  </span>
-                </div>
-                <Badge variant="secondary" className="shrink-0 tabular-nums">
-                  #{fixture.eventId}
-                </Badge>
+              <div className="flex min-w-0 items-center gap-2">
+                <span className="truncate text-sm font-semibold">
+                  {fixture.homeTeam}
+                </span>
+                <span className="shrink-0 text-xs text-muted-foreground">
+                  vs
+                </span>
+                <span className="truncate text-sm font-semibold">
+                  {fixture.awayTeam}
+                </span>
               </div>
             </CardHeader>
             <CardContent>
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <Calendar className="size-3.5" />
-                {fixture.startDate} · {fixture.startTime}
+                {fixture.startDate} · {fixture.startTime} · #{fixture.eventId}
               </div>
             </CardContent>
           </Card>
