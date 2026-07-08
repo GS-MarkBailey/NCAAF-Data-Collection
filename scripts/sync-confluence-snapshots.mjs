@@ -161,7 +161,11 @@ async function renderInteractions(imageBase, weekLabel, mode) {
 }
 
 async function main() {
-  const mode = resolveImageMode()
+  await syncConfluenceDoc({ write: true })
+}
+
+export async function syncConfluenceDoc({ write = true, mode } = {}) {
+  const imageMode = mode ?? resolveImageMode()
   const imageBase = resolveSnapshotImageBase(ROOT)
   let content = await readFile(DOC_PATH, 'utf8')
 
@@ -169,7 +173,7 @@ async function main() {
   content = replaceMarkedBlock(
     content,
     'ui-evolution',
-    renderLatestScreens(imageBase, latest, mode),
+    renderLatestScreens(imageBase, latest, imageMode),
   )
 
   for (const week of SNAPSHOT_WEEKS) {
@@ -178,7 +182,7 @@ async function main() {
       content = replaceMarkedBlock(
         content,
         interactionsMarker,
-        await renderInteractions(imageBase, week.label, mode),
+        await renderInteractions(imageBase, week.label, imageMode),
       )
     }
 
@@ -191,7 +195,7 @@ async function main() {
       content = replaceMarkedBlock(
         content,
         markerId,
-        await renderSnapshotBlock(imageBase, week.label, block, mode),
+        await renderSnapshotBlock(imageBase, week.label, block, imageMode),
       )
     }
   }
@@ -202,9 +206,15 @@ async function main() {
     `**Last updated:** ${formatCommitDate(stamp)} (snapshots synced automatically)`,
   )
 
-  await writeFile(DOC_PATH, content)
-  console.log(`Updated ${DOC_PATH}`)
-  console.log(`Image mode: ${mode}${mode === 'github' ? ` (${imageBase})` : ' (Confluence page attachments)'}`)
+  if (write) {
+    await writeFile(DOC_PATH, content)
+    console.log(`Updated ${DOC_PATH}`)
+    console.log(
+      `Image mode: ${imageMode}${imageMode === 'github' ? ` (${imageBase})` : ' (Confluence page attachments)'}`,
+    )
+  }
+
+  return content
 }
 
 main().catch((err) => {

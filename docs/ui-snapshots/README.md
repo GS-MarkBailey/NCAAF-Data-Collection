@@ -5,8 +5,11 @@ Automated screenshots for build-in-public / Confluence posts.
 ## Quick commands
 
 ```bash
-# Current week only (prod) + refresh Confluence markdown — use this as you ship features
+# Current week only (prod) + refresh Confluence markdown
 npm run capture:current-week
+
+# Publish to Confluence (attachments + page update via API — set up .env once)
+npm run publish:confluence
 
 # All weeks from git history + refresh doc (~5 min)
 npm run capture:and-sync
@@ -87,32 +90,37 @@ Download PNGs from the run’s **Artifacts** tab when not committing images to g
 
 ## Publishing to Confluence
 
-**Recommended:** reference **page attachments** (default). Avoids editor flicker and GitHub rate limits while editing.
+One command updates the page — syncs markdown, uploads screenshot attachments, and replaces the page body via the Confluence API. No manual drag-and-drop or markdown reimport.
 
-### Workflow
+### One-time setup
 
 ```bash
-# After capture — stage flat attachment filenames + refresh markdown
+cp .env.example .env
+# Edit .env — page id is in the Confluence URL: .../pages/123456789/...
+# API token: https://id.atlassian.com/manage-profile/security/api-tokens
+```
+
+### Publish
+
+```bash
 npm run publish:confluence
-
-# Option A: drag docs/confluence-attachments/*.png onto the Confluence page
-# Option B: upload via API (set env vars once)
-export CONFLUENCE_BASE_URL=https://yoursite.atlassian.net/wiki
-export CONFLUENCE_EMAIL=you@company.com
-export CONFLUENCE_API_TOKEN=...
-export CONFLUENCE_PAGE_ID=123456789
-npm run upload:confluence-attachments
 ```
 
-Then **reimport** `docs/confluence-weekly-build-in-public.md` (replace page content, don’t append).
+After capturing new screenshots:
 
-Auto-generated image lines look like:
-
-```markdown
-![Connection status chip](week-3--connection-status.png)
+```bash
+npm run capture:current-week   # or capture:and-sync
+npm run publish:confluence
 ```
 
-Flat names map from repo paths: `week-3/features/connection-status.png` → `week-3--connection-status.png`.
+### What it does
+
+1. Regenerates auto-snapshot sections in the markdown doc
+2. Copies PNGs to `docs/confluence-attachments/` (flat filenames)
+3. Uploads attachments to your Confluence page
+4. Converts markdown → Confluence storage format and **PUT**s the page
+
+Images use page attachments (not GitHub URLs), so the editor does not flicker offline/online.
 
 ### GitHub URLs (optional)
 
@@ -121,8 +129,6 @@ For GitHub markdown preview only:
 ```bash
 CONFLUENCE_IMAGE_MODE=github npm run sync:confluence-doc
 ```
-
-Override branch/host with `CONFLUENCE_IMAGE_BASE_URL` if needed.
 
 ## Feature scenarios per week
 

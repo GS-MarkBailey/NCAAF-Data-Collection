@@ -23,5 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 
+.env
+
 # Staged Confluence attachment copies (regenerate with npm run stage:confluence-attachments)
 docs/confluence-attachments/*.png

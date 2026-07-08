@@ -6,7 +6,7 @@
 **Period covered:** 16 June 2026 – 12 July 2026  
 **Last updated:** 7 Jul 2026 (snapshots synced automatically)
 
-**Confluence images:** Screenshots use **page attachment** filenames (not GitHub URLs) so the editor stays stable. Upload PNGs from `docs/confluence-attachments/` to this page before importing — run `npm run publish:confluence` locally. See [`docs/ui-snapshots/README.md`](./ui-snapshots/README.md).
+**Confluence images:** Page attachments (stable in the editor). Publish with `npm run publish:confluence` — see `.env.example`.
 
 ---
 

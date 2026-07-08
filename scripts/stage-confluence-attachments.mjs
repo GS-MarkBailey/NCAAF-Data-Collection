@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 /**
  * Copy snapshot PNGs to docs/confluence-attachments/ using flat attachment filenames.
- * Upload that folder to your Confluence page (drag-and-drop or npm run upload:confluence-attachments).
  */
 
 import { access, copyFile, mkdir, writeFile } from 'node:fs/promises'
@@ -14,7 +13,7 @@ import { SNAPSHOT_WEEKS } from './ui-snapshot-weeks.mjs'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
 const SNAPSHOTS_DIR = path.join(ROOT, 'docs', 'ui-snapshots')
-const STAGE_DIR = path.join(ROOT, 'docs', 'confluence-attachments')
+export const STAGE_DIR = path.join(ROOT, 'docs', 'confluence-attachments')
 
 async function fileExists(filePath) {
   try {
@@ -40,23 +39,18 @@ function collectRelPaths() {
   return [...relPaths].sort()
 }
 
-async function main() {
+export async function stageConfluenceAttachments() {
   await mkdir(STAGE_DIR, { recursive: true })
 
   const manifest = []
 
   for (const relPath of collectRelPaths()) {
     const source = path.join(SNAPSHOTS_DIR, relPath)
-    if (!(await fileExists(source))) {
-      console.warn(`  skip (missing): ${relPath}`)
-      continue
-    }
+    if (!(await fileExists(source))) continue
 
     const attachmentName = attachmentFileName(relPath)
-    const dest = path.join(STAGE_DIR, attachmentName)
-    await copyFile(source, dest)
+    await copyFile(source, path.join(STAGE_DIR, attachmentName))
     manifest.push({ relPath, attachmentName })
-    console.log(`  ✓ ${attachmentName}`)
   }
 
   await writeFile(
@@ -64,8 +58,15 @@ async function main() {
     JSON.stringify({ stagedAt: new Date().toISOString(), files: manifest }, null, 2),
   )
 
+  return manifest
+}
+
+async function main() {
+  const manifest = await stageConfluenceAttachments()
+  for (const { attachmentName } of manifest) {
+    console.log(`  ✓ ${attachmentName}`)
+  }
   console.log(`\nStaged ${manifest.length} file(s) → ${STAGE_DIR}`)
-  console.log('Upload to Confluence: drag this folder onto the page, or npm run upload:confluence-attachments')
 }
 
 main().catch((err) => {

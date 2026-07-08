@@ -12,7 +12,7 @@
     "sync:confluence-doc": "node scripts/sync-confluence-snapshots.mjs",
     "stage:confluence-attachments": "node scripts/stage-confluence-attachments.mjs",
     "upload:confluence-attachments": "node scripts/upload-confluence-attachments.mjs",
-    "publish:confluence": "node scripts/stage-confluence-attachments.mjs && node scripts/sync-confluence-snapshots.mjs",
+    "publish:confluence": "node scripts/publish-confluence-page.mjs",
     "capture:and-sync": "node scripts/capture-ui-snapshots.mjs --milestones && node scripts/sync-confluence-snapshots.mjs",
     "capture:current-week": "node scripts/capture-ui-snapshots.mjs --current && node scripts/sync-confluence-snapshots.mjs"
   },
