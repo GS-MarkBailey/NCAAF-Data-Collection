@@ -1,51 +1,35 @@
 #!/usr/bin/env node
 /**
  * One-command Confluence publish:
- *   1. Sync markdown (attachment image refs)
- *   2. Stage PNGs
- *   3. Upload attachments + replace page body via REST API
+ *   1. Sync markdown (GitHub raw image URLs)
+ *   2. Replace page body via REST API
  *
  * Setup: copy .env.example → .env (gitignored) and fill in Confluence details.
+ * Push snapshot PNGs to GitHub before publishing so raw URLs resolve.
  */
 
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import {
-  confluenceConfig,
-  fetchPage,
-  loadEnvFile,
-  updatePageStorage,
-  uploadAttachments,
-} from './confluence-api.mjs'
+import { confluenceConfig, fetchPage, loadEnvFile, updatePageStorage } from './confluence-api.mjs'
 import {
   markdownTitle,
   markdownToConfluenceStorage,
 } from './markdown-to-confluence-storage.mjs'
-import { stageConfluenceAttachments } from './stage-confluence-attachments.mjs'
 import { syncConfluenceDoc } from './sync-confluence-snapshots.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
 const DOC_PATH = path.join(ROOT, 'docs', 'confluence-weekly-build-in-public.md')
-const STAGE_DIR = path.join(ROOT, 'docs', 'confluence-attachments')
 
 async function main() {
   await loadEnvFile(path.join(ROOT, '.env'))
   const config = confluenceConfig()
 
-  console.log('1/4 Syncing markdown…')
-  await syncConfluenceDoc({ write: true, mode: 'attachments' })
+  console.log('1/2 Syncing markdown (GitHub image URLs)…')
+  await syncConfluenceDoc({ write: true, mode: 'github' })
 
-  console.log('2/4 Staging attachments…')
-  const staged = await stageConfluenceAttachments()
-  console.log(`     ${staged.length} PNG(s)`)
-
-  console.log('3/4 Uploading attachments…')
-  const uploaded = await uploadAttachments(config, config.pageId, STAGE_DIR)
-  console.log(`     ${uploaded} uploaded`)
-
-  console.log('4/4 Updating Confluence page…')
+  console.log('2/2 Updating Confluence page…')
   const page = await fetchPage(config)
   const markdown = await readFile(DOC_PATH, 'utf8')
   const storage = markdownToConfluenceStorage(markdown)

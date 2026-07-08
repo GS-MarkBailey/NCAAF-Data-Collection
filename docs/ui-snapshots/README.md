@@ -8,7 +8,7 @@ Automated screenshots for build-in-public / Confluence posts.
 # Current week only (prod) + refresh Confluence markdown
 npm run capture:current-week
 
-# Publish to Confluence (attachments + page update via API — set up .env once)
+# Publish to Confluence (GitHub image URLs + page update via API — set up .env once)
 npm run publish:confluence
 
 # All weeks from git history + refresh doc (~5 min)
@@ -46,7 +46,7 @@ Snapshot **tables and image embeds** in `docs/confluence-weekly-build-in-public.
 | `week-N-interactions` | Feature screenshots inline with Core / Key interactions copy |
 | `week-N-shipped-<key>` | Feature screenshots inline in Shipped subsections |
 
-Default image mode: **Confluence attachments** (flat filenames). Set `CONFLUENCE_IMAGE_MODE=github` for raw GitHub URLs.
+Default image mode: **GitHub raw URLs** (`raw.githubusercontent.com/.../docs/ui-snapshots/...`). Set `CONFLUENCE_IMAGE_MODE=attachments` for Confluence page attachments instead.
 
 Edit interaction text in `WEEK_INTERACTIONS` and shipped image mappings in `WEEK_SHIPPED` (`scripts/ui-snapshot-doc-content.mjs`).
 
@@ -90,7 +90,9 @@ Download PNGs from the run’s **Artifacts** tab when not committing images to g
 
 ## Publishing to Confluence
 
-One command updates the page — syncs markdown, uploads screenshot attachments, and replaces the page body via the Confluence API. No manual drag-and-drop or markdown reimport.
+One command updates the page — syncs markdown with GitHub image URLs and replaces the page body via the Confluence API.
+
+Push snapshot PNGs to GitHub before publishing so Confluence can load the images.
 
 ### One-time setup
 
@@ -115,19 +117,17 @@ npm run publish:confluence
 
 ### What it does
 
-1. Regenerates auto-snapshot sections in the markdown doc
-2. Copies PNGs to `docs/confluence-attachments/` (flat filenames)
-3. Uploads attachments to your Confluence page
-4. Converts markdown → Confluence storage format and **PUT**s the page
+1. Regenerates auto-snapshot sections in the markdown doc (GitHub raw URLs)
+2. Converts markdown → Confluence storage format and **PUT**s the page
 
-Images use page attachments (not GitHub URLs), so the editor does not flicker offline/online.
+Images are loaded from GitHub (`raw.githubusercontent.com`), not page attachments.
 
-### GitHub URLs (optional)
-
-For GitHub markdown preview only:
+### Confluence attachments (optional)
 
 ```bash
-CONFLUENCE_IMAGE_MODE=github npm run sync:confluence-doc
+CONFLUENCE_IMAGE_MODE=attachments npm run sync:confluence-doc
+npm run stage:confluence-attachments
+npm run upload:confluence-attachments
 ```
 
 ## Feature scenarios per week

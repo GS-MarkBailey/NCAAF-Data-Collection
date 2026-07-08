@@ -11,13 +11,12 @@ const FALLBACK = {
 /**
  * How snapshot images are referenced in the Confluence markdown doc.
  *
- * - attachments (default): flat filenames served from Confluence page attachments
- *   — stable in the editor, no GitHub fetches while editing
- * - github: raw.githubusercontent.com URLs — good for GitHub markdown preview only
+ * - github (default): raw.githubusercontent.com URLs — used in markdown and Confluence publish
+ * - attachments: flat filenames for Confluence page attachments (set CONFLUENCE_IMAGE_MODE=attachments)
  */
 export function resolveImageMode() {
-  const mode = process.env.CONFLUENCE_IMAGE_MODE?.toLowerCase() ?? 'attachments'
-  return mode === 'github' ? 'github' : 'attachments'
+  const mode = process.env.CONFLUENCE_IMAGE_MODE?.toLowerCase() ?? 'github'
+  return mode === 'attachments' ? 'attachments' : 'github'
 }
 
 /** week-3/features/connection-status.png → week-3--connection-status.png */

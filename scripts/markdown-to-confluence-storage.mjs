@@ -23,6 +23,12 @@ function attachmentImage(filename, alt) {
   return `<ac:image ac:align="center" ac:layout="center" ac:width="900"${altAttr}><ri:attachment ri:filename="${safeName}" /></ac:image>`
 }
 
+function externalImage(url, alt) {
+  const safeUrl = escapeXml(url)
+  const altAttr = alt ? ` ac:alt="${escapeXml(alt)}"` : ''
+  return `<ac:image ac:align="center" ac:layout="center" ac:width="900"${altAttr}><ri:url ri:value="${safeUrl}" /></ac:image>`
+}
+
 function parseImageToken(token) {
   const match = token.match(/^!\[([^\]]*)\]\(([^)]+)\)$/)
   if (!match) return null
@@ -63,7 +69,7 @@ function renderImages(images) {
   return images
     .map(({ alt, href }) => {
       if (/^https?:\/\//i.test(href)) {
-        return `<p><a href="${escapeXml(href)}">${escapeXml(alt || href)}</a></p>`
+        return externalImage(href, alt)
       }
       return attachmentImage(href, alt)
     })
