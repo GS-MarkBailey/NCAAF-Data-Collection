@@ -24,27 +24,44 @@ export function attachmentFileName(relPath) {
   return relPath.replace(/^\.\//, '').replace(/\//g, '--')
 }
 
-export function resolveSnapshotImageBase(rootDir) {
-  const override = process.env.CONFLUENCE_IMAGE_BASE_URL?.replace(/\/$/, '')
-  if (override) return override
+/** Branch used in raw GitHub image URLs (always main unless overridden). */
+export function resolveImageBranch() {
+  return process.env.CONFLUENCE_IMAGE_BRANCH?.trim() || FALLBACK.branch
+}
 
+function resolveGitHubRepo(rootDir) {
   try {
     const remote = execSync('git remote get-url origin', {
       cwd: rootDir,
       encoding: 'utf8',
     }).trim()
-    const branch =
-      execSync('git branch --show-current', { cwd: rootDir, encoding: 'utf8' }).trim() ||
-      FALLBACK.branch
-
     const match = remote.match(/github\.com[:/]([^/]+)\/(.+?)(?:\.git)?$/i)
     if (!match) throw new Error('Origin is not a GitHub remote')
-
     const [, owner, repo] = match
-    return `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/docs/ui-snapshots`
+    return { owner, repo }
   } catch {
-    return `https://raw.githubusercontent.com/${FALLBACK.owner}/${FALLBACK.repo}/${FALLBACK.branch}/docs/ui-snapshots`
+    return { owner: FALLBACK.owner, repo: FALLBACK.repo }
   }
+}
+
+export function resolveSnapshotImageBase(rootDir) {
+  const override = process.env.CONFLUENCE_IMAGE_BASE_URL?.replace(/\/$/, '')
+  if (override) return override
+
+  const { owner, repo } = resolveGitHubRepo(rootDir)
+  const branch = resolveImageBranch()
+  return `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/docs/ui-snapshots`
+}
+
+/** Extract snapshot rel path from a raw GitHub URL, or null. */
+export function snapshotRelPathFromUrl(url) {
+  const match = String(url).match(/\/docs\/ui-snapshots\/(.+\.png)(?:\?.*)?$/i)
+  return match?.[1] ?? null
+}
+
+export function snapshotUrlToAttachment(url) {
+  const relPath = snapshotRelPathFromUrl(url)
+  return relPath ? attachmentFileName(relPath) : null
 }
 
 export function snapshotImageUrl(base, relPath) {

@@ -6,7 +6,7 @@
 **Period covered:** 16 June 2026 – 12 July 2026  
 **Last updated:** 8 Jul 2026 (snapshots synced automatically)
 
-**Confluence images:** GitHub raw URLs (`raw.githubusercontent.com`). Push snapshots to `main`, then `npm run publish:confluence` — see `.env.example`.
+**Confluence images:** Markdown uses GitHub raw URLs; publish uploads PNGs as page attachments so all viewers see screenshots. Run `npm run publish:confluence` after pushing to `main` — see `.env.example`.
 
 ---
 

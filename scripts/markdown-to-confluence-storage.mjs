@@ -1,3 +1,5 @@
+import { snapshotUrlToAttachment } from './confluence-image.mjs'
+
 function escapeXml(value) {
   return value
     .replace(/&/g, '&amp;')
@@ -65,9 +67,13 @@ function blockFromLine(line) {
   return { type: 'text', text: line }
 }
 
-function renderImages(images) {
+function renderImages(images, { useAttachments = false } = {}) {
   return images
     .map(({ alt, href }) => {
+      if (useAttachments) {
+        const attachment = snapshotUrlToAttachment(href)
+        if (attachment) return attachmentImage(attachment, alt)
+      }
       if (/^https?:\/\//i.test(href)) {
         return externalImage(href, alt)
       }
@@ -76,13 +82,13 @@ function renderImages(images) {
     .join('')
 }
 
-function renderBlock(block) {
+function renderBlock(block, options) {
   if (block.type === 'images') {
-    return renderImages(block.images)
+    return renderImages(block.images, options)
   }
 
   if (block.type === 'mixed') {
-    return `<p>${inlineMarkdown(block.text)}</p>${renderImages(block.images)}`
+    return `<p>${inlineMarkdown(block.text)}</p>${renderImages(block.images, options)}`
   }
 
   return `<p>${inlineMarkdown(block.text)}</p>`
@@ -121,7 +127,12 @@ function renderTable(rows) {
   return `<table data-layout="default"><tbody><tr>${headCells}</tr>${bodyRows}</tbody></table>`
 }
 
-export function markdownToConfluenceStorage(markdown) {
+/**
+ * @param {string} markdown
+ * @param {{ useAttachments?: boolean }} [options]
+ *   useAttachments — map snapshot GitHub URLs to Confluence page attachments (for viewers)
+ */
+export function markdownToConfluenceStorage(markdown, options = {}) {
   const lines = markdown
     .replace(/\r\n/g, '\n')
     .split('\n')
@@ -216,7 +227,7 @@ export function markdownToConfluenceStorage(markdown) {
 
     closeList()
     const block = blockFromLine(line)
-    out.push(renderBlock(block))
+    out.push(renderBlock(block, options))
     i += 1
   }
 

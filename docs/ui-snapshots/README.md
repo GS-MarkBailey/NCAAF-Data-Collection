@@ -8,7 +8,7 @@ Automated screenshots for build-in-public / Confluence posts.
 # Current week only (prod) + refresh Confluence markdown
 npm run capture:current-week
 
-# Publish to Confluence (GitHub image URLs + page update via API — set up .env once)
+# Publish to Confluence (sync markdown + upload images + update page — set up .env once)
 npm run publish:confluence
 
 # All weeks from git history + refresh doc (~5 min)
@@ -46,7 +46,7 @@ Snapshot **tables and image embeds** in `docs/confluence-weekly-build-in-public.
 | `week-N-interactions` | Feature screenshots inline with Core / Key interactions copy |
 | `week-N-shipped-<key>` | Feature screenshots inline in Shipped subsections |
 
-Default image mode: **GitHub raw URLs** (`raw.githubusercontent.com/.../docs/ui-snapshots/...`). Set `CONFLUENCE_IMAGE_MODE=attachments` for Confluence page attachments instead.
+Default image mode in the **markdown file**: **GitHub raw URLs** on `main` (previewable in GitHub). **Publish** uploads PNGs as Confluence page attachments so every viewer sees screenshots — no external image dependency.
 
 Edit interaction text in `WEEK_INTERACTIONS` and shipped image mappings in `WEEK_SHIPPED` (`scripts/ui-snapshot-doc-content.mjs`).
 
@@ -80,55 +80,54 @@ Your prose (Overview, Shipped, Technical notes) stays manual. Only the snapshot 
 
 ## CI (GitHub Actions)
 
-Workflow: `.github/workflows/ui-snapshots.yml`
+| Workflow | Trigger | What it does |
+|----------|---------|--------------|
+| `ui-snapshots.yml` | Push to `main` (`src/` changes) | Captures current week + syncs markdown; uploads artifacts |
+| `ui-snapshots.yml` | Manual → milestones | Full history capture + doc sync |
+| `publish-confluence.yml` | Push to `main` (`docs/` changes) | Publishes to Confluence if secrets are configured |
+| `publish-confluence.yml` | Manual | Publish on demand |
 
-- **On push to `main`** (when `src/` changes): captures production and uploads artifacts.
-- **Manual → milestones**: full history capture + doc sync.
-- **Manual → production**: prod capture + doc sync (dates/timestamps only if PNGs unchanged).
+Download PNGs from the snapshot run’s **Artifacts** tab when not committing images to git.
 
-Download PNGs from the run’s **Artifacts** tab when not committing images to git.
+### Auto-publish to Confluence (optional)
+
+Add these **repository secrets** in GitHub → Settings → Secrets:
+
+- `CONFLUENCE_BASE_URL` — e.g. `https://yoursite.atlassian.net/wiki`
+- `CONFLUENCE_EMAIL`
+- `CONFLUENCE_API_TOKEN`
+- `CONFLUENCE_PAGE_ID`
+
+After that, every push to `main` that changes `docs/ui-snapshots/` or the Confluence markdown triggers `publish-confluence.yml` automatically.
 
 ## Publishing to Confluence
 
-One command updates the page — syncs markdown with GitHub image URLs and replaces the page body via the Confluence API.
+The markdown file (`docs/confluence-weekly-build-in-public.md`) is the long-term source of truth. Prose is edited manually; snapshot sections regenerate from markers. Publish pushes the page + images to Confluence.
 
-Push snapshot PNGs to GitHub before publishing so Confluence can load the images.
-
-### One-time setup
+### One-time setup (local)
 
 ```bash
 cp .env.example .env
-# Edit .env — page id is in the Confluence URL: .../pages/123456789/...
+# Page id is in the Confluence URL: .../pages/123456789/...
 # API token: https://id.atlassian.com/manage-profile/security/api-tokens
 ```
 
-### Publish
+### Ongoing workflow
 
 ```bash
-npm run publish:confluence
+npm run capture:current-week   # new screenshots + refresh auto sections
+git add docs/ && git commit -m "Update UI snapshots"
+git push origin main           # triggers auto-publish if secrets are set
+npm run publish:confluence     # or publish manually from your machine
 ```
 
-After capturing new screenshots:
+### What publish does
 
-```bash
-npm run capture:current-week   # or capture:and-sync
-npm run publish:confluence
-```
-
-### What it does
-
-1. Regenerates auto-snapshot sections in the markdown doc (GitHub raw URLs)
-2. Converts markdown → Confluence storage format and **PUT**s the page
-
-Images are loaded from GitHub (`raw.githubusercontent.com`), not page attachments.
-
-### Confluence attachments (optional)
-
-```bash
-CONFLUENCE_IMAGE_MODE=attachments npm run sync:confluence-doc
-npm run stage:confluence-attachments
-npm run upload:confluence-attachments
-```
+1. Regenerates auto-snapshot sections in the markdown (GitHub raw URLs on `main`)
+2. Copies PNGs to `docs/confluence-attachments/` (flat filenames)
+3. Uploads attachments to your Confluence page
+4. Converts markdown → Confluence storage with **attachment embeds** (reliable for all viewers)
+5. **PUT**s the page body via REST API
 
 ## Feature scenarios per week
 
