@@ -78,47 +78,52 @@ Your prose (Overview, Shipped, Technical notes) stays manual. Only the snapshot 
    ```
 4. Run `npm run capture:current-week`.
 
+## Automated sync (recommended)
+
+Once GitHub secrets are set, **you don't need to run anything manually**. Push code to `main` and CI handles the rest.
+
+### One-time GitHub setup
+
+In your repo → **Settings → Secrets and variables → Actions**, add:
+
+| Secret | Your value |
+|--------|------------|
+| `CONFLUENCE_BASE_URL` | `https://geniussports.atlassian.net/wiki` |
+| `CONFLUENCE_EMAIL` | your Atlassian email |
+| `CONFLUENCE_API_TOKEN` | from [Atlassian API tokens](https://id.atlassian.com/manage-profile/security/api-tokens) |
+| `CONFLUENCE_PAGE_ID` | `7091814415` |
+
+### What happens automatically
+
+Workflow: `.github/workflows/build-in-public-sync.yml`
+
+| You do | CI does |
+|--------|---------|
+| Push `src/` changes to `main` | Capture current week → commit `docs/` → publish Confluence |
+| Push manual edits to the Confluence markdown | Publish Confluence |
+| Add feature config (no `src/` change) | Regenerate snapshot sections → publish |
+
+No Cursor prompts. No local `npm run publish:confluence` unless you want to preview before pushing.
+
+Local `.env` is only needed for manual publishes from your machine.
+
 ## CI (GitHub Actions)
 
-| Workflow | Trigger | What it does |
-|----------|---------|--------------|
-| `ui-snapshots.yml` | Push to `main` (`src/` changes) | Captures current week + syncs markdown; uploads artifacts |
-| `ui-snapshots.yml` | Manual → milestones | Full history capture + doc sync |
-| `publish-confluence.yml` | Push to `main` (`docs/` changes) | Publishes to Confluence if secrets are configured |
-| `publish-confluence.yml` | Manual | Publish on demand |
+| Trigger | What it does |
+|---------|--------------|
+| Push to `main` (`src/` changes) | Capture → commit docs → publish Confluence |
+| Push to `main` (`docs/` or snapshot scripts) | Sync and/or publish |
+| Manual → **current-week** | Capture latest week + publish |
+| Manual → **milestones** | Full history capture + publish |
+| Manual → **publish-only** | Publish without re-capturing |
 
-Download PNGs from the snapshot run’s **Artifacts** tab when not committing images to git.
+## Publishing to Confluence (manual fallback)
 
-### Auto-publish to Confluence (optional)
-
-Add these **repository secrets** in GitHub → Settings → Secrets:
-
-- `CONFLUENCE_BASE_URL` — e.g. `https://yoursite.atlassian.net/wiki`
-- `CONFLUENCE_EMAIL`
-- `CONFLUENCE_API_TOKEN`
-- `CONFLUENCE_PAGE_ID`
-
-After that, every push to `main` that changes `docs/ui-snapshots/` or the Confluence markdown triggers `publish-confluence.yml` automatically.
-
-## Publishing to Confluence
-
-The markdown file (`docs/confluence-weekly-build-in-public.md`) is the long-term source of truth. Prose is edited manually; snapshot sections regenerate from markers. Publish pushes the page + images to Confluence.
-
-### One-time setup (local)
+The markdown file (`docs/confluence-weekly-build-in-public.md`) is the source of truth in git. CI keeps Confluence in sync; use this only if you want to publish without pushing.
 
 ```bash
-cp .env.example .env
-# Page id is in the Confluence URL: .../pages/123456789/...
-# API token: https://id.atlassian.com/manage-profile/security/api-tokens
-```
-
-### Ongoing workflow
-
-```bash
-npm run capture:current-week   # new screenshots + refresh auto sections
-git add docs/ && git commit -m "Update UI snapshots"
-git push origin main           # triggers auto-publish if secrets are set
-npm run publish:confluence     # or publish manually from your machine
+cp .env.example .env   # one-time local setup
+npm run publish:confluence
 ```
 
 ### What publish does
