@@ -121,12 +121,12 @@ export async function listAttachments(config, pageId) {
   return byTitle
 }
 
-async function attachmentDataRequest(config, url, filename, buffer) {
+async function attachmentDataRequest(config, url, filename, buffer, method = 'POST') {
   const form = new FormData()
   form.append('file', new Blob([buffer], { type: 'image/png' }), filename)
 
   const res = await fetch(url, {
-    method: 'POST',
+    method,
     headers: {
       Authorization: config.authHeader,
       'X-Atlassian-Token': 'no-check',
@@ -138,11 +138,10 @@ async function attachmentDataRequest(config, url, filename, buffer) {
     const body = await res.text()
     throw new Error(`Attachment upload failed for ${filename} (${res.status}): ${body.slice(0, 400)}`)
   }
+
+  return res.json().catch(() => null)
 }
 
-async function deleteAttachment(config, attachmentId) {
-  await confluenceFetch(config, `/rest/api/content/${attachmentId}`, { method: 'DELETE' })
-}
 
 export async function uploadAttachments(config, pageId, attachmentsDir) {
   const files = (await readdir(attachmentsDir))
@@ -162,18 +161,22 @@ export async function uploadAttachments(config, pageId, attachmentsDir) {
     const current = existing.get(filename)
 
     if (current) {
-      await deleteAttachment(config, current.id)
+      await attachmentDataRequest(
+        config,
+        `${config.baseUrl}/rest/api/content/${pageId}/child/attachment/${current.id}/data`,
+        filename,
+        buffer,
+      )
       updated += 1
     } else {
+      await attachmentDataRequest(
+        config,
+        `${config.baseUrl}/rest/api/content/${pageId}/child/attachment`,
+        filename,
+        buffer,
+      )
       created += 1
     }
-
-    await attachmentDataRequest(
-      config,
-      `${config.baseUrl}/rest/api/content/${pageId}/child/attachment`,
-      filename,
-      buffer,
-    )
   }
 
   return { total: files.length, created, updated }

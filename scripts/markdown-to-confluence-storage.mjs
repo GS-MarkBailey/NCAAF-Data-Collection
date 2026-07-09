@@ -22,13 +22,13 @@ function inlineMarkdown(text) {
 function attachmentImage(filename, alt) {
   const safeName = escapeXml(filename)
   const altAttr = alt ? ` ac:alt="${escapeXml(alt)}"` : ''
-  return `<ac:image ac:align="center" ac:layout="center" ac:width="900"${altAttr}><ri:attachment ri:filename="${safeName}" /></ac:image>`
+  return `<p><ac:image ac:align="center" ac:layout="center" ac:width="900"${altAttr}><ri:attachment ri:filename="${safeName}" /></ac:image></p>`
 }
 
 function externalImage(url, alt) {
   const safeUrl = escapeXml(url)
   const altAttr = alt ? ` ac:alt="${escapeXml(alt)}"` : ''
-  return `<ac:image ac:align="center" ac:layout="center" ac:width="900"${altAttr}><ri:url ri:value="${safeUrl}" /></ac:image>`
+  return `<p><ac:image ac:align="center" ac:layout="center" ac:width="900"${altAttr}><ri:url ri:value="${safeUrl}" /></ac:image></p>`
 }
 
 function parseImageToken(token) {
