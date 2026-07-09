@@ -11,7 +11,6 @@ import {
   canEndCurrentPeriod,
   canStartNextPeriod,
   canStartOvertime,
-  isAwaitingQuarterStart,
   isAwaitingRegulationDecision,
   isOvertimePeriod,
 } from '@/lib/clock'
@@ -148,30 +147,6 @@ export const useAppStore = create<AppStore>((set, get) => ({
         period: game.clock.period,
       }
 
-      if (!game.gameStarted) {
-        return {
-          games: updateGame(state.games, fixtureId, (g) => ({
-            ...g,
-            gameStarted: true,
-            periodEnded: false,
-            clock: { ...g.clock, running: true },
-          })),
-          actionLogs: appendAction(
-            state.actionLogs,
-            createUserAction(
-              fixtureId,
-              {
-                type: 'clock_toggle',
-                payload: { running: true, seconds: game.clock.seconds },
-              },
-              clockBefore,
-            ),
-          ),
-        }
-      }
-
-      if (isAwaitingQuarterStart(game.clock, game.gameStarted)) return state
-
       const running = !game.clock.running
       const seconds = game.clock.seconds
       return {
@@ -187,7 +162,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
               type: 'clock_toggle',
               payload: { running, seconds },
             },
-            { seconds: game.clock.seconds, period: game.clock.period },
+            clockBefore,
           ),
         ),
       }
