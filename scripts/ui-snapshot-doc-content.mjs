@@ -57,8 +57,8 @@ export const WEEK_INTERACTIONS = {
   ],
   'week-4': [
     {
-      text: '**Fixtures filters & search** — date, time, team, and unified search on one compact row',
-      featureIds: ['fixtures-filters'],
+      text: '**Fixtures search & refresh** — compact search on the left, refresh button on the right; pull-to-refresh on mobile',
+      featureIds: ['fixtures-search'],
     },
     {
       text: '**Scheduled / past chips** — status at a glance; past fixtures open in match-ended state',
@@ -90,7 +90,7 @@ export const WEEK_SHIPPED = {
     settings: { featureIds: ['settings-tabs'] },
   },
   'week-4': {
-    'fixtures-page': { featureIds: ['fixtures-filters', 'fixture-status-chips'] },
+    'fixtures-page': { featureIds: ['fixtures-search', 'fixture-status-chips'] },
     'match-ended': { featureIds: ['past-fixture-ended'] },
     'portrait-game': { featureIds: ['portrait-stack'] },
   },

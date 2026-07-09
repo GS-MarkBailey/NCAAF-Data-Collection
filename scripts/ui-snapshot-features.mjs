@@ -146,12 +146,12 @@ export const WEEK_FEATURES = {
   ],
   'week-4': [
     {
-      id: 'fixtures-filters',
-      title: 'Fixtures filters and search',
+      id: 'fixtures-search',
+      title: 'Fixtures search and refresh',
       path: '/fixtures',
       viewport: 'fixtures-landscape',
       async prepare(page) {
-        await page.locator('#fixture-filter-date').waitFor({ state: 'visible' })
+        await page.locator('#fixture-search').waitFor({ state: 'visible' })
       },
     },
     {

@@ -1,5 +1,5 @@
 {
-  "stagedAt": "2026-07-09T14:01:03.368Z",
+  "stagedAt": "2026-07-09T14:07:44.142Z",
   "files": [
     {
       "relPath": "week-1/features/action-log.png",
@@ -74,8 +74,8 @@
       "attachmentName": "week-4--features--fixture-status-chips.png"
     },
     {
-      "relPath": "week-4/features/fixtures-filters.png",
-      "attachmentName": "week-4--features--fixtures-filters.png"
+      "relPath": "week-4/features/fixtures-search.png",
+      "attachmentName": "week-4--features--fixtures-search.png"
     },
     {
       "relPath": "week-4/features/past-fixture-ended.png",

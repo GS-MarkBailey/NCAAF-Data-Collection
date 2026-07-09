@@ -313,7 +313,7 @@ On the game page, portrait mode dropped tabs in favour of a vertical stack of pa
 - Date/time/team filter dropdowns removed in favour of search-only discovery
 
 <!-- AUTO-SNAPSHOTS:week-4-shipped-fixtures-page:START -->
-![Fixtures filters and search](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/fixtures-filters.png) ![Scheduled and past fixture chips](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/fixture-status-chips.png)
+![Fixtures search and refresh](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/fixtures-search.png) ![Scheduled and past fixture chips](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/fixture-status-chips.png)
 <!-- AUTO-SNAPSHOTS:week-4-shipped-fixtures-page:END -->
 
 **Match-ended scoreboard behaviour**
@@ -377,9 +377,9 @@ On the game page, portrait mode dropped tabs in favour of a vertical stack of pa
 ### Key interactions
 
 <!-- AUTO-SNAPSHOTS:week-4-interactions:START -->
-- **Fixtures filters & search** — date, time, team, and unified search on one compact row
+- **Fixtures search & refresh** — compact search on the left, refresh button on the right; pull-to-refresh on mobile
 
-![Fixtures filters and search](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/fixtures-filters.png)
+![Fixtures search and refresh](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/fixtures-search.png)
 
 - **Scheduled / past chips** — status at a glance; past fixtures open in match-ended state
 

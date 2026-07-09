@@ -1,7 +1,7 @@
 {
   "label": "week-4",
   "portrait": true,
-  "capturedAt": "2026-07-09T09:34:43.829Z",
+  "capturedAt": "2026-07-09T14:07:37.424Z",
   "baseUrl": "https://ncaaf-data-collection.vercel.app",
   "views": [
     "fixtures-landscape",
@@ -13,9 +13,9 @@
   ],
   "features": [
     {
-      "id": "fixtures-filters",
-      "title": "Fixtures filters and search",
-      "file": "features/fixtures-filters.png"
+      "id": "fixtures-search",
+      "title": "Fixtures search and refresh",
+      "file": "features/fixtures-search.png"
     },
     {
       "id": "fixture-status-chips",
