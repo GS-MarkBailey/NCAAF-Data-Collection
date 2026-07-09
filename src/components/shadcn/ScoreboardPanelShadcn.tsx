@@ -220,7 +220,8 @@ export function ScoreboardPanelShadcn({
   }
 
   const canUsePlayPause = showPlayPause && showPlayPauseButton
-  const canToggleClock = !clockLocked && canUsePlayPause
+  const canToggleClock =
+    !clockLocked && canUsePlayPause && !showClockWheelEditor
 
   const handleEndPeriod = (event: MouseEvent<HTMLButtonElement>) => {
     openConfirmation('endPeriod', event)
@@ -372,23 +373,6 @@ export function ScoreboardPanelShadcn({
           {paused ? 'Start' : 'Pause'}
         </Badge>
       ) : null}
-      {showClockWheelEditor && showPlayPause && !clockLocked && !inOvertime ? (
-        <Badge
-          render={
-            <button
-              type="button"
-              onClick={(event) => {
-                event.stopPropagation()
-                handleOpenClockEditor()
-              }}
-              aria-label={`Edit game clock, currently ${formatClock(clockSeconds)}`}
-            />
-          }
-          className={PRIMARY_ACTION_BADGE_CLASS}
-        >
-          Edit clock
-        </Badge>
-      ) : null}
     </>
   )
 
@@ -400,11 +384,9 @@ export function ScoreboardPanelShadcn({
         pregame ||
         showStartOvertimeButton ||
         showEndOvertimeButton)) ||
-    (showPlayPause && showPlayPauseButton) ||
-    (showClockWheelEditor && showPlayPause && !clockLocked && !inOvertime)
+    (showPlayPause && showPlayPauseButton)
 
-  const clockEditButton =
-    showClockWheelEditor && !showPlayPause ? (
+  const clockEditButton = showClockWheelEditor ? (
       <button
         type="button"
         className={cn(
