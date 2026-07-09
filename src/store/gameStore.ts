@@ -140,7 +140,36 @@ export const useAppStore = create<AppStore>((set, get) => ({
   toggleClock: (fixtureId) => {
     set((state) => {
       const game = state.games[fixtureId]
-      if (!game || !game.gameStarted || game.gameEnded) return state
+      if (!game || game.gameEnded) return state
+      if (game.clock.seconds <= 0) return state
+
+      const clockBefore = {
+        seconds: game.clock.seconds,
+        period: game.clock.period,
+      }
+
+      if (!game.gameStarted) {
+        return {
+          games: updateGame(state.games, fixtureId, (g) => ({
+            ...g,
+            gameStarted: true,
+            periodEnded: false,
+            clock: { ...g.clock, running: true },
+          })),
+          actionLogs: appendAction(
+            state.actionLogs,
+            createUserAction(
+              fixtureId,
+              {
+                type: 'clock_toggle',
+                payload: { running: true, seconds: game.clock.seconds },
+              },
+              clockBefore,
+            ),
+          ),
+        }
+      }
+
       if (isAwaitingQuarterStart(game.clock, game.gameStarted)) return state
 
       const running = !game.clock.running

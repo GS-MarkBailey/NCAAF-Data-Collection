@@ -9,6 +9,7 @@ import {
   canEndCurrentPeriod,
   canStartNextPeriod,
   canStartOvertime,
+  canUsePlayPauseWithoutPeriodManagement,
   isAwaitingRegulationDecision,
   isOvertimePeriod,
   isPeriodInProgress,
@@ -150,8 +151,11 @@ export function ScoreboardPanelShadcn({
   )
   const inOvertime = isOvertimePeriod(clockPeriod)
   const showEndOvertimeButton = inOvertime && !gameEnded
-  const showPlayPauseButton =
-    gameStarted && !gameEnded && periodInProgress
+  const showPlayPauseButton = showPeriodManagement
+    ? gameStarted && !gameEnded && periodInProgress
+    : canUsePlayPauseWithoutPeriodManagement(gameEnded, {
+        seconds: clockSeconds,
+      })
   const clockLocked = gameEnded
 
   const handleOpenClockEditor = () => {

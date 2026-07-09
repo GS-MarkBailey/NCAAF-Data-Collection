@@ -33,6 +33,14 @@ export function isPeriodInProgress(
   )
 }
 
+/** Play/pause when period workflow is off — clock-driven MVP (no kick-off required). */
+export function canUsePlayPauseWithoutPeriodManagement(
+  gameEnded: boolean,
+  clock: { seconds: number },
+): boolean {
+  return !gameEnded && clock.seconds > 0
+}
+
 /** True when the operator can end the current regulation period (End PRD). */
 export function canEndCurrentPeriod(
   gameStarted: boolean,
