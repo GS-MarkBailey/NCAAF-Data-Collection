@@ -4,7 +4,7 @@
 **Live demo:** https://ncaaf-data-collection.vercel.app  
 **Repository:** GitHub (auto-deployed to Vercel on each change)  
 **Period covered:** 16 June 2026 – 12 July 2026  
-**Last updated:** 9 Jul 2026 (snapshots synced automatically)
+**Last updated:** 9 Jul 2026 (MVP polish — fixtures search, play/pause, profile, risk layout)
 
 **Confluence images:** Auto-synced by GitHub Actions on push to `main` (capture → publish). Manual fallback: `npm run publish:confluence`.
 
@@ -22,14 +22,14 @@ The prototype is intentionally demo-driven today: fixtures, scores, and play-by-
 
 We built a mobile-first NCAAF data collection prototype from scratch in four weeks of active development. The app lets operators select a fixture, take control of a live game console, manage the clock and scoreboard, toggle risk flags, and review an action log — optimised for landscape and portrait phones, installable as a PWA, and configurable via deployable feature flags.
 
-Development moved in a clear arc: first map requirements and explore responsive layout in Figma, then establish the three-panel game console and deployment pipeline, then add operator-grade clock and period controls, then open up remote feature configuration, and finally polish the fixtures list and portrait iPhone experience. The heaviest weeks were Week 1 (foundation) and Week 3 (game logic), with Week 4 focused on real-device testing feedback from iPhone users.
+Development moved in a clear arc: first map requirements and explore responsive layout in Figma, then establish the three-panel game console and deployment pipeline, then add operator-grade clock and period controls, then open up remote feature configuration, and finally polish the fixtures list, MVP scoreboard flags, and portrait iPhone experience. The heaviest weeks were Week 1 (foundation) and Week 3 (game logic), with Week 4 focused on real-device testing feedback from iPhone users and late MVP operator tweaks.
 
 | Week | Dates | Theme | Highlights |
 |------|-------|-------|------------|
 | 1 | 16–22 Jun 2026 | Foundation | Requirements phasing spreadsheet, Figma mobile-first exploration, app scaffold, three-panel game console, PWA, Vercel deploy pipeline |
 | 2 | 23–29 Jun 2026 | Config groundwork | Feature flags panel polish |
 | 3 | 30 Jun–5 Jul 2026 | Game logic & platform | Clock editor, period flow, field direction, feature flag deploy, error toasts |
-| 4 | 6–12 Jul 2026 | Fixtures & mobile | Filters, pull-to-refresh, portrait layout, iOS fixes |
+| 4 | 6–12 Jul 2026 | Fixtures & mobile | Search & refresh, portrait layout, MVP scoreboard flags, profile, iOS fixes |
 
 **Total:** ~154 commits · React + Vite + TypeScript · shadcn/ui · Zustand
 
@@ -179,13 +179,13 @@ Supporting work included the connection status chip, fixture-scoped error toasts
 
 **Feature flags system**
 - 20+ flags across five groups: Game Console, Header, Scoreboard, Risk Management, Settings
-- Settings → UI tab: toggle any panel, header element, scoreboard behaviour, or risk type
+- Settings → Features tab: toggle any panel, header element, scoreboard behaviour, or risk type
 - Parent/child flag dependencies (e.g. scoreboard sub-flags require scoreboard panel)
 - Settings gear always available (cannot be hidden by accident)
-- **Deploy to Vercel:** confirm changes with passphrase → updates `feature-flag-defaults.json` for all users
+- **Deploy to Vercel:** Settings → Features → **Confirm & deploy** (passphrase) → updates `feature-flag-defaults.json` on GitHub and redeploys for all users — toggling alone is a local preview until confirmed
 - Serverless API (`/api/deploy-feature-flags`) + dev middleware
 - Recovery via `?resetFeatureFlags` URL parameter
-- Published defaults: play-by-play hidden by default; connection status configurable
+- Published defaults: play-by-play hidden; period management off for MVP; play/pause and clock editor on
 
 <!-- AUTO-SNAPSHOTS:week-3-shipped-feature-flags:START -->
 ![Settings dialog (Log / Field / Features)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/features/settings-tabs.png)
@@ -204,16 +204,15 @@ Supporting work included the connection status chip, fixture-scoped error toasts
 
 **Scoreboard & clock overhaul**
 - **Clock wheel editor** — iOS-style scroll pickers for period · minutes : seconds
-- Tap clock → edit with Cancel / Confirm
-- Tap elsewhere in clock area → pause or start
-- **Full period lifecycle:**
+- Tap clock time → edit with Cancel / Confirm
+- **Play / pause** (feature-flagged) — Start/Pause chip toggles the running clock; no kick-off required when period management is off
+- **Period management** (feature-flagged, off in MVP defaults) — full lifecycle when enabled:
   - KICK OFF (pre-game)
   - END PERIOD when clock reaches 0:00
   - START PERIOD after period ended
   - End-of-regulation choice: start overtime or end game
   - END GAME in overtime
   - MATCH ENDED display when game finished
-- Pause/Start chip always visible
 - Cancel/Confirm confirmation for end period, end game, and start overtime
 - Quarter status cell colour coding (feature-flagged)
 - Clock editor capped at 15 minutes
@@ -295,24 +294,26 @@ Supporting work included the connection status chip, fixture-scoped error toasts
 
 ### Overview
 
-Week 4 shifted attention from the game console to the **fixtures entry point** and to **portrait iPhone** usage — feedback showed operators often hold the phone vertically and need to find the right match quickly. We rebuilt the fixtures page with filters, unified search, scheduled/past status chips, pull-to-refresh, and sensible sort order (upcoming fixtures first). Past fixtures now open in a post-match state with final scores and em-dash placeholders on live stat cells, mirroring what collectors see after ending a game.
+Week 4 shifted attention from the game console to the **fixtures entry point** and to **portrait iPhone** usage — feedback showed operators often hold the phone vertically and need to find the right match quickly. We rebuilt the fixtures page with compact search, a refresh control, scheduled/past status chips, pull-to-refresh, and sensible sort order (upcoming fixtures first). Past fixtures now open in a post-match state with final scores and em-dash placeholders on live stat cells, mirroring what collectors see after ending a game.
 
-On the game page, portrait mode dropped tabs in favour of a vertical stack of panels, reworked the header for thumb reach, separated clock from action chips to prevent mis-taps, and fixed several iOS-specific issues including a blank-screen regression and clock editor layout overlap. Most of this work landed in a concentrated session on 7 July, with live Vercel verification on device.
+A follow-up session on **9 July** tightened the MVP operator experience: simplified fixtures toolbar (search left, refresh right), split scoreboard play/pause from period management via feature flags, added a profile button in the header, and gave the **Unreliable** risk chip distinct placement and styling in the risk panel.
+
+On the game page, portrait mode dropped tabs in favour of a vertical stack of panels, reworked the header for thumb reach, separated clock editing from play/pause controls, and fixed several iOS-specific issues including a blank-screen regression and clock editor layout overlap. Most of this work landed in a concentrated session on 7 July, with live Vercel verification on device.
 
 ### Shipped
 
 **Fixtures page**
-- **Filters:** start date, start time, team (alphabetised dropdown), fixture ID — all derived from fixture data
-- **Unified search** — one search box for teams, times, dates, and IDs
-- Filters and search on a single compact row; responsive grid on mobile
+- **Search** — fixed-width field on the left; matches all fixture metadata (teams, abbreviations, IDs, dates, times, status, scores)
+- **Refresh** — icon button on the right (in addition to pull-to-refresh on mobile)
 - **Status chips:** green “Scheduled” for upcoming; neutral for past fixtures
 - **Sort order:** furthest-ahead fixtures at top
 - **Past fixtures** added to demo data with final scores
 - **Post-match state:** opening a past fixture loads ended-game view (same as operator ending a game)
 - **Pull-to-refresh** with success toast (“Fixtures list refreshed”)
+- Date/time/team filter dropdowns removed in favour of search-only discovery
 
 <!-- AUTO-SNAPSHOTS:week-4-shipped-fixtures-page:START -->
-![Fixtures filters and search](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/fixtures-filters.png) ![Scheduled and past fixture chips](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/fixture-status-chips.png)
+![Fixtures search and refresh](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/fixtures-filters.png) ![Scheduled and past fixture chips](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/fixture-status-chips.png)
 <!-- AUTO-SNAPSHOTS:week-4-shipped-fixtures-page:END -->
 
 **Match-ended scoreboard behaviour**
@@ -328,9 +329,9 @@ On the game page, portrait mode dropped tabs in favour of a vertical stack of pa
 **Portrait mobile — game page**
 - Removed tabs on portrait; scoreboard, play-by-play, and risks **stack vertically**
 - **Header layout (portrait):**
-  - Row 1: back + connection chip | settings + take control
+  - Row 1: back + connection chip | settings + profile + take control
   - Row 2: home · score · away
-- Clock and action chips on separate rows (no accidental clock tap)
+- Tap clock time to edit; use Start/Pause chip to run or stop the clock (when period management is off, no kick-off required)
 - Panels fill vertical space with visible borders
 - Stat cells resized for small screens (no text clipping)
 - Possession buttons: corner rounding matches container (home = bottom-left, away = bottom-right)
@@ -350,10 +351,33 @@ On the game page, portrait mode dropped tabs in favour of a vertical stack of pa
 - Wheel picker initialises to current period/time on open
 - Fixed layout: picker no longer overlaps Cancel / Confirm buttons (fixed 84px viewport height)
 
+### 9 July — MVP polish
+
+**Scoreboard (MVP defaults)**
+- Split `scoreboard.playPause` and `scoreboard.periodManagement` — MVP ships with play/pause and clock editor on; kick-off / end period / overtime flow off until enabled
+- Play/pause only toggles `clock.running` (no implicit game start)
+- Tap clock time opens wheel editor; Start/Pause badge controls the running clock
+
+**Game header**
+- **Profile** icon button to the right of Settings — opens a dialog showing signed-in email (demo: `collector@geniussports.com`)
+
+**Risk management**
+- **Unreliable** chip pinned to bottom-right of the panel
+- Amber border/background when inactive for emphasis; selected state matches other risk chips (red)
+
+**Fixtures toolbar**
+- Search on the left (compact width), refresh icon on the right
+- Feature flag renamed from `fixtures.filters` to `fixtures.search`
+
+**Publishing**
+- Code changes: push to GitHub `main` → Vercel auto-deploys
+- Feature flag defaults: Settings → Features → **Confirm & deploy** (separate from git push)
+- Confluence build-in-public doc: auto-sync on push via GitHub Actions; manual `npm run publish:confluence`
+
 ### Key interactions
 
 <!-- AUTO-SNAPSHOTS:week-4-interactions:START -->
-- **Fixtures filters & search** — date, time, team, and unified search on one compact row
+- **Fixtures search & refresh** — compact search on the left, refresh button on the right; pull-to-refresh still available on mobile
 
 ![Fixtures filters and search](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/fixtures-filters.png)
 
@@ -372,31 +396,34 @@ On the game page, portrait mode dropped tabs in favour of a vertical stack of pa
 
 ---
 
-## Current product capabilities (as of 7 July 2026)
+## Current product capabilities (as of 9 July 2026)
 
 ### Overview
 
-The table below is a checklist of what the prototype supports today on the live Vercel build. Items marked complete are implemented and deployable; several depend on feature flags (e.g. play-by-play is built but off by default in published defaults). Nothing in this list implies backend integration — all state is client-side and resets on refresh except deployed feature flag defaults.
+The table below is a checklist of what the prototype supports today on the live Vercel build ([ncaaf-data-collection.vercel.app](https://ncaaf-data-collection.vercel.app)). Items marked complete are implemented and deployable; several depend on feature flags (e.g. play-by-play and period management are built but off in published MVP defaults). Nothing in this list implies backend integration — all state is client-side and resets on refresh except deployed feature flag defaults.
 
 | Area | Status |
 |------|--------|
-| Fixtures list with filters, search, sort, pull-to-refresh | ✅ |
+| Fixtures list with search, sort, pull-to-refresh, refresh button | ✅ |
 | Scheduled vs past fixture status | ✅ |
 | Post-match fixture entry | ✅ |
 | Three-panel game console (landscape + portrait) | ✅ |
-| Take Control with confirmation | ✅ |
-| Clock edit (wheel picker) + pause/start | ✅ |
-| Full period / overtime / game-end flow | ✅ |
+| Take Control with confirmation (feature-flagged) | ✅ |
+| Clock edit (wheel picker) — tap clock time | ✅ |
+| Play / pause clock (no kick-off required in MVP) | ✅ |
+| Full period / overtime / game-end flow (feature-flagged, off in MVP) | ✅ |
 | Field direction + quarter-end flip | ✅ |
-| Risk management toggles | ✅ |
+| Risk management toggles (Unreliable emphasised, bottom-right) | ✅ |
 | Play-by-play (feature-flagged, off by default) | ✅ |
 | Action log + CSV export | ✅ |
-| Feature flags with Vercel deploy | ✅ |
+| Feature flags with Vercel deploy (Confirm & deploy) | ✅ |
 | Connection status chip (feature-flagged) | ✅ |
-| Error toast (fixture-scoped) | ✅ |
+| Profile button + email dialog | ✅ |
+| Error toast (fixture-scoped, feature-flagged) | ✅ |
 | PWA / Add to Home Screen | ✅ |
 | iPhone portrait + landscape safe areas | ✅ |
-| Auto-deploy GitHub → Vercel | ✅ |
+| Auto-deploy GitHub → Vercel (code) | ✅ |
+| Auto-sync Confluence doc + snapshots (GitHub Actions) | ✅ |
 
 ---
 
@@ -404,7 +431,7 @@ The table below is a checklist of what the prototype supports today on the live 
 
 ### Overview
 
-The app is a single-page React application with no server-side rendering. Game and fixture state live in the browser; the only server interaction today is fetching published feature flag defaults and optionally posting new defaults through the deploy API. This keeps the prototype fast to iterate and easy to host on Vercel, at the cost of no persistence or multi-user sync until a backend is added.
+The app is a single-page React application with no server-side rendering. Game and fixture state live in the browser; server interaction today is limited to fetching published feature flag defaults (`/feature-flag-defaults.json`) and posting new defaults through the deploy API. **Code** ships via git push to `main` (Vercel rebuilds automatically). **Feature flag defaults** ship separately via Settings → Features → Confirm & deploy, which commits `public/feature-flag-defaults.json` to GitHub and triggers another Vercel deploy.
 
 | Layer | Technology |
 |-------|------------|
@@ -425,10 +452,12 @@ The app is a single-page React application with no server-side rendering. Game a
 These are deliberate prototype boundaries or open items identified during the four-week build. They are useful context for anyone evaluating the demo: the UI and flows are largely representative of target operator experience, but data, connectivity, and configuration security are not production-ready yet.
 
 - Demo data only — no live feed or backend integration yet
-- Feature flag deploy requires passphrase (not end-user self-service)
+- Feature flag deploy requires **Confirm & deploy** in Settings → Features (toggles alone are local preview); passphrase required on production if configured
+- Git push deploys code only — not in-browser feature flag drafts
 - Clock wheel initialisation on iPhone may need further device testing
 - Play-by-play simulation is synthetic, not tied to real game events
 - Connection status chip is UI-only (no real connectivity check)
+- Profile email is a placeholder (no auth yet)
 
 ---
 
