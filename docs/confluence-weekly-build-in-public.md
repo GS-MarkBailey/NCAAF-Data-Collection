@@ -12,7 +12,7 @@
 
 ## Overview
 
-MY document is a week-by-week record of the NCAAF Data Collection prototype — a mobile web app built for live game operators who need to manage clock, scoreboard, and risk state from a phone or tablet at the sideline. Work started from a blank repository on 16 June 2026 and progressed through four active development weeks, with each push to GitHub triggering an automatic deploy to Vercel so stakeholders can try changes on a real device within minutes.
+This document is a week-by-week record of the NCAAF Data Collection prototype — a mobile web app built for live game operators who need to manage clock, scoreboard, and risk state from a phone or tablet at the sideline. Work started from a blank repository on 16 June 2026 and progressed through four active development weeks, with each push to GitHub triggering an automatic deploy to Vercel so stakeholders can try changes on a real device within minutes.
 
 The prototype is intentionally demo-driven today: fixtures, scores, and play-by-play events use in-memory sample data rather than a live backend. That lets us validate layout, interaction design, and operator workflows on iPhone and landscape mobile before wiring up production APIs. Week 1 also included upfront product design work — a requirements phasing spreadsheet and Figma prototypes for mobile-first responsive components — that is not reflected in git history but shaped what was built. This write-up is structured for a **build in public** audience — what shipped each week, why it mattered, and where the product stands now.
 
