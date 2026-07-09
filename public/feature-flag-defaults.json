@@ -1,12 +1,12 @@
 {
-  "version": 1783599950280,
-  "updatedAt": "2026-07-09T12:25:50.280Z",
+  "version": 1783600368947,
+  "updatedAt": "2026-07-09T12:32:48.947Z",
   "flags": {
     "game.scoreboard": true,
     "game.playByPlay": false,
     "game.riskManagement": true,
     "game.fieldDirectionDialog": true,
-    "game.errorToast": true,
+    "game.errorToast": false,
     "header.connectionStatus": true,
     "header.takeControl": false,
     "header.settings": true,
