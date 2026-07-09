@@ -1,24 +1,33 @@
 {
-  "version": 1783444400212,
-  "updatedAt": "2026-07-07T17:13:20.212Z",
+  "version": 1783588452641,
+  "updatedAt": "2026-07-09T09:14:12.641Z",
   "flags": {
     "game.scoreboard": true,
-    "game.playByPlay": true,
+    "game.playByPlay": false,
     "game.riskManagement": true,
     "game.fieldDirectionDialog": true,
+    "game.errorToast": true,
     "header.connectionStatus": true,
     "header.takeControl": true,
     "header.settings": true,
     "scoreboard.quarterStatus": true,
     "scoreboard.possessionSwitch": true,
+    "scoreboard.clockWheelEditor": true,
+    "scoreboard.periodControls": true,
+    "scoreboard.downDistance": true,
+    "scoreboard.ballOn": true,
     "risk.challengeReview": true,
-    "risk.statDelay": false,
+    "risk.statDelay": true,
     "risk.bigPlay": true,
     "risk.penalty": true,
     "risk.touchdown": true,
     "risk.playAboutToStart": true,
     "settings.fieldDirection": true,
     "settings.actionLog": true,
-    "settings.csvExport": true
+    "settings.csvExport": true,
+    "settings.featureFlags": true,
+    "fixtures.filters": true,
+    "fixtures.pullToRefresh": true,
+    "fixtures.statusChips": true
   }
 }

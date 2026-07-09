@@ -47,6 +47,7 @@ export function ActionLogDialogShadcn({ fixtureId }: ActionLogDialogShadcnProps)
   const showFieldTab = useFeatureFlag('settings.fieldDirection')
   const showLogTab = useFeatureFlag('settings.actionLog')
   const showCsvExport = useFeatureFlag('settings.csvExport')
+  const showFeaturesTab = useFeatureFlag('settings.featureFlags')
   const defaultTab = showFieldTab ? 'field' : showLogTab ? 'log' : 'features'
 
   const reversed = [...actions].reverse()
@@ -83,9 +84,11 @@ export function ActionLogDialogShadcn({ fixtureId }: ActionLogDialogShadcnProps)
                 Log
               </TabsTrigger>
             ) : null}
-            <TabsTrigger value="features" className="flex-1">
-              Features
-            </TabsTrigger>
+            {showFeaturesTab ? (
+              <TabsTrigger value="features" className="flex-1">
+                Features
+              </TabsTrigger>
+            ) : null}
           </TabsList>
 
           <div className="relative min-h-0 flex-1">
@@ -171,11 +174,13 @@ export function ActionLogDialogShadcn({ fixtureId }: ActionLogDialogShadcnProps)
               </TabsContent>
             ) : null}
 
-            <TabsContent value="features" className={SETTINGS_TAB_CONTENT}>
-              <div className={`${SETTINGS_TAB_PANEL} h-full`}>
-                <FeatureFlagsPanel />
-              </div>
-            </TabsContent>
+            {showFeaturesTab ? (
+              <TabsContent value="features" className={SETTINGS_TAB_CONTENT}>
+                <div className={`${SETTINGS_TAB_PANEL} h-full`}>
+                  <FeatureFlagsPanel />
+                </div>
+              </TabsContent>
+            ) : null}
           </div>
         </Tabs>
       </DialogContent>

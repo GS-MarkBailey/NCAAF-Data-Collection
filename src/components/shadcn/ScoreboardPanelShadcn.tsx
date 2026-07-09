@@ -91,6 +91,10 @@ export function ScoreboardPanelShadcn({
   const setPossession = useAppStore((s) => s.setPossession)
   const showQuarterStatus = useFeatureFlag('scoreboard.quarterStatus')
   const showPossessionSwitch = useFeatureFlag('scoreboard.possessionSwitch')
+  const showClockWheelEditor = useFeatureFlag('scoreboard.clockWheelEditor')
+  const showPeriodControls = useFeatureFlag('scoreboard.periodControls')
+  const showDownDistance = useFeatureFlag('scoreboard.downDistance')
+  const showBallOn = useFeatureFlag('scoreboard.ballOn')
   const stacked = layout === 'stack'
 
   const [editingClock, setEditingClock] = useState(false)
@@ -150,7 +154,7 @@ export function ScoreboardPanelShadcn({
   const clockLocked = gameEnded
 
   const handleOpenClockEditor = () => {
-    if (clockLocked || inOvertime || pendingConfirmation) return
+    if (!showClockWheelEditor || clockLocked || inOvertime || pendingConfirmation) return
 
     const parts = clockToParts(clockSeconds)
     setDraftPeriod(clockPeriod)
@@ -201,7 +205,7 @@ export function ScoreboardPanelShadcn({
   }
 
   const handleToggleClock = () => {
-    if (gameEnded || pendingConfirmation) return
+    if (!showPeriodControls || gameEnded || pendingConfirmation) return
 
     if (pregame) {
       startPeriod(fixtureId)
@@ -377,15 +381,16 @@ export function ScoreboardPanelShadcn({
   )
 
   const showActionBar =
-    showStartPeriodButton ||
-    showEndPeriodButton ||
-    pregame ||
-    showStartOvertimeButton ||
-    showEndOvertimeButton ||
-    gameEnded ||
-    showPlayPauseButton
+    showPeriodControls &&
+    (showStartPeriodButton ||
+      showEndPeriodButton ||
+      pregame ||
+      showStartOvertimeButton ||
+      showEndOvertimeButton ||
+      gameEnded ||
+      showPlayPauseButton)
 
-  const clockEditButton = (
+  const clockEditButton = showClockWheelEditor ? (
     <button
       type="button"
       className={cn(
@@ -409,6 +414,10 @@ export function ScoreboardPanelShadcn({
         {clockDisplayText}
       </span>
     </button>
+  ) : (
+    <span className={cn('font-bold leading-none', clockDisplayLabel)}>
+      {clockDisplayText}
+    </span>
   )
 
   return (
@@ -594,29 +603,35 @@ export function ScoreboardPanelShadcn({
                   : undefined
               }
             />
-            <StatCell
-              label="DOWN"
-              value={down}
-              displayValue={gameEnded ? MATCH_ENDED_STAT : undefined}
-              compact={stacked}
-            />
-            <StatCell
-              label="TO GO"
-              value={distance}
-              displayValue={gameEnded ? MATCH_ENDED_STAT : undefined}
-              compact={stacked}
-            />
-            <BallOnStatCell
-              ballOn={ballOn}
-              offenseIsHome={offenseIsHome}
-              homeAttacksRight={homeAttacksRight}
-              inactive={gameEnded}
-              compact={stacked}
-              pulseEndColor="var(--card)"
-              shellClassName="border-border"
-              labelClassName="text-muted-foreground"
-              valueClassName="text-foreground"
-            />
+            {showDownDistance ? (
+              <>
+                <StatCell
+                  label="DOWN"
+                  value={down}
+                  displayValue={gameEnded ? MATCH_ENDED_STAT : undefined}
+                  compact={stacked}
+                />
+                <StatCell
+                  label="TO GO"
+                  value={distance}
+                  displayValue={gameEnded ? MATCH_ENDED_STAT : undefined}
+                  compact={stacked}
+                />
+              </>
+            ) : null}
+            {showBallOn ? (
+              <BallOnStatCell
+                ballOn={ballOn}
+                offenseIsHome={offenseIsHome}
+                homeAttacksRight={homeAttacksRight}
+                inactive={gameEnded}
+                compact={stacked}
+                pulseEndColor="var(--card)"
+                shellClassName="border-border"
+                labelClassName="text-muted-foreground"
+                valueClassName="text-foreground"
+              />
+            ) : null}
           </div>
 
           {showPossessionSwitch ? (

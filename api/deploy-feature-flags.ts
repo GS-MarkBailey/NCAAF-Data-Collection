@@ -8,7 +8,7 @@ type FeatureFlagPayload = {
   passphrase?: string
 }
 
-const LOCKED_ON = new Set(['header.settings'])
+const LOCKED_ON = new Set(['header.settings', 'settings.featureFlags'])
 const DEFAULTS_PATH = 'public/feature-flag-defaults.json'
 
 function normalizePayload(payload: FeatureFlagPayload) {

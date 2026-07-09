@@ -1,6 +1,7 @@
 import {
   DEFAULT_FEATURE_FLAGS,
   FEATURE_FLAGS,
+  LOCKED_ON_FEATURE_FLAGS,
   type FeatureFlagId,
 } from '@/config/featureFlags'
 
@@ -71,7 +72,9 @@ export function buildFeatureFlagDefaultsFile(
   version = Date.now(),
 ): FeatureFlagDefaultsFile {
   const normalized = mergeFlags(flags)
-  normalized['header.settings'] = true
+  for (const id of LOCKED_ON_FEATURE_FLAGS) {
+    normalized[id] = true
+  }
 
   return {
     version,

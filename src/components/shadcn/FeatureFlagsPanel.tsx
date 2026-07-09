@@ -3,6 +3,7 @@ import {
   FEATURE_FLAG_BY_ID,
   FEATURE_FLAG_GROUPS,
   FEATURE_FLAGS,
+  LOCKED_ON_FEATURE_FLAGS,
   type FeatureFlagId,
 } from '@/config/featureFlags'
 import { FeatureFlagDeployError } from '@/lib/featureFlagDeploy'
@@ -113,7 +114,7 @@ export function FeatureFlagsPanel() {
                   {groupFlags.map((flag) => {
                     const parentId =
                       'parent' in flag ? (flag.parent as FeatureFlagId) : undefined
-                    const lockedOn = flag.id === 'header.settings'
+                    const lockedOn = LOCKED_ON_FEATURE_FLAGS.includes(flag.id)
                     const configured = flags[flag.id]
                     const effective = isEnabled(flag.id)
                     const inactiveInApp = configured && !effective
@@ -132,7 +133,9 @@ export function FeatureFlagsPanel() {
                           label={flag.label}
                           description={
                             lockedOn
-                              ? 'Always enabled so settings stay accessible.'
+                              ? flag.id === 'header.settings'
+                                ? 'Always enabled so settings stay accessible.'
+                                : 'Always enabled so feature flags stay accessible.'
                               : inactiveHint ??
                                 ('description' in flag ? flag.description : undefined)
                           }

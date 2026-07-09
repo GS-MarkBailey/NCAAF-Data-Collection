@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import {
   DEFAULT_FEATURE_FLAGS,
   FEATURE_FLAGS,
+  LOCKED_ON_FEATURE_FLAGS,
   type FeatureFlagId,
   isFeatureEnabled,
 } from '@/config/featureFlags'
@@ -13,7 +14,7 @@ import {
 
 const STORAGE_KEY = 'ncaaf-feature-flags-draft'
 
-const LOCKED_ON_FLAGS: FeatureFlagId[] = ['header.settings']
+const LOCKED_ON_FLAGS: FeatureFlagId[] = LOCKED_ON_FEATURE_FLAGS
 
 type FeatureFlagState = Record<FeatureFlagId, boolean>
 

@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
+import { useFeatureFlag } from '@/hooks/useFeatureFlag'
 import { showSuccessToast } from '@/store/errorToastStore'
 import { useAppStore } from '@/store/gameStore'
 
@@ -35,6 +36,9 @@ export function FixturesPageShadcn() {
   const initGame = useAppStore((s) => s.initGame)
   const refreshFixtures = useAppStore((s) => s.refreshFixtures)
   const [filters, setFilters] = useState<FixtureFilters>(EMPTY_FIXTURE_FILTERS)
+  const showFilters = useFeatureFlag('fixtures.filters')
+  const showPullToRefresh = useFeatureFlag('fixtures.pullToRefresh')
+  const showStatusChips = useFeatureFlag('fixtures.statusChips')
 
   const handleRefresh = useCallback(async () => {
     await refreshFixtures()
@@ -43,6 +47,7 @@ export function FixturesPageShadcn() {
 
   const { scrollRef, pullDistance, refreshing, pullReady } = usePullToRefresh({
     onRefresh: handleRefresh,
+    disabled: !showPullToRefresh,
   })
 
   const uniqueDates = useMemo(() => getUniqueFixtureDates(fixtures), [fixtures])
@@ -75,6 +80,7 @@ export function FixturesPageShadcn() {
           <h1 className="text-lg font-semibold tracking-tight">Fixtures</h1>
         </div>
 
+        {showFilters ? (
         <div className="grid grid-cols-2 gap-2 md:grid-cols-[8.5rem_7rem_minmax(11rem,1.5fr)_minmax(0,1fr)_auto] md:items-center">
           <select
             id="fixture-filter-date"
@@ -145,6 +151,7 @@ export function FixturesPageShadcn() {
             </Button>
           ) : null}
         </div>
+        ) : null}
       </header>
 
       <Separator />
@@ -156,10 +163,12 @@ export function FixturesPageShadcn() {
         <div
           className={cn(
             'pointer-events-none flex shrink-0 items-center justify-center overflow-hidden text-xs font-medium text-muted-foreground transition-[height,opacity] duration-150',
-            pullDistance > 0 || refreshing ? 'opacity-100' : 'opacity-0',
+            showPullToRefresh && (pullDistance > 0 || refreshing)
+              ? 'opacity-100'
+              : 'opacity-0',
           )}
           style={{ height: refreshing ? 40 : pullDistance }}
-          aria-hidden={!pullDistance && !refreshing}
+          aria-hidden={!showPullToRefresh || (!pullDistance && !refreshing)}
         >
           {refreshing ? (
             <span className="inline-flex items-center gap-1.5">
@@ -212,16 +221,18 @@ export function FixturesPageShadcn() {
                         </span>
                       </div>
                     </div>
-                    <Badge
-                      variant={scheduled ? 'outline' : 'secondary'}
-                      className={cn(
-                        'shrink-0',
-                        scheduled &&
-                          'border-emerald-200 bg-emerald-50 text-emerald-800',
-                      )}
-                    >
-                      {scheduled ? 'Scheduled' : 'Past'}
-                    </Badge>
+                    {showStatusChips ? (
+                      <Badge
+                        variant={scheduled ? 'outline' : 'secondary'}
+                        className={cn(
+                          'shrink-0',
+                          scheduled &&
+                            'border-emerald-200 bg-emerald-50 text-emerald-800',
+                        )}
+                      >
+                        {scheduled ? 'Scheduled' : 'Past'}
+                      </Badge>
+                    ) : null}
                   </div>
                 </CardHeader>
                 <CardContent className="pt-0">
@@ -232,7 +243,7 @@ export function FixturesPageShadcn() {
                     <span>{fixture.startTime}</span>
                     <span aria-hidden>·</span>
                     <span>#{fixture.eventId}</span>
-                    {!scheduled && fixture.finalScore ? (
+                    {showStatusChips && !scheduled && fixture.finalScore ? (
                       <>
                         <span aria-hidden>·</span>
                         <span className="font-medium text-foreground">

@@ -21,6 +21,7 @@ export function GamePageShadcn() {
   const showScoreboard = useFeatureFlag('game.scoreboard')
   const showPlayByPlay = useFeatureFlag('game.playByPlay')
   const showRiskManagement = useFeatureFlag('game.riskManagement')
+  const showErrorToast = useFeatureFlag('game.errorToast')
   const showFieldDirectionDialog = useFeatureFlag('game.fieldDirectionDialog')
 
   const desktopPanelCount = [showScoreboard, showPlayByPlay, showRiskManagement].filter(
@@ -30,7 +31,10 @@ export function GamePageShadcn() {
 
   useClockTicker(fixtureId)
 
-  useFixtureErrorToast(fixtureId, game?.homeAttacksRight)
+  useFixtureErrorToast(
+    showErrorToast ? fixtureId : undefined,
+    showErrorToast ? game?.homeAttacksRight : undefined,
+  )
 
   useEffect(() => {
     if (fixtureId) initGame(fixtureId)

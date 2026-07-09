@@ -5,6 +5,7 @@ export const FEATURE_FLAG_GROUPS = [
   'Header',
   'Scoreboard',
   'Risk Management',
+  'Fixtures',
   'Settings',
 ] as const
 
@@ -50,6 +51,13 @@ export const FEATURE_FLAGS = [
     defaultEnabled: true,
   },
   {
+    id: 'game.errorToast',
+    label: 'Fixture error toast',
+    description: 'Demo error notification on the game console (dismissible).',
+    group: 'Game Console',
+    defaultEnabled: true,
+  },
+  {
     id: 'header.connectionStatus',
     label: 'Connection status chip',
     description: 'Online indicator beside the back button.',
@@ -82,6 +90,38 @@ export const FEATURE_FLAGS = [
     id: 'scoreboard.possessionSwitch',
     label: 'Possession switch',
     description: 'Home / away possession selector.',
+    group: 'Scoreboard',
+    parent: 'game.scoreboard',
+    defaultEnabled: true,
+  },
+  {
+    id: 'scoreboard.clockWheelEditor',
+    label: 'Clock wheel editor',
+    description: 'Tap the clock to edit period, minutes, and seconds.',
+    group: 'Scoreboard',
+    parent: 'game.scoreboard',
+    defaultEnabled: true,
+  },
+  {
+    id: 'scoreboard.periodControls',
+    label: 'Period controls',
+    description: 'Kick off, end period, overtime, end game, and play/pause.',
+    group: 'Scoreboard',
+    parent: 'game.scoreboard',
+    defaultEnabled: true,
+  },
+  {
+    id: 'scoreboard.downDistance',
+    label: 'Down & distance',
+    description: 'DOWN and TO GO stat cells.',
+    group: 'Scoreboard',
+    parent: 'game.scoreboard',
+    defaultEnabled: true,
+  },
+  {
+    id: 'scoreboard.ballOn',
+    label: 'Ball on',
+    description: 'Ball position with direction arrow.',
     group: 'Scoreboard',
     parent: 'game.scoreboard',
     defaultEnabled: true,
@@ -150,9 +190,44 @@ export const FEATURE_FLAGS = [
     parent: 'settings.actionLog',
     defaultEnabled: true,
   },
+  {
+    id: 'settings.featureFlags',
+    label: 'Features tab',
+    description: 'Feature flag panel in Settings (always on so you can recover).',
+    group: 'Settings',
+    parent: 'header.settings',
+    defaultEnabled: true,
+  },
+  {
+    id: 'fixtures.filters',
+    label: 'Filters & search',
+    description: 'Date, time, team, and search row on the fixtures list.',
+    group: 'Fixtures',
+    defaultEnabled: true,
+  },
+  {
+    id: 'fixtures.pullToRefresh',
+    label: 'Pull to refresh',
+    description: 'Swipe down on the fixtures list to reload.',
+    group: 'Fixtures',
+    defaultEnabled: true,
+  },
+  {
+    id: 'fixtures.statusChips',
+    label: 'Scheduled / past chips',
+    description: 'Status badge and final score on fixture cards.',
+    group: 'Fixtures',
+    defaultEnabled: true,
+  },
 ] as const satisfies readonly FeatureFlagDefinition[]
 
 export type FeatureFlagId = (typeof FEATURE_FLAGS)[number]['id']
+
+/** Cannot be turned off — prevents locking yourself out of Settings → Features. */
+export const LOCKED_ON_FEATURE_FLAGS: FeatureFlagId[] = [
+  'header.settings',
+  'settings.featureFlags',
+]
 
 export const FEATURE_FLAG_BY_ID = Object.fromEntries(
   FEATURE_FLAGS.map((flag) => [flag.id, flag]),
