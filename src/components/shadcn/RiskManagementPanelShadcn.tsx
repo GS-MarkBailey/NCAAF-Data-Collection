@@ -21,6 +21,37 @@ const RISKS: { key: RiskType; label: string; fullWidth?: boolean }[] = [
   { key: 'playAboutToStart', label: 'Play About to Start' },
 ]
 
+const STANDARD_RISK_ITEM_CLASS = cn(
+  'h-full w-full justify-center whitespace-normal px-2 text-center leading-tight',
+  'border-border bg-secondary text-secondary-foreground hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)]',
+  'data-pressed:border-destructive data-pressed:bg-destructive data-pressed:text-white data-pressed:hover:bg-destructive',
+)
+
+const UNRELIABLE_RISK_ITEM_CLASS = cn(
+  STANDARD_RISK_ITEM_CLASS,
+  'border-amber-500/70 bg-amber-50 text-amber-950 shadow-sm',
+  'hover:bg-amber-100',
+  'dark:border-amber-500/50 dark:bg-amber-950/40 dark:text-amber-50 dark:hover:bg-amber-950/55',
+  'data-pressed:border-amber-700 data-pressed:bg-amber-600 data-pressed:text-white data-pressed:hover:bg-amber-600',
+  'ring-1 ring-inset ring-amber-500/20',
+  'font-semibold',
+)
+
+function getRiskGridRowCount(
+  standardCount: number,
+  hasUnreliable: boolean,
+): number {
+  if (standardCount === 0) return hasUnreliable ? 1 : 1
+
+  if (!hasUnreliable) {
+    return Math.max(1, Math.ceil(standardCount / 2))
+  }
+
+  return standardCount % 2 === 0
+    ? standardCount / 2 + 1
+    : Math.ceil(standardCount / 2)
+}
+
 const PORTRAIT_PANEL_CLASS = 'min-h-0 flex-1 border border-border ring-0'
 
 interface RiskManagementPanelShadcnProps {
@@ -42,10 +73,21 @@ export function RiskManagementPanelShadcn({
       ),
     [flags],
   )
+  const standardRisks = useMemo(
+    () => visibleRisks.filter(({ key }) => key !== 'statDelay'),
+    [visibleRisks],
+  )
+  const unreliableRisk = useMemo(
+    () => visibleRisks.find(({ key }) => key === 'statDelay'),
+    [visibleRisks],
+  )
   const activeValues = visibleRisks.filter(({ key }) => game.risks[key]).map(
     ({ key }) => key,
   )
-  const rowCount = Math.max(1, Math.ceil(visibleRisks.length / 2))
+  const rowCount = getRiskGridRowCount(
+    standardRisks.length,
+    Boolean(unreliableRisk),
+  )
   const stacked = layout === 'stack'
   const portraitPanelClass = PORTRAIT_PANEL_CLASS
 
@@ -87,23 +129,36 @@ export function RiskManagementPanelShadcn({
             className="grid h-full min-h-0 w-full grid-cols-2 gap-2"
             style={{ gridTemplateRows: `repeat(${rowCount}, minmax(0, 1fr))` }}
           >
-            {visibleRisks.map(({ key, label, fullWidth }) => (
+            {standardRisks.map(({ key, label, fullWidth }) => (
               <ToggleGroupItem
                 key={key}
                 value={key}
                 className={cn(
-                  'h-full w-full justify-center whitespace-normal px-2 text-center leading-tight',
+                  STANDARD_RISK_ITEM_CLASS,
                   stacked
                     ? 'min-h-11 text-xs'
                     : 'min-h-12 text-sm landscape-mobile:text-xs',
-                  'border-border bg-secondary text-secondary-foreground hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)]',
-                  'data-pressed:border-destructive data-pressed:bg-destructive data-pressed:text-white data-pressed:hover:bg-destructive',
                   fullWidth && 'col-span-2',
                 )}
               >
                 {label}
               </ToggleGroupItem>
             ))}
+            {unreliableRisk ? (
+              <ToggleGroupItem
+                key={unreliableRisk.key}
+                value={unreliableRisk.key}
+                style={{ gridColumn: 2, gridRow: rowCount }}
+                className={cn(
+                  UNRELIABLE_RISK_ITEM_CLASS,
+                  stacked
+                    ? 'min-h-11 text-xs'
+                    : 'min-h-12 text-sm landscape-mobile:text-xs',
+                )}
+              >
+                {unreliableRisk.label}
+              </ToggleGroupItem>
+            ) : null}
           </ToggleGroup>
         )}
       </CardContent>
