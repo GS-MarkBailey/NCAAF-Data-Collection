@@ -103,12 +103,20 @@ export const FEATURE_FLAGS = [
     defaultEnabled: true,
   },
   {
-    id: 'scoreboard.periodControls',
-    label: 'Period controls',
-    description: 'Kick off, end period, overtime, end game, and play/pause.',
+    id: 'scoreboard.playPause',
+    label: 'Play / pause',
+    description: 'Pause and resume the game clock during live play.',
     group: 'Scoreboard',
     parent: 'game.scoreboard',
     defaultEnabled: true,
+  },
+  {
+    id: 'scoreboard.periodManagement',
+    label: 'Period management',
+    description: 'Kick off, end period, start quarters, overtime, and end game.',
+    group: 'Scoreboard',
+    parent: 'game.scoreboard',
+    defaultEnabled: false,
   },
   {
     id: 'scoreboard.downDistance',

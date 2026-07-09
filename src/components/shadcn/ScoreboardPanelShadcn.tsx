@@ -92,7 +92,8 @@ export function ScoreboardPanelShadcn({
   const showQuarterStatus = useFeatureFlag('scoreboard.quarterStatus')
   const showPossessionSwitch = useFeatureFlag('scoreboard.possessionSwitch')
   const showClockWheelEditor = useFeatureFlag('scoreboard.clockWheelEditor')
-  const showPeriodControls = useFeatureFlag('scoreboard.periodControls')
+  const showPlayPause = useFeatureFlag('scoreboard.playPause')
+  const showPeriodManagement = useFeatureFlag('scoreboard.periodManagement')
   const showDownDistance = useFeatureFlag('scoreboard.downDistance')
   const showBallOn = useFeatureFlag('scoreboard.ballOn')
   const stacked = layout === 'stack'
@@ -205,25 +206,35 @@ export function ScoreboardPanelShadcn({
   }
 
   const handleToggleClock = () => {
-    if (!showPeriodControls || gameEnded || pendingConfirmation) return
+    if (gameEnded || pendingConfirmation) return
 
-    if (pregame) {
-      startPeriod(fixtureId)
-      return
+    if (showPeriodManagement) {
+      if (pregame) {
+        startPeriod(fixtureId)
+        return
+      }
+
+      if (showStartPeriodButton) {
+        startPeriod(fixtureId)
+        return
+      }
+
+      if (showStartOvertimeButton) {
+        setPendingConfirmation('startOvertime')
+        return
+      }
     }
 
-    if (showStartPeriodButton) {
-      startPeriod(fixtureId)
-      return
+    if (showPlayPause && showPlayPauseButton) {
+      toggleClock(fixtureId)
     }
-
-    if (showStartOvertimeButton) {
-      setPendingConfirmation('startOvertime')
-      return
-    }
-
-    toggleClock(fixtureId)
   }
+
+  const canUsePeriodActions =
+    showPeriodManagement &&
+    (pregame || showStartPeriodButton || showStartOvertimeButton)
+  const canUsePlayPause = showPlayPause && showPlayPauseButton
+  const canToggleClock = !clockLocked && (canUsePeriodActions || canUsePlayPause)
 
   const handleEndPeriod = (event: MouseEvent<HTMLButtonElement>) => {
     openConfirmation('endPeriod', event)
@@ -248,7 +259,7 @@ export function ScoreboardPanelShadcn({
   }
 
   const handleContainerKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (gameEnded || event.target !== event.currentTarget) return
+    if (!canToggleClock || event.target !== event.currentTarget) return
 
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault()
@@ -272,10 +283,11 @@ export function ScoreboardPanelShadcn({
       : formatClock(clockSeconds)
 
   const clockSurfaceClassName = cn(
-    (pregame ||
-      showEndPeriodButton ||
-      showStartPeriodButton ||
-      showStartOvertimeButton) &&
+    showPeriodManagement &&
+      (pregame ||
+        showEndPeriodButton ||
+        showStartPeriodButton ||
+        showStartOvertimeButton) &&
       'bg-[var(--color-primary-bg)]',
     gameEnded && 'bg-muted',
   )
@@ -283,12 +295,14 @@ export function ScoreboardPanelShadcn({
   const clockAreaClassName = cn(
     'relative flex min-h-0 flex-1 flex-col items-center justify-center gap-2 px-2 transition-colors',
     clockSurfaceClassName,
-    !stacked && !clockLocked && 'cursor-pointer hover:bg-muted/40 active:bg-muted/60',
+    !stacked &&
+      canToggleClock &&
+      'cursor-pointer hover:bg-muted/40 active:bg-muted/60',
   )
 
   const actionBadges = (
     <>
-      {showStartPeriodButton ? (
+      {showPeriodManagement && showStartPeriodButton ? (
         <Badge
           render={
             <button
@@ -302,7 +316,7 @@ export function ScoreboardPanelShadcn({
           Start Q{nextQuarterNumber(clockPeriod)}
         </Badge>
       ) : null}
-      {showEndPeriodButton ? (
+      {showPeriodManagement && showEndPeriodButton ? (
         <Badge
           render={
             <button
@@ -316,7 +330,7 @@ export function ScoreboardPanelShadcn({
           End period
         </Badge>
       ) : null}
-      {pregame ? (
+      {showPeriodManagement && pregame ? (
         <Badge
           render={
             <button
@@ -333,7 +347,7 @@ export function ScoreboardPanelShadcn({
           Kick off
         </Badge>
       ) : null}
-      {showStartOvertimeButton ? (
+      {showPeriodManagement && showStartOvertimeButton ? (
         <Badge
           render={
             <button
@@ -347,7 +361,7 @@ export function ScoreboardPanelShadcn({
           Start overtime
         </Badge>
       ) : null}
-      {showEndOvertimeButton ? (
+      {showPeriodManagement && showEndOvertimeButton ? (
         <Badge
           render={
             <button
@@ -362,7 +376,7 @@ export function ScoreboardPanelShadcn({
         </Badge>
       ) : null}
       {gameEnded ? <Badge variant="secondary">Final</Badge> : null}
-      {showPlayPauseButton ? (
+      {showPlayPause && showPlayPauseButton ? (
         <Badge
           variant="destructive"
           render={
@@ -381,14 +395,14 @@ export function ScoreboardPanelShadcn({
   )
 
   const showActionBar =
-    showPeriodControls &&
-    (showStartPeriodButton ||
-      showEndPeriodButton ||
-      pregame ||
-      showStartOvertimeButton ||
-      showEndOvertimeButton ||
-      gameEnded ||
-      showPlayPauseButton)
+    gameEnded ||
+    (showPeriodManagement &&
+      (showStartPeriodButton ||
+        showEndPeriodButton ||
+        pregame ||
+        showStartOvertimeButton ||
+        showEndOvertimeButton)) ||
+    (showPlayPause && showPlayPauseButton)
 
   const clockEditButton = showClockWheelEditor ? (
     <button
@@ -512,7 +526,7 @@ export function ScoreboardPanelShadcn({
             >
               <div className="relative flex min-h-0 flex-1 items-center justify-center px-2">
                 {clockEditButton}
-                {awaitingRegulationDecision && periodEnded ? (
+                {showPeriodManagement && awaitingRegulationDecision && periodEnded ? (
                   <Button
                     type="button"
                     variant="outline"
@@ -533,23 +547,25 @@ export function ScoreboardPanelShadcn({
           ) : (
             <div
               role="presentation"
-              tabIndex={clockLocked ? undefined : 0}
+              tabIndex={canToggleClock ? 0 : undefined}
               aria-label={
                 gameEnded
                   ? 'Game final'
-                  : awaitingRegulationDecision
-                    ? showStartOvertimeButton
-                      ? 'Start overtime'
-                      : 'End period'
-                    : showStartPeriodButton
-                      ? `Start quarter ${nextQuarterNumber(clockPeriod)}`
-                      : pregame
-                        ? 'Kick off game'
-                        : paused
-                          ? 'Start clock'
-                          : 'Pause clock'
+                  : canUsePeriodActions
+                    ? awaitingRegulationDecision
+                      ? showStartOvertimeButton
+                        ? 'Start overtime'
+                        : 'End period'
+                      : showStartPeriodButton
+                        ? `Start quarter ${nextQuarterNumber(clockPeriod)}`
+                        : 'Kick off game'
+                    : canUsePlayPause
+                      ? paused
+                        ? 'Start clock'
+                        : 'Pause clock'
+                      : 'Game clock'
               }
-              onClick={handleToggleClock}
+              onClick={canToggleClock ? handleToggleClock : undefined}
               onKeyDown={handleContainerKeyDown}
               className={clockAreaClassName}
             >
@@ -559,7 +575,7 @@ export function ScoreboardPanelShadcn({
                   {actionBadges}
                 </div>
               </div>
-              {awaitingRegulationDecision && periodEnded ? (
+              {showPeriodManagement && awaitingRegulationDecision && periodEnded ? (
                 <Button
                   type="button"
                   variant="outline"
