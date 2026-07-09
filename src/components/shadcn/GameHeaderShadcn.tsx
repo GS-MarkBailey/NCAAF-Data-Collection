@@ -3,6 +3,7 @@ import { ChevronLeft } from 'lucide-react'
 import type { GameState } from '@/types'
 import { ActionLogDialogShadcn } from '@/components/shadcn/ActionLogDialogShadcn'
 import { ConnectionStatusChip } from '@/components/shadcn/ConnectionStatusChip'
+import { ProfileDialogShadcn } from '@/components/shadcn/ProfileDialogShadcn'
 import { FeatureGate } from '@/components/game/FeatureGate'
 import { TakeControlButton } from '@/components/game/TakeControlButton'
 import { Badge } from '@/components/ui/badge'
@@ -43,6 +44,7 @@ export function GameHeaderShadcn({
             <FeatureGate flag="header.settings">
               <ActionLogDialogShadcn fixtureId={fixture.id} />
             </FeatureGate>
+            <ProfileDialogShadcn />
             <FeatureGate flag="header.takeControl">
               <TakeControlButton
                 variant="shadcn"
@@ -86,6 +88,7 @@ export function GameHeaderShadcn({
           <FeatureGate flag="header.settings">
             <ActionLogDialogShadcn fixtureId={fixture.id} />
           </FeatureGate>
+          <ProfileDialogShadcn />
           <FeatureGate flag="header.takeControl">
             <TakeControlButton
               variant="shadcn"
