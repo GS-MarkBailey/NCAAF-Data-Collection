@@ -559,7 +559,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   tickClock: (fixtureId) => {
     set((state) => ({
       games: updateGame(state.games, fixtureId, (game) => {
-        if (!game.gameStarted || !game.clock.running || game.clock.seconds <= 0) {
+        if (!game.clock.running || game.clock.seconds <= 0) {
           return game
         }
 
