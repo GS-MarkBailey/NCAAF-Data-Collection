@@ -101,6 +101,49 @@ export async function updatePageStorage(config, page, storageHtml, versionMessag
   })
 }
 
+export async function listAttachments(config, pageId) {
+  const byTitle = new Map()
+  let start = 0
+  const limit = 250
+
+  while (true) {
+    const data = await confluenceFetch(
+      config,
+      `/rest/api/content/${pageId}/child/attachment?start=${start}&limit=${limit}&expand=version`,
+    )
+    for (const attachment of data.results ?? []) {
+      byTitle.set(attachment.title, attachment)
+    }
+    if (data.size < limit) break
+    start += limit
+  }
+
+  return byTitle
+}
+
+async function attachmentDataRequest(config, url, filename, buffer) {
+  const form = new FormData()
+  form.append('file', new Blob([buffer], { type: 'image/png' }), filename)
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      Authorization: config.authHeader,
+      'X-Atlassian-Token': 'no-check',
+    },
+    body: form,
+  })
+
+  if (!res.ok) {
+    const body = await res.text()
+    throw new Error(`Attachment upload failed for ${filename} (${res.status}): ${body.slice(0, 400)}`)
+  }
+}
+
+async function deleteAttachment(config, attachmentId) {
+  await confluenceFetch(config, `/rest/api/content/${attachmentId}`, { method: 'DELETE' })
+}
+
 export async function uploadAttachments(config, pageId, attachmentsDir) {
   const files = (await readdir(attachmentsDir))
     .filter((f) => f.endsWith('.png'))
@@ -110,28 +153,28 @@ export async function uploadAttachments(config, pageId, attachmentsDir) {
     throw new Error(`No PNG attachments found in ${attachmentsDir}`)
   }
 
-  const form = new FormData()
+  const existing = await listAttachments(config, pageId)
+  let created = 0
+  let updated = 0
+
   for (const filename of files) {
     const buffer = await readFile(path.join(attachmentsDir, filename))
-    form.append('file', new Blob([buffer], { type: 'image/png' }), filename)
+    const current = existing.get(filename)
+
+    if (current) {
+      await deleteAttachment(config, current.id)
+      updated += 1
+    } else {
+      created += 1
+    }
+
+    await attachmentDataRequest(
+      config,
+      `${config.baseUrl}/rest/api/content/${pageId}/child/attachment`,
+      filename,
+      buffer,
+    )
   }
 
-  const res = await fetch(
-    `${config.baseUrl}/rest/api/content/${pageId}/child/attachment`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: config.authHeader,
-        'X-Atlassian-Token': 'no-check',
-      },
-      body: form,
-    },
-  )
-
-  if (!res.ok) {
-    const body = await res.text()
-    throw new Error(`Attachment upload failed (${res.status}): ${body.slice(0, 400)}`)
-  }
-
-  return files.length
+  return { total: files.length, created, updated }
 }

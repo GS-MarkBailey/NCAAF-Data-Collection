@@ -10,8 +10,8 @@ async function main() {
   await loadEnvFile(path.join(ROOT, '.env'))
   const config = confluenceConfig()
   await stageConfluenceAttachments()
-  const count = await uploadAttachments(config, config.pageId, STAGE_DIR)
-  console.log(`Uploaded ${count} attachment(s) to page ${config.pageId}`)
+  const { total, created, updated } = await uploadAttachments(config, config.pageId, STAGE_DIR)
+  console.log(`Synced ${total} attachment(s) to page ${config.pageId} (${created} new, ${updated} updated)`)
 }
 
 main().catch((err) => {

@@ -4,7 +4,7 @@
 **Live demo:** https://ncaaf-data-collection.vercel.app  
 **Repository:** GitHub (auto-deployed to Vercel on each change)  
 **Period covered:** 16 June 2026 – 12 July 2026  
-**Last updated:** 8 Jul 2026 (snapshots synced automatically)
+**Last updated:** 9 Jul 2026 (snapshots synced automatically)
 
 **Confluence images:** Auto-synced by GitHub Actions on push to `main` (capture → publish). Manual fallback: `npm run publish:confluence`.
 

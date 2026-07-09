@@ -38,8 +38,12 @@ async function main() {
   console.log(`     ${staged.length} PNG(s)`)
 
   console.log('3/4 Uploading attachments to Confluence…')
-  const uploaded = await uploadAttachments(config, config.pageId, STAGE_DIR)
-  console.log(`     ${uploaded} uploaded`)
+  const { total, created, updated: attachmentsUpdated } = await uploadAttachments(
+    config,
+    config.pageId,
+    STAGE_DIR,
+  )
+  console.log(`     ${total} attachment(s) (${created} new, ${attachmentsUpdated} updated)`)
 
   console.log('4/4 Updating Confluence page (attachment embeds for viewers)…')
   const page = await fetchPage(config)
