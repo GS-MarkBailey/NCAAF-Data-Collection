@@ -105,6 +105,8 @@ Workflow: `.github/workflows/build-in-public-sync.yml`
 
 No Cursor prompts. No local `npm run publish:confluence` unless you want to preview before pushing.
 
+**After capture or publish locally, always push to `main`** so GitHub raw URLs and Vercel reflect the new PNGs (see `.cursor/rules/push-snapshots-to-main.mdc`).
+
 Local `.env` is only needed for manual publishes from your machine.
 
 ## CI (GitHub Actions)
