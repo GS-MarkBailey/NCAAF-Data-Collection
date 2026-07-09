@@ -4,7 +4,7 @@
 **Live demo:** https://ncaaf-data-collection.vercel.app  
 **Repository:** GitHub (auto-deployed to Vercel on each change)  
 **Period covered:** 16 June 2026 – 12 July 2026  
-**Last updated:** 9 Jul 2026 (MVP polish — fixtures search, play/pause, profile, risk layout)
+**Last updated:** 9 Jul 2026 (snapshots synced automatically)
 
 **Confluence images:** Auto-synced by GitHub Actions on push to `main` (capture → publish). Manual fallback: `npm run publish:confluence`.
 
@@ -313,7 +313,7 @@ On the game page, portrait mode dropped tabs in favour of a vertical stack of pa
 - Date/time/team filter dropdowns removed in favour of search-only discovery
 
 <!-- AUTO-SNAPSHOTS:week-4-shipped-fixtures-page:START -->
-![Fixtures search and refresh](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/fixtures-filters.png) ![Scheduled and past fixture chips](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/fixture-status-chips.png)
+![Fixtures filters and search](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/fixtures-filters.png) ![Scheduled and past fixture chips](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/fixture-status-chips.png)
 <!-- AUTO-SNAPSHOTS:week-4-shipped-fixtures-page:END -->
 
 **Match-ended scoreboard behaviour**
@@ -377,7 +377,7 @@ On the game page, portrait mode dropped tabs in favour of a vertical stack of pa
 ### Key interactions
 
 <!-- AUTO-SNAPSHOTS:week-4-interactions:START -->
-- **Fixtures search & refresh** — compact search on the left, refresh button on the right; pull-to-refresh still available on mobile
+- **Fixtures filters & search** — date, time, team, and unified search on one compact row
 
 ![Fixtures filters and search](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/fixtures-filters.png)
 
