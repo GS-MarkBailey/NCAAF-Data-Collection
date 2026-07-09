@@ -65,14 +65,35 @@ export function getUniqueFixtureTeams(fixtures: Fixture[]): string[] {
 }
 
 function getFixtureSearchValues(fixture: Fixture): string[] {
-  return [
+  const scheduled = isFixtureScheduled(fixture)
+  const values = [
     fixture.id,
     fixture.eventId,
+    `#${fixture.eventId}`,
+    fixture.homeTeam,
+    fixture.homeAbbr,
+    fixture.awayTeam,
+    fixture.awayAbbr,
+    `${fixture.homeTeam} vs ${fixture.awayTeam}`,
+    `${fixture.homeAbbr} vs ${fixture.awayAbbr}`,
     fixture.startDate,
     fixture.startTime,
     `${fixture.startDate} ${fixture.startTime}`,
-    `#${fixture.eventId}`,
+    scheduled ? 'scheduled' : 'past',
   ]
+
+  if (fixture.finalScore) {
+    const { home, away } = fixture.finalScore
+    values.push(
+      String(home),
+      String(away),
+      `${home}-${away}`,
+      `${home}–${away}`,
+      `${home} - ${away}`,
+    )
+  }
+
+  return values
 }
 
 export function filterFixtures(

@@ -63,20 +63,15 @@ export function FixturesPageShadcn() {
           <h1 className="text-lg font-semibold tracking-tight">Fixtures</h1>
         </div>
 
-        <div
-          className={cn(
-            'flex items-center gap-2',
-            !showSearch && 'justify-end',
-          )}
-        >
+        <div className="flex items-center gap-2">
           {showSearch ? (
-            <div className="relative min-w-0 flex-1">
+            <div className="relative w-56 max-w-[calc(100%-2.75rem)] sm:w-64">
               <Search className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
               <Input
                 id="fixture-search"
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder="ID, date, time"
+                placeholder="Teams, IDs, dates…"
                 aria-label="Search fixtures"
                 className="pl-8"
               />
