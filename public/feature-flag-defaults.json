@@ -27,7 +27,7 @@
     "settings.actionLog": true,
     "settings.csvExport": true,
     "settings.featureFlags": true,
-    "fixtures.filters": true,
+    "fixtures.search": true,
     "fixtures.pullToRefresh": true,
     "fixtures.statusChips": true
   }

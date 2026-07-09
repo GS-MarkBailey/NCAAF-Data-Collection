@@ -109,5 +109,6 @@ export function usePullToRefresh({
     pullDistance,
     refreshing,
     pullReady: pullDistance >= PULL_THRESHOLD_PX,
+    refresh: runRefresh,
   }
 }

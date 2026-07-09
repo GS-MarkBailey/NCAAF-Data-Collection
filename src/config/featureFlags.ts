@@ -207,9 +207,9 @@ export const FEATURE_FLAGS = [
     defaultEnabled: true,
   },
   {
-    id: 'fixtures.filters',
-    label: 'Filters & search',
-    description: 'Date, time, team, and search row on the fixtures list.',
+    id: 'fixtures.search',
+    label: 'Fixture search',
+    description: 'Search field on the fixtures list.',
     group: 'Fixtures',
     defaultEnabled: true,
   },
