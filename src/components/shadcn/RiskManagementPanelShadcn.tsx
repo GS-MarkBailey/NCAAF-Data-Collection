@@ -29,12 +29,11 @@ const STANDARD_RISK_ITEM_CLASS = cn(
 
 const UNRELIABLE_RISK_ITEM_CLASS = cn(
   STANDARD_RISK_ITEM_CLASS,
-  'border-amber-500/70 bg-amber-50 text-amber-950 shadow-sm',
-  'hover:bg-amber-100',
-  'dark:border-amber-500/50 dark:bg-amber-950/40 dark:text-amber-50 dark:hover:bg-amber-950/55',
-  'data-pressed:border-amber-700 data-pressed:bg-amber-600 data-pressed:text-white data-pressed:hover:bg-amber-600',
-  'ring-1 ring-inset ring-amber-500/20',
   'font-semibold',
+  'ring-1 ring-inset ring-amber-500/20 data-pressed:ring-0',
+  'not-data-pressed:border-amber-500/70 not-data-pressed:bg-amber-50 not-data-pressed:text-amber-950 not-data-pressed:shadow-sm',
+  'not-data-pressed:hover:bg-amber-100',
+  'dark:not-data-pressed:border-amber-500/50 dark:not-data-pressed:bg-amber-950/40 dark:not-data-pressed:text-amber-50 dark:not-data-pressed:hover:bg-amber-950/55',
 )
 
 function getRiskGridRowCount(
