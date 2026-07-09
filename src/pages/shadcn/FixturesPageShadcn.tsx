@@ -71,8 +71,8 @@ export function FixturesPageShadcn() {
                 id="fixture-search"
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder="Teams, IDs, dates…"
-                aria-label="Search fixtures"
+                placeholder="Search"
+                aria-label="Search"
                 className="pl-8"
               />
             </div>
