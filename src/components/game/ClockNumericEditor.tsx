@@ -64,7 +64,8 @@ function NumericField({
         value={display}
         aria-label={label}
         className={cn(
-          'h-14 w-full max-w-[6rem] text-center text-3xl font-bold tabular-nums',
+          // Override base Input `text-base md:text-sm` so digits stay large on all breakpoints
+          'h-16 w-full max-w-[6.5rem] text-center text-4xl font-bold tabular-nums md:text-4xl',
           disabled && 'opacity-60',
         )}
         onFocus={(event) => event.currentTarget.select()}
@@ -117,7 +118,7 @@ export function ClockNumericEditor({
         onChange={onPeriodChange}
       />
       <span
-        className="mt-5 shrink-0 text-2xl font-bold text-muted-foreground"
+        className="mt-6 shrink-0 text-4xl font-bold text-muted-foreground"
         aria-hidden
       >
         ·
@@ -131,7 +132,7 @@ export function ClockNumericEditor({
         onChange={handleMinutesChange}
       />
       <span
-        className="mt-5 shrink-0 text-2xl font-bold text-muted-foreground"
+        className="mt-6 shrink-0 text-4xl font-bold text-muted-foreground"
         aria-hidden
       >
         :
