@@ -240,7 +240,7 @@ export const FEATURE_FLAGS = [
     id: 'scoreboard.clockNumericEditor',
     label: 'Variant B — Clock edit panel',
     description:
-      'ORIGINAL off (inline scroll wheel). ON: tap the clock to open a dialog with direct number entry and +/- steppers.',
+      'ORIGINAL off (inline scroll wheel). ON: tap the clock to open a dialog with direct number entry for period, minutes, and seconds.',
     group: 'Design variants',
     parent: 'scoreboard.clockWheelEditor',
     defaultEnabled: false,

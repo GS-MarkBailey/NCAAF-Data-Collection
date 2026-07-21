@@ -1,4 +1,3 @@
-import { Minus, Plus } from 'lucide-react'
 import {
   CLOCK_EDIT_MAX_MINUTES,
   CLOCK_EDIT_MAX_SECONDS,
@@ -6,7 +5,6 @@ import {
   MIN_PERIOD,
   clampPeriod,
 } from '@/lib/clock'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 
@@ -47,10 +45,6 @@ function NumericField({
 }: NumericFieldProps) {
   const display = pad ? value.toString().padStart(2, '0') : String(value)
 
-  const nudge = (delta: number) => {
-    onChange(clampInt(value + delta, min, max))
-  }
-
   return (
     <div className="flex min-w-0 flex-1 flex-col items-center gap-2">
       <label
@@ -59,54 +53,30 @@ function NumericField({
       >
         {label}
       </label>
-      <div className="flex w-full max-w-[6rem] flex-col items-stretch gap-1.5">
-        <Button
-          type="button"
-          variant="outline"
-          size="icon"
-          className="h-10 w-full"
-          aria-label={`Increase ${label}`}
-          disabled={disabled || value >= max}
-          onClick={() => nudge(1)}
-        >
-          <Plus className="size-4" />
-        </Button>
-        <Input
-          id={id}
-          type="text"
-          inputMode="numeric"
-          pattern="[0-9]*"
-          autoComplete="off"
-          enterKeyHint="done"
-          disabled={disabled}
-          value={display}
-          aria-label={label}
-          className={cn(
-            'h-14 text-center text-3xl font-bold tabular-nums',
-            disabled && 'opacity-60',
-          )}
-          onFocus={(event) => event.currentTarget.select()}
-          onChange={(event) => {
-            const digits = event.target.value.replace(/\D/g, '')
-            if (digits === '') {
-              onChange(min)
-              return
-            }
-            onChange(clampInt(Number.parseInt(digits, 10), min, max))
-          }}
-        />
-        <Button
-          type="button"
-          variant="outline"
-          size="icon"
-          className="h-10 w-full"
-          aria-label={`Decrease ${label}`}
-          disabled={disabled || value <= min}
-          onClick={() => nudge(-1)}
-        >
-          <Minus className="size-4" />
-        </Button>
-      </div>
+      <Input
+        id={id}
+        type="text"
+        inputMode="numeric"
+        pattern="[0-9]*"
+        autoComplete="off"
+        enterKeyHint="done"
+        disabled={disabled}
+        value={display}
+        aria-label={label}
+        className={cn(
+          'h-14 w-full max-w-[6rem] text-center text-3xl font-bold tabular-nums',
+          disabled && 'opacity-60',
+        )}
+        onFocus={(event) => event.currentTarget.select()}
+        onChange={(event) => {
+          const digits = event.target.value.replace(/\D/g, '')
+          if (digits === '') {
+            onChange(min)
+            return
+          }
+          onChange(clampInt(Number.parseInt(digits, 10), min, max))
+        }}
+      />
     </div>
   )
 }
@@ -133,7 +103,7 @@ export function ClockNumericEditor({
 
   return (
     <div
-      className="flex w-full max-w-md items-start justify-center gap-3 px-1"
+      className="flex w-full max-w-md items-center justify-center gap-3 px-1"
       role="group"
       aria-label="Edit game clock"
     >
@@ -147,7 +117,7 @@ export function ClockNumericEditor({
         onChange={onPeriodChange}
       />
       <span
-        className="mt-[3.25rem] shrink-0 text-2xl font-bold text-muted-foreground"
+        className="mt-5 shrink-0 text-2xl font-bold text-muted-foreground"
         aria-hidden
       >
         ·
@@ -161,7 +131,7 @@ export function ClockNumericEditor({
         onChange={handleMinutesChange}
       />
       <span
-        className="mt-[3.25rem] shrink-0 text-2xl font-bold text-muted-foreground"
+        className="mt-5 shrink-0 text-2xl font-bold text-muted-foreground"
         aria-hidden
       >
         :
