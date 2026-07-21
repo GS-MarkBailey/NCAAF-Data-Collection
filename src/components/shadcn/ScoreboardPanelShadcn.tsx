@@ -35,7 +35,6 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -712,10 +711,6 @@ export function ScoreboardPanelShadcn({
       >
         <DialogHeader className="border-b border-border px-4 pt-4 pb-3">
           <DialogTitle>Edit clock</DialogTitle>
-          <DialogDescription>
-            Type period, minutes, and seconds, or use +/- for one-step
-            adjustments.
-          </DialogDescription>
         </DialogHeader>
         <div className="flex justify-center px-3 py-4">
           <ClockNumericEditor
