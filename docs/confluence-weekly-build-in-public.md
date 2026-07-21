@@ -3,8 +3,8 @@
 **Product:** NCAAF live game data collection console  
 **Live demo:** https://ncaaf-data-collection.vercel.app  
 **Repository:** GitHub (auto-deployed to Vercel on each change)  
-**Period covered:** 16 June 2026 – 12 July 2026  
-**Last updated:** 21 Jul 2026 (snapshots synced automatically)
+**Period covered:** 16 June 2026 – 21 July 2026  
+**Last updated:** 21 Jul 2026 (device feedback variants + operator UI polish)
 
 **Confluence images:** Auto-synced by GitHub Actions on push to `main` (capture → publish). Manual fallback: `npm run publish:confluence`.
 
@@ -22,14 +22,14 @@ The prototype is intentionally demo-driven today: fixtures, scores, and play-by-
 
 We built a mobile-first NCAAF data collection prototype from scratch in four weeks of active development. The app lets operators select a fixture, take control of a live game console, manage the clock and scoreboard, toggle risk flags, and review an action log — optimised for landscape and portrait phones, installable as a PWA, and configurable via deployable feature flags.
 
-Development moved in a clear arc: first map requirements and explore responsive layout in Figma, then establish the three-panel game console and deployment pipeline, then add operator-grade clock and period controls, then open up remote feature configuration, and finally polish the fixtures list, MVP scoreboard flags, and portrait iPhone experience. The heaviest weeks were Week 1 (foundation) and Week 3 (game logic), with Week 4 focused on real-device testing feedback from iPhone users and late MVP operator tweaks.
+Development moved in a clear arc: first map requirements and explore responsive layout in Figma, then establish the three-panel game console and deployment pipeline, then add operator-grade clock and period controls, then open up remote feature configuration, then polish fixtures and portrait iPhone, and most recently respond to **on-device feedback** with opt-in design variants (display resilience, numeric clock panel) while keeping the original UI as the default. The heaviest weeks were Week 1 (foundation) and Week 3 (game logic).
 
 | Week | Dates | Theme | Highlights |
 |------|-------|-------|------------|
 | 1 | 16–22 Jun 2026 | Foundation | Requirements phasing spreadsheet, Figma mobile-first exploration, app scaffold, three-panel game console, PWA, Vercel deploy pipeline |
 | 2 | 23–29 Jun 2026 | Config groundwork | Feature flags panel polish |
 | 3 | 30 Jun–5 Jul 2026 | Game logic & platform | Clock editor, period flow, field direction, feature flag deploy, error toasts |
-| 4 | 6–12 Jul 2026 | Fixtures & mobile | Search & refresh, portrait layout, MVP scoreboard flags, profile, iOS fixes |
+| 4 | 6–21 Jul 2026 | Fixtures, mobile & feedback | Search & refresh, portrait, MVP flags, design variants A/B, device feedback fixes |
 
 **Total:** ~154 commits · React + Vite + TypeScript · shadcn/ui · Zustand
 
@@ -374,6 +374,26 @@ On the game page, portrait mode dropped tabs in favour of a vertical stack of pa
 - Feature flag defaults: Settings → Features → **Confirm & deploy** (separate from git push)
 - Confluence build-in-public doc: auto-sync on push via GitHub Actions; manual `npm run publish:confluence`
 
+### 21 July — device feedback & design variants
+
+Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX and display-scaling notes) drove a set of **opt-in design variants** plus operator polish. Original behaviour stays the default until a variant is enabled.
+
+**Design variants** (Settings → Features → **Design variants**)
+- Dedicated group with clear **Variant A / Variant B** labels and “Compare vs original” guidance
+- **Variant A — Display resilience:** soft-caps rem growth, improves bottom safe-area padding, allows console panels to scroll under larger fonts / bold text / display scaling / zoom
+- **Variant B — Clock edit panel:** tap the clock opens a dialog with direct number entry for Period · Min : Sec (no scroll wheels, no +/- steppers) — addresses slow/imprecise wheel scrolling during live updates
+- Documented **supported phone display & browser settings** baseline (Default font, Bold off, Display Default, Zoom 100%)
+
+**Scoreboard / clock polish**
+- Start/Pause chips: Play/Pause icons; green Start / red Pause with matching chip style; larger invisible tap target around the chip
+- Stat cells (DOWN, TO GO, QTR, ball-on): tighter spacing between label and value
+
+**Game header (landscape)**
+- Team names no longer float absolutely over side controls — five-column grid so long names **truncate with ellipsis** when space is tight (full name via `title`)
+
+**Publishing habit**
+- Finished app updates are pushed to `main` for Vercel; the build-in-public markdown is kept in sync with shipped operator-visible changes
+
 ### Key interactions
 
 <!-- AUTO-SNAPSHOTS:week-4-interactions:START -->
@@ -396,7 +416,7 @@ On the game page, portrait mode dropped tabs in favour of a vertical stack of pa
 
 ---
 
-## Current product capabilities (as of 9 July 2026)
+## Current product capabilities (as of 21 July 2026)
 
 ### Overview
 
@@ -409,23 +429,25 @@ The table below is a checklist of what the prototype supports today on the live 
 | Post-match fixture entry | ✅ |
 | Three-panel game console (landscape + portrait) | ✅ |
 | Take Control with confirmation (feature-flagged) | ✅ |
-| Clock edit (wheel picker) — tap clock time | ✅ |
-| Play / pause clock (no kick-off required in MVP) | ✅ |
+| Clock edit — original inline wheel (tap clock time) | ✅ |
+| Clock edit — Variant B dialog with numeric entry (feature-flagged) | ✅ |
+| Play / pause clock with icons + colour chips (no kick-off required in MVP) | ✅ |
 | Full period / overtime / game-end flow (feature-flagged, off in MVP) | ✅ |
 | Field direction + quarter-end flip | ✅ |
 | Risk management toggles (Unreliable emphasised, bottom-right) | ✅ |
 | Play-by-play (feature-flagged, off by default) | ✅ |
 | Action log + CSV export | ✅ |
 | Feature flags with Vercel deploy (Confirm & deploy) | ✅ |
+| Design variants group (A display resilience, B clock panel) | ✅ |
 | Connection status chip (feature-flagged) | ✅ |
 | Profile button + email dialog | ✅ |
 | Error toast (fixture-scoped, feature-flagged) | ✅ |
+| Landscape header team names truncate when space is tight | ✅ |
 | PWA / Add to Home Screen | ✅ |
 | iPhone portrait + landscape safe areas | ✅ |
 | Auto-deploy GitHub → Vercel (code) | ✅ |
 | Auto-sync Confluence doc + snapshots (GitHub Actions) | ✅ |
-| Display resilience layout variant (feature-flagged, off by default) | ✅ |
-| Clock numeric input variant (feature-flagged, off by default) | ✅ |
+| Documented supported phone display / browser settings | ✅ |
 
 ---
 
@@ -489,7 +511,7 @@ The game console is a fixed-height operator UI. System font size, bold text, dis
 | Variant | Off (original) | On |
 |---------|----------------|----|
 | **A — Display resilience** | Fixed-height console as shipped | Soft font cap, safe-area padding, scrollable panels under large fonts/zoom |
-| **B — Clock edit panel** | Inline scroll wheels in the scoreboard | Dialog panel with direct number entry and +/- steppers |
+| **B — Clock edit panel** | Inline scroll wheels in the scoreboard | Dialog panel with direct number entry for Period · Min : Sec |
 
 Turn either off anytime to revert. Confirm & deploy to publish a variant as the app default.
 
