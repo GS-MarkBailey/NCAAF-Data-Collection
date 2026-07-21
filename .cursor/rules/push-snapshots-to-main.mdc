@@ -1,31 +1,34 @@
 ---
-description: Always commit and push UI snapshot and Confluence doc changes to main
+description: Always commit and push app/docs changes to main so Vercel updates
 alwaysApply: true
 ---
 
-# Push snapshots and Confluence doc to main
+# Push to main for Vercel after updates
 
-After any of these workflows finish, **commit and push to `main`** so GitHub raw image URLs and Vercel stay in sync:
+After finishing user-requested work that changes the app or docs, **commit and push to `main`** so Vercel redeploys and phone/browser testing stays current.
 
-- `npm run capture:current-week` / `capture:snapshots` / `capture:and-sync`
-- `npm run sync:confluence-doc`
-- `npm run publish:confluence` (includes markdown sync + attachment staging)
+## Always push when you change
 
-## What to push
-
-- `docs/ui-snapshots/**` (PNG captures, `meta.json`)
-- `docs/confluence-weekly-build-in-public.md`
-- `docs/confluence-attachments/**` (if changed)
-- Snapshot script updates under `scripts/ui-snapshot-*.mjs`, `scripts/sync-confluence-snapshots.mjs`
+- `src/**`, `public/**` (except see feature flags note below)
+- `index.html`, `vite.config.*`, `package.json` / lockfile when needed for the change
+- `docs/ui-snapshots/**`, `docs/confluence-weekly-build-in-public.md`, `docs/confluence-attachments/**`
+- Snapshot / Confluence scripts under `scripts/`
 
 ## Workflow
 
-1. Run capture and/or publish as needed.
-2. `git add` the paths above (never `.env` or secrets).
-3. Commit with a clear message (e.g. `docs: refresh week-4 UI snapshots`).
+1. Finish the requested change.
+2. `git add` relevant paths (never `.env` or secrets).
+3. Commit with a clear message.
 4. `git pull --rebase origin main` if remote is ahead.
 5. `git push origin main`.
+6. Tell the user the live URL if relevant: https://ncaaf-data-collection.vercel.app
 
-Do not leave fresh captures or Confluence markdown updates only on disk — stakeholders and Confluence GitHub raw URLs depend on `main`.
+Do not leave finished UI/app work only on disk.
 
-Feature flag defaults in `public/feature-flag-defaults.json` only ship via **Confirm & deploy** in the app unless the user explicitly asks to commit them.
+## Snapshots / Confluence
+
+After `capture:*`, `sync:confluence-doc`, or `publish:confluence`, also commit and push the generated docs/snapshot paths as above.
+
+## Exception — feature flag defaults
+
+`public/feature-flag-defaults.json` only ships via **Confirm & deploy** in the app unless the user explicitly asks to commit those defaults. You may still add new flag keys with safe defaults when introducing a flag.
