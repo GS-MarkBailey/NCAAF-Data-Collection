@@ -383,16 +383,16 @@ export function ScoreboardPanelShadcn({
             />
           }
           className={cn(
-            'gap-1 border font-semibold',
+            'h-9 min-w-16 gap-1.5 border px-3 py-2 text-sm font-semibold [&_svg]:size-3.5!',
             paused
               ? 'border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
               : 'border-red-200 bg-red-50 text-red-800 hover:bg-red-100',
           )}
         >
           {paused ? (
-            <Play className="size-3 fill-current" aria-hidden />
+            <Play className="fill-current" aria-hidden />
           ) : (
-            <Pause className="size-3 fill-current" aria-hidden />
+            <Pause className="fill-current" aria-hidden />
           )}
           {paused ? 'Start' : 'Pause'}
         </Badge>
