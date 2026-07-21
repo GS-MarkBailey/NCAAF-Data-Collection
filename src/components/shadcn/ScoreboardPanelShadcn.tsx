@@ -789,7 +789,7 @@ function StatCell({
         'flex h-full min-h-0 flex-1 flex-col items-center border-r border-border px-1 last:border-r-0 landscape-mobile:py-3',
         compact
           ? 'min-h-10 shrink-0 justify-center gap-0.5 py-1'
-          : 'justify-center gap-1 py-4',
+          : 'justify-center gap-0 py-4',
         statusStyle?.className,
         pulsing && 'push-data-pulse',
       )}
