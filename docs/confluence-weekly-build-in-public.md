@@ -376,7 +376,7 @@ On the game page, portrait mode dropped tabs in favour of a vertical stack of pa
 
 ### 21 July — device feedback & design variants
 
-Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX and display-scaling notes) drove a set of **opt-in design variants** plus operator polish. Original behaviour stays the default until a variant is enabled.
+Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX and display-scaling notes) drove a set of **design variants** plus operator polish. As of 21 July these are **on by default** for all users (still toggleable in Settings → Features).
 
 **Design variants** (Settings → Features → **Design variants**)
 - Dedicated group with clear **Variant A / Variant B** labels and “Compare vs original” guidance
