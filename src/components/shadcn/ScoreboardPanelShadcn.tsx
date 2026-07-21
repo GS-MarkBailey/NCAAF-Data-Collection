@@ -707,7 +707,7 @@ export function ScoreboardPanelShadcn({
       }}
     >
       <DialogContent
-        className="gap-0 p-0 sm:max-w-md"
+        className="gap-0 overflow-hidden p-0 sm:max-w-md"
         showCloseButton={false}
       >
         <DialogHeader className="border-b border-border px-4 pt-4 pb-3">
@@ -728,7 +728,7 @@ export function ScoreboardPanelShadcn({
             onSecondsChange={setDraftSeconds}
           />
         </div>
-        <DialogFooter className="border-t border-border bg-muted/30 px-4 py-3 sm:justify-stretch">
+        <DialogFooter className="m-0 rounded-none border-t border-border bg-muted/30 px-4 py-3 sm:justify-stretch">
           <Button
             type="button"
             variant="outline"
