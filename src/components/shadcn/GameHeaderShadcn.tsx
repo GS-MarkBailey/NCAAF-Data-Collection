@@ -66,8 +66,8 @@ export function GameHeaderShadcn({
         </div>
       </div>
 
-      <div className="relative hidden grid-cols-[1fr_auto_1fr] items-center gap-3 py-3 md:grid landscape-mobile:grid landscape-mobile:py-2">
-        <div className="z-10 flex items-center gap-2 justify-self-start">
+      <div className="relative hidden grid-cols-[auto_minmax(0,1fr)_auto_minmax(0,1fr)_auto] items-center gap-2 py-3 md:grid landscape-mobile:grid landscape-mobile:gap-1.5 landscape-mobile:py-2">
+        <div className="z-10 flex shrink-0 items-center gap-2 justify-self-start">
           <Button
             variant="outline"
             size="icon"
@@ -82,7 +82,21 @@ export function GameHeaderShadcn({
           </FeatureGate>
         </div>
 
-        <div className="min-w-0" aria-hidden />
+        <span
+          className="min-w-0 truncate text-right text-sm font-medium landscape-mobile:text-xs"
+          title={fixture.homeTeam}
+        >
+          {fixture.homeTeam}
+        </span>
+
+        <ScoreDisplay score={score} />
+
+        <span
+          className="min-w-0 truncate text-left text-sm font-medium landscape-mobile:text-xs"
+          title={fixture.awayTeam}
+        >
+          {fixture.awayTeam}
+        </span>
 
         <div className="layout-header-actions z-10 flex shrink-0 items-center justify-end gap-2 justify-self-end">
           <FeatureGate flag="header.settings">
@@ -96,18 +110,6 @@ export function GameHeaderShadcn({
               onToggleTakeControl={onToggleTakeControl}
             />
           </FeatureGate>
-        </div>
-
-        <div className="pointer-events-none absolute left-1/2 top-1/2 z-0 -translate-x-1/2 -translate-y-1/2">
-          <div className="relative pointer-events-auto">
-            <ScoreDisplay score={score} />
-            <span className="absolute top-1/2 right-full mr-2 max-w-[min(11rem,34vw)] -translate-y-1/2 truncate text-right text-sm font-medium landscape-mobile:text-xs">
-              {fixture.homeTeam}
-            </span>
-            <span className="absolute top-1/2 left-full ml-2 max-w-[min(11rem,34vw)] -translate-y-1/2 truncate text-left text-sm font-medium landscape-mobile:text-xs">
-              {fixture.awayTeam}
-            </span>
-          </div>
         </div>
       </div>
     </header>
