@@ -40,7 +40,7 @@ export function GameHeaderShadcn({
             </FeatureGate>
           </div>
 
-          <div className="flex shrink-0 items-center gap-2">
+          <div className="layout-header-actions flex shrink-0 items-center gap-2">
             <FeatureGate flag="header.settings">
               <ActionLogDialogShadcn fixtureId={fixture.id} />
             </FeatureGate>
@@ -84,7 +84,7 @@ export function GameHeaderShadcn({
 
         <div className="min-w-0" aria-hidden />
 
-        <div className="z-10 flex shrink-0 items-center justify-end gap-2 justify-self-end">
+        <div className="layout-header-actions z-10 flex shrink-0 items-center justify-end gap-2 justify-self-end">
           <FeatureGate flag="header.settings">
             <ActionLogDialogShadcn fixtureId={fixture.id} />
           </FeatureGate>

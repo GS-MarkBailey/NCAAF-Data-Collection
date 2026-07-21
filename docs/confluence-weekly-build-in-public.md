@@ -424,6 +424,7 @@ The table below is a checklist of what the prototype supports today on the live 
 | iPhone portrait + landscape safe areas | ✅ |
 | Auto-deploy GitHub → Vercel (code) | ✅ |
 | Auto-sync Confluence doc + snapshots (GitHub Actions) | ✅ |
+| Display resilience layout variant (feature-flagged, off by default) | ✅ |
 
 ---
 
@@ -458,6 +459,7 @@ These are deliberate prototype boundaries or open items identified during the fo
 - Play-by-play simulation is synthetic, not tied to real game events
 - Connection status chip is UI-only (no real connectivity check)
 - Profile email is a placeholder (no auth yet)
+- Mobile layout is sensitive to system font size, bold text, display scaling, and browser zoom when using the **original** design — see supported settings under How to try it; **Display resilience** is an opt-in feature-flagged variant
 
 ---
 
@@ -467,8 +469,25 @@ These are deliberate prototype boundaries or open items identified during the fo
 
 The fastest way to evaluate the build is on a physical phone — especially iPhone in portrait — since much of Week 4’s work targets that form factor. Desktop and landscape mobile also work; the game console was originally designed for landscape sideline use.
 
+### Supported phone display & browser settings
+
+The game console is a fixed-height operator UI. System font size, bold text, display scaling, and browser zoom can shrink tap targets and crowd controls. For demos and collection trials, use:
+
+| Setting | Supported baseline |
+|---------|-------------------|
+| Font size | **Default** |
+| Bold text / bold font | **Off** |
+| Display size / Display Zoom | **Default** |
+| Custom font style | **System default** |
+| Browser zoom (Chrome / Safari) | **100%** |
+
+**Devices verified for layout work:** Samsung Galaxy S24 Ultra, iPhone 13 Pro Max (portrait + landscape).
+
+**Optional experimental variant:** Settings → Features → **Display resilience (variant)**. When on, the console soft-caps rem growth, improves bottom safe-area padding, and allows panels to scroll under larger fonts/zoom. **Off** keeps the original design so you can compare or revert instantly. Confirm & deploy to publish that flag as the app default for everyone.
+
 1. Open https://ncaaf-data-collection.vercel.app on a phone or desktop
 2. On iPhone: Safari → Share → Add to Home Screen for full-screen PWA
-3. Select a fixture from the list
-4. Set field direction on first open (if enabled)
-5. Use Take Control, clock, scoreboard, and risk panels as an operator would
+3. Confirm phone font/display settings match the table above (or enable Display resilience to trial the variant)
+4. Select a fixture from the list
+5. Set field direction on first open (if enabled)
+6. Use Take Control, clock, scoreboard, and risk panels as an operator would

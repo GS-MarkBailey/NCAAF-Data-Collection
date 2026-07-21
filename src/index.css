@@ -252,6 +252,66 @@ html[data-display-mode='standalone'] .safe-t {
   padding-top: env(safe-area-inset-top, 0px);
 }
 
+/*
+ * Display-resilience layout variant (feature flag: layout.displayResilience).
+ * Original design is unchanged when data-layout-variant="original" (default).
+ */
+html[data-layout-variant='resilient'] {
+  /* Soft-cap rem growth from system font / zoom without fully locking a11y */
+  font-size: clamp(14px, 100%, 17px);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+html[data-layout-variant='resilient'] .safe-b {
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
+}
+
+html[data-layout-variant='resilient'] .layout-console-portrait {
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+html[data-layout-variant='resilient'] .layout-console-portrait > * {
+  flex: 1 1 auto;
+  min-height: min(11rem, 30dvh);
+}
+
+html[data-layout-variant='resilient'] .layout-console-shell {
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+}
+
+html[data-layout-variant='resilient'] .layout-clock-display {
+  font-size: clamp(1.25rem, 5cqh, 1.85rem) !important;
+  line-height: 1.05;
+}
+
+html[data-layout-variant='resilient'] .layout-risk-tile {
+  min-height: 2.5rem !important;
+  font-size: 0.75rem !important;
+  line-height: 1.15;
+  padding-block: 0.35rem;
+}
+
+html[data-layout-variant='resilient'] .layout-take-control {
+  min-width: 0 !important;
+  max-width: 100%;
+  padding-inline: 0.75rem;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+html[data-layout-variant='resilient'] .layout-fixtures-search {
+  width: min(14rem, 55vw) !important;
+}
+
+html[data-layout-variant='resilient'] .layout-header-actions {
+  gap: 0.375rem;
+  min-width: 0;
+}
+
 .panel-header {
   display: flex;
   align-items: center;

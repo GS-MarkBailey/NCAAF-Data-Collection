@@ -46,6 +46,7 @@ export function TakeControlButton({
           onClick={handleClick}
           className={cn(
             'min-w-[8.25rem] rounded-[10px] px-4 py-2.5 text-[13px] font-semibold text-white shadow-sm transition-colors landscape-mobile:px-3 landscape-mobile:py-2 landscape-mobile:text-xs',
+            'layout-take-control',
             takeControlActive
               ? 'bg-[var(--color-danger)] hover:bg-[var(--color-danger-hover)]'
               : 'bg-[var(--color-brand)] hover:bg-[var(--color-brand-hover)]',
@@ -57,7 +58,7 @@ export function TakeControlButton({
         <Button
           variant="ghost"
           className={cn(
-            'min-w-[8.25rem] border-0 text-white shadow-none',
+            'min-w-[8.25rem] border-0 text-white shadow-none layout-take-control',
             takeControlActive
               ? 'bg-[var(--color-danger)] hover:bg-[var(--color-danger-hover)]'
               : 'bg-[var(--color-brand)] hover:bg-[var(--color-brand-hover)]',

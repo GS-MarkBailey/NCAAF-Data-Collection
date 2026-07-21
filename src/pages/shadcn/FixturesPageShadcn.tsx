@@ -65,7 +65,7 @@ export function FixturesPageShadcn() {
 
         <div className="flex items-center gap-2">
           {showSearch ? (
-            <div className="relative w-56 sm:w-64">
+            <div className="layout-fixtures-search relative w-56 sm:w-64">
               <Search className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
               <Input
                 id="fixture-search"

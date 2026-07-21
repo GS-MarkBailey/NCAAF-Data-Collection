@@ -6,6 +6,7 @@ export const FEATURE_FLAG_GROUPS = [
   'Scoreboard',
   'Risk Management',
   'Fixtures',
+  'Layout',
   'Settings',
 ] as const
 
@@ -226,6 +227,14 @@ export const FEATURE_FLAGS = [
     description: 'Status badge and final score on fixture cards.',
     group: 'Fixtures',
     defaultEnabled: true,
+  },
+  {
+    id: 'layout.displayResilience',
+    label: 'Display resilience (variant)',
+    description:
+      'Experimental layout that stays usable with larger phone fonts, bold text, display scaling, or browser zoom. Off = original design (easy to revert).',
+    group: 'Layout',
+    defaultEnabled: false,
   },
 ] as const satisfies readonly FeatureFlagDefinition[]
 

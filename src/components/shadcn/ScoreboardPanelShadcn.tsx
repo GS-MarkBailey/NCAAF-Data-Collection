@@ -406,12 +406,12 @@ export function ScoreboardPanelShadcn({
               : `Edit game clock, currently ${formatClock(clockSeconds)}`
         }
       >
-        <span className={cn('font-bold leading-none', clockDisplayLabel)}>
+        <span className={cn('layout-clock-display font-bold leading-none', clockDisplayLabel)}>
           {clockDisplayText}
         </span>
       </button>
     ) : (
-      <span className={cn('font-bold leading-none', clockDisplayLabel)}>
+      <span className={cn('layout-clock-display font-bold leading-none', clockDisplayLabel)}>
         {clockDisplayText}
       </span>
     )

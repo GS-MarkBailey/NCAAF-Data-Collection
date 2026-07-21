@@ -6,6 +6,7 @@ import { PlayByPlayPanelShadcn } from '@/components/shadcn/PlayByPlayPanelShadcn
 import { RiskManagementPanelShadcn } from '@/components/shadcn/RiskManagementPanelShadcn'
 import { ScoreboardPanelShadcn } from '@/components/shadcn/ScoreboardPanelShadcn'
 import { useFeatureFlag } from '@/hooks/useFeatureFlag'
+import { useDisplayResilience } from '@/components/layout/LayoutVariantSync'
 import { cn } from '@/lib/utils'
 import { useClockTicker } from '@/hooks/useClockTicker'
 import { useFixtureErrorToast } from '@/hooks/useFixtureErrorToast'
@@ -23,6 +24,7 @@ export function GamePageShadcn() {
   const showRiskManagement = useFeatureFlag('game.riskManagement')
   const showErrorToast = useFeatureFlag('game.errorToast')
   const showFieldDirectionDialog = useFeatureFlag('game.fieldDirectionDialog')
+  const displayResilience = useDisplayResilience()
 
   const desktopPanelCount = [showScoreboard, showPlayByPlay, showRiskManagement].filter(
     Boolean,
@@ -73,17 +75,30 @@ export function GamePageShadcn() {
         onToggleTakeControl={() => toggleTakeControl(fixtureId)}
       />
 
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden overscroll-none safe-l safe-r pb-3 landscape-mobile:pb-2">
+      <div
+        className={cn(
+          'flex min-h-0 flex-1 flex-col overscroll-none safe-l safe-r pb-3 landscape-mobile:pb-2',
+          displayResilience ? 'layout-console-shell overflow-y-auto' : 'overflow-hidden',
+        )}
+      >
         <div
           className={cn(
-            'flex min-h-0 flex-1 flex-col gap-3 overflow-hidden overscroll-none rounded-xl border-[3px] p-3 transition-colors landscape-mobile:gap-3 landscape-mobile:p-3',
+            'flex min-h-0 flex-1 flex-col gap-3 overscroll-none rounded-xl border-[3px] p-3 transition-colors landscape-mobile:gap-3 landscape-mobile:p-3',
+            displayResilience ? 'overflow-visible' : 'overflow-hidden',
             takeControl
               ? 'border-destructive bg-destructive/10'
               : 'border-border/30 bg-background',
           )}
         >
           {portraitPanelCount > 0 ? (
-            <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-hidden overscroll-none md:hidden landscape-mobile:hidden">
+            <div
+              className={cn(
+                'flex min-h-0 flex-1 flex-col gap-2 overscroll-none md:hidden landscape-mobile:hidden',
+                displayResilience
+                  ? 'layout-console-portrait'
+                  : 'overflow-hidden',
+              )}
+            >
               {showScoreboard ? (
                 <div className="flex min-h-0 flex-1 flex-col">
                   <ScoreboardPanelShadcn fixtureId={fixtureId} layout="stack" />

@@ -7,6 +7,7 @@ import App from './App'
 
 initPwa()
 document.documentElement.dataset.uiVariant = 'shadcn'
+document.documentElement.dataset.layoutVariant = 'original'
 
 const rootElement = document.getElementById('root')
 

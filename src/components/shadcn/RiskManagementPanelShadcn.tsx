@@ -134,6 +134,7 @@ export function RiskManagementPanelShadcn({
                 value={key}
                 className={cn(
                   STANDARD_RISK_ITEM_CLASS,
+                  'layout-risk-tile',
                   stacked
                     ? 'min-h-11 text-xs'
                     : 'min-h-12 text-sm landscape-mobile:text-xs',
@@ -150,6 +151,7 @@ export function RiskManagementPanelShadcn({
                 style={{ gridColumn: 2, gridRow: rowCount }}
                 className={cn(
                   UNRELIABLE_RISK_ITEM_CLASS,
+                  'layout-risk-tile',
                   stacked
                     ? 'min-h-11 text-xs'
                     : 'min-h-12 text-sm landscape-mobile:text-xs',
