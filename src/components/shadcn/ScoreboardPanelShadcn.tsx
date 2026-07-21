@@ -1,5 +1,5 @@
 import { useState, type CSSProperties, type KeyboardEvent, type MouseEvent } from 'react'
-import { LayoutGrid } from 'lucide-react'
+import { LayoutGrid, Pause, Play } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { formatClock } from '@/lib/format'
 import {
@@ -382,7 +382,13 @@ export function ScoreboardPanelShadcn({
               aria-pressed={!paused}
             />
           }
+          className="gap-1"
         >
+          {paused ? (
+            <Play className="size-3 fill-current" aria-hidden />
+          ) : (
+            <Pause className="size-3 fill-current" aria-hidden />
+          )}
           {paused ? 'Start' : 'Pause'}
         </Badge>
       ) : null}
