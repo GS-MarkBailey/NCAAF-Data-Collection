@@ -68,6 +68,22 @@ export const WEEK_INTERACTIONS = {
       text: '**Portrait game console** — scoreboard, play-by-play, and risks stacked vertically on iPhone',
       featureIds: ['portrait-stack'],
     },
+    {
+      text: '**Design variants** — Settings → Features → Design variants (Variant A display resilience, Variant B clock edit panel)',
+      featureIds: ['design-variants-panel', 'clock-numeric-editor'],
+    },
+    {
+      text: '**Start / Pause chips** — Play/Pause icons with green Start / red Pause; larger invisible tap target',
+      featureIds: ['start-pause-chips'],
+    },
+    {
+      text: '**Profile** — header icon opens signed-in email dialog',
+      featureIds: ['profile-dialog'],
+    },
+    {
+      text: '**Unreliable risk** — pinned bottom-right with amber idle emphasis',
+      featureIds: ['unreliable-risk'],
+    },
   ],
 }
 
@@ -93,5 +109,11 @@ export const WEEK_SHIPPED = {
     'fixtures-page': { featureIds: ['fixtures-search', 'fixture-status-chips'] },
     'match-ended': { featureIds: ['past-fixture-ended'] },
     'portrait-game': { featureIds: ['portrait-stack'] },
+    'design-variants': {
+      featureIds: ['design-variants-panel', 'clock-numeric-editor'],
+    },
+    'clock-polish': { featureIds: ['start-pause-chips'] },
+    profile: { featureIds: ['profile-dialog'] },
+    'unreliable-risk': { featureIds: ['unreliable-risk'] },
   },
 }

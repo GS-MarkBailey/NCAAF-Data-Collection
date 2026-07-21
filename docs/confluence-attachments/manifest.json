@@ -1,5 +1,5 @@
 {
-  "stagedAt": "2026-07-21T14:44:27.720Z",
+  "stagedAt": "2026-07-21T14:50:39.569Z",
   "files": [
     {
       "relPath": "week-1/features/action-log.png",
@@ -70,6 +70,14 @@
       "attachmentName": "week-3--game-landscape.png"
     },
     {
+      "relPath": "week-4/features/clock-numeric-editor.png",
+      "attachmentName": "week-4--features--clock-numeric-editor.png"
+    },
+    {
+      "relPath": "week-4/features/design-variants-panel.png",
+      "attachmentName": "week-4--features--design-variants-panel.png"
+    },
+    {
       "relPath": "week-4/features/fixture-status-chips.png",
       "attachmentName": "week-4--features--fixture-status-chips.png"
     },
@@ -84,6 +92,18 @@
     {
       "relPath": "week-4/features/portrait-stack.png",
       "attachmentName": "week-4--features--portrait-stack.png"
+    },
+    {
+      "relPath": "week-4/features/profile-dialog.png",
+      "attachmentName": "week-4--features--profile-dialog.png"
+    },
+    {
+      "relPath": "week-4/features/start-pause-chips.png",
+      "attachmentName": "week-4--features--start-pause-chips.png"
+    },
+    {
+      "relPath": "week-4/features/unreliable-risk.png",
+      "attachmentName": "week-4--features--unreliable-risk.png"
     },
     {
       "relPath": "week-4/fixtures-landscape.png",

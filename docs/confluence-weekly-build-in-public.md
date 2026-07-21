@@ -384,15 +384,35 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 - **Variant B — Clock edit panel:** tap the clock opens a dialog with direct number entry for Period · Min : Sec (no scroll wheels, no +/- steppers) — addresses slow/imprecise wheel scrolling during live updates
 - Documented **supported phone display & browser settings** baseline (Default font, Bold off, Display Default, Zoom 100%)
 
+<!-- AUTO-SNAPSHOTS:week-4-shipped-design-variants:START -->
+![Design variants in Features settings](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/design-variants-panel.png) ![Clock edit panel (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-numeric-editor.png)
+<!-- AUTO-SNAPSHOTS:week-4-shipped-design-variants:END -->
+
 **Scoreboard / clock polish**
 - Start/Pause chips: Play/Pause icons; green Start / red Pause with matching chip style; larger invisible tap target around the chip
 - Stat cells (DOWN, TO GO, QTR, ball-on): tighter spacing between label and value
 
+<!-- AUTO-SNAPSHOTS:week-4-shipped-clock-polish:START -->
+![Start / Pause clock chips](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/start-pause-chips.png)
+<!-- AUTO-SNAPSHOTS:week-4-shipped-clock-polish:END -->
+
 **Game header (landscape)**
 - Team names no longer float absolutely over side controls — five-column grid so long names **truncate with ellipsis** when space is tight (full name via `title`)
+- **Profile** icon opens signed-in email dialog (`collector@geniussports.com`)
+
+<!-- AUTO-SNAPSHOTS:week-4-shipped-profile:START -->
+![Profile dialog](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/profile-dialog.png)
+<!-- AUTO-SNAPSHOTS:week-4-shipped-profile:END -->
+
+**Risk management**
+- **Unreliable** chip pinned bottom-right; amber when idle for emphasis
+
+<!-- AUTO-SNAPSHOTS:week-4-shipped-unreliable-risk:START -->
+![Unreliable risk chip placement](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/unreliable-risk.png)
+<!-- AUTO-SNAPSHOTS:week-4-shipped-unreliable-risk:END -->
 
 **Publishing habit**
-- Finished app updates are pushed to `main` for Vercel; the build-in-public markdown is kept in sync with shipped operator-visible changes
+- Finished app updates are pushed to `main` for Vercel; the build-in-public markdown (including screenshots) is kept in sync with shipped operator-visible changes
 
 ### Key interactions
 
@@ -408,6 +428,22 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 - **Portrait game console** — scoreboard, play-by-play, and risks stacked vertically on iPhone
 
 ![Portrait game console (stacked panels)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/portrait-stack.png)
+
+- **Design variants** — Settings → Features → Design variants (Variant A display resilience, Variant B clock edit panel)
+
+![Design variants in Features settings](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/design-variants-panel.png) ![Clock edit panel (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-numeric-editor.png)
+
+- **Start / Pause chips** — Play/Pause icons with green Start / red Pause; larger invisible tap target
+
+![Start / Pause clock chips](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/start-pause-chips.png)
+
+- **Profile** — header icon opens signed-in email dialog
+
+![Profile dialog](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/profile-dialog.png)
+
+- **Unreliable risk** — pinned bottom-right with amber idle emphasis
+
+![Unreliable risk chip placement](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/unreliable-risk.png)
 <!-- AUTO-SNAPSHOTS:week-4-interactions:END -->
 
 ### Technical notes

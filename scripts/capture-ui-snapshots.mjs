@@ -389,6 +389,18 @@ async function captureFeature(browser, baseUrl, feature, featuresDir) {
   const suppressErrorToast =
     feature.path.startsWith('/game/') && setup.errorToast !== 'keep'
   const context = await createCaptureContext(browser, view, { suppressErrorToast })
+  if (feature.featureFlagOverrides && typeof feature.featureFlagOverrides === 'object') {
+    await context.addInitScript((overrides) => {
+      const key = 'ncaaf-feature-flags-draft'
+      let existing = {}
+      try {
+        existing = JSON.parse(localStorage.getItem(key) || '{}')
+      } catch {
+        existing = {}
+      }
+      localStorage.setItem(key, JSON.stringify({ ...existing, ...overrides }))
+    }, feature.featureFlagOverrides)
+  }
   const page = await context.newPage()
   const route = feature.path.startsWith('/game/')
     ? gamePathForCapture(feature.path, feature)

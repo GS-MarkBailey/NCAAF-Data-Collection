@@ -60,9 +60,12 @@ Your prose (Overview, Shipped, Technical notes) stays manual. Only the snapshot 
 
 ### Adding a new feature mid-week
 
-1. Add a scenario to `scripts/ui-snapshot-features.mjs` under the current week key.
-2. Run `npm run capture:current-week`.
-3. Commit the PNGs + updated markdown.
+1. Add a scenario to `scripts/ui-snapshot-features.mjs` under the current week key (optional `featureFlagOverrides` for design variants).
+2. Map it in `scripts/ui-snapshot-doc-content.mjs` and add empty `AUTO-SNAPSHOTS` markers beside the new prose.
+3. Run `npm run capture:current-week`.
+4. Commit the PNGs + updated markdown (and prefer `npm run publish:confluence`).
+
+**Standing habit:** every operator-visible product update should ship with screenshots in the weekly build-in-public doc — not prose alone.
 
 ### Starting a new week (e.g. week-5)
 

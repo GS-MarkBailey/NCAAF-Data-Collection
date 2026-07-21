@@ -12,6 +12,7 @@ export const PAST_FIXTURE_ID = 'NCAAF-2026-030'
  * @property {SnapshotViewport} viewport
  * @property {(page: import('playwright').Page) => Promise<void>} [prepare]
  * @property {{ fieldDirection?: 'dismiss' | 'keep', errorToast?: 'dismiss' | 'keep' }} [gameSetup]
+ * @property {Record<string, boolean>} [featureFlagOverrides] Draft overrides applied via localStorage before load
  */
 
 /** @type {Record<string, FeatureScenario[]>} */
@@ -187,6 +188,76 @@ export const WEEK_FEATURES = {
           state: 'visible',
           timeout: 5000,
         }).catch(() => {})
+      },
+    },
+    {
+      id: 'design-variants-panel',
+      title: 'Design variants in Features settings',
+      path: '/game/NCAAF-2026-001',
+      viewport: 'game-landscape',
+      gameSetup: { fieldDirection: 'dismiss', errorToast: 'dismiss' },
+      async prepare(page) {
+        await page.getByRole('button', { name: /open settings/i }).click()
+        await page.getByRole('tab', { name: 'Features' }).click()
+        await page.getByRole('dialog').waitFor({ state: 'visible' })
+        const heading = page.getByRole('heading', { name: /design variants/i })
+        await heading.waitFor({ state: 'visible', timeout: 8000 })
+        await heading.scrollIntoViewIfNeeded()
+        await page.getByText(/Variant A — Display resilience/i).first().waitFor({
+          state: 'visible',
+          timeout: 5000,
+        })
+      },
+    },
+    {
+      id: 'clock-numeric-editor',
+      title: 'Clock edit panel (Variant B)',
+      path: '/game/NCAAF-2026-001',
+      viewport: 'game-landscape',
+      gameSetup: { fieldDirection: 'dismiss', errorToast: 'dismiss' },
+      featureFlagOverrides: {
+        'scoreboard.clockWheelEditor': true,
+        'scoreboard.clockNumericEditor': true,
+      },
+      async prepare(page) {
+        await page.getByRole('button', { name: /edit game clock/i }).click()
+        await page.getByRole('button', { name: 'Confirm' }).waitFor({ state: 'visible' })
+        await page.getByLabel('Period').waitFor({ state: 'visible', timeout: 5000 })
+      },
+    },
+    {
+      id: 'start-pause-chips',
+      title: 'Start / Pause clock chips',
+      path: '/game/NCAAF-2026-001',
+      viewport: 'game-landscape',
+      gameSetup: { fieldDirection: 'dismiss', errorToast: 'dismiss' },
+      async prepare(page) {
+        const start = page.getByRole('button', { name: 'Start clock' })
+        await start.waitFor({ state: 'visible', timeout: 5000 })
+      },
+    },
+    {
+      id: 'profile-dialog',
+      title: 'Profile dialog',
+      path: '/game/NCAAF-2026-001',
+      viewport: 'game-landscape',
+      gameSetup: { fieldDirection: 'dismiss', errorToast: 'dismiss' },
+      async prepare(page) {
+        await page.getByRole('button', { name: /user profile/i }).click()
+        await page.getByRole('dialog').waitFor({ state: 'visible' })
+        await page.getByText('collector@geniussports.com').waitFor({ state: 'visible' })
+      },
+    },
+    {
+      id: 'unreliable-risk',
+      title: 'Unreliable risk chip placement',
+      path: '/game/NCAAF-2026-001',
+      viewport: 'game-landscape',
+      gameSetup: { fieldDirection: 'dismiss', errorToast: 'dismiss' },
+      async prepare(page) {
+        const unreliable = page.getByRole('button', { name: 'Unreliable' })
+        await unreliable.waitFor({ state: 'visible', timeout: 5000 })
+        await unreliable.scrollIntoViewIfNeeded()
       },
     },
   ],

@@ -1,7 +1,7 @@
 {
   "label": "week-4",
   "portrait": true,
-  "capturedAt": "2026-07-21T14:42:59.692Z",
+  "capturedAt": "2026-07-21T14:50:35.908Z",
   "baseUrl": "https://ncaaf-data-collection.vercel.app",
   "views": [
     "fixtures-landscape",
@@ -31,6 +31,31 @@
       "id": "past-fixture-ended",
       "title": "Past fixture match-ended scoreboard",
       "file": "features/past-fixture-ended.png"
+    },
+    {
+      "id": "design-variants-panel",
+      "title": "Design variants in Features settings",
+      "file": "features/design-variants-panel.png"
+    },
+    {
+      "id": "clock-numeric-editor",
+      "title": "Clock edit panel (Variant B)",
+      "file": "features/clock-numeric-editor.png"
+    },
+    {
+      "id": "start-pause-chips",
+      "title": "Start / Pause clock chips",
+      "file": "features/start-pause-chips.png"
+    },
+    {
+      "id": "profile-dialog",
+      "title": "Profile dialog",
+      "file": "features/profile-dialog.png"
+    },
+    {
+      "id": "unreliable-risk",
+      "title": "Unreliable risk chip placement",
+      "file": "features/unreliable-risk.png"
     }
   ]
 }
