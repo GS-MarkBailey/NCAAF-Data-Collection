@@ -52,19 +52,19 @@ function NumericField({
   }
 
   return (
-    <div className="flex min-w-0 flex-1 flex-col items-center gap-1.5">
+    <div className="flex min-w-0 flex-1 flex-col items-center gap-2">
       <label
         htmlFor={id}
-        className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase"
+        className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase"
       >
         {label}
       </label>
-      <div className="flex w-full max-w-[5.5rem] flex-col items-stretch gap-1">
+      <div className="flex w-full max-w-[6rem] flex-col items-stretch gap-1.5">
         <Button
           type="button"
           variant="outline"
           size="icon"
-          className="h-9 w-full"
+          className="h-10 w-full"
           aria-label={`Increase ${label}`}
           disabled={disabled || value >= max}
           onClick={() => nudge(1)}
@@ -82,7 +82,7 @@ function NumericField({
           value={display}
           aria-label={label}
           className={cn(
-            'h-12 text-center text-2xl font-bold tabular-nums',
+            'h-14 text-center text-3xl font-bold tabular-nums',
             disabled && 'opacity-60',
           )}
           onFocus={(event) => event.currentTarget.select()}
@@ -99,7 +99,7 @@ function NumericField({
           type="button"
           variant="outline"
           size="icon"
-          className="h-9 w-full"
+          className="h-10 w-full"
           aria-label={`Decrease ${label}`}
           disabled={disabled || value <= min}
           onClick={() => nudge(-1)}
@@ -111,7 +111,7 @@ function NumericField({
   )
 }
 
-/** Direct numeric clock editor — feature-flagged alternative to the scroll wheel. */
+/** Variant B — dialog-friendly numeric clock editor (not the scroll wheel). */
 export function ClockNumericEditor({
   period,
   minutes,
@@ -133,7 +133,7 @@ export function ClockNumericEditor({
 
   return (
     <div
-      className="flex w-full max-w-sm items-start justify-center gap-2 px-2 py-1"
+      className="flex w-full max-w-md items-start justify-center gap-3 px-1"
       role="group"
       aria-label="Edit game clock"
     >
@@ -147,7 +147,7 @@ export function ClockNumericEditor({
         onChange={onPeriodChange}
       />
       <span
-        className="mt-[2.65rem] shrink-0 text-xl font-bold text-muted-foreground"
+        className="mt-[3.25rem] shrink-0 text-2xl font-bold text-muted-foreground"
         aria-hidden
       >
         ·
@@ -161,7 +161,7 @@ export function ClockNumericEditor({
         onChange={handleMinutesChange}
       />
       <span
-        className="mt-[2.65rem] shrink-0 text-xl font-bold text-muted-foreground"
+        className="mt-[3.25rem] shrink-0 text-2xl font-bold text-muted-foreground"
         aria-hidden
       >
         :

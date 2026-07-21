@@ -1,12 +1,12 @@
 import type { RiskType } from '@/types'
 
 export const FEATURE_FLAG_GROUPS = [
+  'Design variants',
   'Game Console',
   'Header',
   'Scoreboard',
   'Risk Management',
   'Fixtures',
-  'Layout',
   'Settings',
 ] as const
 
@@ -98,19 +98,10 @@ export const FEATURE_FLAGS = [
   {
     id: 'scoreboard.clockWheelEditor',
     label: 'Clock wheel editor',
-    description: 'Tap the clock to edit period, minutes, and seconds.',
+    description: 'Tap the clock to open the original inline scroll-wheel editor.',
     group: 'Scoreboard',
     parent: 'game.scoreboard',
     defaultEnabled: true,
-  },
-  {
-    id: 'scoreboard.clockNumericEditor',
-    label: 'Clock numeric input (variant)',
-    description:
-      'Replace wheel scrolling with direct number entry and +/- steppers. Off = original scroll wheel.',
-    group: 'Scoreboard',
-    parent: 'scoreboard.clockWheelEditor',
-    defaultEnabled: false,
   },
   {
     id: 'scoreboard.playPause',
@@ -239,10 +230,19 @@ export const FEATURE_FLAGS = [
   },
   {
     id: 'layout.displayResilience',
-    label: 'Display resilience (variant)',
+    label: 'Variant A — Display resilience',
     description:
-      'Experimental layout that stays usable with larger phone fonts, bold text, display scaling, or browser zoom. Off = original design (easy to revert).',
-    group: 'Layout',
+      'ORIGINAL off. ON: soft-caps font growth, safer safe-areas, and scrollable panels under large phone fonts / zoom.',
+    group: 'Design variants',
+    defaultEnabled: false,
+  },
+  {
+    id: 'scoreboard.clockNumericEditor',
+    label: 'Variant B — Clock edit panel',
+    description:
+      'ORIGINAL off (inline scroll wheel). ON: tap the clock to open a dialog with direct number entry and +/- steppers.',
+    group: 'Design variants',
+    parent: 'scoreboard.clockWheelEditor',
     defaultEnabled: false,
   },
 ] as const satisfies readonly FeatureFlagDefinition[]

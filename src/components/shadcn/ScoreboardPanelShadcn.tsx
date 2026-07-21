@@ -32,6 +32,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 
 interface ScoreboardPanelShadcnProps {
   fixtureId: string
@@ -224,6 +232,10 @@ export function ScoreboardPanelShadcn({
   const canUsePlayPause = showPlayPause && showPlayPauseButton
   const canToggleClock =
     !clockLocked && canUsePlayPause && !showClockWheelEditor
+
+  const useClockEditPanel = showClockWheelEditor && showClockNumericEditor
+  const editingClockInline = editingClock && !useClockEditPanel
+  const editingClockPanel = editingClock && useClockEditPanel
 
   const handleEndPeriod = (event: MouseEvent<HTMLButtonElement>) => {
     openConfirmation('endPeriod', event)
@@ -419,6 +431,7 @@ export function ScoreboardPanelShadcn({
     )
 
   return (
+    <>
     <Card
       size="compact"
       className={cn(
@@ -470,30 +483,18 @@ export function ScoreboardPanelShadcn({
                 </Button>
               </div>
             </div>
-          ) : editingClock ? (
+          ) : editingClockInline ? (
             <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
-              <div className="flex min-h-0 flex-1 items-center justify-center overflow-y-auto overflow-x-hidden">
-                {showClockNumericEditor ? (
-                  <ClockNumericEditor
-                    key={clockEditSession}
-                    period={draftPeriod}
-                    minutes={draftMinutes}
-                    seconds={draftSeconds}
-                    onPeriodChange={setDraftPeriod}
-                    onMinutesChange={setDraftMinutes}
-                    onSecondsChange={setDraftSeconds}
-                  />
-                ) : (
-                  <ClockWheelEditor
-                    key={clockEditSession}
-                    period={draftPeriod}
-                    minutes={draftMinutes}
-                    seconds={draftSeconds}
-                    onPeriodChange={setDraftPeriod}
-                    onMinutesChange={setDraftMinutes}
-                    onSecondsChange={setDraftSeconds}
-                  />
-                )}
+              <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden">
+                <ClockWheelEditor
+                  key={clockEditSession}
+                  period={draftPeriod}
+                  minutes={draftMinutes}
+                  seconds={draftSeconds}
+                  onPeriodChange={setDraftPeriod}
+                  onMinutesChange={setDraftMinutes}
+                  onSecondsChange={setDraftSeconds}
+                />
               </div>
               <div className="relative z-10 flex shrink-0 gap-2 border-t border-border bg-background p-2">
                 <Button
@@ -698,6 +699,55 @@ export function ScoreboardPanelShadcn({
         </div>
       </CardContent>
     </Card>
+
+    <Dialog
+      open={editingClockPanel}
+      onOpenChange={(open) => {
+        if (!open) handleCancelClockEdit()
+      }}
+    >
+      <DialogContent
+        className="gap-0 p-0 sm:max-w-md"
+        showCloseButton={false}
+      >
+        <DialogHeader className="border-b border-border px-4 pt-4 pb-3">
+          <DialogTitle>Edit clock</DialogTitle>
+          <DialogDescription>
+            Type period, minutes, and seconds, or use +/- for one-step
+            adjustments.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex justify-center px-3 py-4">
+          <ClockNumericEditor
+            key={clockEditSession}
+            period={draftPeriod}
+            minutes={draftMinutes}
+            seconds={draftSeconds}
+            onPeriodChange={setDraftPeriod}
+            onMinutesChange={setDraftMinutes}
+            onSecondsChange={setDraftSeconds}
+          />
+        </div>
+        <DialogFooter className="border-t border-border bg-muted/30 px-4 py-3 sm:justify-stretch">
+          <Button
+            type="button"
+            variant="outline"
+            className="flex-1"
+            onClick={handleCancelClockEdit}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="button"
+            className="flex-1 bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
+            onClick={handleConfirmClockEdit}
+          >
+            Confirm
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   )
 }
 

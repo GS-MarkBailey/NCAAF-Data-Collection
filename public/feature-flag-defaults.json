@@ -1,6 +1,6 @@
 {
-  "version": 1783600368947,
-  "updatedAt": "2026-07-09T12:32:48.947Z",
+  "version": 1784631253858,
+  "updatedAt": "2026-07-21T10:54:13.858Z",
   "flags": {
     "game.scoreboard": true,
     "game.playByPlay": false,
@@ -12,8 +12,8 @@
     "header.settings": true,
     "scoreboard.quarterStatus": true,
     "scoreboard.possessionSwitch": true,
-    "scoreboard.clockWheelEditor": true,
-    "scoreboard.clockNumericEditor": false,
+    "scoreboard.clockWheelEditor": false,
+    "scoreboard.clockNumericEditor": true,
     "scoreboard.playPause": true,
     "scoreboard.periodManagement": false,
     "scoreboard.downDistance": true,
@@ -31,8 +31,8 @@
     "fixtures.search": true,
     "fixtures.pullToRefresh": true,
     "fixtures.statusChips": true,
+    "layout.displayResilience": true,
     "fixtures.filters": true,
-    "scoreboard.periodControls": false,
-    "layout.displayResilience": false
+    "scoreboard.periodControls": false
   }
 }

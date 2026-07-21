@@ -484,9 +484,14 @@ The game console is a fixed-height operator UI. System font size, bold text, dis
 
 **Devices verified for layout work:** Samsung Galaxy S24 Ultra, iPhone 13 Pro Max (portrait + landscape).
 
-**Optional experimental variant:** Settings → Features → **Display resilience (variant)**. When on, the console soft-caps rem growth, improves bottom safe-area padding, and allows panels to scroll under larger fonts/zoom. **Off** keeps the original design so you can compare or revert instantly. Confirm & deploy to publish that flag as the app default for everyone.
+**Optional design variants** (Settings → Features → **Design variants**):
 
-**Clock edit variant:** Settings → Features → **Clock numeric input (variant)** (requires Clock wheel editor). When on, period / minutes / seconds use direct number entry and +/- steppers instead of scroll wheels — faster and more precise on large phones during live updates. **Off** keeps the original iOS-style wheel.
+| Variant | Off (original) | On |
+|---------|----------------|----|
+| **A — Display resilience** | Fixed-height console as shipped | Soft font cap, safe-area padding, scrollable panels under large fonts/zoom |
+| **B — Clock edit panel** | Inline scroll wheels in the scoreboard | Dialog panel with direct number entry and +/- steppers |
+
+Turn either off anytime to revert. Confirm & deploy to publish a variant as the app default.
 
 1. Open https://ncaaf-data-collection.vercel.app on a phone or desktop
 2. On iPhone: Safari → Share → Add to Home Screen for full-screen PWA

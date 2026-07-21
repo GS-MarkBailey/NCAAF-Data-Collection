@@ -11,6 +11,7 @@ import {
   useFeatureFlagStore,
   useFeatureFlagsDirty,
 } from '@/store/featureFlagStore'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -107,9 +108,21 @@ export function FeatureFlagsPanel() {
 
             return (
               <section key={group}>
-                <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <h3 className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   {group}
+                  {group === 'Design variants' ? (
+                    <span className="rounded-full bg-[var(--color-brand)]/15 px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-[var(--color-brand)] normal-case">
+                      Compare vs original
+                    </span>
+                  ) : null}
                 </h3>
+                {group === 'Design variants' ? (
+                  <p className="mb-2 text-xs text-muted-foreground">
+                    Each switch is an alternate UI. Leave off to keep the original
+                    design; turn on to trial the change. Revert anytime by turning
+                    off.
+                  </p>
+                ) : null}
                 <ul className="divide-y divide-border rounded-lg border border-border bg-background">
                   {groupFlags.map((flag) => {
                     const parentId =
@@ -119,6 +132,7 @@ export function FeatureFlagsPanel() {
                     const effective = isEnabled(flag.id)
                     const inactiveInApp = configured && !effective
                     const isPending = configured !== deployedDefaults[flag.id]
+                    const isDesignVariant = group === 'Design variants'
                     const inactiveHint =
                       inactiveInApp && parentId
                         ? `Saved on, but hidden in app until ${FEATURE_FLAG_BY_ID[parentId].label} is enabled.`
@@ -139,9 +153,10 @@ export function FeatureFlagsPanel() {
                               : inactiveHint ??
                                 ('description' in flag ? flag.description : undefined)
                           }
-                          nested={parentId != null}
+                          nested={parentId != null && !isDesignVariant}
                           pending={isPending}
                           inactiveInApp={inactiveInApp}
+                          designVariant={isDesignVariant}
                           checked={configured}
                           disabled={lockedOn}
                           onCheckedChange={(checked) => setFlag(flag.id, checked)}
@@ -295,6 +310,7 @@ function FeatureFlagRow({
   nested,
   pending,
   inactiveInApp,
+  designVariant,
   checked,
   disabled,
   onCheckedChange,
@@ -305,6 +321,7 @@ function FeatureFlagRow({
   nested: boolean
   pending: boolean
   inactiveInApp: boolean
+  designVariant?: boolean
   checked: boolean
   disabled: boolean
   onCheckedChange: (checked: boolean) => void
@@ -317,6 +334,7 @@ function FeatureFlagRow({
         disabled && 'opacity-50',
         pending && 'bg-amber-50/70',
         inactiveInApp && !pending && 'bg-muted/40',
+        designVariant && !pending && 'bg-[var(--color-brand)]/[0.04]',
       )}
     >
       <div className="min-w-0">
@@ -324,6 +342,14 @@ function FeatureFlagRow({
           <Label htmlFor={id} className="text-sm font-medium">
             {label}
           </Label>
+          {designVariant ? (
+            <Badge
+              variant="outline"
+              className="border-[var(--color-brand)]/30 bg-[var(--color-brand)]/10 text-[10px] font-semibold uppercase tracking-wide text-[var(--color-brand)]"
+            >
+              Variant
+            </Badge>
+          ) : null}
           {pending ? (
             <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-800">
               Changed
