@@ -479,15 +479,13 @@ export function ScoreboardPanelShadcn({
               <div className="flex gap-2 border-t border-border bg-background p-2">
                 <Button
                   variant="outline"
-                  size="sm"
-                  className="flex-1"
+                  className="h-8 min-h-8 flex-1 shrink-0"
                   onClick={handleCancelConfirmation}
                 >
                   Cancel
                 </Button>
                 <Button
-                  size="sm"
-                  className="flex-1 bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
+                  className="h-8 min-h-8 flex-1 shrink-0 bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
                   onClick={handleConfirmAction}
                 >
                   Confirm
@@ -510,15 +508,13 @@ export function ScoreboardPanelShadcn({
               <div className="relative z-10 flex shrink-0 gap-2 border-t border-border bg-background p-2">
                 <Button
                   variant="outline"
-                  size="sm"
-                  className="flex-1"
+                  className="h-8 min-h-8 flex-1 shrink-0"
                   onClick={handleCancelClockEdit}
                 >
                   Cancel
                 </Button>
                 <Button
-                  size="sm"
-                  className="flex-1 bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
+                  className="h-8 min-h-8 flex-1 shrink-0 bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
                   onClick={handleConfirmClockEdit}
                 >
                   Confirm
@@ -735,18 +731,18 @@ export function ScoreboardPanelShadcn({
             onSecondsChange={setDraftSeconds}
           />
         </div>
-        <DialogFooter className="m-0 rounded-none border-t border-border bg-muted/30 px-4 py-3 sm:justify-stretch">
+        <DialogFooter className="m-0 flex-row items-stretch gap-2 rounded-none border-t border-border bg-muted/30 px-4 py-3 sm:justify-stretch">
           <Button
             type="button"
             variant="outline"
-            className="flex-1"
+            className="h-8 min-h-8 flex-1 shrink-0"
             onClick={handleCancelClockEdit}
           >
             Cancel
           </Button>
           <Button
             type="button"
-            className="flex-1 bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
+            className="h-8 min-h-8 flex-1 shrink-0 bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
             onClick={handleConfirmClockEdit}
           >
             Confirm
