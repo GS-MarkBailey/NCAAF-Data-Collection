@@ -78,8 +78,9 @@ function NumericField({
         value={display}
         aria-label={label}
         className={cn(
-          // Override base Input `text-base md:text-sm` so digits stay large on all breakpoints
-          'h-16 w-full max-w-[6.5rem] text-center text-4xl font-bold tabular-nums md:text-4xl',
+          // Fluid size from editor width; override base Input `text-base md:text-sm`
+          'h-[clamp(2.75rem,18cqw,4rem)] w-full max-w-[6.5rem] px-[clamp(0.25rem,2cqw,0.625rem)]',
+          'text-center text-[length:clamp(1.25rem,12cqw,2.25rem)] font-bold tabular-nums md:text-[length:clamp(1.25rem,12cqw,2.25rem)]',
           // Active field = focus ring only — never blue text-selection highlight
           'caret-[var(--color-brand)] selection:bg-transparent selection:text-inherit',
           'focus-visible:border-[var(--color-brand)] focus-visible:ring-[var(--color-brand)]/35',
@@ -156,7 +157,7 @@ export function ClockNumericEditor({
 
   return (
     <div
-      className="flex w-full max-w-md items-center justify-center gap-3 px-1"
+      className="@container flex w-full max-w-md items-center justify-center gap-[clamp(0.25rem,2cqw,0.75rem)] px-1"
       role="group"
       aria-label="Edit game clock"
     >
@@ -170,7 +171,7 @@ export function ClockNumericEditor({
         onChange={onPeriodChange}
       />
       <span
-        className="mt-6 shrink-0 text-4xl font-bold text-muted-foreground"
+        className="mt-[clamp(1rem,4cqw,1.5rem)] shrink-0 text-[length:clamp(1.25rem,12cqw,2.25rem)] font-bold text-muted-foreground"
         aria-hidden
       >
         ·
@@ -184,7 +185,7 @@ export function ClockNumericEditor({
         onChange={handleMinutesChange}
       />
       <span
-        className="mt-6 shrink-0 text-4xl font-bold text-muted-foreground"
+        className="mt-[clamp(1rem,4cqw,1.5rem)] shrink-0 text-[length:clamp(1.25rem,12cqw,2.25rem)] font-bold text-muted-foreground"
         aria-hidden
       >
         :
