@@ -13,6 +13,7 @@
     "scoreboard.quarterStatus": true,
     "scoreboard.possessionSwitch": true,
     "scoreboard.clockWheelEditor": true,
+    "scoreboard.clockNumericEditor": false,
     "scoreboard.playPause": true,
     "scoreboard.periodManagement": false,
     "scoreboard.downDistance": true,

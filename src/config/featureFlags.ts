@@ -104,6 +104,15 @@ export const FEATURE_FLAGS = [
     defaultEnabled: true,
   },
   {
+    id: 'scoreboard.clockNumericEditor',
+    label: 'Clock numeric input (variant)',
+    description:
+      'Replace wheel scrolling with direct number entry and +/- steppers. Off = original scroll wheel.',
+    group: 'Scoreboard',
+    parent: 'scoreboard.clockWheelEditor',
+    defaultEnabled: false,
+  },
+  {
     id: 'scoreboard.playPause',
     label: 'Play / pause',
     description: 'Pause and resume the game clock during live play.',

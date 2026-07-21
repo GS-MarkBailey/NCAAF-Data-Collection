@@ -425,6 +425,7 @@ The table below is a checklist of what the prototype supports today on the live 
 | Auto-deploy GitHub → Vercel (code) | ✅ |
 | Auto-sync Confluence doc + snapshots (GitHub Actions) | ✅ |
 | Display resilience layout variant (feature-flagged, off by default) | ✅ |
+| Clock numeric input variant (feature-flagged, off by default) | ✅ |
 
 ---
 
@@ -484,6 +485,8 @@ The game console is a fixed-height operator UI. System font size, bold text, dis
 **Devices verified for layout work:** Samsung Galaxy S24 Ultra, iPhone 13 Pro Max (portrait + landscape).
 
 **Optional experimental variant:** Settings → Features → **Display resilience (variant)**. When on, the console soft-caps rem growth, improves bottom safe-area padding, and allows panels to scroll under larger fonts/zoom. **Off** keeps the original design so you can compare or revert instantly. Confirm & deploy to publish that flag as the app default for everyone.
+
+**Clock edit variant:** Settings → Features → **Clock numeric input (variant)** (requires Clock wheel editor). When on, period / minutes / seconds use direct number entry and +/- steppers instead of scroll wheels — faster and more precise on large phones during live updates. **Off** keeps the original iOS-style wheel.
 
 1. Open https://ncaaf-data-collection.vercel.app on a phone or desktop
 2. On iPhone: Safari → Share → Add to Home Screen for full-screen PWA

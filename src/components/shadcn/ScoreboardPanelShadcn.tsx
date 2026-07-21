@@ -22,6 +22,7 @@ import { useAppStore } from '@/store/gameStore'
 import { getEffectiveHomeAttacksRight } from '@/lib/playSimulation'
 import { MATCH_ENDED_STAT } from '@/lib/scoreboard'
 import { BallOnStatCell } from '@/components/game/BallOnStatCell'
+import { ClockNumericEditor } from '@/components/game/ClockNumericEditor'
 import { ClockWheelEditor } from '@/components/game/ClockWheelEditor'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -93,6 +94,7 @@ export function ScoreboardPanelShadcn({
   const showQuarterStatus = useFeatureFlag('scoreboard.quarterStatus')
   const showPossessionSwitch = useFeatureFlag('scoreboard.possessionSwitch')
   const showClockWheelEditor = useFeatureFlag('scoreboard.clockWheelEditor')
+  const showClockNumericEditor = useFeatureFlag('scoreboard.clockNumericEditor')
   const showPlayPause = useFeatureFlag('scoreboard.playPause')
   const showPeriodManagement = useFeatureFlag('scoreboard.periodManagement')
   const showDownDistance = useFeatureFlag('scoreboard.downDistance')
@@ -470,16 +472,28 @@ export function ScoreboardPanelShadcn({
             </div>
           ) : editingClock ? (
             <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
-              <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden">
-                <ClockWheelEditor
-                  key={clockEditSession}
-                  period={draftPeriod}
-                  minutes={draftMinutes}
-                  seconds={draftSeconds}
-                  onPeriodChange={setDraftPeriod}
-                  onMinutesChange={setDraftMinutes}
-                  onSecondsChange={setDraftSeconds}
-                />
+              <div className="flex min-h-0 flex-1 items-center justify-center overflow-y-auto overflow-x-hidden">
+                {showClockNumericEditor ? (
+                  <ClockNumericEditor
+                    key={clockEditSession}
+                    period={draftPeriod}
+                    minutes={draftMinutes}
+                    seconds={draftSeconds}
+                    onPeriodChange={setDraftPeriod}
+                    onMinutesChange={setDraftMinutes}
+                    onSecondsChange={setDraftSeconds}
+                  />
+                ) : (
+                  <ClockWheelEditor
+                    key={clockEditSession}
+                    period={draftPeriod}
+                    minutes={draftMinutes}
+                    seconds={draftSeconds}
+                    onPeriodChange={setDraftPeriod}
+                    onMinutesChange={setDraftMinutes}
+                    onSecondsChange={setDraftSeconds}
+                  />
+                )}
               </div>
               <div className="relative z-10 flex shrink-0 gap-2 border-t border-border bg-background p-2">
                 <Button
