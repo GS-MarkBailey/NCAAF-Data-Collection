@@ -373,7 +373,7 @@ export function ScoreboardPanelShadcn({
       {gameEnded ? <Badge variant="secondary">Final</Badge> : null}
       {showPlayPause && showPlayPauseButton ? (
         <Badge
-          variant={paused ? 'outline' : 'destructive'}
+          variant="outline"
           render={
             <button
               type="button"
@@ -383,9 +383,10 @@ export function ScoreboardPanelShadcn({
             />
           }
           className={cn(
-            'gap-1',
-            paused &&
-              'border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100',
+            'gap-1 border font-semibold',
+            paused
+              ? 'border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
+              : 'border-red-200 bg-red-50 text-red-800 hover:bg-red-100',
           )}
         >
           {paused ? (
