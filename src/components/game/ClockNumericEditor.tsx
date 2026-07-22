@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type Ref } from 'react'
+import { Minus, Plus } from 'lucide-react'
 import {
   CLOCK_EDIT_MAX_MINUTES,
   CLOCK_EDIT_MAX_SECONDS,
@@ -6,6 +7,7 @@ import {
   MIN_PERIOD,
   clampPeriod,
 } from '@/lib/clock'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { cn } from '@/lib/utils'
@@ -41,6 +43,7 @@ interface NumericFieldProps {
   autoFocus?: boolean
   inputRef?: Ref<HTMLInputElement>
   onChange: (value: number) => void
+  className?: string
 }
 
 function NumericField({
@@ -54,6 +57,7 @@ function NumericField({
   autoFocus = false,
   inputRef,
   onChange,
+  className,
 }: NumericFieldProps) {
   const display = pad ? value.toString().padStart(2, '0') : String(value)
   /** First digit after focus replaces the value (no select-all highlight). */
@@ -68,8 +72,21 @@ function NumericField({
     onChange(clampInt(Number.parseInt(digits, 10), min, max))
   }
 
+  const commitReplaceDigit = (raw: string) => {
+    replaceOnTypeRef.current = false
+    const digits = raw.replace(/\D/g, '')
+    if (!digits) return
+    // Use the whole inserted run when possible (e.g. paste "12"), else last digit
+    commitDigits(digits.length <= 2 ? digits : digits.slice(-2))
+  }
+
   return (
-    <div className="flex min-w-0 flex-1 flex-col items-center gap-2">
+    <div
+      className={cn(
+        'flex min-w-0 flex-1 flex-col items-center gap-2',
+        className,
+      )}
+    >
       <label
         htmlFor={id}
         className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase"
@@ -124,26 +141,101 @@ function NumericField({
             }
           }
         }}
+        onBeforeInput={(event) => {
+          const data = (event as unknown as { data?: string | null }).data
+          if (
+            replaceOnTypeRef.current &&
+            typeof data === 'string' &&
+            /^\d+$/.test(data)
+          ) {
+            event.preventDefault()
+            commitReplaceDigit(data)
+          }
+        }}
         onKeyDown={(event) => {
           if (event.key === 'Backspace' || event.key === 'Delete') {
             replaceOnTypeRef.current = false
+            return
+          }
+          if (
+            replaceOnTypeRef.current &&
+            /^\d$/.test(event.key) &&
+            !event.ctrlKey &&
+            !event.metaKey &&
+            !event.altKey
+          ) {
+            event.preventDefault()
+            commitReplaceDigit(event.key)
           }
         }}
         onChange={(event) => {
           const digits = event.target.value.replace(/\D/g, '')
           if (replaceOnTypeRef.current) {
+            // Fallback when beforeInput/keyDown did not handle replace (some mobile IME)
             replaceOnTypeRef.current = false
-            // Typing after focus replaces the whole field with the newest digit(s)
-            const typed =
-              digits.length > display.replace(/\D/g, '').length
-                ? digits.slice(display.replace(/\D/g, '').length)
-                : digits
-            commitDigits(typed || digits.slice(-1))
+            commitDigits(digits.slice(-1) || digits)
             return
           }
           commitDigits(digits)
         }}
       />
+    </div>
+  )
+}
+
+function PeriodEditor({
+  period,
+  onPeriodChange,
+  autoFocus,
+  inputRef,
+}: {
+  period: number
+  onPeriodChange: (period: number) => void
+  autoFocus?: boolean
+  inputRef?: Ref<HTMLInputElement>
+}) {
+  const value = clampPeriod(period)
+
+  return (
+    <div
+      className="flex w-full items-center justify-center gap-3 px-1"
+      role="group"
+      aria-label="Edit period"
+    >
+      <Button
+        type="button"
+        variant="outline"
+        size="icon"
+        className="size-12 min-h-12 min-w-12 shrink-0"
+        disabled={value <= MIN_PERIOD}
+        aria-label="Decrease period"
+        onClick={() => onPeriodChange(clampPeriod(value - 1))}
+      >
+        <Minus className="size-5" />
+      </Button>
+      <NumericField
+        id="clock-edit-period"
+        label="Period"
+        value={value}
+        min={MIN_PERIOD}
+        max={MAX_PERIOD}
+        pad={false}
+        autoFocus={autoFocus}
+        inputRef={inputRef}
+        onChange={onPeriodChange}
+        className="max-w-[7rem] flex-none"
+      />
+      <Button
+        type="button"
+        variant="outline"
+        size="icon"
+        className="size-12 min-h-12 min-w-12 shrink-0"
+        disabled={value >= MAX_PERIOD}
+        aria-label="Increase period"
+        onClick={() => onPeriodChange(clampPeriod(value + 1))}
+      >
+        <Plus className="size-5" />
+      </Button>
     </div>
   )
 }
@@ -211,23 +303,12 @@ export function ClockNumericEditor({
       </TabsList>
 
       <TabsContent value="period" className="outline-none">
-        <div
-          className="@container flex w-full items-center justify-center px-1"
-          role="group"
-          aria-label="Edit period"
-        >
-          <NumericField
-            id="clock-edit-period"
-            label="Period"
-            value={clampPeriod(period)}
-            min={MIN_PERIOD}
-            max={MAX_PERIOD}
-            pad={false}
-            autoFocus={tab === 'period'}
-            inputRef={periodInputRef}
-            onChange={onPeriodChange}
-          />
-        </div>
+        <PeriodEditor
+          period={period}
+          onPeriodChange={onPeriodChange}
+          autoFocus={tab === 'period'}
+          inputRef={periodInputRef}
+        />
       </TabsContent>
 
       <TabsContent value="time" className="outline-none">

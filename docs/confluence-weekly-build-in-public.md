@@ -381,7 +381,7 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 **Design variants** (Settings → Features → **Design variants**)
 - Dedicated group with clear **Variant A / Variant B** labels and “Compare vs original” guidance
 - **Variant A — Display resilience:** soft-caps rem growth, improves bottom safe-area padding, allows console panels to scroll under larger fonts / bold text / display scaling / zoom
-- **Variant B — Clock edit panel:** tap the clock opens **Time** (Min : Sec); tap **QTR** opens **Period** — separate tabs, direct number entry (no scroll wheels, no +/- steppers); digit inputs scale for narrow dialogs
+- **Variant B — Clock edit panel:** tap the clock opens **Time** (Min : Sec); tap **QTR** opens **Period** with **− / +** steppers (and direct entry) — separate tabs, no scroll wheels; digit inputs scale for narrow dialogs
 - Documented **supported phone display & browser settings** baseline (Default font, Bold off, Display Default, Zoom 100%)
 
 <!-- AUTO-SNAPSHOTS:week-4-shipped-design-variants:START -->
