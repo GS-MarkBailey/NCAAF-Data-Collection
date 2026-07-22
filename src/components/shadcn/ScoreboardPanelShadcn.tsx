@@ -22,7 +22,7 @@ import { useAppStore } from '@/store/gameStore'
 import { getEffectiveHomeAttacksRight } from '@/lib/playSimulation'
 import { MATCH_ENDED_STAT } from '@/lib/scoreboard'
 import { BallOnStatCell } from '@/components/game/BallOnStatCell'
-import { ClockNumericEditor } from '@/components/game/ClockNumericEditor'
+import { ClockNumericEditor, type ClockEditTab } from '@/components/game/ClockNumericEditor'
 import { ClockWheelEditor } from '@/components/game/ClockWheelEditor'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -109,12 +109,14 @@ export function ScoreboardPanelShadcn({
   const stacked = layout === 'stack'
 
   const [editingClock, setEditingClock] = useState(false)
+  const [clockEditTab, setClockEditTab] = useState<ClockEditTab>('time')
   const [pendingConfirmation, setPendingConfirmation] =
     useState<PendingConfirmation | null>(null)
   const [draftPeriod, setDraftPeriod] = useState(1)
   const [draftMinutes, setDraftMinutes] = useState(0)
   const [draftSeconds, setDraftSeconds] = useState(0)
   const [clockEditSession, setClockEditSession] = useState(0)
+  const clockPeriodInputRef = useRef<HTMLInputElement>(null)
   const clockMinutesInputRef = useRef<HTMLInputElement>(null)
 
   const paused = !clockRunning
@@ -168,16 +170,20 @@ export function ScoreboardPanelShadcn({
       })
   const clockLocked = gameEnded
 
-  const handleOpenClockEditor = () => {
+  const handleOpenClockEditor = (tab: ClockEditTab = 'time') => {
     if (!showClockWheelEditor || clockLocked || inOvertime || pendingConfirmation) return
 
     const parts = clockToParts(clockSeconds)
     setDraftPeriod(clockPeriod)
     setDraftMinutes(parts.minutes)
     setDraftSeconds(parts.seconds)
+    setClockEditTab(tab)
     setClockEditSession((session) => session + 1)
     setEditingClock(true)
   }
+
+  const canOpenClockEditor =
+    showClockWheelEditor && !clockLocked && !inOvertime && !pendingConfirmation
 
   const handleCancelClockEdit = () => {
     setEditingClock(false)
@@ -421,7 +427,7 @@ export function ScoreboardPanelShadcn({
         )}
         onClick={(event) => {
           event.stopPropagation()
-          handleOpenClockEditor()
+          handleOpenClockEditor('time')
         }}
         disabled={clockLocked || (inOvertime && !gameEnded)}
         aria-label={
@@ -429,7 +435,7 @@ export function ScoreboardPanelShadcn({
             ? 'Match ended'
             : inOvertime
               ? 'Overtime in progress'
-              : `Edit game clock, currently ${formatClock(clockSeconds)}`
+              : `Edit game clock time, currently ${formatClock(clockSeconds)}`
         }
       >
         <span className={cn('layout-clock-display font-bold leading-none', clockDisplayLabel)}>
@@ -624,6 +630,19 @@ export function ScoreboardPanelShadcn({
                     : undefined
               }
               compact={stacked}
+              interactive={canOpenClockEditor}
+              onClick={
+                canOpenClockEditor
+                  ? () => handleOpenClockEditor('period')
+                  : undefined
+              }
+              ariaLabel={
+                canOpenClockEditor
+                  ? `Edit period, currently ${
+                      isOvertimePeriod(clockPeriod) ? 'OT' : clockPeriod
+                    }`
+                  : undefined
+              }
               status={
                 showQuarterStatus
                   ? pregame || gameEnded
@@ -717,7 +736,9 @@ export function ScoreboardPanelShadcn({
       <DialogContent
         className="gap-0 overflow-hidden p-0 sm:max-w-md"
         showCloseButton={false}
-        initialFocus={clockMinutesInputRef}
+        initialFocus={
+          clockEditTab === 'period' ? clockPeriodInputRef : clockMinutesInputRef
+        }
       >
         <DialogHeader className="border-b border-border px-4 pt-4 pb-3">
           <DialogTitle>Edit clock</DialogTitle>
@@ -731,6 +752,8 @@ export function ScoreboardPanelShadcn({
             onPeriodChange={setDraftPeriod}
             onMinutesChange={setDraftMinutes}
             onSecondsChange={setDraftSeconds}
+            initialTab={clockEditTab}
+            periodInputRef={clockPeriodInputRef}
             minutesInputRef={clockMinutesInputRef}
           />
         </div>
@@ -772,18 +795,38 @@ function StatCell({
   displayValue,
   status,
   compact = false,
+  interactive = false,
+  onClick,
+  ariaLabel,
 }: {
   label: string
   value: number
   displayValue?: string
   status?: QuarterStatus
   compact?: boolean
+  interactive?: boolean
+  onClick?: () => void
+  ariaLabel?: string
 }) {
   const pulsing = usePushPulse(value)
   const statusStyle = status ? QUARTER_STATUS_CLASS[status] : undefined
 
   return (
     <div
+      role={interactive ? 'button' : undefined}
+      tabIndex={interactive ? 0 : undefined}
+      aria-label={ariaLabel}
+      onClick={interactive ? onClick : undefined}
+      onKeyDown={
+        interactive
+          ? (event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault()
+                onClick?.()
+              }
+            }
+          : undefined
+      }
       className={cn(
         'flex h-full min-h-0 flex-1 flex-col items-center border-r border-border px-1 last:border-r-0 landscape-mobile:py-3',
         compact
@@ -791,6 +834,8 @@ function StatCell({
           : 'justify-center gap-0 py-4',
         statusStyle?.className,
         pulsing && 'push-data-pulse',
+        interactive &&
+          'cursor-pointer transition-colors hover:bg-muted/50 active:bg-muted/70',
       )}
       style={
         {

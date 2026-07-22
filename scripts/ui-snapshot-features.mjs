@@ -211,7 +211,7 @@ export const WEEK_FEATURES = {
     },
     {
       id: 'clock-numeric-editor',
-      title: 'Clock edit panel (Variant B)',
+      title: 'Clock edit panel — Time tab (Variant B)',
       path: '/game/NCAAF-2026-001',
       viewport: 'game-landscape',
       gameSetup: { fieldDirection: 'dismiss', errorToast: 'dismiss' },
@@ -220,9 +220,33 @@ export const WEEK_FEATURES = {
         'scoreboard.clockNumericEditor': true,
       },
       async prepare(page) {
-        await page.getByRole('button', { name: /edit game clock/i }).click()
+        await page.getByRole('button', { name: /edit game clock time/i }).click()
+        await page.getByRole('tab', { name: 'Time' }).waitFor({ state: 'visible' })
         await page.getByRole('button', { name: 'Confirm' }).waitFor({ state: 'visible' })
-        await page.getByLabel('Period').waitFor({ state: 'visible', timeout: 5000 })
+        await page.getByLabel('Min').waitFor({ state: 'visible', timeout: 5000 })
+      },
+    },
+    {
+      id: 'clock-period-editor',
+      title: 'Clock edit panel — Period tab (Variant B)',
+      path: '/game/NCAAF-2026-001',
+      viewport: 'game-landscape',
+      gameSetup: { fieldDirection: 'dismiss', errorToast: 'dismiss' },
+      featureFlagOverrides: {
+        'scoreboard.clockWheelEditor': true,
+        'scoreboard.clockNumericEditor': true,
+      },
+      async prepare(page) {
+        await page
+          .getByRole('button', { name: /edit period/i })
+          .filter({ visible: true })
+          .click()
+        await page.getByRole('tab', { name: 'Period' }).waitFor({ state: 'visible' })
+        await page.getByRole('button', { name: 'Confirm' }).waitFor({ state: 'visible' })
+        await page.getByRole('textbox', { name: 'Period' }).waitFor({
+          state: 'visible',
+          timeout: 5000,
+        })
       },
     },
     {

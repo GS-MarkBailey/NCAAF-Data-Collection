@@ -69,8 +69,12 @@ export const WEEK_INTERACTIONS = {
       featureIds: ['portrait-stack'],
     },
     {
-      text: '**Design variants** — Settings → Features → Design variants (Variant A display resilience, Variant B clock edit panel)',
-      featureIds: ['design-variants-panel', 'clock-numeric-editor'],
+      text: '**Design variants** — Settings → Features → Design variants (Variant A display resilience, Variant B clock edit panel with Period / Time tabs)',
+      featureIds: [
+        'design-variants-panel',
+        'clock-numeric-editor',
+        'clock-period-editor',
+      ],
     },
     {
       text: '**Start / Pause chips** — Play/Pause icons with green Start / red Pause; larger invisible tap target',
@@ -110,7 +114,11 @@ export const WEEK_SHIPPED = {
     'match-ended': { featureIds: ['past-fixture-ended'] },
     'portrait-game': { featureIds: ['portrait-stack'] },
     'design-variants': {
-      featureIds: ['design-variants-panel', 'clock-numeric-editor'],
+      featureIds: [
+        'design-variants-panel',
+        'clock-numeric-editor',
+        'clock-period-editor',
+      ],
     },
     'clock-polish': { featureIds: ['start-pause-chips'] },
     profile: { featureIds: ['profile-dialog'] },

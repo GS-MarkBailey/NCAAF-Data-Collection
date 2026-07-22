@@ -1,4 +1,4 @@
-import { useRef, type Ref } from 'react'
+import { useEffect, useRef, useState, type Ref } from 'react'
 import {
   CLOCK_EDIT_MAX_MINUTES,
   CLOCK_EDIT_MAX_SECONDS,
@@ -7,7 +7,10 @@ import {
   clampPeriod,
 } from '@/lib/clock'
 import { Input } from '@/components/ui/input'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { cn } from '@/lib/utils'
+
+export type ClockEditTab = 'period' | 'time'
 
 interface ClockNumericEditorProps {
   period: number
@@ -16,7 +19,9 @@ interface ClockNumericEditorProps {
   onPeriodChange: (period: number) => void
   onMinutesChange: (minutes: number) => void
   onSecondsChange: (seconds: number) => void
-  /** Used by the dialog to focus Min on open. */
+  /** Which tab to show when the dialog opens. */
+  initialTab?: ClockEditTab
+  periodInputRef?: Ref<HTMLInputElement>
   minutesInputRef?: Ref<HTMLInputElement>
 }
 
@@ -151,10 +156,17 @@ export function ClockNumericEditor({
   onPeriodChange,
   onMinutesChange,
   onSecondsChange,
+  initialTab = 'time',
+  periodInputRef,
   minutesInputRef,
 }: ClockNumericEditorProps) {
+  const [tab, setTab] = useState<ClockEditTab>(initialTab)
   const secondsLocked = minutes >= CLOCK_EDIT_MAX_MINUTES
   const clampedSeconds = secondsLocked ? 0 : seconds
+
+  useEffect(() => {
+    setTab(initialTab)
+  }, [initialTab])
 
   const handleMinutesChange = (nextMinutes: number) => {
     const clamped = clampInt(nextMinutes, 0, CLOCK_EDIT_MAX_MINUTES)
@@ -164,52 +176,93 @@ export function ClockNumericEditor({
     }
   }
 
+  const handleTabChange = (value: string | number | null) => {
+    if (value === 'period' || value === 'time') {
+      setTab(value)
+    }
+  }
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      const target =
+        tab === 'period'
+          ? document.getElementById('clock-edit-period')
+          : document.getElementById('clock-edit-minutes')
+      if (target instanceof HTMLInputElement && !target.disabled) {
+        target.focus()
+      }
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [tab])
+
   return (
-    <div
-      className="@container flex w-full max-w-md items-center justify-center gap-[clamp(0.25rem,2cqw,0.75rem)] px-1"
-      role="group"
-      aria-label="Edit game clock"
+    <Tabs
+      value={tab}
+      onValueChange={handleTabChange}
+      className="w-full gap-3"
     >
-      <NumericField
-        id="clock-edit-period"
-        label="Period"
-        value={clampPeriod(period)}
-        min={MIN_PERIOD}
-        max={MAX_PERIOD}
-        pad={false}
-        onChange={onPeriodChange}
-      />
-      <span
-        className="mt-[clamp(1rem,4cqw,1.5rem)] shrink-0 text-[length:clamp(1.25rem,12cqw,2.25rem)] font-bold text-muted-foreground"
-        aria-hidden
-      >
-        ·
-      </span>
-      <NumericField
-        id="clock-edit-minutes"
-        label="Min"
-        value={minutes}
-        min={0}
-        max={CLOCK_EDIT_MAX_MINUTES}
-        autoFocus
-        inputRef={minutesInputRef}
-        onChange={handleMinutesChange}
-      />
-      <span
-        className="mt-[clamp(1rem,4cqw,1.5rem)] shrink-0 text-[length:clamp(1.25rem,12cqw,2.25rem)] font-bold text-muted-foreground"
-        aria-hidden
-      >
-        :
-      </span>
-      <NumericField
-        id="clock-edit-seconds"
-        label="Sec"
-        value={clampedSeconds}
-        min={0}
-        max={CLOCK_EDIT_MAX_SECONDS}
-        disabled={secondsLocked}
-        onChange={onSecondsChange}
-      />
-    </div>
+      <TabsList className="mx-auto w-full max-w-xs">
+        <TabsTrigger value="period" className="flex-1">
+          Period
+        </TabsTrigger>
+        <TabsTrigger value="time" className="flex-1">
+          Time
+        </TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="period" className="outline-none">
+        <div
+          className="@container flex w-full items-center justify-center px-1"
+          role="group"
+          aria-label="Edit period"
+        >
+          <NumericField
+            id="clock-edit-period"
+            label="Period"
+            value={clampPeriod(period)}
+            min={MIN_PERIOD}
+            max={MAX_PERIOD}
+            pad={false}
+            autoFocus={tab === 'period'}
+            inputRef={periodInputRef}
+            onChange={onPeriodChange}
+          />
+        </div>
+      </TabsContent>
+
+      <TabsContent value="time" className="outline-none">
+        <div
+          className="@container flex w-full max-w-md items-center justify-center gap-[clamp(0.25rem,2cqw,0.75rem)] px-1"
+          role="group"
+          aria-label="Edit game clock time"
+        >
+          <NumericField
+            id="clock-edit-minutes"
+            label="Min"
+            value={minutes}
+            min={0}
+            max={CLOCK_EDIT_MAX_MINUTES}
+            autoFocus={tab === 'time'}
+            inputRef={minutesInputRef}
+            onChange={handleMinutesChange}
+          />
+          <span
+            className="mt-[clamp(1rem,4cqw,1.5rem)] shrink-0 text-[length:clamp(1.25rem,12cqw,2.25rem)] font-bold text-muted-foreground"
+            aria-hidden
+          >
+            :
+          </span>
+          <NumericField
+            id="clock-edit-seconds"
+            label="Sec"
+            value={clampedSeconds}
+            min={0}
+            max={CLOCK_EDIT_MAX_SECONDS}
+            disabled={secondsLocked}
+            onChange={onSecondsChange}
+          />
+        </div>
+      </TabsContent>
+    </Tabs>
   )
 }

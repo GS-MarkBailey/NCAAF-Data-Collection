@@ -381,11 +381,11 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 **Design variants** (Settings → Features → **Design variants**)
 - Dedicated group with clear **Variant A / Variant B** labels and “Compare vs original” guidance
 - **Variant A — Display resilience:** soft-caps rem growth, improves bottom safe-area padding, allows console panels to scroll under larger fonts / bold text / display scaling / zoom
-- **Variant B — Clock edit panel:** tap the clock opens a dialog with direct number entry for Period · Min : Sec (no scroll wheels, no +/- steppers) — addresses slow/imprecise wheel scrolling during live updates; digit inputs use a larger type size for thumb entry
+- **Variant B — Clock edit panel:** tap the clock opens **Time** (Min : Sec); tap **QTR** opens **Period** — separate tabs, direct number entry (no scroll wheels, no +/- steppers); digit inputs scale for narrow dialogs
 - Documented **supported phone display & browser settings** baseline (Default font, Bold off, Display Default, Zoom 100%)
 
 <!-- AUTO-SNAPSHOTS:week-4-shipped-design-variants:START -->
-![Design variants in Features settings](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/design-variants-panel.png) ![Clock edit panel (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-numeric-editor.png)
+![Design variants in Features settings](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/design-variants-panel.png) ![Clock edit panel — Time tab (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-numeric-editor.png) ![Clock edit panel — Period tab (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-period-editor.png)
 <!-- AUTO-SNAPSHOTS:week-4-shipped-design-variants:END -->
 
 **Scoreboard / clock polish**
@@ -429,9 +429,9 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 
 ![Portrait game console (stacked panels)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/portrait-stack.png)
 
-- **Design variants** — Settings → Features → Design variants (Variant A display resilience, Variant B clock edit panel)
+- **Design variants** — Settings → Features → Design variants (Variant A display resilience, Variant B clock edit panel with Period / Time tabs)
 
-![Design variants in Features settings](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/design-variants-panel.png) ![Clock edit panel (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-numeric-editor.png)
+![Design variants in Features settings](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/design-variants-panel.png) ![Clock edit panel — Time tab (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-numeric-editor.png) ![Clock edit panel — Period tab (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-period-editor.png)
 
 - **Start / Pause chips** — Play/Pause icons with green Start / red Pause; larger invisible tap target
 
