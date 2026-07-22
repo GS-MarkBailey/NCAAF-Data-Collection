@@ -1,4 +1,4 @@
-import { useState, type CSSProperties, type KeyboardEvent, type MouseEvent } from 'react'
+import { useRef, useState, type CSSProperties, type KeyboardEvent, type MouseEvent } from 'react'
 import { LayoutGrid, Pause, Play } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { formatClock } from '@/lib/format'
@@ -115,6 +115,7 @@ export function ScoreboardPanelShadcn({
   const [draftMinutes, setDraftMinutes] = useState(0)
   const [draftSeconds, setDraftSeconds] = useState(0)
   const [clockEditSession, setClockEditSession] = useState(0)
+  const clockMinutesInputRef = useRef<HTMLInputElement>(null)
 
   const paused = !clockRunning
   const pregame = !gameStarted
@@ -716,6 +717,7 @@ export function ScoreboardPanelShadcn({
       <DialogContent
         className="gap-0 overflow-hidden p-0 sm:max-w-md"
         showCloseButton={false}
+        initialFocus={clockMinutesInputRef}
       >
         <DialogHeader className="border-b border-border px-4 pt-4 pb-3">
           <DialogTitle>Edit clock</DialogTitle>
@@ -729,6 +731,7 @@ export function ScoreboardPanelShadcn({
             onPeriodChange={setDraftPeriod}
             onMinutesChange={setDraftMinutes}
             onSecondsChange={setDraftSeconds}
+            minutesInputRef={clockMinutesInputRef}
           />
         </div>
         <DialogFooter className="m-0 flex-col items-stretch gap-2 rounded-none border-t border-border bg-muted/30 px-4 py-3 sm:flex-row sm:justify-stretch">

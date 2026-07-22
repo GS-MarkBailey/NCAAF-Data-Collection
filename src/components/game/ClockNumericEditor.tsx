@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, type Ref } from 'react'
 import {
   CLOCK_EDIT_MAX_MINUTES,
   CLOCK_EDIT_MAX_SECONDS,
@@ -16,6 +16,8 @@ interface ClockNumericEditorProps {
   onPeriodChange: (period: number) => void
   onMinutesChange: (minutes: number) => void
   onSecondsChange: (seconds: number) => void
+  /** Used by the dialog to focus Min on open. */
+  minutesInputRef?: Ref<HTMLInputElement>
 }
 
 function clampInt(value: number, min: number, max: number): number {
@@ -31,6 +33,8 @@ interface NumericFieldProps {
   max: number
   pad?: boolean
   disabled?: boolean
+  autoFocus?: boolean
+  inputRef?: Ref<HTMLInputElement>
   onChange: (value: number) => void
 }
 
@@ -42,6 +46,8 @@ function NumericField({
   max,
   pad = true,
   disabled = false,
+  autoFocus = false,
+  inputRef,
   onChange,
 }: NumericFieldProps) {
   const display = pad ? value.toString().padStart(2, '0') : String(value)
@@ -66,6 +72,7 @@ function NumericField({
         {label}
       </label>
       <Input
+        ref={inputRef}
         id={id}
         type="text"
         inputMode="numeric"
@@ -75,6 +82,7 @@ function NumericField({
         spellCheck={false}
         enterKeyHint="done"
         disabled={disabled}
+        autoFocus={autoFocus}
         value={display}
         aria-label={label}
         className={cn(
@@ -143,6 +151,7 @@ export function ClockNumericEditor({
   onPeriodChange,
   onMinutesChange,
   onSecondsChange,
+  minutesInputRef,
 }: ClockNumericEditorProps) {
   const secondsLocked = minutes >= CLOCK_EDIT_MAX_MINUTES
   const clampedSeconds = secondsLocked ? 0 : seconds
@@ -182,6 +191,8 @@ export function ClockNumericEditor({
         value={minutes}
         min={0}
         max={CLOCK_EDIT_MAX_MINUTES}
+        autoFocus
+        inputRef={minutesInputRef}
         onChange={handleMinutesChange}
       />
       <span
