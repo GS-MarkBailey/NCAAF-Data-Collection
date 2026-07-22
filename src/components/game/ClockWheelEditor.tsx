@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
-import { MAX_PERIOD, MIN_PERIOD, CLOCK_EDIT_MAX_MINUTES, getClockEditSecondValues } from '@/lib/clock'
+import { MAX_PERIOD, MIN_PERIOD, CLOCK_EDIT_MAX_MINUTES, formatPeriodLabel, getClockEditSecondValues } from '@/lib/clock'
 
 const ITEM_HEIGHT = 28
 const INITIAL_SCROLL_SUPPRESS_MS = 400
@@ -215,7 +215,7 @@ export function ClockWheelEditor({
         values={CLOCK_PERIOD_VALUES}
         value={period}
         onChange={onPeriodChange}
-        formatValue={(option) => option.toString()}
+        formatValue={(option) => formatPeriodLabel(option)}
       />
       <span className="shrink-0 self-center text-xl font-bold leading-none text-muted-foreground">
         ·
