@@ -2,7 +2,8 @@ export const QUARTER_LENGTH_SECONDS = 15 * 60
 export const DEMO_CLOCK_SECONDS = 30
 export const REGULATION_QUARTERS = 4
 export const MIN_PERIOD = 1
-export const MAX_PERIOD = 5
+/** Manual period edits (and wheel values) — regulation is still 1–4; 5+ is overtime. */
+export const MAX_PERIOD = 99
 
 export function clampPeriod(period: number): number {
   return Math.max(MIN_PERIOD, Math.min(MAX_PERIOD, Math.round(period)))

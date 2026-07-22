@@ -14,6 +14,7 @@ import {
   isOvertimePeriod,
   isPeriodInProgress,
   nextQuarterNumber,
+  REGULATION_QUARTERS,
   type QuarterStatus,
 } from '@/lib/clock'
 import { usePushPulse } from '@/hooks/usePushPulse'
@@ -626,7 +627,9 @@ export function ScoreboardPanelShadcn({
                 gameEnded
                   ? MATCH_ENDED_STAT
                   : isOvertimePeriod(clockPeriod)
-                    ? 'OT'
+                    ? clockPeriod === REGULATION_QUARTERS + 1
+                      ? 'OT'
+                      : `OT${clockPeriod - REGULATION_QUARTERS}`
                     : undefined
               }
               compact={stacked}
@@ -638,9 +641,7 @@ export function ScoreboardPanelShadcn({
               }
               ariaLabel={
                 canOpenClockEditor
-                  ? `Edit period, currently ${
-                      isOvertimePeriod(clockPeriod) ? 'OT' : clockPeriod
-                    }`
+                  ? `Edit period, currently ${clockPeriod}`
                   : undefined
               }
               status={
