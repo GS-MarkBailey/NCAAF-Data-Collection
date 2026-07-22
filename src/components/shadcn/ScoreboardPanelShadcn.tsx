@@ -5,6 +5,7 @@ import { formatClock } from '@/lib/format'
 import {
   clockFromParts,
   clockToParts,
+  formatPeriodLabel,
   getQuarterStatus,
   canEndCurrentPeriod,
   canStartNextPeriod,
@@ -14,7 +15,6 @@ import {
   isOvertimePeriod,
   isPeriodInProgress,
   nextQuarterNumber,
-  REGULATION_QUARTERS,
   type QuarterStatus,
 } from '@/lib/clock'
 import { usePushPulse } from '@/hooks/usePushPulse'
@@ -624,13 +624,7 @@ export function ScoreboardPanelShadcn({
               label="QTR"
               value={clockPeriod}
               displayValue={
-                gameEnded
-                  ? MATCH_ENDED_STAT
-                  : isOvertimePeriod(clockPeriod)
-                    ? clockPeriod === REGULATION_QUARTERS + 1
-                      ? 'OT'
-                      : `OT${clockPeriod - REGULATION_QUARTERS}`
-                    : undefined
+                gameEnded ? MATCH_ENDED_STAT : formatPeriodLabel(clockPeriod)
               }
               compact={stacked}
               interactive={canOpenClockEditor}
@@ -641,7 +635,7 @@ export function ScoreboardPanelShadcn({
               }
               ariaLabel={
                 canOpenClockEditor
-                  ? `Edit period, currently ${clockPeriod}`
+                  ? `Edit period, currently ${formatPeriodLabel(clockPeriod)}`
                   : undefined
               }
               status={

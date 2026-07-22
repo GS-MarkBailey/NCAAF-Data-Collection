@@ -6,6 +6,8 @@ import {
   MAX_PERIOD,
   MIN_PERIOD,
   clampPeriod,
+  formatPeriodLabel,
+  parsePeriodInput,
 } from '@/lib/clock'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -195,6 +197,23 @@ function PeriodEditor({
   inputRef?: Ref<HTMLInputElement>
 }) {
   const value = clampPeriod(period)
+  const label = formatPeriodLabel(value)
+  const [draft, setDraft] = useState(label)
+  const [editing, setEditing] = useState(false)
+
+  useEffect(() => {
+    if (!editing) setDraft(formatPeriodLabel(value))
+  }, [value, editing])
+
+  const commitDraft = (raw: string) => {
+    const parsed = parsePeriodInput(raw)
+    if (parsed == null) {
+      setDraft(formatPeriodLabel(value))
+      return
+    }
+    onPeriodChange(parsed)
+    setDraft(formatPeriodLabel(parsed))
+  }
 
   return (
     <div
@@ -213,18 +232,63 @@ function PeriodEditor({
       >
         <Minus className="size-5" />
       </Button>
-      <NumericField
-        id="clock-edit-period"
-        label="Period"
-        value={value}
-        min={MIN_PERIOD}
-        max={MAX_PERIOD}
-        pad={false}
-        autoFocus={autoFocus}
-        inputRef={inputRef}
-        onChange={onPeriodChange}
-        className="max-w-[7rem] flex-none"
-      />
+      <div className="flex min-w-0 max-w-[7rem] flex-none flex-col items-center gap-2">
+        <label
+          htmlFor="clock-edit-period"
+          className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase"
+        >
+          Period
+        </label>
+        <Input
+          ref={inputRef}
+          id="clock-edit-period"
+          type="text"
+          inputMode="text"
+          autoComplete="off"
+          autoCorrect="off"
+          spellCheck={false}
+          enterKeyHint="done"
+          autoFocus={autoFocus}
+          value={editing ? draft : label}
+          aria-label="Period"
+          className={cn(
+            'h-[clamp(2.75rem,18cqw,4rem)] w-full max-w-[6.5rem] px-[clamp(0.25rem,2cqw,0.625rem)]',
+            'text-center text-[length:clamp(1.25rem,12cqw,2.25rem)] font-bold tabular-nums md:text-[length:clamp(1.25rem,12cqw,2.25rem)]',
+            'caret-[var(--color-brand)] selection:bg-transparent selection:text-inherit',
+            'focus-visible:border-[var(--color-brand)] focus-visible:ring-[var(--color-brand)]/35',
+          )}
+          onFocus={(event) => {
+            setEditing(true)
+            setDraft(formatPeriodLabel(value))
+            const el = event.currentTarget
+            requestAnimationFrame(() => {
+              const len = el.value.length
+              try {
+                el.setSelectionRange(len, len)
+              } catch {
+                /* ignore */
+              }
+            })
+          }}
+          onBlur={() => {
+            commitDraft(draft)
+            setEditing(false)
+          }}
+          onChange={(event) => {
+            const next = event.target.value.toUpperCase()
+            setDraft(next)
+            const parsed = parsePeriodInput(next)
+            if (parsed != null && /^(?:\d+|OT\d*)$/i.test(next.trim())) {
+              onPeriodChange(parsed)
+            }
+          }}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') {
+              event.currentTarget.blur()
+            }
+          }}
+        />
+      </div>
       <Button
         type="button"
         variant="outline"

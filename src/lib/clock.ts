@@ -9,6 +9,33 @@ export function clampPeriod(period: number): number {
   return Math.max(MIN_PERIOD, Math.min(MAX_PERIOD, Math.round(period)))
 }
 
+/** Scoreboard / editor label: 1–4 numeric, first OT as "OT", then OT2, OT3, … */
+export function formatPeriodLabel(period: number): string {
+  const value = clampPeriod(period)
+  if (value <= REGULATION_QUARTERS) return String(value)
+  const overtimeIndex = value - REGULATION_QUARTERS
+  return overtimeIndex === 1 ? 'OT' : `OT${overtimeIndex}`
+}
+
+/** Parse editor input ("3", "5", "OT", "OT2") into a clamped period number. */
+export function parsePeriodInput(raw: string): number | null {
+  const trimmed = raw.trim().toUpperCase()
+  if (trimmed === '' || trimmed === 'O') return null
+  if (trimmed === 'OT' || trimmed === 'OT1') {
+    return REGULATION_QUARTERS + 1
+  }
+  const otMatch = /^OT(\d+)$/.exec(trimmed)
+  if (otMatch) {
+    const overtimeIndex = Number.parseInt(otMatch[1], 10)
+    if (Number.isFinite(overtimeIndex) && overtimeIndex >= 1) {
+      return clampPeriod(REGULATION_QUARTERS + overtimeIndex)
+    }
+  }
+  const digits = trimmed.replace(/\D/g, '')
+  if (!digits) return null
+  return clampPeriod(Number.parseInt(digits, 10))
+}
+
 export function isAwaitingQuarterStart(clock: {
   seconds: number
   period: number
