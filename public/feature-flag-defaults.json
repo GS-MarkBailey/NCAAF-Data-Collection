@@ -1,11 +1,11 @@
 {
-  "version": 1784649915036,
-  "updatedAt": "2026-07-21T16:05:15.036Z",
+  "version": 1785398794777,
+  "updatedAt": "2026-07-30T08:06:34.777Z",
   "flags": {
     "game.scoreboard": true,
     "game.playByPlay": false,
     "game.riskManagement": true,
-    "game.fieldDirectionDialog": true,
+    "game.fieldDirectionDialog": false,
     "game.errorToast": false,
     "header.connectionStatus": true,
     "header.takeControl": false,
@@ -23,7 +23,7 @@
     "risk.penalty": true,
     "risk.touchdown": true,
     "risk.playAboutToStart": true,
-    "settings.fieldDirection": true,
+    "settings.fieldDirection": false,
     "settings.actionLog": true,
     "settings.csvExport": true,
     "settings.featureFlags": true,
