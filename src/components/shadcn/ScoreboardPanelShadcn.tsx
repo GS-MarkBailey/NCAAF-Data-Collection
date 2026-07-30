@@ -107,6 +107,7 @@ export function ScoreboardPanelShadcn({
   const showPeriodManagement = useFeatureFlag('scoreboard.periodManagement')
   const showDownDistance = useFeatureFlag('scoreboard.downDistance')
   const showBallOn = useFeatureFlag('scoreboard.ballOn')
+  const showBallOnArrow = useFeatureFlag('scoreboard.ballOnArrow')
   const stacked = layout === 'stack'
 
   const [editingClock, setEditingClock] = useState(false)
@@ -672,6 +673,7 @@ export function ScoreboardPanelShadcn({
                 homeAttacksRight={homeAttacksRight}
                 inactive={gameEnded}
                 compact={stacked}
+                showArrow={showBallOnArrow}
                 pulseEndColor="var(--card)"
                 shellClassName="border-border"
                 labelClassName="text-muted-foreground"

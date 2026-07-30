@@ -10,6 +10,7 @@ interface BallOnStatCellProps {
   homeAttacksRight: boolean
   inactive?: boolean
   compact?: boolean
+  showArrow?: boolean
   pulseEndColor?: string
   shellClassName?: string
   labelClassName?: string
@@ -22,6 +23,7 @@ export function BallOnStatCell({
   homeAttacksRight,
   inactive = false,
   compact = false,
+  showArrow = true,
   pulseEndColor = 'var(--color-panel)',
   shellClassName,
   labelClassName,
@@ -67,6 +69,7 @@ export function BallOnStatCell({
           yardLine={yardLine}
           arrowSide={arrowSide}
           compact={compact}
+          showArrow={showArrow}
           valueClassName={valueClassName}
         />
       )}
@@ -78,6 +81,7 @@ interface BallOnValueProps {
   yardLine: number
   arrowSide: BallOnArrowSide
   compact?: boolean
+  showArrow?: boolean
   valueClassName?: string
 }
 
@@ -85,11 +89,14 @@ export function BallOnValue({
   yardLine,
   arrowSide,
   compact = false,
+  showArrow = true,
   valueClassName,
 }: BallOnValueProps) {
   return (
     <div className="flex w-full min-w-0 items-center justify-center gap-[0.12em] px-0.5 text-[var(--color-text)]">
-      {arrowSide === 'left' && <FieldArrow direction="left" compact={compact} />}
+      {showArrow && arrowSide === 'left' ? (
+        <FieldArrow direction="left" compact={compact} />
+      ) : null}
       <span
         className={cn(
           'shrink-0 font-bold leading-none text-current',
@@ -99,7 +106,9 @@ export function BallOnValue({
       >
         {yardLine}
       </span>
-      {arrowSide === 'right' && <FieldArrow direction="right" compact={compact} />}
+      {showArrow && arrowSide === 'right' ? (
+        <FieldArrow direction="right" compact={compact} />
+      ) : null}
     </div>
   )
 }

@@ -130,9 +130,17 @@ export const FEATURE_FLAGS = [
   {
     id: 'scoreboard.ballOn',
     label: 'Ball on',
-    description: 'Ball position with direction arrow.',
+    description: 'BL ON yard-line cell on the scoreboard.',
     group: 'Scoreboard',
     parent: 'game.scoreboard',
+    defaultEnabled: true,
+  },
+  {
+    id: 'scoreboard.ballOnArrow',
+    label: 'Ball-on direction arrow',
+    description: 'Field-direction arrow beside the BL ON yard line.',
+    group: 'Scoreboard',
+    parent: 'scoreboard.ballOn',
     defaultEnabled: true,
   },
   {

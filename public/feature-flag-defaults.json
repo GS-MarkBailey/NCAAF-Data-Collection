@@ -1,6 +1,6 @@
 {
-  "version": 1785398794777,
-  "updatedAt": "2026-07-30T08:06:34.777Z",
+  "version": 1785402337283,
+  "updatedAt": "2026-07-30T09:05:37.283Z",
   "flags": {
     "game.scoreboard": true,
     "game.playByPlay": false,
@@ -17,6 +17,7 @@
     "scoreboard.periodManagement": false,
     "scoreboard.downDistance": true,
     "scoreboard.ballOn": true,
+    "scoreboard.ballOnArrow": true,
     "risk.challengeReview": true,
     "risk.statDelay": true,
     "risk.bigPlay": true,
