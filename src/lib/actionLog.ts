@@ -87,6 +87,18 @@ export function formatActionLabel(action: UserAction): string {
       return `Possession → ${action.payload.teamAbbr}`
     case 'field_direction_set':
       return `${action.payload.homeAbbr} attacks ${action.payload.homeAttacksRight ? 'right' : 'left'}`
+    case 'down_set':
+      return `Down ${action.payload.fromDown} → ${action.payload.toDown}`
+    case 'distance_set':
+      return `To go ${action.payload.fromDistance} → ${action.payload.toDistance}`
+    case 'play_snap':
+      return `Snap — ${action.payload.down} & ${action.payload.distance}`
+    case 'play_end':
+      return action.payload.description
+    case 'yards_adjust': {
+      const sign = action.payload.delta > 0 ? '+' : ''
+      return `Yards ${sign}${action.payload.delta} (net ${action.payload.yardsGained})`
+    }
   }
 }
 
@@ -114,6 +126,16 @@ export function formatActionType(action: UserAction): string {
       return 'Possession'
     case 'field_direction_set':
       return 'Field Direction'
+    case 'down_set':
+      return 'Down'
+    case 'distance_set':
+      return 'To Go'
+    case 'play_snap':
+      return 'Snap'
+    case 'play_end':
+      return 'End Play'
+    case 'yards_adjust':
+      return 'Yards'
   }
 }
 

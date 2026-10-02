@@ -329,6 +329,10 @@ export function tickPlaySimulation(
     return null
   }
 
+  if (game.playInProgress) {
+    return null
+  }
+
   const ticksUntilNextPlay = game.simulation.ticksUntilNextPlay - 1
 
   if (ticksUntilNextPlay > 0) {

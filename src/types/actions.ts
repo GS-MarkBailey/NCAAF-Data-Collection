@@ -12,6 +12,11 @@ export type UserActionType =
   | 'game_end'
   | 'possession_toggle'
   | 'field_direction_set'
+  | 'down_set'
+  | 'distance_set'
+  | 'play_snap'
+  | 'play_end'
+  | 'yards_adjust'
 
 interface UserActionBase {
   id: string
@@ -105,6 +110,52 @@ export type FieldDirectionSetAction = UserActionBase & {
   }
 }
 
+export type DownSetAction = UserActionBase & {
+  type: 'down_set'
+  payload: {
+    fromDown: number
+    toDown: number
+  }
+}
+
+export type DistanceSetAction = UserActionBase & {
+  type: 'distance_set'
+  payload: {
+    fromDistance: number
+    toDistance: number
+  }
+}
+
+export type PlaySnapAction = UserActionBase & {
+  type: 'play_snap'
+  payload: {
+    down: number
+    distance: number
+    ballOn: number
+  }
+}
+
+export type PlayEndAction = UserActionBase & {
+  type: 'play_end'
+  payload: {
+    yardsGained: number
+    down: number
+    distance: number
+    ballOn: number
+    description: string
+  }
+}
+
+export type YardsAdjustAction = UserActionBase & {
+  type: 'yards_adjust'
+  payload: {
+    delta: number
+    yardsGained: number
+    ballOn: number
+    distance: number
+  }
+}
+
 export type UserAction =
   | TakeControlAction
   | RiskToggleAction
@@ -117,6 +168,11 @@ export type UserAction =
   | GameEndAction
   | PossessionToggleAction
   | FieldDirectionSetAction
+  | DownSetAction
+  | DistanceSetAction
+  | PlaySnapAction
+  | PlayEndAction
+  | YardsAdjustAction
 
 export type UserActionPayload<T extends UserActionType> = Extract<
   UserAction,

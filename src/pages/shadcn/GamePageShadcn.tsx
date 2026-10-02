@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import { FieldDirectionDialog } from '@/components/game/FieldDirectionDialog'
 import { GameHeaderShadcn } from '@/components/shadcn/GameHeaderShadcn'
 import { PlayByPlayPanelShadcn } from '@/components/shadcn/PlayByPlayPanelShadcn'
+import { PlayControlsPanelShadcn } from '@/components/shadcn/PlayControlsPanelShadcn'
 import { RiskManagementPanelShadcn } from '@/components/shadcn/RiskManagementPanelShadcn'
 import { ScoreboardPanelShadcn } from '@/components/shadcn/ScoreboardPanelShadcn'
 import { useFeatureFlag } from '@/hooks/useFeatureFlag'
@@ -21,14 +22,18 @@ export function GamePageShadcn() {
   const toggleRisk = useAppStore((s) => s.toggleRisk)
   const showScoreboard = useFeatureFlag('game.scoreboard')
   const showPlayByPlay = useFeatureFlag('game.playByPlay')
+  const showPlayControls = useFeatureFlag('game.playControls')
   const showRiskManagement = useFeatureFlag('game.riskManagement')
   const showErrorToast = useFeatureFlag('game.errorToast')
   const showFieldDirectionDialog = useFeatureFlag('game.fieldDirectionDialog')
   const displayResilience = useDisplayResilience()
 
-  const desktopPanelCount = [showScoreboard, showPlayByPlay, showRiskManagement].filter(
-    Boolean,
-  ).length
+  const desktopPanelCount = [
+    showScoreboard,
+    showPlayByPlay,
+    showPlayControls,
+    showRiskManagement,
+  ].filter(Boolean).length
   const portraitPanelCount = desktopPanelCount
 
   useClockTicker(fixtureId)
@@ -109,6 +114,11 @@ export function GamePageShadcn() {
                   <PlayByPlayPanelShadcn game={game} />
                 </div>
               ) : null}
+              {showPlayControls ? (
+                <div className="flex min-h-0 flex-1 flex-col">
+                  <PlayControlsPanelShadcn fixtureId={fixtureId} layout="stack" />
+                </div>
+              ) : null}
               {showRiskManagement ? (
                 <div className="flex min-h-0 flex-1 flex-col">
                   <RiskManagementPanelShadcn
@@ -135,12 +145,16 @@ export function GamePageShadcn() {
                 desktopPanelCount === 1 && 'grid-cols-1',
                 desktopPanelCount === 2 && 'grid-cols-2',
                 desktopPanelCount === 3 && 'grid-cols-3',
+                desktopPanelCount >= 4 && 'grid-cols-4',
               )}
             >
               {showScoreboard ? (
                 <ScoreboardPanelShadcn fixtureId={fixtureId} layout="column" />
               ) : null}
               {showPlayByPlay ? <PlayByPlayPanelShadcn game={game} /> : null}
+              {showPlayControls ? (
+                <PlayControlsPanelShadcn fixtureId={fixtureId} layout="column" />
+              ) : null}
               {showRiskManagement ? (
                 <RiskManagementPanelShadcn
                   game={game}

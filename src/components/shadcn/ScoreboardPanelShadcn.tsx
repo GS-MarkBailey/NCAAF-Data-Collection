@@ -24,6 +24,7 @@ import { getEffectiveHomeAttacksRight } from '@/lib/playSimulation'
 import { MATCH_ENDED_STAT } from '@/lib/scoreboard'
 import { BallOnStatCell } from '@/components/game/BallOnStatCell'
 import { ClockNumericEditor, type ClockEditTab } from '@/components/game/ClockNumericEditor'
+import { DownDistanceEditor, type DownDistanceEditTab } from '@/components/game/DownDistanceEditor'
 import { ClockWheelEditor } from '@/components/game/ClockWheelEditor'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -99,6 +100,8 @@ export function ScoreboardPanelShadcn({
   const startOvertime = useAppStore((s) => s.startOvertime)
   const endGame = useAppStore((s) => s.endGame)
   const setPossession = useAppStore((s) => s.setPossession)
+  const setDown = useAppStore((s) => s.setDown)
+  const setDistance = useAppStore((s) => s.setDistance)
   const showQuarterStatus = useFeatureFlag('scoreboard.quarterStatus')
   const showPossessionSwitch = useFeatureFlag('scoreboard.possessionSwitch')
   const showClockWheelEditor = useFeatureFlag('scoreboard.clockWheelEditor')
@@ -120,6 +123,14 @@ export function ScoreboardPanelShadcn({
   const [clockEditSession, setClockEditSession] = useState(0)
   const clockPeriodInputRef = useRef<HTMLInputElement>(null)
   const clockMinutesInputRef = useRef<HTMLInputElement>(null)
+  const [editingDownDistance, setEditingDownDistance] = useState(false)
+  const [downDistanceTab, setDownDistanceTab] =
+    useState<DownDistanceEditTab>('down')
+  const [draftDown, setDraftDown] = useState(1)
+  const [draftDistance, setDraftDistance] = useState(10)
+  const [downDistanceSession, setDownDistanceSession] = useState(0)
+  const downInputRef = useRef<HTMLInputElement>(null)
+  const distanceInputRef = useRef<HTMLInputElement>(null)
 
   const paused = !clockRunning
   const pregame = !gameStarted
@@ -186,6 +197,28 @@ export function ScoreboardPanelShadcn({
 
   const canOpenClockEditor =
     showClockWheelEditor && !clockLocked && !inOvertime && !pendingConfirmation
+
+  const canOpenDownDistanceEditor =
+    showDownDistance && !gameEnded && !pendingConfirmation
+
+  const handleOpenDownDistanceEditor = (tab: DownDistanceEditTab) => {
+    if (!canOpenDownDistanceEditor) return
+    setDraftDown(down)
+    setDraftDistance(distance)
+    setDownDistanceTab(tab)
+    setDownDistanceSession((session) => session + 1)
+    setEditingDownDistance(true)
+  }
+
+  const handleCancelDownDistanceEdit = () => {
+    setEditingDownDistance(false)
+  }
+
+  const handleConfirmDownDistanceEdit = () => {
+    setDown(fixtureId, draftDown)
+    setDistance(fixtureId, draftDistance)
+    setEditingDownDistance(false)
+  }
 
   const handleCancelClockEdit = () => {
     setEditingClock(false)
@@ -657,12 +690,34 @@ export function ScoreboardPanelShadcn({
                   value={down}
                   displayValue={gameEnded ? MATCH_ENDED_STAT : undefined}
                   compact={stacked}
+                  interactive={canOpenDownDistanceEditor}
+                  onClick={
+                    canOpenDownDistanceEditor
+                      ? () => handleOpenDownDistanceEditor('down')
+                      : undefined
+                  }
+                  ariaLabel={
+                    canOpenDownDistanceEditor
+                      ? `Edit down, currently ${down}`
+                      : undefined
+                  }
                 />
                 <StatCell
                   label="TO GO"
                   value={distance}
                   displayValue={gameEnded ? MATCH_ENDED_STAT : undefined}
                   compact={stacked}
+                  interactive={canOpenDownDistanceEditor}
+                  onClick={
+                    canOpenDownDistanceEditor
+                      ? () => handleOpenDownDistanceEditor('distance')
+                      : undefined
+                  }
+                  ariaLabel={
+                    canOpenDownDistanceEditor
+                      ? `Edit yards to go, currently ${distance}`
+                      : undefined
+                  }
                 />
               </>
             ) : null}
@@ -767,6 +822,54 @@ export function ScoreboardPanelShadcn({
             type="button"
             className="h-8 min-h-8 w-full shrink-0 bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)] sm:w-auto sm:flex-1"
             onClick={handleConfirmClockEdit}
+          >
+            Confirm
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
+    <Dialog
+      open={editingDownDistance}
+      onOpenChange={(open) => {
+        if (!open) handleCancelDownDistanceEdit()
+      }}
+    >
+      <DialogContent
+        className="gap-0 overflow-hidden p-0 sm:max-w-md"
+        showCloseButton={false}
+        initialFocus={
+          downDistanceTab === 'down' ? downInputRef : distanceInputRef
+        }
+      >
+        <DialogHeader className="border-b border-border px-4 pt-4 pb-3">
+          <DialogTitle>Edit down & distance</DialogTitle>
+        </DialogHeader>
+        <div className="flex justify-center px-3 py-4">
+          <DownDistanceEditor
+            key={downDistanceSession}
+            down={draftDown}
+            distance={draftDistance}
+            onDownChange={setDraftDown}
+            onDistanceChange={setDraftDistance}
+            initialTab={downDistanceTab}
+            downInputRef={downInputRef}
+            distanceInputRef={distanceInputRef}
+          />
+        </div>
+        <DialogFooter className="m-0 flex-col items-stretch gap-2 rounded-none border-t border-border bg-muted/30 px-4 py-3 sm:flex-row sm:justify-stretch">
+          <Button
+            type="button"
+            variant="outline"
+            className="h-8 min-h-8 w-full shrink-0 sm:w-auto sm:flex-1"
+            onClick={handleCancelDownDistanceEdit}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="button"
+            className="h-8 min-h-8 w-full shrink-0 bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)] sm:w-auto sm:flex-1"
+            onClick={handleConfirmDownDistanceEdit}
           >
             Confirm
           </Button>

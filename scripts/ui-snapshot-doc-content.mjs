@@ -77,6 +77,10 @@ export const WEEK_INTERACTIONS = {
       ],
     },
     {
+      text: '**Down & to go** — tap DOWN or TO GO to edit with −/+ steppers (Down / To go tabs)',
+      featureIds: ['down-distance-editor'],
+    },
+    {
       text: '**Start / Pause chips** — Play/Pause icons with green Start / red Pause; larger invisible tap target',
       featureIds: ['start-pause-chips'],
     },
@@ -87,6 +91,10 @@ export const WEEK_INTERACTIONS = {
     {
       text: '**Unreliable risk** — pinned bottom-right with amber idle emphasis',
       featureIds: ['unreliable-risk'],
+    },
+    {
+      text: '**Play controls** — SNAP / END PLAY plus +1 / +5 / −5 / −1 yard adjustments; pauses auto-sim while a play is live',
+      featureIds: ['play-controls-idle', 'play-controls-live'],
     },
   ],
 }
@@ -121,7 +129,11 @@ export const WEEK_SHIPPED = {
       ],
     },
     'clock-polish': { featureIds: ['start-pause-chips'] },
+    'down-distance': { featureIds: ['down-distance-editor'] },
     profile: { featureIds: ['profile-dialog'] },
     'unreliable-risk': { featureIds: ['unreliable-risk'] },
+    'play-controls': {
+      featureIds: ['play-controls-idle', 'play-controls-live'],
+    },
   },
 }

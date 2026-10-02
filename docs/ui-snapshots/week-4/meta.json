@@ -1,8 +1,8 @@
 {
   "label": "week-4",
   "portrait": true,
-  "capturedAt": "2026-07-30T09:07:16.626Z",
-  "baseUrl": "https://ncaaf-data-collection.vercel.app",
+  "capturedAt": "2026-10-02T13:30:35.758Z",
+  "baseUrl": "http://127.0.0.1:4173",
   "views": [
     "fixtures-landscape",
     "game-landscape"
@@ -48,9 +48,9 @@
       "file": "features/clock-period-editor.png"
     },
     {
-      "id": "start-pause-chips",
-      "title": "Start / Pause clock chips",
-      "file": "features/start-pause-chips.png"
+      "id": "down-distance-editor",
+      "title": "Down & to-go editor",
+      "file": "features/down-distance-editor.png"
     },
     {
       "id": "profile-dialog",
@@ -61,6 +61,16 @@
       "id": "unreliable-risk",
       "title": "Unreliable risk chip placement",
       "file": "features/unreliable-risk.png"
+    },
+    {
+      "id": "play-controls-idle",
+      "title": "Play controls panel (idle)",
+      "file": "features/play-controls-idle.png"
+    },
+    {
+      "id": "play-controls-live",
+      "title": "Play controls panel (live play)",
+      "file": "features/play-controls-live.png"
     }
   ]
 }

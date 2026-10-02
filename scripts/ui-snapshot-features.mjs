@@ -250,6 +250,25 @@ export const WEEK_FEATURES = {
       },
     },
     {
+      id: 'down-distance-editor',
+      title: 'Down & to-go editor',
+      path: '/game/NCAAF-2026-001',
+      viewport: 'game-landscape',
+      gameSetup: { fieldDirection: 'dismiss', errorToast: 'dismiss' },
+      async prepare(page) {
+        await page
+          .getByRole('button', { name: /edit down/i })
+          .filter({ visible: true })
+          .click()
+        await page.getByRole('tab', { name: 'Down' }).waitFor({ state: 'visible' })
+        await page.getByRole('button', { name: 'Confirm' }).waitFor({ state: 'visible' })
+        await page.getByRole('textbox', { name: 'Down' }).waitFor({
+          state: 'visible',
+          timeout: 5000,
+        })
+      },
+    },
+    {
       id: 'start-pause-chips',
       title: 'Start / Pause clock chips',
       path: '/game/NCAAF-2026-001',
@@ -282,6 +301,55 @@ export const WEEK_FEATURES = {
         const unreliable = page.getByRole('button', { name: 'Unreliable' })
         await unreliable.waitFor({ state: 'visible', timeout: 5000 })
         await unreliable.scrollIntoViewIfNeeded()
+      },
+    },
+    {
+      id: 'play-controls-idle',
+      title: 'Play controls panel (idle)',
+      path: '/game/NCAAF-2026-001',
+      viewport: 'game-landscape',
+      gameSetup: { fieldDirection: 'dismiss', errorToast: 'dismiss' },
+      featureFlagOverrides: {
+        'game.playControls': true,
+        'playControls.snap': true,
+        'playControls.endPlay': true,
+        'playControls.yardAdjust': true,
+      },
+      async prepare(page) {
+        await page.getByRole('button', { name: 'SNAP' }).waitFor({
+          state: 'visible',
+          timeout: 5000,
+        })
+      },
+    },
+    {
+      id: 'play-controls-live',
+      title: 'Play controls panel (live play)',
+      path: '/game/NCAAF-2026-001',
+      viewport: 'game-landscape',
+      gameSetup: { fieldDirection: 'dismiss', errorToast: 'dismiss' },
+      featureFlagOverrides: {
+        'game.playControls': true,
+        'playControls.snap': true,
+        'playControls.endPlay': true,
+        'playControls.yardAdjust': true,
+      },
+      async prepare(page) {
+        const snap = page.getByRole('button', { name: 'SNAP' }).filter({ visible: true })
+        await snap.click()
+        await page
+          .getByRole('button', { name: 'END PLAY' })
+          .filter({ visible: true })
+          .waitFor({ state: 'visible', timeout: 5000 })
+        await page
+          .getByRole('button', { name: 'Gain 5 yards' })
+          .filter({ visible: true })
+          .click()
+        await page
+          .getByText('+5 YARDS')
+          .filter({ visible: true })
+          .first()
+          .waitFor({ state: 'visible', timeout: 5000 })
       },
     },
   ],

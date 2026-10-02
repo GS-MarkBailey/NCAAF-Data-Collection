@@ -11,7 +11,8 @@ export const FIXTURES: Fixture[] = [
     homeAbbr: 'CONC',
     awayTeam: 'Rockford',
     awayAbbr: 'ROCK',
-    startDate: '2026-09-05',
+    // Keep the primary demo fixture in the future so the live console stays operable.
+    startDate: '2026-10-17',
     startTime: '13:00',
   },
   {
@@ -337,6 +338,11 @@ export function createInitialGameState(fixture: Fixture): GameState {
     gameStarted: false,
     gameEnded: false,
     periodEnded: false,
+    playInProgress: false,
+    playYardsGained: 0,
+    playStartDown: 1,
+    playStartDistance: 10,
+    playStartBallOn: 25,
     plays: [],
     simulation: createInitialSimulation(true),
   }

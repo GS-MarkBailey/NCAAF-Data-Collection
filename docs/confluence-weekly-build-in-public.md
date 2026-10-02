@@ -4,7 +4,7 @@
 **Live demo:** https://ncaaf-data-collection.vercel.app  
 **Repository:** GitHub (auto-deployed to Vercel on each change)  
 **Period covered:** 16 June 2026 – 21 July 2026  
-**Last updated:** 30 Jul 2026 (snapshots synced automatically)
+**Last updated:** 2 Oct 2026 (snapshots synced automatically)
 
 **Confluence images:** Auto-synced by GitHub Actions on push to `main` (capture → publish). Manual fallback: `npm run publish:confluence`.
 
@@ -391,6 +391,11 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 **Scoreboard / clock polish**
 - Start/Pause chips: Play/Pause icons; green Start / red Pause with matching chip style; larger invisible tap target around the chip
 - Stat cells (DOWN, TO GO, QTR, ball-on): tighter spacing between label and value
+- **DOWN / TO GO editing:** tap either cell to open a dialog with **Down** and **To go** tabs, −/+ steppers, and direct entry (same pattern as QTR/period)
+
+<!-- AUTO-SNAPSHOTS:week-4-shipped-down-distance:START -->
+![Down & to-go editor](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/down-distance-editor.png)
+<!-- AUTO-SNAPSHOTS:week-4-shipped-down-distance:END -->
 
 <!-- AUTO-SNAPSHOTS:week-4-shipped-clock-polish:START -->
 ![Start / Pause clock chips](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/start-pause-chips.png)
@@ -410,6 +415,15 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 <!-- AUTO-SNAPSHOTS:week-4-shipped-unreliable-risk:START -->
 ![Unreliable risk chip placement](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/unreliable-risk.png)
 <!-- AUTO-SNAPSHOTS:week-4-shipped-unreliable-risk:END -->
+
+**Play controls panel**
+- New console panel beside scoreboard / risk: **SNAP**, **END PLAY**, and **+1 / +5 / −5 / −1** yard buttons
+- Snap starts a live play (pauses auto play-by-play sim); yard buttons move ball-on and update to-go; End Play advances down / first down / turnover on downs
+- Feature-flagged under Settings → Features → **Play Controls** (`game.playControls` + Snap / End play / Yard adjustments)
+
+<!-- AUTO-SNAPSHOTS:week-4-shipped-play-controls:START -->
+![Play controls panel (idle)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/play-controls-idle.png) ![Play controls panel (live play)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/play-controls-live.png)
+<!-- AUTO-SNAPSHOTS:week-4-shipped-play-controls:END -->
 
 **Publishing habit**
 - Finished app updates are pushed to `main` for Vercel; the build-in-public markdown (including screenshots) is kept in sync with shipped operator-visible changes
@@ -433,6 +447,10 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 
 ![Design variants in Features settings](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/design-variants-panel.png) ![Clock edit panel — Time tab (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-numeric-editor.png) ![Clock edit panel — Period tab (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-period-editor.png)
 
+- **Down & to go** — tap DOWN or TO GO to edit with −/+ steppers (Down / To go tabs)
+
+![Down & to-go editor](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/down-distance-editor.png)
+
 - **Start / Pause chips** — Play/Pause icons with green Start / red Pause; larger invisible tap target
 
 ![Start / Pause clock chips](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/start-pause-chips.png)
@@ -444,6 +462,10 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 - **Unreliable risk** — pinned bottom-right with amber idle emphasis
 
 ![Unreliable risk chip placement](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/unreliable-risk.png)
+
+- **Play controls** — SNAP / END PLAY plus +1 / +5 / −5 / −1 yard adjustments; pauses auto-sim while a play is live
+
+![Play controls panel (idle)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/play-controls-idle.png) ![Play controls panel (live play)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/play-controls-live.png)
 <!-- AUTO-SNAPSHOTS:week-4-interactions:END -->
 
 ### Technical notes
@@ -467,10 +489,12 @@ The table below is a checklist of what the prototype supports today on the live 
 | Take Control with confirmation (feature-flagged) | ✅ |
 | Clock edit — original inline wheel (tap clock time) | ✅ |
 | Clock edit — Variant B dialog with numeric entry (feature-flagged) | ✅ |
+| Down & to-go edit dialog (tap DOWN / TO GO; steppers + tabs) | ✅ |
 | Play / pause clock with icons + colour chips (no kick-off required in MVP) | ✅ |
 | Full period / overtime / game-end flow (feature-flagged, off in MVP) | ✅ |
 | Field direction + quarter-end flip | ✅ |
 | Risk management toggles (Unreliable emphasised, bottom-right) | ✅ |
+| Play controls — snap, end play, yard adjust (feature-flagged) | ✅ |
 | Play-by-play (feature-flagged, off by default) | ✅ |
 | Action log + CSV export | ✅ |
 | Feature flags with Vercel deploy (Confirm & deploy) | ✅ |
@@ -556,4 +580,4 @@ Turn either off anytime to revert. Confirm & deploy to publish a variant as the 
 3. Confirm phone font/display settings match the table above (or enable Display resilience to trial the variant)
 4. Select a fixture from the list
 5. Set field direction on first open (if enabled)
-6. Use Take Control, clock, scoreboard, and risk panels as an operator would
+6. Use Take Control, clock, scoreboard, play controls, and risk panels as an operator would

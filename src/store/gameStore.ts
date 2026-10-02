@@ -3,7 +3,15 @@ import type { Fixture, GameState, RiskType } from '@/types'
 import type { ActionLogsByFixture, UserAction } from '@/types/actions'
 import { FIXTURES, createGameStateForFixture } from '@/data/fixtures'
 import { appendAction, createUserAction } from '@/lib/actionLog'
-import { tickPlaySimulation, createInitialSimulation, createQuarterStartPlay } from '@/lib/playSimulation'
+import {
+  tickPlaySimulation,
+  createInitialSimulation,
+  createQuarterStartPlay,
+  formatBallOn,
+} from '@/lib/playSimulation'
+import { formatClock } from '@/lib/format'
+import { applyYardDelta } from '@/lib/ballOn'
+import { clampDistance, clampDown, MAX_DOWN } from '@/lib/downDistance'
 import {
   QUARTER_LENGTH_SECONDS,
   REGULATION_QUARTERS,
@@ -31,6 +39,11 @@ interface AppStore {
   adjustClock: (fixtureId: string, delta: number) => void
   setClockTime: (fixtureId: string, seconds: number) => void
   setClockPeriod: (fixtureId: string, period: number) => void
+  setDown: (fixtureId: string, down: number) => void
+  setDistance: (fixtureId: string, distance: number) => void
+  snapPlay: (fixtureId: string) => void
+  endPlay: (fixtureId: string) => void
+  adjustYards: (fixtureId: string, delta: number) => void
   startPeriod: (fixtureId: string) => void
   endPeriod: (fixtureId: string) => void
   startOvertime: (fixtureId: string) => void
@@ -259,6 +272,309 @@ export const useAppStore = create<AppStore>((set, get) => ({
             {
               type: 'period_set',
               payload: { fromPeriod, toPeriod },
+            },
+            clockBefore,
+          ),
+        ),
+      }
+    })
+  },
+
+  setDown: (fixtureId, down) => {
+    set((state) => {
+      const game = state.games[fixtureId]
+      if (!game || game.gameEnded) return state
+
+      const toDown = clampDown(down)
+      if (toDown === game.down) return state
+
+      const fromDown = game.down
+      const clockBefore = {
+        seconds: game.clock.seconds,
+        period: game.clock.period,
+      }
+
+      return {
+        games: updateGame(state.games, fixtureId, (g) => ({
+          ...g,
+          down: toDown,
+        })),
+        actionLogs: appendAction(
+          state.actionLogs,
+          createUserAction(
+            fixtureId,
+            {
+              type: 'down_set',
+              payload: { fromDown, toDown },
+            },
+            clockBefore,
+          ),
+        ),
+      }
+    })
+  },
+
+  setDistance: (fixtureId, distance) => {
+    set((state) => {
+      const game = state.games[fixtureId]
+      if (!game || game.gameEnded) return state
+
+      const toDistance = clampDistance(distance)
+      if (toDistance === game.distance) return state
+
+      const fromDistance = game.distance
+      const clockBefore = {
+        seconds: game.clock.seconds,
+        period: game.clock.period,
+      }
+
+      return {
+        games: updateGame(state.games, fixtureId, (g) => ({
+          ...g,
+          distance: toDistance,
+        })),
+        actionLogs: appendAction(
+          state.actionLogs,
+          createUserAction(
+            fixtureId,
+            {
+              type: 'distance_set',
+              payload: { fromDistance, toDistance },
+            },
+            clockBefore,
+          ),
+        ),
+      }
+    })
+  },
+
+  snapPlay: (fixtureId) => {
+    set((state) => {
+      const game = state.games[fixtureId]
+      if (!game || game.gameEnded || game.playInProgress) return state
+
+      const clockBefore = {
+        seconds: game.clock.seconds,
+        period: game.clock.period,
+      }
+
+      return {
+        games: updateGame(state.games, fixtureId, (g) => ({
+          ...g,
+          playInProgress: true,
+          playYardsGained: 0,
+          playStartDown: g.down,
+          playStartDistance: g.distance,
+          playStartBallOn: g.ballOn,
+        })),
+        actionLogs: appendAction(
+          state.actionLogs,
+          createUserAction(
+            fixtureId,
+            {
+              type: 'play_snap',
+              payload: {
+                down: game.down,
+                distance: game.distance,
+                ballOn: game.ballOn,
+              },
+            },
+            clockBefore,
+          ),
+        ),
+      }
+    })
+  },
+
+  adjustYards: (fixtureId, delta) => {
+    set((state) => {
+      const game = state.games[fixtureId]
+      if (!game || game.gameEnded || !game.playInProgress || delta === 0) {
+        return state
+      }
+
+      const { ballOn, distance } = applyYardDelta({
+        ballOn: game.ballOn,
+        distance: game.distance,
+        delta,
+      })
+      const actualDelta = ballOn - game.ballOn
+      if (actualDelta === 0) return state
+
+      const yardsGained = game.playYardsGained + actualDelta
+      const clockBefore = {
+        seconds: game.clock.seconds,
+        period: game.clock.period,
+      }
+
+      return {
+        games: updateGame(state.games, fixtureId, (g) => ({
+          ...g,
+          ballOn,
+          distance,
+          playYardsGained: yardsGained,
+        })),
+        actionLogs: appendAction(
+          state.actionLogs,
+          createUserAction(
+            fixtureId,
+            {
+              type: 'yards_adjust',
+              payload: {
+                delta: actualDelta,
+                yardsGained,
+                ballOn,
+                distance,
+              },
+            },
+            clockBefore,
+          ),
+        ),
+      }
+    })
+  },
+
+  endPlay: (fixtureId) => {
+    set((state) => {
+      const game = state.games[fixtureId]
+      if (!game || game.gameEnded || !game.playInProgress) return state
+
+      const yardsGained = game.playYardsGained
+      const startDistance = game.playStartDistance
+      const firstDown = yardsGained >= startDistance
+
+      let nextDown = game.down
+      let nextDistance = game.distance
+
+      if (firstDown) {
+        nextDown = 1
+        nextDistance = 10
+      } else if (game.down >= MAX_DOWN) {
+        // Turnover on downs — flip possession and reset to 1st & 10
+        // Keep ballOn as absolute field position for the new offense
+        const absoluteYards = game.possessionIsHome
+          ? game.ballOn
+          : 100 - game.ballOn
+        const nextPossessionIsHome = !game.possessionIsHome
+        const nextBallOn = nextPossessionIsHome
+          ? absoluteYards
+          : 100 - absoluteYards
+        nextDown = 1
+        nextDistance = 10
+
+        const description =
+          yardsGained === 0
+            ? 'Play ended — turnover on downs'
+            : `Play ended — ${yardsGained > 0 ? '+' : ''}${yardsGained} yards, turnover on downs`
+
+        const clockBefore = {
+          seconds: game.clock.seconds,
+          period: game.clock.period,
+        }
+
+        const play = {
+          id: crypto.randomUUID(),
+          quarter: game.clock.period,
+          down: game.playStartDown,
+          distance: game.playStartDistance,
+          ballOn: formatBallOn(
+            game.possessionIsHome,
+            game.ballOn,
+            game.fixture.homeAbbr,
+            game.fixture.awayAbbr,
+          ),
+          description,
+          clock: formatClock(game.clock.seconds),
+        }
+
+        return {
+          games: updateGame(state.games, fixtureId, (g) => ({
+            ...g,
+            playInProgress: false,
+            playYardsGained: 0,
+            down: nextDown,
+            distance: nextDistance,
+            ballOn: nextBallOn,
+            possessionIsHome: nextPossessionIsHome,
+            simulation: g.simulation
+              ? { ...g.simulation, offenseIsHome: nextPossessionIsHome }
+              : g.simulation,
+            plays: [...g.plays, play],
+          })),
+          actionLogs: appendAction(
+            state.actionLogs,
+            createUserAction(
+              fixtureId,
+              {
+                type: 'play_end',
+                payload: {
+                  yardsGained,
+                  down: nextDown,
+                  distance: nextDistance,
+                  ballOn: nextBallOn,
+                  description,
+                },
+              },
+              clockBefore,
+            ),
+          ),
+        }
+      } else {
+        nextDown = clampDown(game.down + 1)
+        nextDistance = clampDistance(startDistance - yardsGained)
+      }
+
+      const description =
+        yardsGained === 0
+          ? firstDown
+            ? 'Play ended — no gain, first down'
+            : 'Play ended — no gain'
+          : `Play ended — ${yardsGained > 0 ? '+' : ''}${yardsGained} yards${
+              firstDown ? ', first down' : ''
+            }`
+
+      const clockBefore = {
+        seconds: game.clock.seconds,
+        period: game.clock.period,
+      }
+
+      const play = {
+        id: crypto.randomUUID(),
+        quarter: game.clock.period,
+        down: game.playStartDown,
+        distance: game.playStartDistance,
+        ballOn: formatBallOn(
+          game.possessionIsHome,
+          game.ballOn,
+          game.fixture.homeAbbr,
+          game.fixture.awayAbbr,
+        ),
+        description,
+        clock: formatClock(game.clock.seconds),
+      }
+
+      return {
+        games: updateGame(state.games, fixtureId, (g) => ({
+          ...g,
+          playInProgress: false,
+          playYardsGained: 0,
+          down: nextDown,
+          distance: nextDistance,
+          plays: [...g.plays, play],
+        })),
+        actionLogs: appendAction(
+          state.actionLogs,
+          createUserAction(
+            fixtureId,
+            {
+              type: 'play_end',
+              payload: {
+                yardsGained,
+                down: nextDown,
+                distance: nextDistance,
+                ballOn: game.ballOn,
+                description,
+              },
             },
             clockBefore,
           ),

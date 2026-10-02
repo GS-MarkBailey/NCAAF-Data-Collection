@@ -57,6 +57,14 @@ export interface GameState {
   gameEnded: boolean
   /** True after the operator ends the current period (before the next starts) */
   periodEnded: boolean
+  /** True between SNAP and END PLAY while the operator is collecting a play */
+  playInProgress: boolean
+  /** Net yards gained for the offense since the last SNAP */
+  playYardsGained: number
+  /** Down / distance / ball-on at SNAP (used when ending the play) */
+  playStartDown: number
+  playStartDistance: number
+  playStartBallOn: number
   plays: PlayEntry[]
   simulation?: PlaySimulationState
 }
