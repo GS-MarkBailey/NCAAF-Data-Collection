@@ -76,6 +76,7 @@ export function PlayControlsPanelShadcn({
   )
   const undoPlayControl = useAppStore((s) => s.undoPlayControl)
   const startPeriod = useAppStore((s) => s.startPeriod)
+  const openKickoffCollection = useAppStore((s) => s.openKickoffCollection)
   const canUndo = canUndoPlayAction(game)
 
   const showSnap = useFeatureFlag('playControls.snap')
@@ -124,7 +125,9 @@ export function PlayControlsPanelShadcn({
   const runAction = (actionId: MatchActionId) => {
     switch (actionId) {
       case 'kickoff':
-        startPeriod(fixtureId)
+        // Opening kickoff starts the match; ensuing kickoffs only open collection.
+        if (!gameStarted) startPeriod(fixtureId)
+        else openKickoffCollection(fixtureId)
         return
       case 'snap':
         snapPlay(fixtureId)
@@ -271,16 +274,14 @@ function MatchStateGuideBody({
 }) {
   const buttons: ControlButton[] = []
 
-  if (canKickOff || matchView.phase === 'pregame') {
-    if (canKickOff) {
-      buttons.push({
-        id: 'kickoff',
-        label: 'KICK OFF',
-        emphasis: 'primary',
-        wide: true,
-        title: 'Kick off — then collect Return / Touchback / …',
-      })
-    }
+  if (canKickOff) {
+    buttons.push({
+      id: 'kickoff',
+      label: 'KICK OFF',
+      emphasis: 'primary',
+      wide: true,
+      title: 'Kick off — then collect Return / Touchback / …',
+    })
   } else if (playInProgress) {
     const maxLikelihood = Math.max(
       0,

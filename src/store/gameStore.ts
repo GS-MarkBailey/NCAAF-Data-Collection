@@ -63,6 +63,8 @@ interface AppStore {
   /** Restore the previous play-controls action (collection / yards / snap / end). */
   undoPlayControl: (fixtureId: string) => void
   startPeriod: (fixtureId: string) => void
+  /** Open kickoff outcome collection (after KICK OFF — opening or ensuing). */
+  openKickoffCollection: (fixtureId: string) => void
   endPeriod: (fixtureId: string) => void
   startOvertime: (fixtureId: string) => void
   endGame: (fixtureId: string) => void
@@ -717,28 +719,18 @@ export const useAppStore = create<AppStore>((set, get) => ({
             }
           }
 
-          // Try resolved → open ensuing kickoff collection.
+          // Try resolved → wait for operator KICK OFF (do not open outcomes yet).
           if (endingTry) {
             return {
               ...base,
-              playInProgress: true,
+              playInProgress: false,
               seriesKind: 'free_kick',
-              playCollectionStep: INITIAL_KICKOFF_COLLECTION_STEP,
-              playCollectionPath: ['kickoff'],
+              playCollectionStep: null,
+              playCollectionPath: [],
               playStartBallOn: resolved.ballOn,
               playStartDown: resolved.down,
               playStartDistance: resolved.distance,
-              collectedDatapoints: [
-                ...withEnd,
-                {
-                  id: crypto.randomUUID(),
-                  key: 'kickoff',
-                  label: labelForDatapointKey('kickoff'),
-                  period: withUndo.clock.period,
-                  clock: formatClock(withUndo.clock.seconds),
-                  collectedAt: Date.now(),
-                },
-              ],
+              collectedDatapoints: withEnd,
               clock: {
                 ...base.clock,
                 running: nextClockRunning(
@@ -774,6 +766,61 @@ export const useAppStore = create<AppStore>((set, get) => ({
             clockBefore,
           ),
         ),
+      }
+    })
+  },
+
+  openKickoffCollection: (fixtureId) => {
+    set((state) => {
+      const game = state.games[fixtureId]
+      if (
+        !game ||
+        game.gameEnded ||
+        game.playInProgress ||
+        game.seriesKind !== 'free_kick'
+      ) {
+        return state
+      }
+
+      const rules = getFootballRuleset(game.rulesetId)
+      const spot = game.ballOn || rules.defaultBallOn
+
+      return {
+        games: updateGame(state.games, fixtureId, (g) => {
+          const withUndo = pushPlayUndoSnapshot(g)
+          return {
+            ...withUndo,
+            playInProgress: true,
+            seriesKind: 'free_kick',
+            playCollectionStep: INITIAL_KICKOFF_COLLECTION_STEP,
+            playCollectionPath: ['kickoff'],
+            playYardsGained: 0,
+            playStartDown: rules.minDown,
+            playStartDistance: rules.firstDownDistance,
+            playStartBallOn: spot,
+            ballOn: spot,
+            down: rules.minDown,
+            distance: rules.firstDownDistance,
+            collectedDatapoints: [
+              ...(withUndo.collectedDatapoints ?? []),
+              {
+                id: crypto.randomUUID(),
+                key: 'kickoff',
+                label: labelForDatapointKey('kickoff'),
+                period: withUndo.clock.period,
+                clock: formatClock(withUndo.clock.seconds),
+                collectedAt: Date.now(),
+              },
+            ],
+            clock: {
+              ...withUndo.clock,
+              running: nextClockRunning(
+                { type: 'kickoff_opened' },
+                withUndo.clock,
+              ),
+            },
+          }
+        }),
       }
     })
   },

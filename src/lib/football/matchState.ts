@@ -561,7 +561,12 @@ export function getPlayControlCapabilities(input: MatchStateInput): {
   const underway = isMatchUnderway(input)
   return {
     phase: view.phase,
-    canKickOff: view.phase === 'pregame' && !input.gameEnded,
+    // Opening kickoff (pregame) or ensuing kickoff after a try / free-kick wait.
+    canKickOff:
+      !input.gameEnded &&
+      !inLivePlay &&
+      (view.phase === 'pregame' ||
+        (input.seriesKind === 'free_kick' && view.phase === 'free_kick')),
     // SNAP only between scrimmage plays — not during try / free-kick collection.
     canSnap:
       !inLivePlay &&

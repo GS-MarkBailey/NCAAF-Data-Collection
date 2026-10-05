@@ -54,13 +54,16 @@ Punt → END PLAY
 
 ```
 TOUCHDOWN (auto-ends) → 1-PT KICK | 2-PT PLAY
-1-PT KICK → GOOD | NO GOOD (auto-ends) → Kickoff collection
-2-PT PLAY → GOOD | NO GOOD | DEFENSE SCORES (auto-ends) → Kickoff
+1-PT KICK → GOOD | NO GOOD (auto-ends) → await KICK OFF
+2-PT PLAY → GOOD | NO GOOD | DEFENSE SCORES (auto-ends) → await KICK OFF
+KICK OFF → Return | Touchback | … (same kickoff tree)
 ```
 
 After a touchdown, open try collection immediately (`seriesKind: try`,
-`INITIAL_TRY_COLLECTION_STEP`). Do **not** show SNAP during try or free-kick
-collection. Terminal choices without a yards pause **auto END PLAY**
+`INITIAL_TRY_COLLECTION_STEP`). After the convert, set `seriesKind: free_kick`
+with **no** live collection until the operator presses **KICK OFF**
+(`openKickoffCollection`). Do **not** show SNAP during try or free-kick wait.
+Terminal choices without a yards pause **auto END PLAY**
 (`resolvePlayCollectionChoice.autoEndPlay`). Yard-bearing terminals
 (tackle, fair catch, …) still pause on `ready_to_end` for yard adjust.
 
