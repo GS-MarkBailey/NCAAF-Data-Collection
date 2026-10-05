@@ -347,6 +347,7 @@ export function createInitialGameState(
     gameEnded: false,
     periodEnded: false,
     playInProgress: false,
+    seriesKind: 'scrimmage',
     playYardsGained: 0,
     playStartDown: rules.minDown,
     playStartDistance: rules.firstDownDistance,

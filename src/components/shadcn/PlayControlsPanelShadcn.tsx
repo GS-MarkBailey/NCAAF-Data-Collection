@@ -1,5 +1,10 @@
 import { MoveHorizontal, Zap } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import {
+  getMatchStateView,
+  getPlayControlCapabilities,
+  toMatchStateInput,
+} from '@/lib/football'
 import { useFeatureFlag } from '@/hooks/useFeatureFlag'
 import { useAppStore } from '@/store/gameStore'
 import { Button } from '@/components/ui/button'
@@ -23,13 +28,8 @@ export function PlayControlsPanelShadcn({
   fixtureId,
   layout = 'column',
 }: PlayControlsPanelShadcnProps) {
-  const gameEnded = useAppStore((s) => s.games[fixtureId]?.gameEnded ?? false)
-  const playInProgress = useAppStore(
-    (s) => s.games[fixtureId]?.playInProgress ?? false,
-  )
-  const playYardsGained = useAppStore(
-    (s) => s.games[fixtureId]?.playYardsGained ?? 0,
-  )
+  const game = useAppStore((s) => s.games[fixtureId])
+  const playYardsGained = game?.playYardsGained ?? 0
   const snapPlay = useAppStore((s) => s.snapPlay)
   const endPlay = useAppStore((s) => s.endPlay)
   const adjustYards = useAppStore((s) => s.adjustYards)
@@ -38,10 +38,15 @@ export function PlayControlsPanelShadcn({
   const showEndPlay = useFeatureFlag('playControls.endPlay')
   const showYardAdjust = useFeatureFlag('playControls.yardAdjust')
 
+  const matchView = game ? getMatchStateView(toMatchStateInput(game)) : null
+  const controls = game
+    ? getPlayControlCapabilities(toMatchStateInput(game))
+    : { canSnap: false, canEndPlay: false, canAdjustYards: false, phase: 'pregame' as const }
+
   const stacked = layout === 'stack'
-  const disabled = gameEnded
-  const canSnap = !disabled && !playInProgress
-  const canEndOrAdjust = !disabled && playInProgress
+  const playInProgress = game?.playInProgress ?? false
+  const canSnap = controls.canSnap
+  const canEndOrAdjust = controls.canEndPlay || controls.canAdjustYards
 
   const yardsLabel =
     playYardsGained === 0
@@ -57,9 +62,16 @@ export function PlayControlsPanelShadcn({
       )}
     >
       <CardHeader className="border-b border-border">
-        <CardTitle className="flex items-center gap-2 text-sm">
-          <Zap className="size-4 text-muted-foreground" />
-          Play controls
+        <CardTitle className="flex items-center justify-between gap-2 text-sm">
+          <span className="flex items-center gap-2">
+            <Zap className="size-4 text-muted-foreground" />
+            Play controls
+          </span>
+          {matchView ? (
+            <span className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+              {matchView.label}
+            </span>
+          ) : null}
         </CardTitle>
       </CardHeader>
       <CardContent className="flex min-h-0 flex-1 flex-col gap-2">

@@ -14,6 +14,7 @@ export * from './possession'
 export * from './field'
 export * from './clock'
 export * from './play'
+export * from './matchState'
 export * from './catalog'
 export {
   createInitialSimulation,

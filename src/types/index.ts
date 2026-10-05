@@ -2,6 +2,9 @@ import type { FootballCode } from '@/lib/football/rulesets'
 
 export type { FootballCode }
 
+/** How the ball will next be put in play. */
+export type SeriesKind = 'scrimmage' | 'free_kick' | 'try'
+
 export type RiskType =
   | 'challengeReview'
   | 'statDelay'
@@ -65,6 +68,11 @@ export interface GameState {
   periodEnded: boolean
   /** True between SNAP and END PLAY while the operator is collecting a play */
   playInProgress: boolean
+  /**
+   * How the ball will next be put in play (scrimmage / free kick / try).
+   * Drives match-phase collectables alongside playInProgress / period flags.
+   */
+  seriesKind: SeriesKind
   /** Net yards gained for the offense since the last SNAP */
   playYardsGained: number
   /** Down / distance / ball-on at SNAP (used when ending the play) */

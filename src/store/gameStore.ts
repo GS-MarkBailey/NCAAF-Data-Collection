@@ -14,12 +14,14 @@ import {
   clampPeriod,
   createInitialSimulation,
   createQuarterStartPlay,
+  applyMatchTransition,
   getFootballRuleset,
   isAwaitingRegulationDecision,
   isOvertimePeriod,
   resolveEndedPlayFromGame,
   startLivePlay,
   tickPlaySimulation,
+  toMatchStateInput,
 } from '@/lib/football'
 
 interface AppStore {
@@ -357,6 +359,9 @@ export const useAppStore = create<AppStore>((set, get) => ({
         distance: game.distance,
         ballOn: game.ballOn,
       })
+      const match = applyMatchTransition(toMatchStateInput(game), {
+        type: 'snap',
+      })
       const clockBefore = {
         seconds: game.clock.seconds,
         period: game.clock.period,
@@ -366,6 +371,8 @@ export const useAppStore = create<AppStore>((set, get) => ({
         games: updateGame(state.games, fixtureId, (g) => ({
           ...g,
           ...snap,
+          seriesKind: match.seriesKind,
+          playInProgress: match.playInProgress,
         })),
         actionLogs: appendAction(
           state.actionLogs,
@@ -458,11 +465,16 @@ export const useAppStore = create<AppStore>((set, get) => ({
         period: game.clock.period,
       }
 
+      const match = applyMatchTransition(toMatchStateInput(game), {
+        type: 'end_play',
+      })
+
       return {
         games: updateGame(state.games, fixtureId, (g) => ({
           ...g,
-          playInProgress: resolved.playInProgress,
+          playInProgress: match.playInProgress,
           playYardsGained: resolved.playYardsGained,
+          seriesKind: match.seriesKind,
           down: resolved.down,
           distance: resolved.distance,
           ballOn: resolved.ballOn,
@@ -505,11 +517,16 @@ export const useAppStore = create<AppStore>((set, get) => ({
       }
 
       if (!game.gameStarted) {
+        const match = applyMatchTransition(toMatchStateInput(game), {
+          type: 'game_started',
+        })
         return {
           games: updateGame(state.games, fixtureId, (g) => ({
             ...g,
-            gameStarted: true,
-            periodEnded: false,
+            gameStarted: match.gameStarted,
+            periodEnded: match.periodEnded,
+            playInProgress: match.playInProgress,
+            seriesKind: match.seriesKind,
             clock: {
               period: 1,
               seconds: rules.quarterLengthSeconds,
@@ -549,11 +566,16 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
       const fromPeriod = game.clock.period
       const toPeriod = fromPeriod + 1
+      const match = applyMatchTransition(toMatchStateInput(game), {
+        type: 'period_started',
+      })
 
       return {
         games: updateGame(state.games, fixtureId, (g) => ({
           ...g,
-          periodEnded: false,
+          periodEnded: match.periodEnded,
+          playInProgress: match.playInProgress,
+          seriesKind: match.seriesKind,
           clock: {
             period: toPeriod,
             seconds: rules.quarterLengthSeconds,
@@ -596,6 +618,9 @@ export const useAppStore = create<AppStore>((set, get) => ({
         return state
       }
 
+      const match = applyMatchTransition(toMatchStateInput(game), {
+        type: 'period_ended',
+      })
       const clockBefore = {
         seconds: game.clock.seconds,
         period: game.clock.period,
@@ -604,7 +629,9 @@ export const useAppStore = create<AppStore>((set, get) => ({
       return {
         games: updateGame(state.games, fixtureId, (g) => ({
           ...g,
-          periodEnded: true,
+          periodEnded: match.periodEnded,
+          playInProgress: match.playInProgress,
+          seriesKind: match.seriesKind,
           clock: {
             ...g.clock,
             seconds: 0,
@@ -644,6 +671,9 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
       const rules = getFootballRuleset(game.rulesetId)
       const toPeriod = rules.regulationPeriods + 1
+      const match = applyMatchTransition(toMatchStateInput(game), {
+        type: 'overtime_started',
+      })
       const clockBefore = {
         seconds: game.clock.seconds,
         period: game.clock.period,
@@ -652,7 +682,9 @@ export const useAppStore = create<AppStore>((set, get) => ({
       return {
         games: updateGame(state.games, fixtureId, (g) => ({
           ...g,
-          periodEnded: false,
+          periodEnded: match.periodEnded,
+          playInProgress: match.playInProgress,
+          seriesKind: match.seriesKind,
           clock: {
             period: toPeriod,
             seconds: rules.quarterLengthSeconds,
@@ -691,6 +723,9 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
       if (!atRegulationDecision && !inOvertime) return state
 
+      const match = applyMatchTransition(toMatchStateInput(game), {
+        type: 'game_ended',
+      })
       const clockBefore = {
         seconds: game.clock.seconds,
         period: game.clock.period,
@@ -699,7 +734,10 @@ export const useAppStore = create<AppStore>((set, get) => ({
       return {
         games: updateGame(state.games, fixtureId, (g) => ({
           ...g,
-          gameEnded: true,
+          gameEnded: match.gameEnded,
+          periodEnded: match.periodEnded,
+          playInProgress: match.playInProgress,
+          seriesKind: match.seriesKind,
           clock: {
             ...g.clock,
             seconds: 0,
