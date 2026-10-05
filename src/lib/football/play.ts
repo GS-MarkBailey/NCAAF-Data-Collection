@@ -385,21 +385,25 @@ export function resolveEndedPlay(
     nextSeries = series.nextSeries
   }
 
+  // During kickoff collection, possessionIsHome is the kicking team.
+  // Normal KO results award the ball to the receiving team.
+  const kickReceivingIsHome = !input.possessionIsHome
+
   if (resultKind === 'kickoff_touchback') {
     outcome = 'kickoff_touchback'
     stopClock = true
     yardsGained = 0
-    applyNewSeries(rules.defaultBallOn, input.possessionIsHome)
+    applyNewSeries(rules.defaultBallOn, kickReceivingIsHome)
   } else if (resultKind === 'kickoff_fair_catch') {
     outcome = 'kickoff_fair_catch'
     stopClock = true
-    applyNewSeries(input.ballOn, input.possessionIsHome)
+    applyNewSeries(input.ballOn, kickReceivingIsHome)
   } else if (resultKind === 'kickoff_out_of_bounds') {
     // Simplified NCAA-style spot for receiving team after kickoff OOB.
     outcome = 'kickoff_out_of_bounds'
     stopClock = true
     yardsGained = 0
-    applyNewSeries(35, input.possessionIsHome)
+    applyNewSeries(35, kickReceivingIsHome)
   } else if (resultKind === 'kickoff_touchdown') {
     outcome = 'kickoff_touchdown'
     stopClock = true
@@ -408,26 +412,22 @@ export function resolveEndedPlay(
     down = rules.minDown
     distance = rules.minDistance
     ballOn = rules.maxBallOn
-    if (input.possessionIsHome) scoreHomeDelta = rules.touchdownPoints
+    possessionIsHome = kickReceivingIsHome
+    if (kickReceivingIsHome) scoreHomeDelta = rules.touchdownPoints
     else scoreAwayDelta = rules.touchdownPoints
   } else if (resultKind === 'kickoff_recovery_kicking') {
     outcome = 'kickoff_recovery'
     stopClock = true
-    // Receiving team had possessionIsHome at kick; kicking team recovers → flip.
-    const flipped = changeOfPossessionSeries({
-      possessionIsHome: input.possessionIsHome,
-      ballOn: input.ballOn,
-      rules,
-    })
-    applyNewSeries(flipped.ballOn, flipped.possessionIsHome)
+    // Kicking team already has possession — keep it at the recovery spot.
+    applyNewSeries(input.ballOn, input.possessionIsHome)
   } else if (resultKind === 'kickoff_recovery_receiving') {
     outcome = 'kickoff_recovery'
     stopClock = true
-    applyNewSeries(input.ballOn, input.possessionIsHome)
+    applyNewSeries(input.ballOn, kickReceivingIsHome)
   } else if (resultKind === 'kickoff_return') {
     outcome = 'kickoff_return'
     stopClock = true
-    applyNewSeries(input.ballOn, input.possessionIsHome)
+    applyNewSeries(input.ballOn, kickReceivingIsHome)
   } else if (resultKind === 'touchdown') {
     outcome = 'touchdown'
     stopClock = true
@@ -449,7 +449,7 @@ export function resolveEndedPlay(
     yardsGained = 0
     scoredTouchdown = false
     nextSeries = 'free_kick'
-    // Scoring team still has possession during the try; after try they kick off.
+    // Scoring team keeps possession through the ensuing kickoff (they kick).
     const scoringIsHome = input.possessionIsHome
     if (resultKind === 'conversion_kick_good') {
       outcome = 'conversion_kick_good'
@@ -461,7 +461,7 @@ export function resolveEndedPlay(
       else scoreAwayDelta = rules.conversionPlayPoints
     } else if (resultKind === 'defensive_conversion') {
       outcome = 'defensive_conversion'
-      // Defense scores the two points.
+      // Defense scores the two points; TD team still kicks off.
       if (scoringIsHome) scoreAwayDelta = rules.conversionPlayPoints
       else scoreHomeDelta = rules.conversionPlayPoints
     } else if (resultKind === 'conversion_kick_miss') {
@@ -469,9 +469,7 @@ export function resolveEndedPlay(
     } else {
       outcome = 'conversion_play_miss'
     }
-    // Receiving team for the ensuing kickoff.
-    const receivingIsHome = !scoringIsHome
-    applyNewSeries(rules.defaultBallOn, receivingIsHome)
+    applyNewSeries(rules.defaultBallOn, scoringIsHome)
   } else if (resultKind === 'incomplete') {
     // Incomplete / pass OOB: replay LOS, consume the down, clock stops.
     yardsGained = 0

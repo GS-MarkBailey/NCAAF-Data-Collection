@@ -1,14 +1,29 @@
 /**
- * Keys credited to the side opposite current possession.
- * Kickoff: possession during KO collection is the receiving team.
- * Interception / defensive recovery / defensive convert: defense.
+ * Keys credited to the defense on scrimmage (opposite of possession).
  */
-const OPPOSITE_POSSESSION_KEYS = new Set([
-  'kickoff',
+const DEFENSE_KEYS = new Set([
   'interception',
   'recovery_defense',
-  'recovery_kicking',
   'defensive_two_point',
+])
+
+/**
+ * Kickoff-tree keys credited to the receiving team.
+ * During free-kick collection, possession is the kicking team.
+ */
+const KICKOFF_RECEIVING_KEYS = new Set([
+  'return',
+  'touchback',
+  'fair_catch',
+  'kick_out_of_bounds',
+  'muff',
+  'tackle',
+  'return_out_of_bounds',
+  'return_fumble',
+  'return_touchdown',
+  'recovery_receiving',
+  'yards',
+  'end_play',
 ])
 
 /** Display labels for progressive collection option ids. */
@@ -55,16 +70,28 @@ export function labelForDatapointKey(key: string): string {
   return DATAPOINT_LABELS[key] ?? key
 }
 
-/** Team abbr credited for a datapoint given current possession. */
+/** Team abbr credited for a datapoint given current possession / kickoff context. */
 export function teamAbbrForDatapoint(
   key: string,
   possessionIsHome: boolean,
   homeAbbr: string,
   awayAbbr: string,
+  playCollectionPath: readonly string[] = [],
 ): string {
-  const creditHome = OPPOSITE_POSSESSION_KEYS.has(key)
-    ? !possessionIsHome
-    : possessionIsHome
+  const onKickoff =
+    key === 'kickoff' || playCollectionPath.includes('kickoff')
+
+  let creditHome = possessionIsHome
+
+  if (onKickoff) {
+    // Possession = kicking team; return / touchback / … → receiving.
+    if (KICKOFF_RECEIVING_KEYS.has(key)) {
+      creditHome = !possessionIsHome
+    }
+  } else if (DEFENSE_KEYS.has(key)) {
+    creditHome = !possessionIsHome
+  }
+
   return creditHome ? homeAbbr : awayAbbr
 }
 

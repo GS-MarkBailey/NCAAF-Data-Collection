@@ -90,12 +90,14 @@ function updateGame(
 function appendCollectedDatapoint(
   game: GameState,
   key: string,
+  path: readonly string[] = game.playCollectionPath,
 ): CollectedDatapoint[] {
   const teamAbbr = teamAbbrForDatapoint(
     key,
     game.possessionIsHome,
     game.fixture.homeAbbr,
     game.fixture.awayAbbr,
+    path,
   )
   const entry: CollectedDatapoint = {
     id: crypto.randomUUID(),
@@ -112,19 +114,20 @@ function appendCollectedDatapoint(
 function makeTeamDatapoint(
   game: GameState,
   key: string,
-  label?: string,
+  path: readonly string[] = game.playCollectionPath,
 ): CollectedDatapoint {
   const teamAbbr = teamAbbrForDatapoint(
     key,
     game.possessionIsHome,
     game.fixture.homeAbbr,
     game.fixture.awayAbbr,
+    path,
   )
   return {
     id: crypto.randomUUID(),
     key,
     teamAbbr,
-    label: label ?? labelForDatapointWithTeam(key, teamAbbr),
+    label: labelForDatapointWithTeam(key, teamAbbr),
     period: game.clock.period,
     clock: formatClock(game.clock.seconds),
     collectedAt: Date.now(),
@@ -520,7 +523,11 @@ export const useAppStore = create<AppStore>((set, get) => ({
             ...withUndo,
             playCollectionStep: resolved.nextStep,
             playCollectionPath: path,
-            collectedDatapoints: appendCollectedDatapoint(withUndo, optionId),
+            collectedDatapoints: appendCollectedDatapoint(
+              withUndo,
+              optionId,
+              path,
+            ),
           }
         }),
       }
@@ -577,6 +584,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
             withUndo.possessionIsHome,
             withUndo.fixture.homeAbbr,
             withUndo.fixture.awayAbbr,
+            withUndo.playCollectionPath,
           )
           const yardPoint: CollectedDatapoint = {
             id: crypto.randomUUID(),
@@ -860,18 +868,25 @@ export const useAppStore = create<AppStore>((set, get) => ({
         return {
           games: updateGame(state.games, fixtureId, (g) => {
             const withUndo = pushPlayUndoSnapshot(g)
+            // Opening KO: away kicks, home receives (possession = kicking team).
+            const kickingIsHome = false
+            const kickoffGame = {
+              ...withUndo,
+              possessionIsHome: kickingIsHome,
+            }
             return {
               ...withUndo,
               gameStarted: match.gameStarted,
               periodEnded: match.periodEnded,
               playInProgress: match.playInProgress,
               seriesKind: match.seriesKind,
+              possessionIsHome: kickingIsHome,
               playCollectionStep: INITIAL_KICKOFF_COLLECTION_STEP,
               playCollectionPath: ['kickoff'],
               collectedDatapoints: [
                 ...(withUndo.collectedDatapoints ?? []),
                 {
-                  ...makeTeamDatapoint(withUndo, 'kickoff'),
+                  ...makeTeamDatapoint(kickoffGame, 'kickoff', ['kickoff']),
                   period: 1,
                   clock: formatClock(rules.quarterLengthSeconds),
                 },
