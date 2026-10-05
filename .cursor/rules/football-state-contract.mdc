@@ -50,16 +50,25 @@ PassAttempt → CompletePass → Tackle | …
 Punt → END PLAY
 ```
 
-## Try / convert (after touchdown END PLAY)
+## Try / convert (after touchdown)
 
 ```
-1-PT KICK → GOOD | NO GOOD → END PLAY → Kickoff collection
-2-PT PLAY → GOOD | NO GOOD | DEFENSE SCORES → END PLAY → Kickoff collection
+TOUCHDOWN (auto-ends) → 1-PT KICK | 2-PT PLAY
+1-PT KICK → GOOD | NO GOOD (auto-ends) → Kickoff collection
+2-PT PLAY → GOOD | NO GOOD | DEFENSE SCORES (auto-ends) → Kickoff
 ```
 
 After a touchdown, open try collection immediately (`seriesKind: try`,
 `INITIAL_TRY_COLLECTION_STEP`). Do **not** show SNAP during try or free-kick
-collection. After the try is ended, open kickoff collection for the ensuing kick.
+collection. Terminal choices without a yards pause **auto END PLAY**
+(`resolvePlayCollectionChoice.autoEndPlay`). Yard-bearing terminals
+(tackle, fair catch, …) still pause on `ready_to_end` for yard adjust.
+
+## Scrimmage fumble
+
+```
+FUMBLE → OFFENSE | DEFENSE → (yards pause if offense) → resolve
+```
 
 Yardage UI: show the yards adjuster whenever the match is not ended (flag on).
 During a live play, presses update ball-on + play yards; between plays they only

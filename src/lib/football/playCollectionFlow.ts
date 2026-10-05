@@ -22,6 +22,7 @@ export type PlayCollectionStepId =
   | 'choose_try_type'
   | 'choose_pat_result'
   | 'choose_two_point_result'
+  | 'choose_fumble_recovery'
   | 'ready_to_end'
 
 /** Visual emphasis derived from relative likelihood (not shown as text). */
@@ -148,6 +149,7 @@ const STEPS: Record<PlayCollectionStepId, PlayCollectionStepDef> = {
         label: 'TOUCHDOWN',
         likelihood: 3,
         catalogId: 'score.touchdown',
+        // Auto-ends into try collection (yards already tracked live).
         nextStep: 'ready_to_end',
         canEndPlay: true,
       },
@@ -279,18 +281,43 @@ const STEPS: Record<PlayCollectionStepId, PlayCollectionStepDef> = {
         label: 'TOUCHDOWN',
         likelihood: 7,
         catalogId: 'score.touchdown',
+        // Auto-ends into try collection (yards already tracked live).
         nextStep: 'ready_to_end',
         canEndPlay: true,
-        showYards: true,
       },
       {
         id: 'play_fumble',
         label: 'FUMBLE',
         likelihood: 5,
         catalogId: 'turnover.fumble_lost',
+        nextStep: 'choose_fumble_recovery',
+        showYards: true,
+      },
+    ],
+  },
+  choose_fumble_recovery: {
+    id: 'choose_fumble_recovery',
+    label: 'Fumble recovery',
+    prompt: 'Who recovered the fumble?',
+    showYards: true,
+    canEndPlay: false,
+    options: [
+      {
+        id: 'recovery_offense',
+        label: 'OFFENSE',
+        likelihood: 55,
+        catalogId: 'turnover.fumble_recovered_own',
         nextStep: 'ready_to_end',
         canEndPlay: true,
         showYards: true,
+      },
+      {
+        id: 'recovery_defense',
+        label: 'DEFENSE',
+        likelihood: 45,
+        catalogId: 'turnover.fumble_lost',
+        nextStep: 'ready_to_end',
+        canEndPlay: true,
       },
     ],
   },
@@ -434,17 +461,30 @@ export function resolvePlayCollectionChoice(
   nextStep: PlayCollectionStepId
   showYards: boolean
   canEndPlay: boolean
+  /**
+   * Terminal choice that does not need a yards pause — store should END PLAY
+   * immediately after recording the datapoint (e.g. incomplete, PAT good).
+   */
+  autoEndPlay: boolean
 } | null {
   const step = STEPS[stepId]
   const option = step?.options.find((entry) => entry.id === optionId)
   if (!step || !option || !option.nextStep) return null
 
   const next = STEPS[option.nextStep]
+  const showYards = option.showYards ?? next.showYards
+  const canEndPlay = option.canEndPlay ?? next.canEndPlay
+  const autoEndPlay =
+    Boolean(canEndPlay) &&
+    option.nextStep === 'ready_to_end' &&
+    !Boolean(option.showYards)
+
   return {
     option,
     nextStep: option.nextStep,
-    showYards: option.showYards ?? next.showYards,
-    canEndPlay: option.canEndPlay ?? next.canEndPlay,
+    showYards,
+    canEndPlay,
+    autoEndPlay,
   }
 }
 

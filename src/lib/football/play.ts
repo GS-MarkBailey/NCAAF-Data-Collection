@@ -180,9 +180,15 @@ export function getPlayResultKind(
         return 'incomplete'
       case 'interception':
         return 'interception'
+      case 'recovery_defense':
       case 'rush_fumble':
-      case 'play_fumble':
         return 'fumble_lost'
+      case 'recovery_offense':
+        // Own recovery — treat as yards play at the spot.
+        return 'yards'
+      case 'play_fumble':
+        // Fumble chosen but recovery not collected yet — should not END PLAY.
+        return 'yards'
       case 'punt':
         return 'punt'
       case 'play_out_of_bounds':

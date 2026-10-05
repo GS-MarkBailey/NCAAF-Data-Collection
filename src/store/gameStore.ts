@@ -403,7 +403,8 @@ export const useAppStore = create<AppStore>((set, get) => ({
         !game ||
         game.gameEnded ||
         !game.gameStarted ||
-        game.playInProgress
+        game.playInProgress ||
+        game.seriesKind !== 'scrimmage'
       ) {
         return state
       }
@@ -455,6 +456,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   },
 
   selectPlayCollectionOption: (fixtureId, optionId) => {
+    let shouldAutoEnd = false
     set((state) => {
       const game = state.games[fixtureId]
       if (!game || game.gameEnded || !game.playInProgress) return state
@@ -468,6 +470,8 @@ export const useAppStore = create<AppStore>((set, get) => ({
       )
       if (!resolved) return state
 
+      shouldAutoEnd = resolved.autoEndPlay
+
       return {
         games: updateGame(state.games, fixtureId, (g) => {
           const path = [...g.playCollectionPath, optionId]
@@ -480,6 +484,10 @@ export const useAppStore = create<AppStore>((set, get) => ({
         }),
       }
     })
+    // Terminal choices without a yards pause (incomplete, PAT good, TD, …).
+    if (shouldAutoEnd) {
+      get().endPlay(fixtureId)
+    }
   },
 
   adjustYards: (fixtureId, delta) => {
@@ -565,6 +573,32 @@ export const useAppStore = create<AppStore>((set, get) => ({
       const game = state.games[fixtureId]
       if (!game || game.gameEnded || !game.playInProgress) return state
 
+      const path = game.playCollectionPath
+      const endingTry = game.seriesKind === 'try'
+      // Don't resolve a try until a convert result is collected.
+      if (
+        endingTry &&
+        !path.some((id) =>
+          [
+            'pat_good',
+            'pat_no_good',
+            'two_point_good',
+            'two_point_no_good',
+            'defensive_two_point',
+          ].includes(id),
+        )
+      ) {
+        return state
+      }
+      // Don't resolve kickoff until a result datapoint exists.
+      if (
+        game.seriesKind === 'free_kick' &&
+        path.length > 0 &&
+        path.every((id) => id === 'kickoff')
+      ) {
+        return state
+      }
+
       const resolved = resolveEndedPlayFromGame({
         fixture: game.fixture,
         clockPeriod: game.clock.period,
@@ -577,7 +611,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
         playStartDown: game.playStartDown,
         playStartDistance: game.playStartDistance,
         playStartBallOn: game.playStartBallOn,
-        playCollectionPath: game.playCollectionPath,
+        playCollectionPath: path,
         rules: game.rulesetId,
       })
 
@@ -586,7 +620,6 @@ export const useAppStore = create<AppStore>((set, get) => ({
         period: game.clock.period,
       }
 
-      const endingTry = game.seriesKind === 'try'
       const match = applyMatchTransition(
         toMatchStateInput(game),
         endingTry
