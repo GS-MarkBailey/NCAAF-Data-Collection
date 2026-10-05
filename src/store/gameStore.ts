@@ -827,6 +827,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
       return {
         games: updateGame(state.games, fixtureId, (g) => {
           const withUndo = pushPlayUndoSnapshot(g)
+          // Possession is already the receiving team (set when the try ended).
           return {
             ...withUndo,
             playInProgress: true,
@@ -840,6 +841,12 @@ export const useAppStore = create<AppStore>((set, get) => ({
             ballOn: spot,
             down: rules.minDown,
             distance: rules.firstDownDistance,
+            simulation: withUndo.simulation
+              ? {
+                  ...withUndo.simulation,
+                  offenseIsHome: withUndo.possessionIsHome,
+                }
+              : withUndo.simulation,
             collectedDatapoints: [
               ...(withUndo.collectedDatapoints ?? []),
               makeTeamDatapoint(withUndo, 'kickoff'),
@@ -876,11 +883,11 @@ export const useAppStore = create<AppStore>((set, get) => ({
         return {
           games: updateGame(state.games, fixtureId, (g) => {
             const withUndo = pushPlayUndoSnapshot(g)
-            // Opening KO: away kicks, home receives (possession = kicking team).
-            const kickingIsHome = false
+            // Opening KO: home receives (possession); away kicks (datapoint).
+            const receivingIsHome = true
             const kickoffGame = {
               ...withUndo,
-              possessionIsHome: kickingIsHome,
+              possessionIsHome: receivingIsHome,
             }
             return {
               ...withUndo,
@@ -888,7 +895,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
               periodEnded: match.periodEnded,
               playInProgress: match.playInProgress,
               seriesKind: match.seriesKind,
-              possessionIsHome: kickingIsHome,
+              possessionIsHome: receivingIsHome,
               playCollectionStep: INITIAL_KICKOFF_COLLECTION_STEP,
               playCollectionPath: ['kickoff'],
               collectedDatapoints: [
@@ -906,6 +913,12 @@ export const useAppStore = create<AppStore>((set, get) => ({
               ballOn: spot,
               down: rules.minDown,
               distance: rules.firstDownDistance,
+              simulation: withUndo.simulation
+                ? {
+                    ...withUndo.simulation,
+                    offenseIsHome: receivingIsHome,
+                  }
+                : withUndo.simulation,
               clock: {
                 period: 1,
                 seconds: rules.quarterLengthSeconds,
@@ -914,7 +927,13 @@ export const useAppStore = create<AppStore>((set, get) => ({
                   { seconds: rules.quarterLengthSeconds, running: false },
                 ),
               },
-              plays: [...withUndo.plays, createQuarterStartPlay(withUndo, 1)],
+              plays: [
+                ...withUndo.plays,
+                createQuarterStartPlay(
+                  { ...withUndo, possessionIsHome: receivingIsHome },
+                  1,
+                ),
+              ],
             }
           }),
           actionLogs: appendAction(

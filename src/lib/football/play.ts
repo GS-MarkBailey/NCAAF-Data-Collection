@@ -385,9 +385,10 @@ export function resolveEndedPlay(
     nextSeries = series.nextSeries
   }
 
-  // During kickoff collection, possessionIsHome is the kicking team.
-  // Normal KO results award the ball to the receiving team.
-  const kickReceivingIsHome = !input.possessionIsHome
+  // During kickoff collection, possessionIsHome is the *receiving* team
+  // (next offense). The kick is by the opposite side.
+  const kickReceivingIsHome = input.possessionIsHome
+  const kickKickingIsHome = !input.possessionIsHome
 
   if (resultKind === 'kickoff_touchback') {
     outcome = 'kickoff_touchback'
@@ -418,8 +419,8 @@ export function resolveEndedPlay(
   } else if (resultKind === 'kickoff_recovery_kicking') {
     outcome = 'kickoff_recovery'
     stopClock = true
-    // Kicking team already has possession — keep it at the recovery spot.
-    applyNewSeries(input.ballOn, input.possessionIsHome)
+    // Onside / muff recovered by kicking team — they become the offense.
+    applyNewSeries(input.ballOn, kickKickingIsHome)
   } else if (resultKind === 'kickoff_recovery_receiving') {
     outcome = 'kickoff_recovery'
     stopClock = true
@@ -449,8 +450,9 @@ export function resolveEndedPlay(
     yardsGained = 0
     scoredTouchdown = false
     nextSeries = 'free_kick'
-    // Scoring team keeps possession through the ensuing kickoff (they kick).
+    // Scoring team kicks off; receiving team gets possession for the KO.
     const scoringIsHome = input.possessionIsHome
+    const receivingIsHome = !scoringIsHome
     if (resultKind === 'conversion_kick_good') {
       outcome = 'conversion_kick_good'
       if (scoringIsHome) scoreHomeDelta = rules.conversionKickPoints
@@ -469,7 +471,7 @@ export function resolveEndedPlay(
     } else {
       outcome = 'conversion_play_miss'
     }
-    applyNewSeries(rules.defaultBallOn, scoringIsHome)
+    applyNewSeries(rules.defaultBallOn, receivingIsHome)
   } else if (resultKind === 'incomplete') {
     // Incomplete / pass OOB: replay LOS, consume the down, clock stops.
     yardsGained = 0

@@ -441,6 +441,7 @@ With **Match-state guide** on, scheduled fixtures open in **pregame** so the ful
 - Fix: background play sim no longer rewrites down/distance once a match is started
 - Scoreboard clock has **− / +** buttons on either side for ±1 second (works while running or paused; tap the time still opens the editor)
 - Game clock capped at American football period length **15:00** via `FootballRuleset.quarterLengthSeconds` / `clampClockSeconds`
+- Kickoff possession = **receiving** team through touchback/return (kicking team only on the Kickoff datapoint) so the first snap stays with the receivers
 - **END PLAY** appears when the chosen result is ready
 - Later quarters: **End period** on the scoreboard, then **Start** on the clock (no Start Q / Kick off badges on the scoreboard)
 
