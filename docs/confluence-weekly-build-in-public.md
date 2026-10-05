@@ -438,6 +438,7 @@ With **Match-state guide** on, scheduled fixtures open in **pregame** so the ful
 - Collected datapoints show the credited team abbr (e.g. **Touchdown - MISS**); after a score the scoring team keeps possession through **KICK OFF** (they kick), then possession flips on the kickoff result
 - App shell uses a cool blue–teal gradient wash behind fixtures and the game console (no frosted outer frame — panels sit directly on the gradient)
 - Game console panels (Scoreboard / Play controls / Risk / Play-by-play) share one card chrome — same border, header height, and title style
+- Fix: background play sim no longer rewrites down/distance once a match is started; between-play yard buttons spot the ball without changing to-go
 - **END PLAY** appears when the chosen result is ready
 - Later quarters: **End period** on the scoreboard, then **Start** on the clock (no Start Q / Kick off badges on the scoreboard)
 

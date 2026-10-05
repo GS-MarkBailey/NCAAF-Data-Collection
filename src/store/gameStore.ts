@@ -6,8 +6,8 @@ import { appendAction, createUserAction } from '@/lib/actionLog'
 import { formatClock } from '@/lib/format'
 import {
   adjustLivePlayYards,
-  applyYardDelta,
   ballOnForPossession,
+  clampBallOn,
   canEndCurrentPeriod,
   canStartNextPeriod,
   canStartOvertime,
@@ -546,7 +546,9 @@ export const useAppStore = create<AppStore>((set, get) => ({
         return state
       }
 
-      // Live play: move ball + accumulate play yards. Between plays: spot only.
+      // Live play: move ball + accumulate play yards.
+      // Between plays: spot the ball only — do not shrink to-go (that caused
+      // the next short gain to resolve as an accidental 1st & 10).
       const adjusted = game.playInProgress
         ? adjustLivePlayYards({
             ballOn: game.ballOn,
@@ -555,20 +557,20 @@ export const useAppStore = create<AppStore>((set, get) => ({
             delta,
             rules: game.rulesetId,
           })
-        : {
-            ...applyYardDelta({
-              ballOn: game.ballOn,
+        : (() => {
+            const nextBallOn = clampBallOn(
+              game.ballOn + delta,
+              game.rulesetId,
+            )
+            return {
+              ballOn: nextBallOn,
               distance: game.distance,
-              delta,
-              rules: game.rulesetId,
-            }),
-            actualDelta: 0,
-            playYardsGained: game.playYardsGained,
-          }
+              actualDelta: nextBallOn - game.ballOn,
+              playYardsGained: game.playYardsGained,
+            }
+          })()
 
-      const actualDelta = game.playInProgress
-        ? adjusted.actualDelta
-        : adjusted.ballOn - game.ballOn
+      const actualDelta = adjusted.actualDelta
       if (actualDelta === 0) return state
 
       const clockBefore = {

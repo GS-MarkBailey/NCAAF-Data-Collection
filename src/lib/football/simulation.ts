@@ -295,11 +295,9 @@ export function tickPlaySimulation(
     return null
   }
 
-  if (game.takeControlActive) {
-    return null
-  }
-
-  if (game.playInProgress) {
+  // Operator session: never invent plays that rewrite down / distance / score.
+  // (Take Control used to gate this, but that flag is off by default.)
+  if (game.takeControlActive || game.gameStarted || game.playInProgress) {
     return null
   }
 
