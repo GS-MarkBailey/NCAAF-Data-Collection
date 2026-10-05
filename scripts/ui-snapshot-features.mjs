@@ -250,6 +250,21 @@ export const WEEK_FEATURES = {
       },
     },
     {
+      id: 'clock-side-nudge',
+      title: 'Clock ±1 second side buttons',
+      path: '/game/NCAAF-2026-001',
+      viewport: 'game-landscape',
+      gameSetup: { fieldDirection: 'dismiss', errorToast: 'dismiss' },
+      async prepare(page) {
+        await page
+          .getByRole('button', { name: 'Decrease clock by 1 second' })
+          .waitFor({ state: 'visible', timeout: 5000 })
+        await page
+          .getByRole('button', { name: 'Increase clock by 1 second' })
+          .waitFor({ state: 'visible', timeout: 5000 })
+      },
+    },
+    {
       id: 'down-distance-editor',
       title: 'Down & to-go editor',
       path: '/game/NCAAF-2026-001',

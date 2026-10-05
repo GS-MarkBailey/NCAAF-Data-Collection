@@ -133,7 +133,7 @@ export const WEEK_SHIPPED = {
         'clock-period-editor',
       ],
     },
-    'clock-polish': { featureIds: ['start-pause-chips'] },
+    'clock-polish': { featureIds: ['start-pause-chips', 'clock-side-nudge'] },
     'down-distance': { featureIds: ['down-distance-editor'] },
     profile: { featureIds: ['profile-dialog'] },
     'unreliable-risk': { featureIds: ['unreliable-risk'] },

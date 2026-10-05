@@ -1,5 +1,5 @@
 import { useRef, useState, type CSSProperties, type KeyboardEvent, type MouseEvent } from 'react'
-import { LayoutGrid, Pause, Play } from 'lucide-react'
+import { LayoutGrid, Minus, Pause, Play, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { formatClock } from '@/lib/format'
 import {
@@ -97,6 +97,7 @@ export function ScoreboardPanelShadcn({
 
   const setClockTime = useAppStore((s) => s.setClockTime)
   const setClockPeriod = useAppStore((s) => s.setClockPeriod)
+  const adjustClock = useAppStore((s) => s.adjustClock)
   const toggleClock = useAppStore((s) => s.toggleClock)
   const endPeriod = useAppStore((s) => s.endPeriod)
   const startOvertime = useAppStore((s) => s.startOvertime)
@@ -328,11 +329,46 @@ export function ScoreboardPanelShadcn({
   )
 
   const clockAreaClassName = cn(
-    'relative flex min-h-0 flex-1 flex-col items-center justify-center gap-2 px-2 transition-colors',
+    'relative flex min-h-0 flex-1 items-stretch transition-colors',
     clockSurfaceClassName,
-    !stacked &&
-      canToggleClock &&
-      'cursor-pointer hover:bg-muted/40 active:bg-muted/60',
+  )
+
+  const canNudgeClock = !gameEnded && !inOvertime
+  const clockNudgeButtonClass = cn(
+    'flex w-10 shrink-0 items-center justify-center self-stretch text-muted-foreground transition-colors',
+    'hover:bg-muted/60 active:bg-muted/80',
+    'disabled:pointer-events-none disabled:opacity-35',
+  )
+
+  const nudgeClock = (delta: number) => (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation()
+    adjustClock(fixtureId, delta)
+  }
+
+  const clockNudgeMinus = (
+    <button
+      type="button"
+      className={cn(clockNudgeButtonClass, 'border-r border-border')}
+      disabled={!canNudgeClock || clockSeconds <= 0}
+      aria-label="Decrease clock by 1 second"
+      title="−1 second"
+      onClick={nudgeClock(-1)}
+    >
+      <Minus className="size-4" aria-hidden />
+    </button>
+  )
+
+  const clockNudgePlus = (
+    <button
+      type="button"
+      className={cn(clockNudgeButtonClass, 'border-l border-border')}
+      disabled={!canNudgeClock}
+      aria-label="Increase clock by 1 second"
+      title="+1 second"
+      onClick={nudgeClock(1)}
+    >
+      <Plus className="size-4" aria-hidden />
+    </button>
   )
 
   const actionBadges = (
@@ -531,13 +567,54 @@ export function ScoreboardPanelShadcn({
                 clockSurfaceClassName,
               )}
             >
+              <div className="relative flex min-h-0 flex-1 items-stretch">
+                {clockNudgeMinus}
+                <div
+                  className={cn(
+                    'relative flex min-h-0 min-w-0 flex-1 items-center justify-center px-2',
+                    canToggleClock &&
+                      'cursor-pointer hover:bg-muted/40 active:bg-muted/60',
+                  )}
+                  role={canToggleClock ? 'button' : undefined}
+                  tabIndex={canToggleClock ? 0 : undefined}
+                  aria-label={
+                    gameEnded
+                      ? 'Game final'
+                      : canUsePlayPause
+                        ? paused
+                          ? 'Start clock'
+                          : 'Pause clock'
+                        : 'Game clock'
+                  }
+                  onClick={canToggleClock ? handleToggleClock : undefined}
+                  onKeyDown={canToggleClock ? handleContainerKeyDown : undefined}
+                >
+                  {clockEditButton}
+                  {showPeriodManagement && awaitingRegulationDecision && periodEnded ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="absolute top-2 right-2 z-10 h-7 text-[10px] font-bold tracking-wider uppercase shadow-sm"
+                      onClick={handleEndGame}
+                    >
+                      End game
+                    </Button>
+                  ) : null}
+                </div>
+                {clockNudgePlus}
+              </div>
+              {showActionBar ? (
+                <div className="flex shrink-0 flex-wrap items-center justify-center gap-2 px-2 pb-2">
+                  {actionBadges}
+                </div>
+              ) : null}
+            </div>
+          ) : (
+            <div className={clockAreaClassName}>
+              {clockNudgeMinus}
               <div
-                className={cn(
-                  'relative flex min-h-0 flex-1 items-center justify-center px-2',
-                  canToggleClock &&
-                    'cursor-pointer hover:bg-muted/40 active:bg-muted/60',
-                )}
-                role={canToggleClock ? 'button' : undefined}
+                role={canToggleClock ? 'button' : 'presentation'}
                 tabIndex={canToggleClock ? 0 : undefined}
                 aria-label={
                   gameEnded
@@ -550,44 +627,15 @@ export function ScoreboardPanelShadcn({
                 }
                 onClick={canToggleClock ? handleToggleClock : undefined}
                 onKeyDown={canToggleClock ? handleContainerKeyDown : undefined}
+                className={cn(
+                  'relative flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center gap-2 px-2',
+                  canToggleClock &&
+                    'cursor-pointer hover:bg-muted/40 active:bg-muted/60',
+                )}
               >
                 {clockEditButton}
-                {showPeriodManagement && awaitingRegulationDecision && periodEnded ? (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="absolute top-2 right-2 z-10 h-7 text-[10px] font-bold tracking-wider uppercase shadow-sm"
-                    onClick={handleEndGame}
-                  >
-                    End game
-                  </Button>
-                ) : null}
               </div>
-              {showActionBar ? (
-                <div className="flex shrink-0 flex-wrap items-center justify-center gap-2 px-2 pb-2">
-                  {actionBadges}
-                </div>
-              ) : null}
-            </div>
-          ) : (
-            <div
-              role="presentation"
-              tabIndex={canToggleClock ? 0 : undefined}
-              aria-label={
-                gameEnded
-                  ? 'Game final'
-                  : canUsePlayPause
-                    ? paused
-                      ? 'Start clock'
-                      : 'Pause clock'
-                    : 'Game clock'
-              }
-              onClick={canToggleClock ? handleToggleClock : undefined}
-              onKeyDown={handleContainerKeyDown}
-              className={clockAreaClassName}
-            >
-              {clockEditButton}
+              {clockNudgePlus}
               <div className="pointer-events-none absolute inset-x-2 bottom-2 flex justify-center gap-2">
                 <div className="pointer-events-auto flex flex-wrap items-center justify-center gap-2">
                   {actionBadges}

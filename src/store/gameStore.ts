@@ -273,15 +273,18 @@ export const useAppStore = create<AppStore>((set, get) => ({
   adjustClock: (fixtureId, delta) => {
     set((state) => {
       const game = state.games[fixtureId]
-      if (!game) return state
+      if (!game || game.gameEnded || delta === 0) return state
       const seconds = Math.max(0, game.clock.seconds + delta)
+      if (seconds === game.clock.seconds) return state
       const clockBefore = {
         seconds: game.clock.seconds,
         period: game.clock.period,
       }
+      // Works while running or stopped — only the displayed time changes.
       return {
         games: updateGame(state.games, fixtureId, (g) => ({
           ...g,
+          periodEnded: seconds > 0 ? false : g.periodEnded,
           clock: { ...g.clock, seconds },
         })),
         actionLogs: appendAction(
