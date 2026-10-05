@@ -562,11 +562,12 @@ export function getPlayControlCapabilities(input: MatchStateInput): {
   return {
     phase: view.phase,
     canKickOff: view.phase === 'pregame' && !input.gameEnded,
-    // SNAP only after kickoff — pregame shows KICK OFF instead.
+    // SNAP only between scrimmage plays — not during try / free-kick collection.
     canSnap:
       !inLivePlay &&
       underway &&
-      (matchHasAction(view, 'snap') || view.phase === 'pre_snap'),
+      input.seriesKind === 'scrimmage' &&
+      view.phase === 'pre_snap',
     canEndPlay: inLivePlay || matchHasAction(view, 'end_play'),
     canAdjustYards: inLivePlay || matchHasAction(view, 'adjust_yards'),
   }

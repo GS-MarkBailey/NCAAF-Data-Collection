@@ -52,6 +52,11 @@ export type EndedPlayOutcome =
   | 'kickoff_touchdown'
   | 'kickoff_recovery'
   | 'touchdown'
+  | 'conversion_kick_good'
+  | 'conversion_kick_miss'
+  | 'conversion_play_good'
+  | 'conversion_play_miss'
+  | 'defensive_conversion'
 
 export type PlayResultKind =
   | 'yards'
@@ -68,6 +73,11 @@ export type PlayResultKind =
   | 'kickoff_touchdown'
   | 'kickoff_recovery_receiving'
   | 'kickoff_recovery_kicking'
+  | 'conversion_kick_good'
+  | 'conversion_kick_miss'
+  | 'conversion_play_good'
+  | 'conversion_play_miss'
+  | 'defensive_conversion'
 
 export interface ResolveEndedPlayInput {
   down: number
@@ -119,9 +129,26 @@ export function getPlayResultKind(
   if (!path?.length) return 'yards'
 
   const isKickoff = path.includes('kickoff')
+  const isTry = path.includes('try')
 
   for (let index = path.length - 1; index >= 0; index -= 1) {
     const id = path[index]
+    if (isTry) {
+      switch (id) {
+        case 'pat_good':
+          return 'conversion_kick_good'
+        case 'pat_no_good':
+          return 'conversion_kick_miss'
+        case 'two_point_good':
+          return 'conversion_play_good'
+        case 'two_point_no_good':
+          return 'conversion_play_miss'
+        case 'defensive_two_point':
+          return 'defensive_conversion'
+        default:
+          break
+      }
+    }
     if (isKickoff) {
       switch (id) {
         case 'touchback':
@@ -250,6 +277,16 @@ function describeEndedPlay(params: {
       return 'Kickoff return — touchdown'
     case 'touchdown':
       return 'Touchdown'
+    case 'conversion_kick_good':
+      return 'Extra point — good'
+    case 'conversion_kick_miss':
+      return 'Extra point — no good'
+    case 'conversion_play_good':
+      return 'Two-point conversion — good'
+    case 'conversion_play_miss':
+      return 'Two-point conversion — no good'
+    case 'defensive_conversion':
+      return 'Defensive two-point conversion'
     case 'kickoff_recovery':
       return 'Kickoff — recovered'
     case 'kickoff_return':
@@ -394,6 +431,40 @@ export function resolveEndedPlay(
     ballOn = rules.maxBallOn
     if (input.possessionIsHome) scoreHomeDelta = rules.touchdownPoints
     else scoreAwayDelta = rules.touchdownPoints
+  } else if (
+    resultKind === 'conversion_kick_good' ||
+    resultKind === 'conversion_kick_miss' ||
+    resultKind === 'conversion_play_good' ||
+    resultKind === 'conversion_play_miss' ||
+    resultKind === 'defensive_conversion'
+  ) {
+    stopClock = true
+    yardsGained = 0
+    scoredTouchdown = false
+    nextSeries = 'free_kick'
+    // Scoring team still has possession during the try; after try they kick off.
+    const scoringIsHome = input.possessionIsHome
+    if (resultKind === 'conversion_kick_good') {
+      outcome = 'conversion_kick_good'
+      if (scoringIsHome) scoreHomeDelta = rules.conversionKickPoints
+      else scoreAwayDelta = rules.conversionKickPoints
+    } else if (resultKind === 'conversion_play_good') {
+      outcome = 'conversion_play_good'
+      if (scoringIsHome) scoreHomeDelta = rules.conversionPlayPoints
+      else scoreAwayDelta = rules.conversionPlayPoints
+    } else if (resultKind === 'defensive_conversion') {
+      outcome = 'defensive_conversion'
+      // Defense scores the two points.
+      if (scoringIsHome) scoreAwayDelta = rules.conversionPlayPoints
+      else scoreHomeDelta = rules.conversionPlayPoints
+    } else if (resultKind === 'conversion_kick_miss') {
+      outcome = 'conversion_kick_miss'
+    } else {
+      outcome = 'conversion_play_miss'
+    }
+    // Receiving team for the ensuing kickoff.
+    const receivingIsHome = !scoringIsHome
+    applyNewSeries(rules.defaultBallOn, receivingIsHome)
   } else if (resultKind === 'incomplete') {
     // Incomplete / pass OOB: replay LOS, consume the down, clock stops.
     yardsGained = 0

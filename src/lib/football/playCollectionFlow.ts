@@ -3,6 +3,7 @@
  *
  * Kickoff series: Kickoff → Return | Touchback | …
  * Scrimmage (after SNAP): Run / PassAttempt / Punt trees.
+ * Try (after touchdown): 1-pt kick / 2-pt play → result → kickoff.
  *
  * Yard presses are logged as datapoints continuously while the ball is live;
  * there is no CONFIRM YARDS button — yards ride alongside the next datapoints.
@@ -18,6 +19,9 @@ export type PlayCollectionStepId =
   | 'choose_play_type'
   | 'choose_pass_result'
   | 'choose_play_end'
+  | 'choose_try_type'
+  | 'choose_pat_result'
+  | 'choose_two_point_result'
   | 'ready_to_end'
 
 /** Visual emphasis derived from relative likelihood (not shown as text). */
@@ -290,6 +294,88 @@ const STEPS: Record<PlayCollectionStepId, PlayCollectionStepDef> = {
       },
     ],
   },
+  choose_try_type: {
+    id: 'choose_try_type',
+    label: 'Try type',
+    prompt: 'What kind of convert?',
+    showYards: false,
+    canEndPlay: false,
+    options: [
+      {
+        id: 'pat_kick',
+        label: '1-PT KICK',
+        likelihood: 88,
+        catalogId: 'score.conversion_kick',
+        nextStep: 'choose_pat_result',
+      },
+      {
+        id: 'two_point',
+        label: '2-PT PLAY',
+        likelihood: 12,
+        catalogId: 'score.conversion_play',
+        nextStep: 'choose_two_point_result',
+        showYards: true,
+      },
+    ],
+  },
+  choose_pat_result: {
+    id: 'choose_pat_result',
+    label: 'Kick result',
+    prompt: 'Was the kick good?',
+    showYards: false,
+    canEndPlay: false,
+    options: [
+      {
+        id: 'pat_good',
+        label: 'GOOD',
+        likelihood: 92,
+        catalogId: 'score.conversion_kick',
+        nextStep: 'ready_to_end',
+        canEndPlay: true,
+      },
+      {
+        id: 'pat_no_good',
+        label: 'NO GOOD',
+        likelihood: 8,
+        nextStep: 'ready_to_end',
+        canEndPlay: true,
+      },
+    ],
+  },
+  choose_two_point_result: {
+    id: 'choose_two_point_result',
+    label: 'Two-point result',
+    prompt: 'What happened on the two-point try?',
+    showYards: true,
+    canEndPlay: false,
+    options: [
+      {
+        id: 'two_point_good',
+        label: 'GOOD',
+        likelihood: 48,
+        catalogId: 'score.conversion_play',
+        nextStep: 'ready_to_end',
+        canEndPlay: true,
+        showYards: true,
+      },
+      {
+        id: 'two_point_no_good',
+        label: 'NO GOOD',
+        likelihood: 48,
+        nextStep: 'ready_to_end',
+        canEndPlay: true,
+        showYards: true,
+      },
+      {
+        id: 'defensive_two_point',
+        label: 'DEFENSE SCORES',
+        likelihood: 4,
+        catalogId: 'score.defensive_conversion',
+        nextStep: 'ready_to_end',
+        canEndPlay: true,
+      },
+    ],
+  },
   ready_to_end: {
     id: 'ready_to_end',
     label: 'End play',
@@ -307,6 +393,13 @@ export const INITIAL_KICKOFF_COLLECTION_STEP: PlayCollectionStepId =
 /** Scrimmage collection after SNAP. */
 export const INITIAL_PLAY_COLLECTION_STEP: PlayCollectionStepId =
   'choose_play_type'
+
+/** Try / convert collection after a touchdown. */
+export const INITIAL_TRY_COLLECTION_STEP: PlayCollectionStepId =
+  'choose_try_type'
+
+/** NCAA-style try spot (offense-relative yard line). */
+export const TRY_SPOT_BALL_ON = 3
 
 export function getPlayCollectionStep(
   stepId: PlayCollectionStepId | null | undefined,

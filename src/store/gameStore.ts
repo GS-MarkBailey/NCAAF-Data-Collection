@@ -18,6 +18,8 @@ import {
   createQuarterStartPlay,
   INITIAL_KICKOFF_COLLECTION_STEP,
   INITIAL_PLAY_COLLECTION_STEP,
+  INITIAL_TRY_COLLECTION_STEP,
+  TRY_SPOT_BALL_ON,
   applyMatchTransition,
   getFootballRuleset,
   isAwaitingRegulationDecision,
@@ -584,41 +586,112 @@ export const useAppStore = create<AppStore>((set, get) => ({
         period: game.clock.period,
       }
 
-      const match = applyMatchTransition(toMatchStateInput(game), {
-        type: 'end_play',
-        scoredTouchdown: resolved.scoredTouchdown,
-        nextSeries: resolved.nextSeries,
-      })
+      const endingTry = game.seriesKind === 'try'
+      const match = applyMatchTransition(
+        toMatchStateInput(game),
+        endingTry
+          ? { type: 'try_resolved' }
+          : {
+              type: 'end_play',
+              scoredTouchdown: resolved.scoredTouchdown,
+              nextSeries: resolved.nextSeries,
+            },
+      )
 
       return {
-        games: updateGame(state.games, fixtureId, (g) => ({
-          ...g,
-          playInProgress: match.playInProgress,
-          playCollectionStep: null,
-          playCollectionPath: [],
-          playYardsGained: resolved.playYardsGained,
-          seriesKind: match.seriesKind,
-          down: resolved.down,
-          distance: resolved.distance,
-          ballOn: resolved.ballOn,
-          possessionIsHome: resolved.possessionIsHome,
-          collectedDatapoints: appendCollectedDatapoint(g, 'end_play'),
-          score: {
-            home: g.score.home + resolved.scoreHomeDelta,
-            away: g.score.away + resolved.scoreAwayDelta,
-          },
-          clock: {
-            ...g.clock,
-            running: nextClockRunning(
-              { type: 'play_ended', stopClock: resolved.stopClock },
-              g.clock,
-            ),
-          },
-          simulation: g.simulation
-            ? { ...g.simulation, offenseIsHome: resolved.possessionIsHome }
-            : g.simulation,
-          plays: [...g.plays, resolved.play],
-        })),
+        games: updateGame(state.games, fixtureId, (g) => {
+          const withEnd = appendCollectedDatapoint(g, 'end_play')
+          const base = {
+            ...g,
+            playYardsGained: resolved.playYardsGained,
+            seriesKind: match.seriesKind,
+            down: resolved.down,
+            distance: resolved.distance,
+            ballOn: resolved.ballOn,
+            possessionIsHome: resolved.possessionIsHome,
+            score: {
+              home: g.score.home + resolved.scoreHomeDelta,
+              away: g.score.away + resolved.scoreAwayDelta,
+            },
+            clock: {
+              ...g.clock,
+              running: nextClockRunning(
+                { type: 'play_ended', stopClock: resolved.stopClock },
+                g.clock,
+              ),
+            },
+            simulation: g.simulation
+              ? { ...g.simulation, offenseIsHome: resolved.possessionIsHome }
+              : g.simulation,
+            plays: [...g.plays, resolved.play],
+          }
+
+          // Touchdown → open try/convert collection (1-pt / 2-pt).
+          if (resolved.scoredTouchdown) {
+            return {
+              ...base,
+              playInProgress: true,
+              seriesKind: 'try',
+              ballOn: TRY_SPOT_BALL_ON,
+              playStartBallOn: TRY_SPOT_BALL_ON,
+              playStartDown: resolved.down,
+              playStartDistance: resolved.distance,
+              playCollectionStep: INITIAL_TRY_COLLECTION_STEP,
+              playCollectionPath: ['try'],
+              collectedDatapoints: [
+                ...withEnd,
+                {
+                  id: crypto.randomUUID(),
+                  key: 'try',
+                  label: labelForDatapointKey('try'),
+                  period: g.clock.period,
+                  clock: formatClock(g.clock.seconds),
+                  collectedAt: Date.now(),
+                },
+              ],
+            }
+          }
+
+          // Try resolved → open ensuing kickoff collection.
+          if (endingTry) {
+            return {
+              ...base,
+              playInProgress: true,
+              seriesKind: 'free_kick',
+              playCollectionStep: INITIAL_KICKOFF_COLLECTION_STEP,
+              playCollectionPath: ['kickoff'],
+              playStartBallOn: resolved.ballOn,
+              playStartDown: resolved.down,
+              playStartDistance: resolved.distance,
+              collectedDatapoints: [
+                ...withEnd,
+                {
+                  id: crypto.randomUUID(),
+                  key: 'kickoff',
+                  label: labelForDatapointKey('kickoff'),
+                  period: g.clock.period,
+                  clock: formatClock(g.clock.seconds),
+                  collectedAt: Date.now(),
+                },
+              ],
+              clock: {
+                ...base.clock,
+                running: nextClockRunning(
+                  { type: 'kickoff_opened' },
+                  base.clock,
+                ),
+              },
+            }
+          }
+
+          return {
+            ...base,
+            playInProgress: match.playInProgress,
+            playCollectionStep: null,
+            playCollectionPath: [],
+            collectedDatapoints: withEnd,
+          }
+        }),
         actionLogs: appendAction(
           state.actionLogs,
           createUserAction(

@@ -25,6 +25,14 @@ const DATAPOINT_LABELS: Record<string, string> = {
   snap: 'Snap',
   end_play: 'EndPlay',
   yards: 'Yards',
+  try: 'Try',
+  pat_kick: 'ConversionKick',
+  two_point: 'TwoPoint',
+  pat_good: 'PatGood',
+  pat_no_good: 'PatNoGood',
+  two_point_good: 'TwoPointGood',
+  two_point_no_good: 'TwoPointNoGood',
+  defensive_two_point: 'DefensiveConversion',
 }
 
 export function labelForDatapointKey(key: string): string {
