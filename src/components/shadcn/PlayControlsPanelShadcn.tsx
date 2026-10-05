@@ -84,15 +84,19 @@ export function PlayControlsPanelShadcn({
   const gameEnded = game?.gameEnded ?? false
   const playInProgress = game?.playInProgress ?? false
 
+  // During a live play, always allow end-play + yards (match-state and classic).
+  const inLivePlay = !gameEnded && playInProgress
   const canSnap = showMatchStateGuide
     ? (matchControls?.canSnap ?? false)
     : !gameEnded && !playInProgress
   const canEndPlay = showMatchStateGuide
-    ? (matchControls?.canEndPlay ?? false)
-    : !gameEnded && playInProgress
+    ? Boolean(matchControls?.canEndPlay || inLivePlay)
+    : inLivePlay
   const canAdjustYards = showMatchStateGuide
-    ? (matchControls?.canAdjustYards ?? false)
-    : !gameEnded && playInProgress
+    ? Boolean(
+        (showYardAdjust && (matchControls?.canAdjustYards || inLivePlay)),
+      )
+    : showYardAdjust && inLivePlay
 
   const yardsLabel =
     playYardsGained === 0

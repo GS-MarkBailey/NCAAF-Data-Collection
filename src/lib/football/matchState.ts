@@ -192,6 +192,9 @@ function collectable(
 export function getMatchPhase(input: MatchStateInput): MatchPhase {
   if (input.gameEnded) return 'game_ended'
 
+  // Live play wins even if Q1 hasn't been formally started (MVP clock mode).
+  if (input.playInProgress) return 'live_play'
+
   if (!input.gameStarted) return 'pregame'
 
   if (
@@ -207,8 +210,6 @@ export function getMatchPhase(input: MatchStateInput): MatchPhase {
   }
 
   if (input.periodEnded) return 'period_break'
-
-  if (input.playInProgress) return 'live_play'
 
   if (input.seriesKind === 'free_kick') return 'free_kick'
   if (input.seriesKind === 'try') return 'try'
@@ -559,14 +560,15 @@ export function getPlayControlCapabilities(input: MatchStateInput): {
   canAdjustYards: boolean
 } {
   const view = getMatchStateView(input)
+  const inLivePlay = input.playInProgress && !input.gameEnded
   return {
     phase: view.phase,
     // Pregame snap allowed while period kickoff flow is optional in the MVP.
     canSnap:
-      matchHasAction(view, 'snap') ||
-      (view.phase === 'pregame' && !input.playInProgress),
-    canEndPlay: matchHasAction(view, 'end_play'),
-    canAdjustYards: matchHasAction(view, 'adjust_yards'),
+      !inLivePlay &&
+      (matchHasAction(view, 'snap') || view.phase === 'pregame'),
+    canEndPlay: inLivePlay || matchHasAction(view, 'end_play'),
+    canAdjustYards: inLivePlay || matchHasAction(view, 'adjust_yards'),
   }
 }
 
