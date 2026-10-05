@@ -27,6 +27,7 @@ Before changing match/game/play-control logic, read and follow this contract. Do
 2. **Kickoff button** = open kickoff *collection* (`seriesKind: free_kick`, path starts with `kickoff`). Clock stays **stopped** (`kickoff_opened`).
 3. **SNAP** starts the clock (`snap` contract event) when `seconds > 0`.
 4. **END PLAY** must pass `playCollectionPath` into `resolveEndedPlayFromGame` and apply `stopClock` via the contract.
+   - Awarded **first down** (in bounds): clock keeps running except last **2:00** of Q2/Q4 (`awardedFirstDownStopsClock`).
 5. **Play-control buttons** must only show datapoints from `playCollectionFlow` for the current step. Do not dump unrelated match-state actions (clock, end period, OT) into play controls.
 6. **Collection path is authoritative** for resolution. Do not resolve INT/punt/incomplete/kickoff as yards-only.
 7. Prefer extending the contract modules over one-off UI/store conditionals.

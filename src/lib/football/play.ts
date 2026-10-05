@@ -8,6 +8,7 @@ import {
   resolveFootballRuleset,
   type RulesetRef,
 } from './rulesets'
+import { awardedFirstDownStopsClock } from './clockContract'
 
 export interface LivePlaySituation {
   down: number
@@ -529,8 +530,13 @@ export function resolveEndedPlay(
       down = rules.minDown
       distance = distanceForNewSeries(input.ballOn, rules)
       ballOn = input.ballOn
-      // NCAA: awarded first down stops the clock.
-      stopClock = true
+      // NCAA DI/DII (2023+): 1st down keeps clock running except last 2:00 of half / OOB.
+      stopClock =
+        forceStop ||
+        awardedFirstDownStopsClock({
+          period: input.clockPeriod,
+          seconds: input.clockSeconds,
+        })
       nextSeries = 'scrimmage'
     } else if (input.down >= rules.maxDown) {
       outcome = 'turnover_on_downs'

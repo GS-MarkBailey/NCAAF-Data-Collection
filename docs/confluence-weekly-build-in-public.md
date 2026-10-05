@@ -434,6 +434,7 @@ With **Match-state guide** on, scheduled fixtures open in **pregame** so the ful
 - **THROW** → **CATCH** / **INCOMPLETE** / **OUT OF BOUNDS** / **INTERCEPTION**
 - **+1 / +5 / −5 / −1** yard buttons stay on screen for the whole match (not just live plays) so operators can spot or adjust anytime; each press logs its own datapoint (no Confirm Yards button)
 - After a **touchdown**, play controls open the **try/convert** path (**1-PT KICK** / **2-PT PLAY** → GOOD / NO GOOD / …); after the convert the operator presses **KICK OFF** again before collecting return / touchback / …
+- **Clock:** awarded first down keeps the game clock running (NCAA 2023+), except last **2:00** of Q2/Q4 or out of bounds
 - **END PLAY** appears when the chosen result is ready
 - Later quarters: **End period** on the scoreboard, then **Start** on the clock (no Start Q / Kick off badges on the scoreboard)
 
