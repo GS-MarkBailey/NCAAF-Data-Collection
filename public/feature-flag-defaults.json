@@ -1,6 +1,6 @@
 {
-  "version": 1790946136008,
-  "updatedAt": "2026-10-02T13:02:16.008Z",
+  "version": 1791230536240,
+  "updatedAt": "2026-10-05T20:02:16.240Z",
   "flags": {
     "game.scoreboard": true,
     "game.playByPlay": false,
@@ -22,7 +22,7 @@
     "playControls.snap": true,
     "playControls.endPlay": true,
     "playControls.yardAdjust": true,
-    "playControls.matchStateGuide": false,
+    "playControls.matchStateGuide": true,
     "risk.challengeReview": true,
     "risk.statDelay": true,
     "risk.bigPlay": true,

@@ -182,7 +182,7 @@ export const FEATURE_FLAGS = [
       'After SNAP, show progressive datapoint buttons (RUSH / THROW → CATCH / INCOMPLETE / …) instead of immediate END PLAY.',
     group: 'Play Controls',
     parent: 'game.playControls',
-    defaultEnabled: false,
+    defaultEnabled: true,
   },
   {
     id: 'risk.challengeReview',

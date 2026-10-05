@@ -320,8 +320,9 @@ export function resolveEndedPlay(
   const resultKind = getPlayResultKind(input.playCollectionPath)
 
   let outcome: EndedPlayOutcome
-  let down: number
-  let distance: number
+  // Initialized so every branch is assign-safe for tsc; applyNewSeries overwrites.
+  let down = input.down
+  let distance = input.distance
   let ballOn = input.ballOn
   let possessionIsHome = input.possessionIsHome
   let yardsGained = input.playYardsGained
