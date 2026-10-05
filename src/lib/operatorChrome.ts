@@ -20,11 +20,12 @@ export const CONSOLE_PANEL_CARD_CLASS = cn(
 )
 
 export const CONSOLE_PANEL_HEADER_CLASS = cn(
-  'min-h-10 items-center border-b border-border py-0',
+  // Flex (not card grid) so title + actions stay vertically centered.
+  'flex min-h-10 flex-row items-center justify-between gap-2 border-b border-border py-0 pb-0',
 )
 
 export const CONSOLE_PANEL_TITLE_CLASS = cn(
-  'flex items-center gap-2 text-sm font-semibold leading-none',
+  'flex items-center gap-2 self-center text-sm font-semibold leading-none',
 )
 
 /** Match Risk Management tile type: sm desktop, xs on landscape mobile / portrait stack. */

@@ -165,7 +165,7 @@ export function PlayControlsPanelShadcn({
           <Zap className="size-4 shrink-0 text-muted-foreground" />
           Play controls
         </CardTitle>
-        <CardAction className="self-center">
+        <CardAction className="static row-span-1 self-center justify-self-auto">
           <Button
             type="button"
             variant="secondary"
