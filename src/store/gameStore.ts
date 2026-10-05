@@ -26,9 +26,10 @@ import {
   getFootballRuleset,
   isAwaitingRegulationDecision,
   isOvertimePeriod,
-  labelForDatapointKey,
-  labelForYardsDelta,
+  labelForDatapointWithTeam,
+  labelForYardsDeltaWithTeam,
   nextClockRunning,
+  teamAbbrForDatapoint,
   pushPlayUndoSnapshot,
   resolveEndedPlayFromGame,
   resolvePlayCollectionChoice,
@@ -90,15 +91,44 @@ function appendCollectedDatapoint(
   game: GameState,
   key: string,
 ): CollectedDatapoint[] {
+  const teamAbbr = teamAbbrForDatapoint(
+    key,
+    game.possessionIsHome,
+    game.fixture.homeAbbr,
+    game.fixture.awayAbbr,
+  )
   const entry: CollectedDatapoint = {
     id: crypto.randomUUID(),
     key,
-    label: labelForDatapointKey(key),
+    teamAbbr,
+    label: labelForDatapointWithTeam(key, teamAbbr),
     period: game.clock.period,
     clock: formatClock(game.clock.seconds),
     collectedAt: Date.now(),
   }
   return [...(game.collectedDatapoints ?? []), entry]
+}
+
+function makeTeamDatapoint(
+  game: GameState,
+  key: string,
+  label?: string,
+): CollectedDatapoint {
+  const teamAbbr = teamAbbrForDatapoint(
+    key,
+    game.possessionIsHome,
+    game.fixture.homeAbbr,
+    game.fixture.awayAbbr,
+  )
+  return {
+    id: crypto.randomUUID(),
+    key,
+    teamAbbr,
+    label: label ?? labelForDatapointWithTeam(key, teamAbbr),
+    period: game.clock.period,
+    clock: formatClock(game.clock.seconds),
+    collectedAt: Date.now(),
+  }
 }
 
 export const useAppStore = create<AppStore>((set, get) => ({
@@ -542,10 +572,17 @@ export const useAppStore = create<AppStore>((set, get) => ({
       return {
         games: updateGame(state.games, fixtureId, (g) => {
           const withUndo = pushPlayUndoSnapshot(g)
+          const teamAbbr = teamAbbrForDatapoint(
+            'yards',
+            withUndo.possessionIsHome,
+            withUndo.fixture.homeAbbr,
+            withUndo.fixture.awayAbbr,
+          )
           const yardPoint: CollectedDatapoint = {
             id: crypto.randomUUID(),
             key: 'yards',
-            label: labelForYardsDelta(actualDelta),
+            teamAbbr,
+            label: labelForYardsDeltaWithTeam(actualDelta, teamAbbr),
             period: withUndo.clock.period,
             clock: formatClock(withUndo.clock.seconds),
             collectedAt: Date.now(),
@@ -707,14 +744,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
               playCollectionPath: ['try'],
               collectedDatapoints: [
                 ...withEnd,
-                {
-                  id: crypto.randomUUID(),
-                  key: 'try',
-                  label: labelForDatapointKey('try'),
-                  period: withUndo.clock.period,
-                  clock: formatClock(withUndo.clock.seconds),
-                  collectedAt: Date.now(),
-                },
+                makeTeamDatapoint(withUndo, 'try'),
               ],
             }
           }
@@ -796,14 +826,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
             distance: rules.firstDownDistance,
             collectedDatapoints: [
               ...(withUndo.collectedDatapoints ?? []),
-              {
-                id: crypto.randomUUID(),
-                key: 'kickoff',
-                label: labelForDatapointKey('kickoff'),
-                period: withUndo.clock.period,
-                clock: formatClock(withUndo.clock.seconds),
-                collectedAt: Date.now(),
-              },
+              makeTeamDatapoint(withUndo, 'kickoff'),
             ],
             clock: {
               ...withUndo.clock,
@@ -848,12 +871,9 @@ export const useAppStore = create<AppStore>((set, get) => ({
               collectedDatapoints: [
                 ...(withUndo.collectedDatapoints ?? []),
                 {
-                  id: crypto.randomUUID(),
-                  key: 'kickoff',
-                  label: labelForDatapointKey('kickoff'),
+                  ...makeTeamDatapoint(withUndo, 'kickoff'),
                   period: 1,
                   clock: formatClock(rules.quarterLengthSeconds),
-                  collectedAt: Date.now(),
                 },
               ],
               playYardsGained: 0,

@@ -1,3 +1,16 @@
+/**
+ * Keys credited to the side opposite current possession.
+ * Kickoff: possession during KO collection is the receiving team.
+ * Interception / defensive recovery / defensive convert: defense.
+ */
+const OPPOSITE_POSSESSION_KEYS = new Set([
+  'kickoff',
+  'interception',
+  'recovery_defense',
+  'recovery_kicking',
+  'defensive_two_point',
+])
+
 /** Display labels for progressive collection option ids. */
 const DATAPOINT_LABELS: Record<string, string> = {
   kickoff: 'Kickoff',
@@ -42,6 +55,27 @@ export function labelForDatapointKey(key: string): string {
   return DATAPOINT_LABELS[key] ?? key
 }
 
+/** Team abbr credited for a datapoint given current possession. */
+export function teamAbbrForDatapoint(
+  key: string,
+  possessionIsHome: boolean,
+  homeAbbr: string,
+  awayAbbr: string,
+): string {
+  const creditHome = OPPOSITE_POSSESSION_KEYS.has(key)
+    ? !possessionIsHome
+    : possessionIsHome
+  return creditHome ? homeAbbr : awayAbbr
+}
+
+/** e.g. Touchdown - MISS */
+export function labelForDatapointWithTeam(
+  key: string,
+  teamAbbr: string,
+): string {
+  return `${labelForDatapointKey(key)} - ${teamAbbr}`
+}
+
 /** Label for an undo datapoint that references what was reversed. */
 export function labelForUndo(undoneLabels: readonly string[]): string {
   if (undoneLabels.length === 0) return 'Undo'
@@ -53,4 +87,11 @@ export function labelForUndo(undoneLabels: readonly string[]): string {
 export function labelForYardsDelta(delta: number): string {
   if (delta === 0) return 'Yards(0)'
   return `Yards(${delta > 0 ? '+' : ''}${delta})`
+}
+
+export function labelForYardsDeltaWithTeam(
+  delta: number,
+  teamAbbr: string,
+): string {
+  return `${labelForYardsDelta(delta)} - ${teamAbbr}`
 }

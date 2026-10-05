@@ -45,6 +45,8 @@ export interface CollectedDatapoint {
   key: string
   /** Display label (PascalCase collection name when known). */
   label: string
+  /** Team credited for the datapoint (home/away abbr), when applicable. */
+  teamAbbr?: string
   period: number
   clock: string
   /** Wall-clock ms when collected. */
