@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { ChevronLeft } from 'lucide-react'
 import type { GameState } from '@/types'
 import { ActionLogDialogShadcn } from '@/components/shadcn/ActionLogDialogShadcn'
+import { CollectedDatapointsDialogShadcn } from '@/components/shadcn/CollectedDatapointsDialogShadcn'
 import { ConnectionStatusChip } from '@/components/shadcn/ConnectionStatusChip'
 import { ProfileDialogShadcn } from '@/components/shadcn/ProfileDialogShadcn'
 import { FeatureGate } from '@/components/game/FeatureGate'
@@ -41,6 +42,7 @@ export function GameHeaderShadcn({
           </div>
 
           <div className="layout-header-actions flex shrink-0 items-center gap-2">
+            <CollectedDatapointsDialogShadcn fixtureId={fixture.id} />
             <FeatureGate flag="header.settings">
               <ActionLogDialogShadcn fixtureId={fixture.id} />
             </FeatureGate>
@@ -99,6 +101,7 @@ export function GameHeaderShadcn({
         </span>
 
         <div className="layout-header-actions z-10 flex shrink-0 items-center justify-end gap-2 justify-self-end">
+          <CollectedDatapointsDialogShadcn fixtureId={fixture.id} />
           <FeatureGate flag="header.settings">
             <ActionLogDialogShadcn fixtureId={fixture.id} />
           </FeatureGate>

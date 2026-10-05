@@ -1,6 +1,7 @@
 import type { FootballCode } from '@/lib/football/rulesets'
+import type { PlayCollectionStepId } from '@/lib/football/playCollectionFlow'
 
-export type { FootballCode }
+export type { FootballCode, PlayCollectionStepId }
 
 /** How the ball will next be put in play. */
 export type SeriesKind = 'scrimmage' | 'free_kick' | 'try'
@@ -34,6 +35,19 @@ export interface PlayEntry {
   ballOn: string
   description: string
   clock: string
+}
+
+/** One operator-collected datapoint in session order. */
+export interface CollectedDatapoint {
+  id: string
+  /** Stable option / event key (e.g. touchback, return). */
+  key: string
+  /** Display label (PascalCase collection name when known). */
+  label: string
+  period: number
+  clock: string
+  /** Wall-clock ms when collected. */
+  collectedAt: number
 }
 
 export interface PlaySimulationState {
@@ -73,6 +87,15 @@ export interface GameState {
    * Drives match-phase collectables alongside playInProgress / period flags.
    */
   seriesKind: SeriesKind
+  /**
+   * Progressive collection step after SNAP (rush/throw → result → yards).
+   * Null when no live play is in progress.
+   */
+  playCollectionStep: PlayCollectionStepId | null
+  /** Choices made during the current live play (option ids in order). */
+  playCollectionPath: string[]
+  /** Session log of datapoints collected (survives END PLAY). */
+  collectedDatapoints: CollectedDatapoint[]
   /** Net yards gained for the offense since the last SNAP */
   playYardsGained: number
   /** Down / distance / ball-on at SNAP (used when ending the play) */

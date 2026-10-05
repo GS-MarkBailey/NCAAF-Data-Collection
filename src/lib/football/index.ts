@@ -13,8 +13,11 @@ export * from './downDistance'
 export * from './possession'
 export * from './field'
 export * from './clock'
+export * from './clockContract'
 export * from './play'
 export * from './matchState'
+export * from './playCollectionFlow'
+export * from './datapointLabels'
 export * from './catalog'
 export {
   createInitialSimulation,

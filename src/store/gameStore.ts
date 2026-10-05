@@ -1,10 +1,12 @@
 import { create } from 'zustand'
-import type { Fixture, GameState, RiskType } from '@/types'
+import type { CollectedDatapoint, Fixture, GameState, RiskType } from '@/types'
 import type { ActionLogsByFixture, UserAction } from '@/types/actions'
 import { FIXTURES, createGameStateForFixture } from '@/data/fixtures'
 import { appendAction, createUserAction } from '@/lib/actionLog'
+import { formatClock } from '@/lib/format'
 import {
   adjustLivePlayYards,
+  applyYardDelta,
   ballOnForPossession,
   canEndCurrentPeriod,
   canStartNextPeriod,
@@ -14,11 +16,17 @@ import {
   clampPeriod,
   createInitialSimulation,
   createQuarterStartPlay,
+  INITIAL_KICKOFF_COLLECTION_STEP,
+  INITIAL_PLAY_COLLECTION_STEP,
   applyMatchTransition,
   getFootballRuleset,
   isAwaitingRegulationDecision,
   isOvertimePeriod,
+  labelForDatapointKey,
+  labelForYardsDelta,
+  nextClockRunning,
   resolveEndedPlayFromGame,
+  resolvePlayCollectionChoice,
   startLivePlay,
   tickPlaySimulation,
   toMatchStateInput,
@@ -45,6 +53,8 @@ interface AppStore {
   snapPlay: (fixtureId: string) => void
   endPlay: (fixtureId: string) => void
   adjustYards: (fixtureId: string, delta: number) => void
+  /** Advance progressive play-collection (rush/throw → result → …). */
+  selectPlayCollectionOption: (fixtureId: string, optionId: string) => void
   startPeriod: (fixtureId: string) => void
   endPeriod: (fixtureId: string) => void
   startOvertime: (fixtureId: string) => void
@@ -65,6 +75,21 @@ function updateGame(
   const game = games[fixtureId]
   if (!game) return games
   return { ...games, [fixtureId]: updater(game) }
+}
+
+function appendCollectedDatapoint(
+  game: GameState,
+  key: string,
+): CollectedDatapoint[] {
+  const entry: CollectedDatapoint = {
+    id: crypto.randomUUID(),
+    key,
+    label: labelForDatapointKey(key),
+    period: game.clock.period,
+    clock: formatClock(game.clock.seconds),
+    collectedAt: Date.now(),
+  }
+  return [...(game.collectedDatapoints ?? []), entry]
 }
 
 export const useAppStore = create<AppStore>((set, get) => ({
@@ -151,18 +176,38 @@ export const useAppStore = create<AppStore>((set, get) => ({
   },
 
   toggleClock: (fixtureId) => {
-    set((state) => {
-      const game = state.games[fixtureId]
-      if (!game || game.gameEnded) return state
-      if (game.clock.seconds <= 0) return state
+    const game = get().games[fixtureId]
+    if (!game || game.gameEnded) return
 
-      const clockBefore = {
-        seconds: game.clock.seconds,
-        period: game.clock.period,
+    // After End period, Start clock advances into the next quarter.
+    if (
+      canStartNextPeriod(
+        game.gameStarted,
+        game.gameEnded,
+        game.periodEnded,
+        game.clock,
+        game.rulesetId,
+      )
+    ) {
+      get().startPeriod(fixtureId)
+      return
+    }
+
+    if (game.clock.seconds <= 0) return
+
+    set((state) => {
+      const current = state.games[fixtureId]
+      if (!current || current.gameEnded || current.clock.seconds <= 0) {
+        return state
       }
 
-      const running = !game.clock.running
-      const seconds = game.clock.seconds
+      const clockBefore = {
+        seconds: current.clock.seconds,
+        period: current.clock.period,
+      }
+
+      const running = !current.clock.running
+      const seconds = current.clock.seconds
       return {
         games: updateGame(state.games, fixtureId, (g) => ({
           ...g,
@@ -352,7 +397,14 @@ export const useAppStore = create<AppStore>((set, get) => ({
   snapPlay: (fixtureId) => {
     set((state) => {
       const game = state.games[fixtureId]
-      if (!game || game.gameEnded || game.playInProgress) return state
+      if (
+        !game ||
+        game.gameEnded ||
+        !game.gameStarted ||
+        game.playInProgress
+      ) {
+        return state
+      }
 
       const snap = startLivePlay({
         down: game.down,
@@ -373,6 +425,13 @@ export const useAppStore = create<AppStore>((set, get) => ({
           ...snap,
           seriesKind: match.seriesKind,
           playInProgress: match.playInProgress,
+          playCollectionStep: INITIAL_PLAY_COLLECTION_STEP,
+          playCollectionPath: [],
+          collectedDatapoints: appendCollectedDatapoint(g, 'snap'),
+          clock: {
+            ...g.clock,
+            running: nextClockRunning({ type: 'snap' }, g.clock),
+          },
         })),
         actionLogs: appendAction(
           state.actionLogs,
@@ -393,21 +452,65 @@ export const useAppStore = create<AppStore>((set, get) => ({
     })
   },
 
+  selectPlayCollectionOption: (fixtureId, optionId) => {
+    set((state) => {
+      const game = state.games[fixtureId]
+      if (!game || game.gameEnded || !game.playInProgress) return state
+      const stepId = game.playCollectionStep
+      if (!stepId) return state
+
+      const resolved = resolvePlayCollectionChoice(
+        stepId,
+        optionId,
+        game.playCollectionPath,
+      )
+      if (!resolved) return state
+
+      return {
+        games: updateGame(state.games, fixtureId, (g) => {
+          const path = [...g.playCollectionPath, optionId]
+          return {
+            ...g,
+            playCollectionStep: resolved.nextStep,
+            playCollectionPath: path,
+            collectedDatapoints: appendCollectedDatapoint(g, optionId),
+          }
+        }),
+      }
+    })
+  },
+
   adjustYards: (fixtureId, delta) => {
     set((state) => {
       const game = state.games[fixtureId]
-      if (!game || game.gameEnded || !game.playInProgress || delta === 0) {
+      if (!game || game.gameEnded || delta === 0) {
         return state
       }
 
-      const adjusted = adjustLivePlayYards({
-        ballOn: game.ballOn,
-        distance: game.distance,
-        playYardsGained: game.playYardsGained,
-        delta,
-        rules: game.rulesetId,
-      })
-      if (adjusted.actualDelta === 0) return state
+      // Live play: move ball + accumulate play yards. Between plays: spot only.
+      const adjusted = game.playInProgress
+        ? adjustLivePlayYards({
+            ballOn: game.ballOn,
+            distance: game.distance,
+            playYardsGained: game.playYardsGained,
+            delta,
+            rules: game.rulesetId,
+          })
+        : {
+            ...applyYardDelta({
+              ballOn: game.ballOn,
+              distance: game.distance,
+              delta,
+              rules: game.rulesetId,
+            }),
+            actualDelta: 0,
+            playYardsGained: game.playYardsGained,
+          }
+
+      const actualDelta = game.playInProgress
+        ? adjusted.actualDelta
+        : adjusted.ballOn - game.ballOn
+      if (actualDelta === 0) return state
 
       const clockBefore = {
         seconds: game.clock.seconds,
@@ -415,12 +518,26 @@ export const useAppStore = create<AppStore>((set, get) => ({
       }
 
       return {
-        games: updateGame(state.games, fixtureId, (g) => ({
-          ...g,
-          ballOn: adjusted.ballOn,
-          distance: adjusted.distance,
-          playYardsGained: adjusted.playYardsGained,
-        })),
+        games: updateGame(state.games, fixtureId, (g) => {
+          const yardPoint: CollectedDatapoint = {
+            id: crypto.randomUUID(),
+            key: 'yards',
+            label: labelForYardsDelta(actualDelta),
+            period: g.clock.period,
+            clock: formatClock(g.clock.seconds),
+            collectedAt: Date.now(),
+          }
+          return {
+            ...g,
+            ballOn: adjusted.ballOn,
+            distance: adjusted.distance,
+            playYardsGained: adjusted.playYardsGained,
+            collectedDatapoints: [
+              ...(g.collectedDatapoints ?? []),
+              yardPoint,
+            ],
+          }
+        }),
         actionLogs: appendAction(
           state.actionLogs,
           createUserAction(
@@ -428,7 +545,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
             {
               type: 'yards_adjust',
               payload: {
-                delta: adjusted.actualDelta,
+                delta: actualDelta,
                 yardsGained: adjusted.playYardsGained,
                 ballOn: adjusted.ballOn,
                 distance: adjusted.distance,
@@ -457,6 +574,8 @@ export const useAppStore = create<AppStore>((set, get) => ({
         playYardsGained: game.playYardsGained,
         playStartDown: game.playStartDown,
         playStartDistance: game.playStartDistance,
+        playStartBallOn: game.playStartBallOn,
+        playCollectionPath: game.playCollectionPath,
         rules: game.rulesetId,
       })
 
@@ -467,18 +586,34 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
       const match = applyMatchTransition(toMatchStateInput(game), {
         type: 'end_play',
+        scoredTouchdown: resolved.scoredTouchdown,
+        nextSeries: resolved.nextSeries,
       })
 
       return {
         games: updateGame(state.games, fixtureId, (g) => ({
           ...g,
           playInProgress: match.playInProgress,
+          playCollectionStep: null,
+          playCollectionPath: [],
           playYardsGained: resolved.playYardsGained,
           seriesKind: match.seriesKind,
           down: resolved.down,
           distance: resolved.distance,
           ballOn: resolved.ballOn,
           possessionIsHome: resolved.possessionIsHome,
+          collectedDatapoints: appendCollectedDatapoint(g, 'end_play'),
+          score: {
+            home: g.score.home + resolved.scoreHomeDelta,
+            away: g.score.away + resolved.scoreAwayDelta,
+          },
+          clock: {
+            ...g.clock,
+            running: nextClockRunning(
+              { type: 'play_ended', stopClock: resolved.stopClock },
+              g.clock,
+            ),
+          },
           simulation: g.simulation
             ? { ...g.simulation, offenseIsHome: resolved.possessionIsHome }
             : g.simulation,
@@ -520,6 +655,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
         const match = applyMatchTransition(toMatchStateInput(game), {
           type: 'game_started',
         })
+        const spot = rules.defaultBallOn
         return {
           games: updateGame(state.games, fixtureId, (g) => ({
             ...g,
@@ -527,10 +663,33 @@ export const useAppStore = create<AppStore>((set, get) => ({
             periodEnded: match.periodEnded,
             playInProgress: match.playInProgress,
             seriesKind: match.seriesKind,
+            playCollectionStep: INITIAL_KICKOFF_COLLECTION_STEP,
+            playCollectionPath: ['kickoff'],
+            collectedDatapoints: [
+              ...(g.collectedDatapoints ?? []),
+              {
+                id: crypto.randomUUID(),
+                key: 'kickoff',
+                label: labelForDatapointKey('kickoff'),
+                period: 1,
+                clock: formatClock(rules.quarterLengthSeconds),
+                collectedAt: Date.now(),
+              },
+            ],
+            playYardsGained: 0,
+            playStartDown: rules.minDown,
+            playStartDistance: rules.firstDownDistance,
+            playStartBallOn: spot,
+            ballOn: spot,
+            down: rules.minDown,
+            distance: rules.firstDownDistance,
             clock: {
               period: 1,
               seconds: rules.quarterLengthSeconds,
-              running: true,
+              running: nextClockRunning(
+                { type: 'kickoff_opened' },
+                { seconds: rules.quarterLengthSeconds, running: false },
+              ),
             },
             plays: [...g.plays, createQuarterStartPlay(g, 1)],
           })),
@@ -579,7 +738,10 @@ export const useAppStore = create<AppStore>((set, get) => ({
           clock: {
             period: toPeriod,
             seconds: rules.quarterLengthSeconds,
-            running: true,
+            running: nextClockRunning(
+              { type: 'period_opened' },
+              { seconds: rules.quarterLengthSeconds, running: false },
+            ),
           },
           plays: [...g.plays, createQuarterStartPlay(g, toPeriod)],
         })),
@@ -635,7 +797,10 @@ export const useAppStore = create<AppStore>((set, get) => ({
           clock: {
             ...g.clock,
             seconds: 0,
-            running: false,
+            running: nextClockRunning(
+              { type: 'period_ended' },
+              { ...g.clock, seconds: 0 },
+            ),
           },
         })),
         actionLogs: appendAction(
@@ -688,7 +853,10 @@ export const useAppStore = create<AppStore>((set, get) => ({
           clock: {
             period: toPeriod,
             seconds: rules.quarterLengthSeconds,
-            running: true,
+            running: nextClockRunning(
+              { type: 'overtime_opened' },
+              { seconds: rules.quarterLengthSeconds, running: false },
+            ),
           },
           plays: [...g.plays, createQuarterStartPlay(g, toPeriod)],
         })),
@@ -741,7 +909,10 @@ export const useAppStore = create<AppStore>((set, get) => ({
           clock: {
             ...g.clock,
             seconds: 0,
-            running: false,
+            running: nextClockRunning(
+              { type: 'game_ended' },
+              { ...g.clock, seconds: 0 },
+            ),
           },
         })),
         actionLogs: appendAction(

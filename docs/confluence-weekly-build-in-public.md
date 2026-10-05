@@ -4,7 +4,7 @@
 **Live demo:** https://ncaaf-data-collection.vercel.app  
 **Repository:** GitHub (auto-deployed to Vercel on each change)  
 **Period covered:** 16 June 2026 – 21 July 2026  
-**Last updated:** 2 Oct 2026 (snapshots synced automatically)
+**Last updated:** 5 Oct 2026 (snapshots synced automatically)
 
 **Confluence images:** Auto-synced by GitHub Actions on push to `main` (capture → publish). Manual fallback: `npm run publish:confluence`.
 
@@ -422,8 +422,25 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 - Feature-flagged under Settings → Features → **Play Controls** (`game.playControls` + Snap / End play / Yard adjustments)
 
 <!-- AUTO-SNAPSHOTS:week-4-shipped-play-controls:START -->
-![Play controls panel (idle)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/play-controls-idle.png) ![Play controls panel (live play)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/play-controls-live.png)
+![Play controls panel (idle)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/play-controls-idle.png) ![Play controls — choose rush / throw](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/play-controls-choose-type.png) ![Play controls — pass result after throw](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/play-controls-pass-result.png) ![Play controls panel (live play)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/play-controls-live.png)
 <!-- AUTO-SNAPSHOTS:week-4-shipped-play-controls:END -->
+
+### 5 Oct — progressive play datapoints
+
+With **Match-state guide** on, scheduled fixtures open in **pregame** so the full path is demoable:
+
+- **KICK OFF** (play controls) → return / touchback / etc. (clock stays paused until SNAP)
+- **SNAP** → **RUSH** / **THROW** / **PUNT**
+- **THROW** → **CATCH** / **INCOMPLETE** / **OUT OF BOUNDS** / **INTERCEPTION**
+- **+1 / +5 / −5 / −1** yard buttons stay on screen for the whole match (not just live plays) so operators can spot or adjust anytime; each press logs its own datapoint (no Confirm Yards button)
+- **END PLAY** appears when the chosen result is ready
+- Later quarters: **End period** on the scoreboard, then **Start** on the clock (no Start Q / Kick off badges on the scoreboard)
+
+Classic SNAP → yards → END PLAY remains available when Match-state guide is off.
+
+<!-- AUTO-SNAPSHOTS:week-4-shipped-play-collection:START -->
+![Play controls — choose rush / throw](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/play-controls-choose-type.png) ![Play controls — pass result after throw](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/play-controls-pass-result.png) ![Play controls panel (live play)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/play-controls-live.png)
+<!-- AUTO-SNAPSHOTS:week-4-shipped-play-collection:END -->
 
 **Publishing habit**
 - Finished app updates are pushed to `main` for Vercel; the build-in-public markdown (including screenshots) is kept in sync with shipped operator-visible changes
@@ -463,9 +480,9 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 
 ![Unreliable risk chip placement](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/unreliable-risk.png)
 
-- **Play controls** — SNAP / END PLAY plus +1 / +5 / −5 / −1 yard adjustments; pauses auto-sim while a play is live
+- **Play controls** — KICK OFF (pregame), then SNAP and progressive datapoints; yard adjusters stay visible for the whole match
 
-![Play controls panel (idle)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/play-controls-idle.png) ![Play controls panel (live play)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/play-controls-live.png)
+![Play controls panel (idle)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/play-controls-idle.png) ![Play controls — choose rush / throw](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/play-controls-choose-type.png) ![Play controls — pass result after throw](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/play-controls-pass-result.png) ![Play controls panel (live play)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/play-controls-live.png)
 <!-- AUTO-SNAPSHOTS:week-4-interactions:END -->
 
 ### Technical notes
@@ -495,6 +512,7 @@ The table below is a checklist of what the prototype supports today on the live 
 | Field direction + quarter-end flip | ✅ |
 | Risk management toggles (Unreliable emphasised, bottom-right) | ✅ |
 | Play controls — snap, end play, yard adjust (feature-flagged) | ✅ |
+| Progressive play datapoints — pregame KICK OFF → SNAP → rush/throw → result (match-state guide) | ✅ |
 | Play-by-play (feature-flagged, off by default) | ✅ |
 | Action log + CSV export | ✅ |
 | Feature flags with Vercel deploy (Confirm & deploy) | ✅ |

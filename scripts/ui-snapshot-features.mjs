@@ -314,12 +314,85 @@ export const WEEK_FEATURES = {
         'playControls.snap': true,
         'playControls.endPlay': true,
         'playControls.yardAdjust': true,
+        'playControls.matchStateGuide': true,
       },
       async prepare(page) {
-        await page.getByRole('button', { name: 'SNAP' }).waitFor({
+        await page.getByRole('button', { name: 'KICK OFF' }).waitFor({
           state: 'visible',
           timeout: 5000,
         })
+      },
+    },
+    {
+      id: 'play-controls-choose-type',
+      title: 'Play controls — choose rush / throw',
+      path: '/game/NCAAF-2026-001',
+      viewport: 'game-landscape',
+      gameSetup: { fieldDirection: 'dismiss', errorToast: 'dismiss' },
+      featureFlagOverrides: {
+        'game.playControls': true,
+        'playControls.snap': true,
+        'playControls.endPlay': true,
+        'playControls.yardAdjust': true,
+        'playControls.matchStateGuide': true,
+      },
+      async prepare(page) {
+        await page
+          .getByRole('button', { name: 'KICK OFF' })
+          .filter({ visible: true })
+          .click()
+        await page
+          .getByRole('button', { name: 'SNAP' })
+          .filter({ visible: true })
+          .click()
+        await page
+          .getByRole('button', { name: 'RUSH' })
+          .filter({ visible: true })
+          .waitFor({ state: 'visible', timeout: 5000 })
+        await page
+          .getByRole('button', { name: 'THROW' })
+          .filter({ visible: true })
+          .waitFor({ state: 'visible', timeout: 5000 })
+        await page
+          .getByRole('button', { name: 'Gain 5 yards' })
+          .filter({ visible: true })
+          .waitFor({ state: 'visible', timeout: 5000 })
+      },
+    },
+    {
+      id: 'play-controls-pass-result',
+      title: 'Play controls — pass result after throw',
+      path: '/game/NCAAF-2026-001',
+      viewport: 'game-landscape',
+      gameSetup: { fieldDirection: 'dismiss', errorToast: 'dismiss' },
+      featureFlagOverrides: {
+        'game.playControls': true,
+        'playControls.snap': true,
+        'playControls.endPlay': true,
+        'playControls.yardAdjust': true,
+        'playControls.matchStateGuide': true,
+      },
+      async prepare(page) {
+        await page
+          .getByRole('button', { name: 'KICK OFF' })
+          .filter({ visible: true })
+          .click()
+        await page
+          .getByRole('button', { name: 'SNAP' })
+          .filter({ visible: true })
+          .click()
+        await page
+          .getByRole('button', { name: 'THROW' })
+          .filter({ visible: true })
+          .click()
+        await page
+          .getByRole('button', { name: 'CATCH' })
+          .filter({ visible: true })
+          .waitFor({ state: 'visible', timeout: 5000 })
+        await page
+          .getByRole('button', { name: 'INCOMPLETE' })
+          .filter({ visible: true })
+          .waitFor({ state: 'visible', timeout: 5000 })
       },
     },
     {
@@ -333,10 +406,25 @@ export const WEEK_FEATURES = {
         'playControls.snap': true,
         'playControls.endPlay': true,
         'playControls.yardAdjust': true,
+        'playControls.matchStateGuide': true,
       },
       async prepare(page) {
-        const snap = page.getByRole('button', { name: 'SNAP' }).filter({ visible: true })
-        await snap.click()
+        await page
+          .getByRole('button', { name: 'KICK OFF' })
+          .filter({ visible: true })
+          .click()
+        await page
+          .getByRole('button', { name: 'SNAP' })
+          .filter({ visible: true })
+          .click()
+        await page
+          .getByRole('button', { name: 'THROW' })
+          .filter({ visible: true })
+          .click()
+        await page
+          .getByRole('button', { name: 'CATCH' })
+          .filter({ visible: true })
+          .click()
         await page
           .getByRole('button', { name: 'END PLAY' })
           .filter({ visible: true })

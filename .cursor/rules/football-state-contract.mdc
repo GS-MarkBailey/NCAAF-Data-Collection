@@ -1,0 +1,70 @@
+---
+description: NCAA-first football match/game state contract — required for any clock, series, play-collection, or END PLAY changes
+globs: src/lib/football/**/*.{ts,tsx},src/store/gameStore.ts,src/components/shadcn/PlayControlsPanelShadcn.tsx,src/components/shadcn/ScoreboardPanelShadcn.tsx,src/types/index.ts
+alwaysApply: false
+---
+
+# Football state contract (enforce on every change)
+
+Before changing match/game/play-control logic, read and follow this contract. Do **not** invent ad-hoc behaviour (especially clock start/stop).
+
+## Source of truth
+
+| Concern | Module |
+|---------|--------|
+| Clock auto start/stop | `src/lib/football/clockContract.ts` → `nextClockRunning` |
+| Play result → down/possession/score | `src/lib/football/play.ts` → `resolveEndedPlay` / `getPlayResultKind` |
+| Progressive datapoint steps | `src/lib/football/playCollectionFlow.ts` |
+| Button emphasis (likelihood) | `likelihood` on options → `emphasisForLikelihood` (never show rates in UI) |
+| Match phase / series | `src/lib/football/matchState.ts` |
+| Session mutations | `src/store/gameStore.ts` (must call the helpers above) |
+
+## Hard rules
+
+1. **Never set `clock.running` directly** in the store except:
+   - via `nextClockRunning(...)`, or
+   - operator override in `toggleClock` (manual Start/Pause only).
+2. **Kickoff button** = open kickoff *collection* (`seriesKind: free_kick`, path starts with `kickoff`). Clock stays **stopped** (`kickoff_opened`).
+3. **SNAP** starts the clock (`snap` contract event) when `seconds > 0`.
+4. **END PLAY** must pass `playCollectionPath` into `resolveEndedPlayFromGame` and apply `stopClock` via the contract.
+5. **Play-control buttons** must only show datapoints from `playCollectionFlow` for the current step. Do not dump unrelated match-state actions (clock, end period, OT) into play controls.
+6. **Collection path is authoritative** for resolution. Do not resolve INT/punt/incomplete/kickoff as yards-only.
+7. Prefer extending the contract modules over one-off UI/store conditionals.
+
+## Kickoff collection tree (current product)
+
+```
+Kickoff → Return | Touchback | FairCatch | OutOfBounds | Muff
+Return → Tackle | OutOfBounds | Fumble | Touchdown
+FairCatch → END PLAY
+Muff / Fumble → Recovery (receiving | kicking)
+→ END PLAY → scrimmage (SNAP)
+```
+
+## Scrimmage tree (after SNAP)
+
+```
+Run → Tackle | OutOfBounds | Fumble | Touchdown
+PassAttempt → CompletePass → Tackle | …
+           → IncompletePass | OutOfBounds | Interception
+Punt → END PLAY
+```
+
+Yardage UI: show the yards adjuster whenever the match is not ended (flag on).
+During a live play, presses update ball-on + play yards; between plays they only
+spot the ball. Each press logs its own datapoint. No CONFIRM YARDS button.
+
+## When adding a datapoint
+
+1. Add the option to `playCollectionFlow.ts` with a relative `likelihood` vs siblings.
+2. Map it in `getPlayResultKind` + `resolveEndedPlay` (and `datapointLabels.ts`).
+3. Wire clock via `clockContract` if the dead-ball reason should stop/start the clock.
+4. Do not add a button that does not change game state.
+5. Do **not** display likelihood/rates in the UI — only use them for primary/secondary/tertiary emphasis.
+
+## Anti-patterns (do not reintroduce)
+
+- `running: true` on Kick Off / period open
+- END PLAY ignoring `playCollectionPath`
+- Showing CLOCK / END PERIOD in play controls
+- Treating Kick Off as “skip to SNAP” without kickoff datapoints

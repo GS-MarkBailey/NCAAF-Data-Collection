@@ -18,7 +18,6 @@ import {
   type CatalogEntryBase,
 } from './catalog'
 import {
-  canStartNextPeriod,
   canStartOvertime,
   isAwaitingRegulationDecision,
 } from './clock'
@@ -188,6 +187,11 @@ function collectable(
   return partial
 }
 
+/** True once kickoff / clock / live play has put the match underway. */
+export function isMatchUnderway(input: MatchStateInput): boolean {
+  return input.gameStarted || input.playInProgress || input.clock.running
+}
+
 /** Derive the current match phase from session flags. */
 export function getMatchPhase(input: MatchStateInput): MatchPhase {
   if (input.gameEnded) return 'game_ended'
@@ -195,7 +199,7 @@ export function getMatchPhase(input: MatchStateInput): MatchPhase {
   // Live play wins even if Q1 hasn't been formally started (MVP clock mode).
   if (input.playInProgress) return 'live_play'
 
-  if (!input.gameStarted) return 'pregame'
+  if (!isMatchUnderway(input)) return 'pregame'
 
   if (
     isAwaitingRegulationDecision(
@@ -226,7 +230,7 @@ function actionsForPhase(
   switch (phase) {
     case 'pregame':
       return [
-        action('start_period', 'Start Q1', 'Kick off the game / start period 1'),
+        action('kickoff', 'Kick off', 'Open the match / start period 1'),
         action('edit_clock', 'Edit clock', 'Set opening clock / period'),
         action('set_possession', 'Set possession', 'Who receives / has the ball'),
       ]
@@ -274,20 +278,12 @@ function actionsForPhase(
     case 'period_break': {
       const actions: MatchAction[] = [
         action('edit_clock', 'Edit clock', 'Adjust before next period'),
+        action(
+          'toggle_clock',
+          'Start clock',
+          'Start the next period from the game clock',
+        ),
       ]
-      if (
-        canStartNextPeriod(
-          input.gameStarted,
-          input.gameEnded,
-          input.periodEnded,
-          input.clock,
-          input.rulesetId,
-        )
-      ) {
-        actions.unshift(
-          action('start_period', 'Start next period', 'Begin the next quarter'),
-        )
-      }
       return actions
     }
     case 'regulation_decision': {
@@ -555,18 +551,22 @@ export function matchHasAction(
 /** Convenience: capabilities used by today’s play-controls UI. */
 export function getPlayControlCapabilities(input: MatchStateInput): {
   phase: MatchPhase
+  canKickOff: boolean
   canSnap: boolean
   canEndPlay: boolean
   canAdjustYards: boolean
 } {
   const view = getMatchStateView(input)
   const inLivePlay = input.playInProgress && !input.gameEnded
+  const underway = isMatchUnderway(input)
   return {
     phase: view.phase,
-    // Pregame snap allowed while period kickoff flow is optional in the MVP.
+    canKickOff: view.phase === 'pregame' && !input.gameEnded,
+    // SNAP only after kickoff — pregame shows KICK OFF instead.
     canSnap:
       !inLivePlay &&
-      (matchHasAction(view, 'snap') || view.phase === 'pregame'),
+      underway &&
+      (matchHasAction(view, 'snap') || view.phase === 'pre_snap'),
     canEndPlay: inLivePlay || matchHasAction(view, 'end_play'),
     canAdjustYards: inLivePlay || matchHasAction(view, 'adjust_yards'),
   }
@@ -604,15 +604,14 @@ export function applyMatchTransition(
 ): MatchTransitionResult {
   switch (event.type) {
     case 'game_started': {
-      // Product default: enter scrimmage so SNAP collection works today.
-      // Opening-kickoff UI should pass a follow-up free_kick series when built.
+      // Opening kickoff collection — free_kick until the kick is resolved.
       const next: MatchStateInput = {
         ...input,
         gameStarted: true,
         gameEnded: false,
         periodEnded: false,
-        playInProgress: false,
-        seriesKind: 'scrimmage',
+        playInProgress: true,
+        seriesKind: 'free_kick',
       }
       return { ...next, phase: getMatchPhase(next) }
     }

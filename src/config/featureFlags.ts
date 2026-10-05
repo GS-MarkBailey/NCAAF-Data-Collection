@@ -179,7 +179,7 @@ export const FEATURE_FLAGS = [
     id: 'playControls.matchStateGuide',
     label: 'Match-state guide',
     description:
-      'Show available actions and collectables from the match-state machine for the current phase (test variant).',
+      'After SNAP, show progressive datapoint buttons (RUSH / THROW → CATCH / INCOMPLETE / …) instead of immediate END PLAY.',
     group: 'Play Controls',
     parent: 'game.playControls',
     defaultEnabled: false,

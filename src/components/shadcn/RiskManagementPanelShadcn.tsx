@@ -1,6 +1,10 @@
 import { useMemo } from 'react'
 import { AlertTriangle } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import {
+  OPERATOR_SECONDARY_SURFACE,
+  operatorButtonTextClass,
+} from '@/lib/operatorChrome'
 import { isFeatureEnabled, RISK_FEATURE_FLAGS } from '@/config/featureFlags'
 import type { GameState, RiskType } from '@/types'
 import { useFeatureFlagStore } from '@/store/featureFlagStore'
@@ -23,7 +27,7 @@ const RISKS: { key: RiskType; label: string; fullWidth?: boolean }[] = [
 
 const STANDARD_RISK_ITEM_CLASS = cn(
   'h-full w-full justify-center whitespace-normal px-2 text-center leading-tight',
-  'border-border bg-secondary text-secondary-foreground hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)]',
+  OPERATOR_SECONDARY_SURFACE,
   'data-pressed:border-destructive data-pressed:bg-destructive data-pressed:text-white data-pressed:hover:bg-destructive',
 )
 
@@ -135,9 +139,8 @@ export function RiskManagementPanelShadcn({
                 className={cn(
                   STANDARD_RISK_ITEM_CLASS,
                   'layout-risk-tile',
-                  stacked
-                    ? 'min-h-11 text-xs'
-                    : 'min-h-12 text-sm landscape-mobile:text-xs',
+                  operatorButtonTextClass(stacked),
+                  stacked ? 'min-h-11' : 'min-h-12',
                   fullWidth && 'col-span-2',
                 )}
               >
@@ -152,9 +155,8 @@ export function RiskManagementPanelShadcn({
                 className={cn(
                   UNRELIABLE_RISK_ITEM_CLASS,
                   'layout-risk-tile',
-                  stacked
-                    ? 'min-h-11 text-xs'
-                    : 'min-h-12 text-sm landscape-mobile:text-xs',
+                  operatorButtonTextClass(stacked),
+                  stacked ? 'min-h-11' : 'min-h-12',
                 )}
               >
                 {unreliableRisk.label}

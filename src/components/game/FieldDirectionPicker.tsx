@@ -1,5 +1,9 @@
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import {
+  OPERATOR_PRIMARY_SURFACE,
+  OPERATOR_SECONDARY_SURFACE,
+} from '@/lib/operatorChrome'
 import { useAppStore } from '@/store/gameStore'
 
 interface FieldDirectionPickerProps {
@@ -23,12 +27,10 @@ export function FieldDirectionPicker({
     'inline-flex items-center justify-center gap-2 rounded-[8px] border px-4 py-2 text-sm font-semibold transition-colors',
     variant === 'custom' &&
       'border-[var(--color-panel-border)] bg-[var(--color-panel)] text-[var(--color-text)] active:bg-[var(--color-play-card-bg)]',
-    variant === 'shadcn' &&
-      'border-border bg-background text-foreground hover:bg-muted',
+    variant === 'shadcn' && OPERATOR_SECONDARY_SURFACE,
   )
 
-  const selectedClass =
-    'border-[var(--color-brand)] bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]'
+  const selectedClass = OPERATOR_PRIMARY_SURFACE
 
   return (
     <div className={cn('grid grid-cols-2 gap-2', className)}>

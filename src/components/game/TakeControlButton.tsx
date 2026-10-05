@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
+import { OPERATOR_SECONDARY_SURFACE } from '@/lib/operatorChrome'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -109,8 +110,7 @@ export function TakeControlButton({
               onClick={() => setConfirmOpen(false)}
               className={cn(
                 'rounded-[8px] border border-[var(--color-panel-border)] bg-[var(--color-panel)] px-4 py-2 text-sm font-semibold text-[var(--color-text)] transition-colors active:bg-[var(--color-play-card-bg)]',
-                variant === 'shadcn' &&
-                  'border-border bg-background text-foreground hover:bg-muted',
+                variant === 'shadcn' && OPERATOR_SECONDARY_SURFACE,
               )}
             >
               Cancel

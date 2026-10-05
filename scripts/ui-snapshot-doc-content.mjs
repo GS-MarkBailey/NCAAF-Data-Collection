@@ -93,8 +93,13 @@ export const WEEK_INTERACTIONS = {
       featureIds: ['unreliable-risk'],
     },
     {
-      text: '**Play controls** — SNAP / END PLAY plus +1 / +5 / −5 / −1 yard adjustments; pauses auto-sim while a play is live',
-      featureIds: ['play-controls-idle', 'play-controls-live'],
+      text: '**Play controls** — KICK OFF (pregame), then SNAP and progressive datapoints; yard adjusters stay visible for the whole match',
+      featureIds: [
+        'play-controls-idle',
+        'play-controls-choose-type',
+        'play-controls-pass-result',
+        'play-controls-live',
+      ],
     },
   ],
 }
@@ -133,7 +138,19 @@ export const WEEK_SHIPPED = {
     profile: { featureIds: ['profile-dialog'] },
     'unreliable-risk': { featureIds: ['unreliable-risk'] },
     'play-controls': {
-      featureIds: ['play-controls-idle', 'play-controls-live'],
+      featureIds: [
+        'play-controls-idle',
+        'play-controls-choose-type',
+        'play-controls-pass-result',
+        'play-controls-live',
+      ],
+    },
+    'play-collection': {
+      featureIds: [
+        'play-controls-choose-type',
+        'play-controls-pass-result',
+        'play-controls-live',
+      ],
     },
   },
 }
