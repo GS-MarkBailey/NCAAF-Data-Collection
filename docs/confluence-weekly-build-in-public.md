@@ -442,7 +442,7 @@ With **Match-state guide** on, scheduled fixtures open in **pregame** so the ful
 - Scoreboard clock has **− / +** buttons on either side for ±1 second (works while running or paused; tap the time still opens the editor)
 - Game clock capped at American football period length **15:00** via `FootballRuleset.quarterLengthSeconds` / `clampClockSeconds`
 - Kickoff: possession switches to the **receiving** team (e.g. MSST kicks → MISS); touchback / return keeps them for the first snap
-- Between plays, yard buttons that cover remaining to-go award **1st & 10** (correct a play that ended short of the sticks)
+- Between plays, forward yard nudges that cover to-go — or any forward nudge while already on 1st — lock **1st & 10** at the new spot (no 1st & 9 / 8 / 7 from spotting)
 - **END PLAY** appears when the chosen result is ready
 - Later quarters: **End period** on the scoreboard, then **Start** on the clock (no Start Q / Kick off badges on the scoreboard)
 

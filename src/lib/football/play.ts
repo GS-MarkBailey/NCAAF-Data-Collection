@@ -268,8 +268,10 @@ export function adjustLivePlayYards(params: {
 }
 
 /**
- * Spot the ball between plays. If the nudge covers remaining to-go
- * (play ended short of the sticks, operator adds yards), award 1st & 10.
+ * Spot the ball between plays.
+ * - Forward nudge that covers to-go → 1st & 10 (or goal).
+ * - Forward nudge while already on 1st → stay locked on a fresh 1st & 10
+ *   at the new spot (never 1st & 9 / 8 / 7 from between-play spotting).
  */
 export function adjustBetweenPlayYards(params: {
   ballOn: number
@@ -292,7 +294,10 @@ export function adjustBetweenPlayYards(params: {
   }
 
   const remaining = params.distance - actualDelta
-  if (remaining <= 0) {
+  const movingForward = actualDelta > 0
+  const onFirstDown = params.down <= rules.minDown
+  // Covering the sticks, or re-spotting while already on 1st — lock 1st & 10.
+  if (remaining <= 0 || (movingForward && onFirstDown)) {
     return {
       ballOn: nextBallOn,
       down: rules.minDown,
