@@ -8,10 +8,23 @@ const DEFENSE_KEYS = new Set([
 ])
 
 /**
- * Kickoff-tree keys credited to the *kicking* team.
- * During free-kick collection, possession is the receiving team.
+ * Kickoff-tree keys credited to the *receiving* team.
+ * During free-kick collection, possession is the kicking team.
  */
-const KICKOFF_KICKING_KEYS = new Set(['kickoff', 'recovery_kicking'])
+const KICKOFF_RECEIVING_KEYS = new Set([
+  'return',
+  'touchback',
+  'fair_catch',
+  'kick_out_of_bounds',
+  'muff',
+  'tackle',
+  'return_out_of_bounds',
+  'return_fumble',
+  'return_touchdown',
+  'recovery_receiving',
+  'yards',
+  'end_play',
+])
 
 /** Display labels for progressive collection option ids. */
 const DATAPOINT_LABELS: Record<string, string> = {
@@ -71,8 +84,8 @@ export function teamAbbrForDatapoint(
   let creditHome = possessionIsHome
 
   if (onKickoff) {
-    // Possession = receiving team; Kickoff / kicking recovery → opposite.
-    if (KICKOFF_KICKING_KEYS.has(key)) {
+    // Possession = kicking team; touchback / return / … → receiving.
+    if (KICKOFF_RECEIVING_KEYS.has(key)) {
       creditHome = !possessionIsHome
     }
   } else if (DEFENSE_KEYS.has(key)) {

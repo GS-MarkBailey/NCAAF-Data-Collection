@@ -69,11 +69,9 @@ KICK OFF → Return | Touchback | … (same kickoff tree)
 After a touchdown, open try collection immediately (`seriesKind: try`,
 `INITIAL_TRY_COLLECTION_STEP`). After the convert, set `seriesKind: free_kick`
 with **no** live collection until the operator presses **KICK OFF**
-(`openKickoffCollection`). Possession for the kickoff is the **receiving**
-team (next offense); the Kickoff datapoint is credited to the kicking team
-(opposite of possession). Touchback / return / fair catch keep receiving
-possession — do not flip again on END PLAY. Do **not** show SNAP during try
-or free-kick wait.
+(`openKickoffCollection`). On kickoff, possession is the **kicking** team;
+touchback / return / fair catch **switch** possession to the receiving team
+(first snap). Do **not** show SNAP during try or free-kick wait.
 Terminal choices without a yards pause **auto END PLAY**
 (`resolvePlayCollectionChoice.autoEndPlay`). Yard-bearing terminals
 (tackle, fair catch, …) still pause on `ready_to_end` for yard adjust.

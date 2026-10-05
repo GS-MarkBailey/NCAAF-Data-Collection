@@ -827,7 +827,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
       return {
         games: updateGame(state.games, fixtureId, (g) => {
           const withUndo = pushPlayUndoSnapshot(g)
-          // Possession is already the receiving team (set when the try ended).
+          // Possession = kicking team for the kickoff (set after the try).
           return {
             ...withUndo,
             playInProgress: true,
@@ -883,11 +883,12 @@ export const useAppStore = create<AppStore>((set, get) => ({
         return {
           games: updateGame(state.games, fixtureId, (g) => {
             const withUndo = pushPlayUndoSnapshot(g)
-            // Opening KO: home receives (possession); away kicks (datapoint).
-            const receivingIsHome = true
+            // Opening KO: away kicks (possession switches to kicking team).
+            // Touchback / return then flips to home (receivers).
+            const kickingIsHome = false
             const kickoffGame = {
               ...withUndo,
-              possessionIsHome: receivingIsHome,
+              possessionIsHome: kickingIsHome,
             }
             return {
               ...withUndo,
@@ -895,7 +896,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
               periodEnded: match.periodEnded,
               playInProgress: match.playInProgress,
               seriesKind: match.seriesKind,
-              possessionIsHome: receivingIsHome,
+              possessionIsHome: kickingIsHome,
               playCollectionStep: INITIAL_KICKOFF_COLLECTION_STEP,
               playCollectionPath: ['kickoff'],
               collectedDatapoints: [
@@ -916,7 +917,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
               simulation: withUndo.simulation
                 ? {
                     ...withUndo.simulation,
-                    offenseIsHome: receivingIsHome,
+                    offenseIsHome: kickingIsHome,
                   }
                 : withUndo.simulation,
               clock: {
@@ -930,7 +931,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
               plays: [
                 ...withUndo.plays,
                 createQuarterStartPlay(
-                  { ...withUndo, possessionIsHome: receivingIsHome },
+                  { ...withUndo, possessionIsHome: kickingIsHome },
                   1,
                 ),
               ],
