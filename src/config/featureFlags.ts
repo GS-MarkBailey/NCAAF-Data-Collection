@@ -176,6 +176,15 @@ export const FEATURE_FLAGS = [
     defaultEnabled: true,
   },
   {
+    id: 'playControls.matchStateGuide',
+    label: 'Match-state guide',
+    description:
+      'Show available actions and collectables from the match-state machine for the current phase (test variant).',
+    group: 'Play Controls',
+    parent: 'game.playControls',
+    defaultEnabled: false,
+  },
+  {
     id: 'risk.challengeReview',
     label: 'Challenge / Review',
     group: 'Risk Management',

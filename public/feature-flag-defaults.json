@@ -22,6 +22,7 @@
     "playControls.snap": true,
     "playControls.endPlay": true,
     "playControls.yardAdjust": true,
+    "playControls.matchStateGuide": false,
     "risk.challengeReview": true,
     "risk.statDelay": true,
     "risk.bigPlay": true,
