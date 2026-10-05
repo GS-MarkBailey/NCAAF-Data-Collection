@@ -385,10 +385,11 @@ export function resolveEndedPlay(
     nextSeries = series.nextSeries
   }
 
-  // During kickoff collection, possessionIsHome is the *kicking* team.
-  // Touchback / return / fair catch → switch to the receiving team.
-  const kickKickingIsHome = input.possessionIsHome
-  const kickReceivingIsHome = !input.possessionIsHome
+  // During kickoff collection, possessionIsHome is the *receiving* team
+  // (set when KICK OFF opens). Touchback / return keep them; only a
+  // kicking-team recovery flips possession.
+  const kickReceivingIsHome = input.possessionIsHome
+  const kickKickingIsHome = !input.possessionIsHome
 
   if (resultKind === 'kickoff_touchback') {
     outcome = 'kickoff_touchback'
@@ -419,7 +420,7 @@ export function resolveEndedPlay(
   } else if (resultKind === 'kickoff_recovery_kicking') {
     outcome = 'kickoff_recovery'
     stopClock = true
-    // Kicking team recovers — they keep the ball.
+    // Kicking team recovers — they take the ball.
     applyNewSeries(input.ballOn, kickKickingIsHome)
   } else if (resultKind === 'kickoff_recovery_receiving') {
     outcome = 'kickoff_recovery'

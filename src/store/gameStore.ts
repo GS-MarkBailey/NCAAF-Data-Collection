@@ -827,11 +827,18 @@ export const useAppStore = create<AppStore>((set, get) => ({
       return {
         games: updateGame(state.games, fixtureId, (g) => {
           const withUndo = pushPlayUndoSnapshot(g)
-          // Possession = kicking team for the kickoff (set after the try).
+          // After a try, possession is still the scoring (kicking) team.
+          // KICK OFF flips possession to the receivers for the kick play.
+          const receivingIsHome = !withUndo.possessionIsHome
+          const kickoffGame = {
+            ...withUndo,
+            possessionIsHome: receivingIsHome,
+          }
           return {
             ...withUndo,
             playInProgress: true,
             seriesKind: 'free_kick',
+            possessionIsHome: receivingIsHome,
             playCollectionStep: INITIAL_KICKOFF_COLLECTION_STEP,
             playCollectionPath: ['kickoff'],
             playYardsGained: 0,
@@ -844,12 +851,12 @@ export const useAppStore = create<AppStore>((set, get) => ({
             simulation: withUndo.simulation
               ? {
                   ...withUndo.simulation,
-                  offenseIsHome: withUndo.possessionIsHome,
+                  offenseIsHome: receivingIsHome,
                 }
               : withUndo.simulation,
             collectedDatapoints: [
               ...(withUndo.collectedDatapoints ?? []),
-              makeTeamDatapoint(withUndo, 'kickoff'),
+              makeTeamDatapoint(kickoffGame, 'kickoff', ['kickoff']),
             ],
             clock: {
               ...withUndo.clock,
@@ -883,12 +890,12 @@ export const useAppStore = create<AppStore>((set, get) => ({
         return {
           games: updateGame(state.games, fixtureId, (g) => {
             const withUndo = pushPlayUndoSnapshot(g)
-            // Opening KO: away kicks (possession switches to kicking team).
-            // Touchback / return then flips to home (receivers).
-            const kickingIsHome = false
+            // Opening KO: home kicks, away receives (NCAA-style).
+            // Possession = receiving team for the kick + first snap.
+            const receivingIsHome = false
             const kickoffGame = {
               ...withUndo,
-              possessionIsHome: kickingIsHome,
+              possessionIsHome: receivingIsHome,
             }
             return {
               ...withUndo,
@@ -896,7 +903,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
               periodEnded: match.periodEnded,
               playInProgress: match.playInProgress,
               seriesKind: match.seriesKind,
-              possessionIsHome: kickingIsHome,
+              possessionIsHome: receivingIsHome,
               playCollectionStep: INITIAL_KICKOFF_COLLECTION_STEP,
               playCollectionPath: ['kickoff'],
               collectedDatapoints: [
@@ -917,7 +924,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
               simulation: withUndo.simulation
                 ? {
                     ...withUndo.simulation,
-                    offenseIsHome: kickingIsHome,
+                    offenseIsHome: receivingIsHome,
                   }
                 : withUndo.simulation,
               clock: {
@@ -931,7 +938,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
               plays: [
                 ...withUndo.plays,
                 createQuarterStartPlay(
-                  { ...withUndo, possessionIsHome: kickingIsHome },
+                  { ...withUndo, possessionIsHome: receivingIsHome },
                   1,
                 ),
               ],

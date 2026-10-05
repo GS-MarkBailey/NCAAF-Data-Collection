@@ -435,13 +435,13 @@ With **Match-state guide** on, scheduled fixtures open in **pregame** so the ful
 - **+1 / +5 / −5 / −1** yard buttons stay on screen for the whole match (not just live plays) so operators can spot or adjust anytime; each press logs its own datapoint (no Confirm Yards button)
 - After a **touchdown**, play controls open the **try/convert** path (**1-PT KICK** / **2-PT PLAY** → GOOD / NO GOOD / …); after the convert the operator presses **KICK OFF** again before collecting return / touchback / …
 - **Clock:** awarded first down keeps the game clock running (NCAA 2023+), except last **2:00** of Q2/Q4 or out of bounds
-- Collected datapoints show the credited team abbr (e.g. **Touchdown - MISS**); after a score the scoring team keeps possession through **KICK OFF** (they kick), then possession flips on the kickoff result
+- Collected datapoints show the credited team abbr (e.g. **Touchdown - MISS**); after a score the scoring team still has possession until **KICK OFF**, which flips it to the receivers
 - App shell uses a cool blue–teal gradient wash behind fixtures and the game console (no frosted outer frame — panels sit directly on the gradient)
 - Game console panels (Scoreboard / Play controls / Risk / Play-by-play) share one card chrome — same border, header height, and title style
 - Fix: background play sim no longer rewrites down/distance once a match is started
 - Scoreboard clock has **− / +** buttons on either side for ±1 second (works while running or paused; tap the time still opens the editor)
 - Game clock capped at American football period length **15:00** via `FootballRuleset.quarterLengthSeconds` / `clampClockSeconds`
-- Kickoff: possession switches to the **kicking** team; touchback / return / fair catch then switches to the **receiving** team for the first snap
+- Kickoff: possession switches to the **receiving** team (e.g. MSST kicks → MISS); touchback / return keeps them for the first snap
 - **END PLAY** appears when the chosen result is ready
 - Later quarters: **End period** on the scoreboard, then **Start** on the clock (no Start Q / Kick off badges on the scoreboard)
 
