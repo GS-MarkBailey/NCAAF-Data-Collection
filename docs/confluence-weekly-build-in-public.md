@@ -436,6 +436,7 @@ With **Match-state guide** on, scheduled fixtures open in **pregame** so the ful
 - After a **touchdown**, play controls open the **try/convert** path (**1-PT KICK** / **2-PT PLAY** → GOOD / NO GOOD / …); after the convert the operator presses **KICK OFF** again before collecting return / touchback / …
 - **Clock:** awarded first down keeps the game clock running (NCAA 2023+), except last **2:00** of Q2/Q4 or out of bounds
 - Collected datapoints show the credited team abbr (e.g. **Touchdown - MISS**); after a score the scoring team keeps possession through **KICK OFF** (they kick), then possession flips on the kickoff result
+- App shell uses a cool blue–teal gradient wash behind fixtures and the game console (panels stay on frosted white)
 - **END PLAY** appears when the chosen result is ready
 - Later quarters: **End period** on the scoreboard, then **Start** on the clock (no Start Q / Kick off badges on the scoreboard)
 

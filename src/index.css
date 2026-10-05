@@ -29,7 +29,9 @@
 @custom-variant landscape-mobile (@media (orientation: landscape) and (max-height: 520px));
 
 @theme {
-  --color-app-bg: #f1f4f9;
+  --color-app-bg: #e8eef8;
+  --color-app-bg-mid: #f3f6fb;
+  --color-app-bg-accent: #dce8f6;
   --color-panel: #ffffff;
   --color-panel-border: #e4e7ec;
   --color-text: #1c1f26;
@@ -106,7 +108,8 @@ html[data-ui-variant='shadcn'] {
   --radius: 0.625rem;
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
-  --background: rgba(241, 244, 249, 1);
+  /* Solid fallback; page shells are transparent so the app gradient shows through. */
+  --background: #e8eef8;
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
@@ -196,18 +199,41 @@ html {
   font-family: var(--font-sans);
 }
 
+/* Cool stadium-glass wash — brand blue + teal, light enough for white panels. */
 body {
   font-family: inherit;
-  background: var(--color-app-bg);
   color: var(--color-text);
   -webkit-font-smoothing: antialiased;
   touch-action: manipulation;
   overscroll-behavior: none;
   width: 100%;
+  background-color: var(--color-app-bg);
+  background-image:
+    radial-gradient(
+      ellipse 110% 80% at 0% -10%,
+      rgba(74, 108, 247, 0.22),
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse 90% 70% at 100% 0%,
+      rgba(45, 182, 168, 0.16),
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse 80% 55% at 70% 100%,
+      rgba(74, 108, 247, 0.12),
+      transparent 55%
+    ),
+    linear-gradient(
+      160deg,
+      var(--color-app-bg) 0%,
+      var(--color-app-bg-mid) 45%,
+      var(--color-app-bg-accent) 100%
+    );
+  background-attachment: fixed;
 }
 
 html[data-ui-variant='shadcn'] body {
-  background: var(--background);
   color: var(--foreground);
 }
 
@@ -216,7 +242,7 @@ html[data-ui-variant='shadcn'] body {
   flex-direction: column;
   width: 100%;
   min-height: 100dvh;
-  background: inherit;
+  background: transparent;
 }
 
 button,

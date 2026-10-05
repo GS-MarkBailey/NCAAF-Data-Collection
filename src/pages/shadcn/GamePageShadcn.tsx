@@ -62,7 +62,7 @@ export function GamePageShadcn() {
 
   if (!fixtureId || !game) {
     return (
-      <div className="flex h-dvh items-center justify-center overflow-hidden overscroll-none bg-background">
+      <div className="flex h-dvh items-center justify-center overflow-hidden overscroll-none bg-transparent">
         <p className="text-sm text-muted-foreground">Loading…</p>
       </div>
     )
@@ -71,7 +71,7 @@ export function GamePageShadcn() {
   const takeControl = game.takeControlActive
 
   return (
-    <div className="flex h-dvh flex-col overflow-hidden overscroll-none bg-background safe-t safe-b">
+    <div className="flex h-dvh flex-col overflow-hidden overscroll-none bg-transparent safe-t safe-b">
       {showFieldDirectionDialog ? (
         <FieldDirectionDialog fixtureId={fixtureId} game={game} variant="shadcn" />
       ) : null}
@@ -92,7 +92,7 @@ export function GamePageShadcn() {
             displayResilience ? 'overflow-visible' : 'overflow-hidden',
             takeControl
               ? 'border-destructive bg-destructive/10'
-              : 'border-border/30 bg-background',
+              : 'border-border/30 bg-white/55 backdrop-blur-md',
           )}
         >
           {portraitPanelCount > 0 ? (
