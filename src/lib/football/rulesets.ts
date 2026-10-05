@@ -35,9 +35,15 @@ export interface FootballRuleset {
   defaultBallOn: number
   /** Regulation period count. */
   regulationPeriods: number
-  /** Length of a regulation period in seconds. */
+  /**
+   * Length of a regulation period in seconds.
+   * American football (NCAA / NFL / CFL): **15:00** — game clock must not exceed this.
+   */
   quarterLengthSeconds: number
-  /** Max minutes allowed in the clock editor. */
+  /**
+   * Max minutes in the clock editor (must match `quarterLengthSeconds / 60`).
+   * American football: **15**.
+   */
   clockEditMaxMinutes: number
   /** Touchdown points. */
   touchdownPoints: number
@@ -55,6 +61,9 @@ export interface FootballRuleset {
   hasRouge: boolean
 }
 
+/** American football regulation period — 15 minutes. */
+const AMERICAN_FOOTBALL_QUARTER_SECONDS = 15 * 60
+
 const NCAA_RULESET: FootballRuleset = {
   id: 'ncaa',
   label: 'College football (NCAA)',
@@ -70,8 +79,8 @@ const NCAA_RULESET: FootballRuleset = {
   maxDistance: 99,
   defaultBallOn: 25,
   regulationPeriods: 4,
-  quarterLengthSeconds: 15 * 60,
-  clockEditMaxMinutes: 15,
+  quarterLengthSeconds: AMERICAN_FOOTBALL_QUARTER_SECONDS,
+  clockEditMaxMinutes: AMERICAN_FOOTBALL_QUARTER_SECONDS / 60,
   touchdownPoints: 6,
   fieldGoalPoints: 3,
   safetyPoints: 2,
@@ -96,8 +105,8 @@ const NFL_RULESET: FootballRuleset = {
   maxDistance: 99,
   defaultBallOn: 25,
   regulationPeriods: 4,
-  quarterLengthSeconds: 15 * 60,
-  clockEditMaxMinutes: 15,
+  quarterLengthSeconds: AMERICAN_FOOTBALL_QUARTER_SECONDS,
+  clockEditMaxMinutes: AMERICAN_FOOTBALL_QUARTER_SECONDS / 60,
   touchdownPoints: 6,
   fieldGoalPoints: 3,
   safetyPoints: 2,
@@ -123,8 +132,8 @@ const CFL_RULESET: FootballRuleset = {
   maxDistance: 109,
   defaultBallOn: 40,
   regulationPeriods: 4,
-  quarterLengthSeconds: 15 * 60,
-  clockEditMaxMinutes: 15,
+  quarterLengthSeconds: AMERICAN_FOOTBALL_QUARTER_SECONDS,
+  clockEditMaxMinutes: AMERICAN_FOOTBALL_QUARTER_SECONDS / 60,
   touchdownPoints: 6,
   fieldGoalPoints: 3,
   safetyPoints: 2,

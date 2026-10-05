@@ -9,6 +9,16 @@ export interface ClockEventDef extends CatalogEntryBase {
 
 export const CLOCK_EVENTS = [
   {
+    id: 'clock.period_length',
+    label: 'Regulation period length',
+    description:
+      'American football regulation periods are 15:00. Game clock must not exceed the ruleset quarter length.',
+    leagues: 'all',
+    category: 'game_clock',
+    notes:
+      'Encoded as FootballRuleset.quarterLengthSeconds / clockEditMaxMinutes; enforced by clampClockSeconds.',
+  },
+  {
     id: 'clock.start',
     label: 'Start game clock',
     description: 'Game clock begins or resumes running.',

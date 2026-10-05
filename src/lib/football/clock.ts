@@ -18,7 +18,11 @@ export function clampPeriod(period: number): number {
   return Math.max(MIN_PERIOD, Math.min(MAX_PERIOD, Math.round(period)))
 }
 
-/** Game clock seconds — 0 … quarter length (NCAA default 15:00). */
+/**
+ * Clamp game clock to the active American football ruleset period length
+ * (`FootballRuleset.quarterLengthSeconds` — 15:00 for NCAA / NFL / CFL).
+ * All store clock writes must go through this.
+ */
 export function clampClockSeconds(
   seconds: number,
   rulesRef?: RulesetRef,
@@ -251,5 +255,5 @@ export function clockFromParts(
       ? 0
       : Math.max(0, Math.min(CLOCK_EDIT_MAX_SECONDS, seconds))
 
-  return clampedMinutes * 60 + clampedSeconds
+  return clampClockSeconds(clampedMinutes * 60 + clampedSeconds, rulesRef)
 }
