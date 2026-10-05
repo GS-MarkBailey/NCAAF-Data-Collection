@@ -1,4 +1,6 @@
-import type { GameState, SeriesKind } from '@/types'
+import type { CollectedDatapoint, GameState, SeriesKind } from '@/types'
+import { formatClock } from '@/lib/format'
+import { labelForUndo } from './datapointLabels'
 import type { PlayCollectionStepId } from './playCollectionFlow'
 
 /** Snapshot of play-control-relevant game fields for one undo step. */
@@ -63,6 +65,22 @@ export function applyPlayUndoSnapshot(
   game: GameState,
   snapshot: PlayUndoSnapshot,
 ): GameState {
+  const prior = game.collectedDatapoints ?? []
+  const undone = prior.slice(snapshot.collectedDatapointsLength)
+  // Skip nested undo markers when labeling what was reversed.
+  const undoneLabels = undone
+    .filter((entry) => entry.key !== 'undo')
+    .map((entry) => entry.label)
+
+  const undoEntry: CollectedDatapoint = {
+    id: crypto.randomUUID(),
+    key: 'undo',
+    label: labelForUndo(undoneLabels),
+    period: game.clock.period,
+    clock: formatClock(game.clock.seconds),
+    collectedAt: Date.now(),
+  }
+
   return {
     ...game,
     playInProgress: snapshot.playInProgress,
@@ -82,10 +100,8 @@ export function applyPlayUndoSnapshot(
     gameStarted: snapshot.gameStarted,
     gameEnded: snapshot.gameEnded,
     periodEnded: snapshot.periodEnded,
-    collectedDatapoints: (game.collectedDatapoints ?? []).slice(
-      0,
-      snapshot.collectedDatapointsLength,
-    ),
+    // Keep history — append Undo instead of deleting reversed datapoints.
+    collectedDatapoints: [...prior, undoEntry],
     plays: (game.plays ?? []).slice(0, snapshot.playsLength),
     simulation: game.simulation
       ? { ...game.simulation, offenseIsHome: snapshot.possessionIsHome }

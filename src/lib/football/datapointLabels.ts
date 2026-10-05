@@ -35,10 +35,18 @@ const DATAPOINT_LABELS: Record<string, string> = {
   two_point_good: 'TwoPointGood',
   two_point_no_good: 'TwoPointNoGood',
   defensive_two_point: 'DefensiveConversion',
+  undo: 'Undo',
 }
 
 export function labelForDatapointKey(key: string): string {
   return DATAPOINT_LABELS[key] ?? key
+}
+
+/** Label for an undo datapoint that references what was reversed. */
+export function labelForUndo(undoneLabels: readonly string[]): string {
+  if (undoneLabels.length === 0) return 'Undo'
+  if (undoneLabels.length === 1) return `Undo(${undoneLabels[0]})`
+  return `Undo(${undoneLabels.join(', ')})`
 }
 
 /** One collected datapoint per yard-button press (not a running total). */
