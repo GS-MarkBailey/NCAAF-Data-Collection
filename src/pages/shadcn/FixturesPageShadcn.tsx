@@ -73,7 +73,7 @@ export function FixturesPageShadcn() {
                 onChange={(event) => setSearchQuery(event.target.value)}
                 placeholder="Search"
                 aria-label="Search"
-                className="pl-8"
+                className="bg-white pl-8"
               />
             </div>
           ) : null}
