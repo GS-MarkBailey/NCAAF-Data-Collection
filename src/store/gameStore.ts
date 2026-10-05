@@ -731,13 +731,6 @@ export const useAppStore = create<AppStore>((set, get) => ({
               playStartDown: resolved.down,
               playStartDistance: resolved.distance,
               collectedDatapoints: withEnd,
-              clock: {
-                ...base.clock,
-                running: nextClockRunning(
-                  { type: 'kickoff_opened' },
-                  base.clock,
-                ),
-              },
             }
           }
 

@@ -192,7 +192,6 @@ export function PlayControlsPanelShadcn({
       <CardContent className="flex min-h-0 flex-1 flex-col gap-2 overflow-hidden">
         {showMatchStateGuide && matchView && matchControls ? (
           <MatchStateGuideBody
-            matchView={matchView}
             canKickOff={canKickOff}
             canSnap={canSnap}
             canEndPlay={canEndPlay}
@@ -246,7 +245,6 @@ export function PlayControlsPanelShadcn({
 }
 
 function MatchStateGuideBody({
-  matchView,
   canKickOff,
   canSnap,
   canEndPlay,
@@ -259,7 +257,6 @@ function MatchStateGuideBody({
   onCollectionOption,
   onAdjustYards,
 }: {
-  matchView: NonNullable<ReturnType<typeof getMatchStateView>>
   canKickOff: boolean
   canSnap: boolean
   canEndPlay: boolean
