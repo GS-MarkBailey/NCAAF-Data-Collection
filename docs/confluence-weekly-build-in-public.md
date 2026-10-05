@@ -398,7 +398,7 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 <!-- AUTO-SNAPSHOTS:week-4-shipped-down-distance:END -->
 
 <!-- AUTO-SNAPSHOTS:week-4-shipped-clock-polish:START -->
-![Start / Pause clock chips](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/start-pause-chips.png)
+![Start / Pause clock chips](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/start-pause-chips.png) ![Clock ±1 second side buttons](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-side-nudge.png)
 <!-- AUTO-SNAPSHOTS:week-4-shipped-clock-polish:END -->
 
 **Game header (landscape)**

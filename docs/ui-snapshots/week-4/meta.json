@@ -1,8 +1,8 @@
 {
   "label": "week-4",
   "portrait": true,
-  "capturedAt": "2026-10-05T21:07:07.241Z",
-  "baseUrl": "https://ncaaf-data-collection.vercel.app",
+  "capturedAt": "2026-10-05T21:38:23.009Z",
+  "baseUrl": "http://127.0.0.1:4173",
   "views": [
     "fixtures-landscape",
     "game-landscape"
@@ -46,6 +46,11 @@
       "id": "clock-period-editor",
       "title": "Clock edit panel — Period tab (Variant B)",
       "file": "features/clock-period-editor.png"
+    },
+    {
+      "id": "clock-side-nudge",
+      "title": "Clock ±1 second side buttons",
+      "file": "features/clock-side-nudge.png"
     },
     {
       "id": "down-distance-editor",
