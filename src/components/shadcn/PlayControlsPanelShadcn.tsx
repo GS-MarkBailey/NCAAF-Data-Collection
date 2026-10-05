@@ -3,7 +3,6 @@ import { cn } from '@/lib/utils'
 import {
   getMatchStateView,
   getPlayControlCapabilities,
-  matchHasAction,
   toMatchStateInput,
   type MatchActionId,
 } from '@/lib/football'
@@ -25,13 +24,30 @@ const YARD_DELTAS = [1, 5, -5, -1] as const
 const WIRED_ACTIONS = new Set<MatchActionId>([
   'snap',
   'end_play',
-  'adjust_yards',
   'start_period',
   'end_period',
   'start_overtime',
   'end_game',
   'toggle_clock',
 ])
+
+/** Short labels for big operator buttons. */
+const ACTION_BUTTON_LABEL: Partial<Record<MatchActionId, string>> = {
+  snap: 'SNAP',
+  end_play: 'END PLAY',
+  start_period: 'START PERIOD',
+  end_period: 'END PERIOD',
+  start_overtime: 'START OT',
+  end_game: 'END GAME',
+  toggle_clock: 'CLOCK',
+}
+
+function actionGridClass(count: number): string {
+  if (count <= 1) return 'grid-cols-1'
+  if (count === 2) return 'grid-cols-2'
+  if (count === 3) return 'grid-cols-3'
+  return 'grid-cols-2'
+}
 
 interface PlayControlsPanelShadcnProps {
   fixtureId: string
@@ -68,13 +84,14 @@ export function PlayControlsPanelShadcn({
   const gameEnded = game?.gameEnded ?? false
   const playInProgress = game?.playInProgress ?? false
 
-  // Classic mode: simple play-in-progress gating (unchanged from original).
-  // Match-state guide: phase-driven capabilities from the state machine.
   const canSnap = showMatchStateGuide
     ? (matchControls?.canSnap ?? false)
     : !gameEnded && !playInProgress
-  const canEndOrAdjust = showMatchStateGuide
-    ? Boolean(matchControls?.canEndPlay || matchControls?.canAdjustYards)
+  const canEndPlay = showMatchStateGuide
+    ? (matchControls?.canEndPlay ?? false)
+    : !gameEnded && playInProgress
+  const canAdjustYards = showMatchStateGuide
+    ? (matchControls?.canAdjustYards ?? false)
     : !gameEnded && playInProgress
 
   const yardsLabel =
@@ -110,6 +127,15 @@ export function PlayControlsPanelShadcn({
     }
   }
 
+  const classicButtons: { id: MatchActionId; label: string; primary?: boolean }[] =
+    []
+  if (showSnap && canSnap) {
+    classicButtons.push({ id: 'snap', label: 'SNAP', primary: true })
+  }
+  if (showEndPlay && canEndPlay) {
+    classicButtons.push({ id: 'end_play', label: 'END PLAY' })
+  }
+
   return (
     <Card
       size="compact"
@@ -132,13 +158,14 @@ export function PlayControlsPanelShadcn({
         </CardTitle>
       </CardHeader>
       <CardContent className="flex min-h-0 flex-1 flex-col gap-2 overflow-hidden">
-        {showMatchStateGuide && matchView ? (
+        {showMatchStateGuide && matchView && matchControls ? (
           <MatchStateGuideBody
-            fixtureId={fixtureId}
             matchView={matchView}
+            canSnap={canSnap}
+            canEndPlay={canEndPlay}
             yardsLabel={yardsLabel}
             playInProgress={playInProgress}
-            canAdjustYards={matchControls?.canAdjustYards ?? false}
+            canAdjustYards={canAdjustYards}
             onAction={runAction}
             onAdjustYards={(delta) => adjustYards(fixtureId, delta)}
           />
@@ -146,50 +173,23 @@ export function PlayControlsPanelShadcn({
           <p className="flex flex-1 items-center justify-center px-2 text-center text-sm text-muted-foreground">
             Play controls are disabled in Settings → Features.
           </p>
+        ) : classicButtons.length === 0 && !(showYardAdjust && canAdjustYards) ? (
+          <p className="flex flex-1 items-center justify-center px-2 text-center text-sm text-muted-foreground">
+            {gameEnded ? 'Match ended' : 'No play actions available'}
+          </p>
         ) : (
           <>
-            {showSnap || showEndPlay ? (
-              <div
-                className={cn(
-                  'grid min-h-0 flex-1 gap-2',
-                  showSnap && showEndPlay ? 'grid-cols-2' : 'grid-cols-1',
-                )}
-              >
-                {showSnap ? (
-                  <Button
-                    type="button"
-                    variant={playInProgress ? 'secondary' : 'default'}
-                    disabled={!canSnap}
-                    aria-pressed={playInProgress}
-                    className={cn(
-                      'h-full min-h-12 text-sm font-bold tracking-wide',
-                      canSnap &&
-                        'bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]',
-                    )}
-                    onClick={() => snapPlay(fixtureId)}
-                  >
-                    SNAP
-                  </Button>
-                ) : null}
-                {showEndPlay ? (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    disabled={!canEndOrAdjust}
-                    className="h-full min-h-12 text-sm font-bold tracking-wide"
-                    onClick={() => endPlay(fixtureId)}
-                  >
-                    END PLAY
-                  </Button>
-                ) : null}
-              </div>
+            {classicButtons.length > 0 ? (
+              <ActionButtonGrid
+                buttons={classicButtons}
+                onAction={runAction}
+              />
             ) : null}
 
-            {showYardAdjust ? (
+            {showYardAdjust && canAdjustYards ? (
               <YardAdjustBlock
                 yardsLabel={yardsLabel}
                 playInProgress={playInProgress}
-                disabled={!canEndOrAdjust}
                 onAdjust={(delta) => adjustYards(fixtureId, delta)}
               />
             ) : null}
@@ -202,94 +202,91 @@ export function PlayControlsPanelShadcn({
 
 function MatchStateGuideBody({
   matchView,
+  canSnap,
+  canEndPlay,
   yardsLabel,
   playInProgress,
   canAdjustYards,
   onAction,
   onAdjustYards,
 }: {
-  fixtureId: string
   matchView: NonNullable<ReturnType<typeof getMatchStateView>>
+  canSnap: boolean
+  canEndPlay: boolean
   yardsLabel: string
   playInProgress: boolean
   canAdjustYards: boolean
   onAction: (actionId: MatchActionId) => void
   onAdjustYards: (delta: number) => void
 }) {
-  const showYards =
-    canAdjustYards || matchHasAction(matchView, 'adjust_yards')
+  const buttons: {
+    id: MatchActionId
+    label: string
+    primary?: boolean
+    title?: string
+  }[] = []
+
+  if (canSnap) {
+    buttons.push({
+      id: 'snap',
+      label: 'SNAP',
+      primary: true,
+      title: 'Start collecting the live scrimmage play',
+    })
+  }
+  if (canEndPlay) {
+    buttons.push({
+      id: 'end_play',
+      label: 'END PLAY',
+      title: 'Finalize down / distance / possession',
+    })
+  }
+
+  for (const action of matchView.actions) {
+    if (
+      action.id === 'snap' ||
+      action.id === 'end_play' ||
+      action.id === 'adjust_yards' ||
+      !WIRED_ACTIONS.has(action.id)
+    ) {
+      continue
+    }
+    if (buttons.some((button) => button.id === action.id)) continue
+    buttons.push({
+      id: action.id,
+      label: ACTION_BUTTON_LABEL[action.id] ?? action.label.toUpperCase(),
+      title: action.description,
+    })
+  }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
-      <div className="rounded-lg border border-border bg-muted/30 px-2.5 py-2">
+    <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-hidden">
+      <div className="shrink-0 rounded-lg border border-border bg-muted/30 px-2.5 py-2">
         <p className="text-xs font-semibold text-foreground">{matchView.label}</p>
         <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">
           {matchView.description}
         </p>
-        <p className="mt-1 text-[10px] tracking-wide text-muted-foreground uppercase">
-          {matchView.seriesKind.replace('_', ' ')} · {matchView.rulesetId}
-        </p>
       </div>
 
-      <section className="flex flex-col gap-1.5">
-        <h3 className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
-          Available actions
-        </h3>
-        <div className="flex flex-col gap-1.5">
-          {matchView.actions.map((action) => {
-            const wired = WIRED_ACTIONS.has(action.id)
-            const isPrimary = action.id === 'snap'
-            return (
-              <Button
-                key={action.id}
-                type="button"
-                variant={isPrimary ? 'default' : 'outline'}
-                disabled={!wired}
-                title={action.description}
-                className={cn(
-                  'h-auto min-h-9 justify-start px-2.5 py-1.5 text-left text-xs font-semibold',
-                  isPrimary &&
-                    wired &&
-                    'bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]',
-                )}
-                onClick={() => onAction(action.id)}
-              >
-                <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                  <span className="truncate">{action.label}</span>
-                  <span
-                    className={cn(
-                      'truncate text-[10px] font-normal',
-                      isPrimary && wired
-                        ? 'text-white/80'
-                        : 'text-muted-foreground',
-                    )}
-                  >
-                    {wired ? action.description : `${action.description} (not wired yet)`}
-                  </span>
-                </span>
-              </Button>
-            )
-          })}
-          {matchView.actions.length === 0 ? (
-            <p className="px-1 text-[11px] text-muted-foreground">
-              No actions in this phase.
-            </p>
-          ) : null}
-        </div>
-      </section>
+      {buttons.length > 0 ? (
+        <ActionButtonGrid buttons={buttons} onAction={onAction} />
+      ) : (
+        <p className="flex min-h-12 flex-1 items-center justify-center px-2 text-center text-sm text-muted-foreground">
+          No actions in this phase
+        </p>
+      )}
 
-      {showYards ? (
+      {canAdjustYards ? (
         <YardAdjustBlock
           yardsLabel={yardsLabel}
           playInProgress={playInProgress}
-          disabled={!canAdjustYards}
           onAdjust={onAdjustYards}
         />
       ) : null}
 
-      <section className="flex flex-col gap-1.5 pb-1">
-        <h3 className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
-          Collectables now
+      <section className="min-h-0 flex-1 overflow-y-auto pb-1">
+        <h3 className="mb-1.5 text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+          Collectables
         </h3>
         <ul className="flex flex-col gap-1">
           {matchView.collectables.map((item) => (
@@ -305,11 +302,7 @@ function MatchStateGuideBody({
                   <span className="text-[10px] font-medium tracking-wide text-amber-700 uppercase dark:text-amber-400">
                     Required
                   </span>
-                ) : (
-                  <span className="text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
-                    Optional
-                  </span>
-                )}
+                ) : null}
               </div>
               <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">
                 {item.description}
@@ -322,19 +315,56 @@ function MatchStateGuideBody({
   )
 }
 
+function ActionButtonGrid({
+  buttons,
+  onAction,
+}: {
+  buttons: {
+    id: MatchActionId
+    label: string
+    primary?: boolean
+    title?: string
+  }[]
+  onAction: (actionId: MatchActionId) => void
+}) {
+  return (
+    <div
+      className={cn(
+        'grid min-h-0 flex-1 gap-2',
+        actionGridClass(buttons.length),
+      )}
+    >
+      {buttons.map((button) => (
+        <Button
+          key={button.id}
+          type="button"
+          variant={button.primary ? 'default' : 'outline'}
+          title={button.title}
+          className={cn(
+            'h-full min-h-12 text-sm font-bold tracking-wide',
+            button.primary &&
+              'bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]',
+          )}
+          onClick={() => onAction(button.id)}
+        >
+          {button.label}
+        </Button>
+      ))}
+    </div>
+  )
+}
+
 function YardAdjustBlock({
   yardsLabel,
   playInProgress,
-  disabled,
   onAdjust,
 }: {
   yardsLabel: string
   playInProgress: boolean
-  disabled: boolean
   onAdjust: (delta: number) => void
 }) {
   return (
-    <div className="flex min-h-0 flex-col gap-2 rounded-lg border border-border p-2">
+    <div className="flex min-h-0 flex-[1.2] flex-col gap-2 rounded-lg border border-border p-2">
       <div className="flex items-center justify-between gap-2">
         <span className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
           <MoveHorizontal className="size-3.5" aria-hidden />
@@ -350,18 +380,17 @@ function YardAdjustBlock({
           {yardsLabel}
         </span>
       </div>
-      <div className="grid grid-cols-4 gap-1.5">
+      <div className="grid min-h-0 flex-1 grid-cols-4 gap-1.5">
         {YARD_DELTAS.map((delta) => (
           <Button
             key={delta}
             type="button"
             variant="outline"
-            disabled={disabled}
             aria-label={`${delta > 0 ? 'Gain' : 'Lose'} ${Math.abs(delta)} ${
               Math.abs(delta) === 1 ? 'yard' : 'yards'
             }`}
             className={cn(
-              'min-h-10 px-1 text-sm font-bold tabular-nums',
+              'h-full min-h-10 px-1 text-sm font-bold tabular-nums',
               delta > 0
                 ? 'text-emerald-700 dark:text-emerald-400'
                 : 'text-red-700 dark:text-red-400',
