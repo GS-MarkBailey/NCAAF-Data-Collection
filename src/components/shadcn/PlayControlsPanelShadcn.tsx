@@ -145,16 +145,9 @@ export function PlayControlsPanelShadcn({
       )}
     >
       <CardHeader className="border-b border-border">
-        <CardTitle className="flex items-center justify-between gap-2 text-sm">
-          <span className="flex items-center gap-2">
-            <Zap className="size-4 text-muted-foreground" />
-            Play controls
-          </span>
-          {matchView && showMatchStateGuide ? (
-            <span className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
-              {matchView.label}
-            </span>
-          ) : null}
+        <CardTitle className="flex items-center gap-2 text-sm">
+          <Zap className="size-4 text-muted-foreground" />
+          Play controls
         </CardTitle>
       </CardHeader>
       <CardContent className="flex min-h-0 flex-1 flex-col gap-2 overflow-hidden">
@@ -259,22 +252,19 @@ function MatchStateGuideBody({
     })
   }
 
-  return (
-    <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-hidden">
-      <div className="shrink-0 rounded-lg border border-border bg-muted/30 px-2.5 py-2">
-        <p className="text-xs font-semibold text-foreground">{matchView.label}</p>
-        <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">
-          {matchView.description}
-        </p>
-      </div>
+  if (buttons.length === 0 && !canAdjustYards) {
+    return (
+      <p className="flex flex-1 items-center justify-center px-2 text-center text-sm text-muted-foreground">
+        No play actions available
+      </p>
+    )
+  }
 
+  return (
+    <div className="flex min-h-0 flex-1 flex-col gap-2">
       {buttons.length > 0 ? (
         <ActionButtonGrid buttons={buttons} onAction={onAction} />
-      ) : (
-        <p className="flex min-h-12 flex-1 items-center justify-center px-2 text-center text-sm text-muted-foreground">
-          No actions in this phase
-        </p>
-      )}
+      ) : null}
 
       {canAdjustYards ? (
         <YardAdjustBlock
@@ -283,34 +273,6 @@ function MatchStateGuideBody({
           onAdjust={onAdjustYards}
         />
       ) : null}
-
-      <section className="min-h-0 flex-1 overflow-y-auto pb-1">
-        <h3 className="mb-1.5 text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
-          Collectables
-        </h3>
-        <ul className="flex flex-col gap-1">
-          {matchView.collectables.map((item) => (
-            <li
-              key={item.id}
-              className="rounded-md border border-border px-2 py-1.5"
-            >
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-xs font-semibold text-foreground">
-                  {item.label}
-                </span>
-                {item.required ? (
-                  <span className="text-[10px] font-medium tracking-wide text-amber-700 uppercase dark:text-amber-400">
-                    Required
-                  </span>
-                ) : null}
-              </div>
-              <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">
-                {item.description}
-              </p>
-            </li>
-          ))}
-        </ul>
-      </section>
     </div>
   )
 }
