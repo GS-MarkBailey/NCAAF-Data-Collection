@@ -18,6 +18,19 @@ export function clampPeriod(period: number): number {
   return Math.max(MIN_PERIOD, Math.min(MAX_PERIOD, Math.round(period)))
 }
 
+/** Game clock seconds — 0 … quarter length (NCAA default 15:00). */
+export function clampClockSeconds(
+  seconds: number,
+  rulesRef?: RulesetRef,
+): number {
+  const rules = resolveFootballRuleset(rulesRef)
+  if (Number.isNaN(seconds)) return 0
+  return Math.max(
+    0,
+    Math.min(rules.quarterLengthSeconds, Math.round(seconds)),
+  )
+}
+
 function regulationPeriods(rulesRef?: RulesetRef): number {
   return resolveFootballRuleset(rulesRef).regulationPeriods
 }

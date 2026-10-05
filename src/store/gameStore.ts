@@ -11,6 +11,7 @@ import {
   canEndCurrentPeriod,
   canStartNextPeriod,
   canStartOvertime,
+  clampClockSeconds,
   clampDistance,
   clampDown,
   clampPeriod,
@@ -274,7 +275,10 @@ export const useAppStore = create<AppStore>((set, get) => ({
     set((state) => {
       const game = state.games[fixtureId]
       if (!game || game.gameEnded || delta === 0) return state
-      const seconds = Math.max(0, game.clock.seconds + delta)
+      const seconds = clampClockSeconds(
+        game.clock.seconds + delta,
+        game.rulesetId,
+      )
       if (seconds === game.clock.seconds) return state
       const clockBefore = {
         seconds: game.clock.seconds,
@@ -307,7 +311,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
       const game = state.games[fixtureId]
       if (!game) return state
 
-      const nextSeconds = Math.max(0, seconds)
+      const nextSeconds = clampClockSeconds(seconds, game.rulesetId)
       if (nextSeconds === game.clock.seconds) return state
 
       const delta = nextSeconds - game.clock.seconds

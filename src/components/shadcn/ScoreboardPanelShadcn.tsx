@@ -6,6 +6,7 @@ import {
   clockFromParts,
   clockToParts,
   formatPeriodLabel,
+  getFootballRuleset,
   getQuarterStatus,
   canEndCurrentPeriod,
   canStartNextPeriod,
@@ -15,7 +16,7 @@ import {
   isOvertimePeriod,
   isPeriodInProgress,
   type QuarterStatus,
-} from '@/lib/clock'
+} from '@/lib/football'
 import { usePushPulse } from '@/hooks/usePushPulse'
 import { useFeatureFlag } from '@/hooks/useFeatureFlag'
 import { useAppStore } from '@/store/gameStore'
@@ -333,6 +334,7 @@ export function ScoreboardPanelShadcn({
     clockSurfaceClassName,
   )
 
+  const maxClockSeconds = getFootballRuleset(rulesetId).quarterLengthSeconds
   const canNudgeClock = !gameEnded && !inOvertime
   const clockNudgeButtonClass = cn(
     'flex w-10 shrink-0 items-center justify-center self-stretch text-muted-foreground transition-colors',
@@ -362,9 +364,9 @@ export function ScoreboardPanelShadcn({
     <button
       type="button"
       className={cn(clockNudgeButtonClass, 'border-l border-border')}
-      disabled={!canNudgeClock}
+      disabled={!canNudgeClock || clockSeconds >= maxClockSeconds}
       aria-label="Increase clock by 1 second"
-      title="+1 second"
+      title="+1 second (max 15:00)"
       onClick={nudgeClock(1)}
     >
       <Plus className="size-4" aria-hidden />
