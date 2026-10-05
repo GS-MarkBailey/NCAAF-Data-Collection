@@ -1,30 +1,58 @@
-export const MIN_DOWN = 1
-export const MAX_DOWN = 4
-export const MIN_DISTANCE = 1
-export const MAX_DISTANCE = 99
-/** Standard to-go after a first down or change of possession. */
-export const FIRST_DOWN_DISTANCE = 10
+import {
+  DEFAULT_FOOTBALL_RULESET,
+  resolveFootballRuleset,
+  type RulesetRef,
+} from './rulesets'
 
-export function clampDown(down: number): number {
-  if (Number.isNaN(down)) return MIN_DOWN
-  return Math.max(MIN_DOWN, Math.min(MAX_DOWN, Math.round(down)))
+/** @deprecated Prefer `rules.minDown`. NCAA default. */
+export const MIN_DOWN = DEFAULT_FOOTBALL_RULESET.minDown
+/** @deprecated Prefer `rules.maxDown`. NCAA default. */
+export const MAX_DOWN = DEFAULT_FOOTBALL_RULESET.maxDown
+/** @deprecated Prefer `rules.minDistance`. NCAA default. */
+export const MIN_DISTANCE = DEFAULT_FOOTBALL_RULESET.minDistance
+/** @deprecated Prefer `rules.maxDistance`. NCAA default. */
+export const MAX_DISTANCE = DEFAULT_FOOTBALL_RULESET.maxDistance
+/** @deprecated Prefer `rules.firstDownDistance`. NCAA default. */
+export const FIRST_DOWN_DISTANCE = DEFAULT_FOOTBALL_RULESET.firstDownDistance
+
+export function clampDown(down: number, rulesRef?: RulesetRef): number {
+  const rules = resolveFootballRuleset(rulesRef)
+  if (Number.isNaN(down)) return rules.minDown
+  return Math.max(
+    rules.minDown,
+    Math.min(rules.maxDown, Math.round(down)),
+  )
 }
 
-export function clampDistance(distance: number): number {
-  if (Number.isNaN(distance)) return MIN_DISTANCE
-  return Math.max(MIN_DISTANCE, Math.min(MAX_DISTANCE, Math.round(distance)))
+export function clampDistance(
+  distance: number,
+  rulesRef?: RulesetRef,
+): number {
+  const rules = resolveFootballRuleset(rulesRef)
+  if (Number.isNaN(distance)) return rules.minDistance
+  return Math.max(
+    rules.minDistance,
+    Math.min(rules.maxDistance, Math.round(distance)),
+  )
 }
 
-export function parseDownInput(raw: string): number | null {
+export function parseDownInput(
+  raw: string,
+  rulesRef?: RulesetRef,
+): number | null {
   const digits = raw.trim().replace(/\D/g, '')
   if (!digits) return null
-  return clampDown(Number.parseInt(digits, 10))
+  return clampDown(Number.parseInt(digits, 10), rulesRef)
 }
 
-export function parseDistanceInput(raw: string): number | null {
+export function parseDistanceInput(
+  raw: string,
+  rulesRef?: RulesetRef,
+): number | null {
+  const rules = resolveFootballRuleset(rulesRef)
   const trimmed = raw.trim().toUpperCase()
-  if (trimmed === 'G' || trimmed === 'GOAL') return MIN_DISTANCE
+  if (trimmed === 'G' || trimmed === 'GOAL') return rules.minDistance
   const digits = trimmed.replace(/\D/g, '')
   if (!digits) return null
-  return clampDistance(Number.parseInt(digits, 10))
+  return clampDistance(Number.parseInt(digits, 10), rules)
 }

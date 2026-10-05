@@ -1,7 +1,10 @@
-import type { Fixture, GameState } from '@/types'
-import { QUARTER_LENGTH_SECONDS, REGULATION_QUARTERS } from '@/lib/clock'
+import type { Fixture, FootballCode, GameState } from '@/types'
+import {
+  DEFAULT_FOOTBALL_CODE,
+  createInitialSimulation,
+  getFootballRuleset,
+} from '@/lib/football'
 import { isFixtureScheduled } from '@/lib/fixtures'
-import { createInitialSimulation } from '@/lib/playSimulation'
 
 export const FIXTURES: Fixture[] = [
   {
@@ -312,19 +315,24 @@ export const FIXTURES: Fixture[] = [
   },
 ]
 
-export function createInitialGameState(fixture: Fixture): GameState {
+export function createInitialGameState(
+  fixture: Fixture,
+  rulesetId: FootballCode = DEFAULT_FOOTBALL_CODE,
+): GameState {
+  const rules = getFootballRuleset(rulesetId)
   return {
     fixture,
+    rulesetId,
     homeAttacksRight: null,
     score: { home: 0, away: 0 },
     clock: {
-      seconds: QUARTER_LENGTH_SECONDS,
+      seconds: rules.quarterLengthSeconds,
       running: false,
       period: 1,
     },
-    down: 1,
-    distance: 10,
-    ballOn: 25,
+    down: rules.minDown,
+    distance: rules.firstDownDistance,
+    ballOn: rules.defaultBallOn,
     possessionIsHome: true,
     risks: {
       challengeReview: false,
@@ -340,25 +348,29 @@ export function createInitialGameState(fixture: Fixture): GameState {
     periodEnded: false,
     playInProgress: false,
     playYardsGained: 0,
-    playStartDown: 1,
-    playStartDistance: 10,
-    playStartBallOn: 25,
+    playStartDown: rules.minDown,
+    playStartDistance: rules.firstDownDistance,
+    playStartBallOn: rules.defaultBallOn,
     plays: [],
     simulation: createInitialSimulation(true),
   }
 }
 
 /** Post-match state for past fixtures — mirrors endGame after regulation. */
-export function createPostMatchGameState(fixture: Fixture): GameState {
+export function createPostMatchGameState(
+  fixture: Fixture,
+  rulesetId: FootballCode = DEFAULT_FOOTBALL_CODE,
+): GameState {
+  const rules = getFootballRuleset(rulesetId)
   return {
-    ...createInitialGameState(fixture),
+    ...createInitialGameState(fixture, rulesetId),
     homeAttacksRight: true,
     score: fixture.finalScore ?? { home: 0, away: 0 },
     gameStarted: true,
     gameEnded: true,
     periodEnded: true,
     clock: {
-      period: REGULATION_QUARTERS,
+      period: rules.regulationPeriods,
       seconds: 0,
       running: false,
     },
@@ -366,8 +378,11 @@ export function createPostMatchGameState(fixture: Fixture): GameState {
   }
 }
 
-export function createGameStateForFixture(fixture: Fixture): GameState {
+export function createGameStateForFixture(
+  fixture: Fixture,
+  rulesetId: FootballCode = DEFAULT_FOOTBALL_CODE,
+): GameState {
   return isFixtureScheduled(fixture)
-    ? createInitialGameState(fixture)
-    : createPostMatchGameState(fixture)
+    ? createInitialGameState(fixture, rulesetId)
+    : createPostMatchGameState(fixture, rulesetId)
 }

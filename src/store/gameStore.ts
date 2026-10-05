@@ -4,8 +4,6 @@ import type { ActionLogsByFixture, UserAction } from '@/types/actions'
 import { FIXTURES, createGameStateForFixture } from '@/data/fixtures'
 import { appendAction, createUserAction } from '@/lib/actionLog'
 import {
-  QUARTER_LENGTH_SECONDS,
-  REGULATION_QUARTERS,
   adjustLivePlayYards,
   ballOnForPossession,
   canEndCurrentPeriod,
@@ -16,6 +14,7 @@ import {
   clampPeriod,
   createInitialSimulation,
   createQuarterStartPlay,
+  getFootballRuleset,
   isAwaitingRegulationDecision,
   isOvertimePeriod,
   resolveEndedPlayFromGame,
@@ -285,7 +284,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
       const game = state.games[fixtureId]
       if (!game || game.gameEnded) return state
 
-      const toDown = clampDown(down)
+      const toDown = clampDown(down, game.rulesetId)
       if (toDown === game.down) return state
 
       const fromDown = game.down
@@ -319,7 +318,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
       const game = state.games[fixtureId]
       if (!game || game.gameEnded) return state
 
-      const toDistance = clampDistance(distance)
+      const toDistance = clampDistance(distance, game.rulesetId)
       if (toDistance === game.distance) return state
 
       const fromDistance = game.distance
@@ -399,6 +398,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
         distance: game.distance,
         playYardsGained: game.playYardsGained,
         delta,
+        rules: game.rulesetId,
       })
       if (adjusted.actualDelta === 0) return state
 
@@ -450,6 +450,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
         playYardsGained: game.playYardsGained,
         playStartDown: game.playStartDown,
         playStartDistance: game.playStartDistance,
+        rules: game.rulesetId,
       })
 
       const clockBefore = {
@@ -497,6 +498,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
       const game = state.games[fixtureId]
       if (!game) return state
 
+      const rules = getFootballRuleset(game.rulesetId)
       const clockBefore = {
         seconds: game.clock.seconds,
         period: game.clock.period,
@@ -510,7 +512,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
             periodEnded: false,
             clock: {
               period: 1,
-              seconds: QUARTER_LENGTH_SECONDS,
+              seconds: rules.quarterLengthSeconds,
               running: true,
             },
             plays: [...g.plays, createQuarterStartPlay(g, 1)],
@@ -524,7 +526,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
                 payload: {
                   fromPeriod: 0,
                   toPeriod: 1,
-                  seconds: QUARTER_LENGTH_SECONDS,
+                  seconds: rules.quarterLengthSeconds,
                 },
               },
               clockBefore,
@@ -539,6 +541,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
           game.gameEnded,
           game.periodEnded,
           game.clock,
+          game.rulesetId,
         )
       ) {
         return state
@@ -553,7 +556,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
           periodEnded: false,
           clock: {
             period: toPeriod,
-            seconds: QUARTER_LENGTH_SECONDS,
+            seconds: rules.quarterLengthSeconds,
             running: true,
           },
           plays: [...g.plays, createQuarterStartPlay(g, toPeriod)],
@@ -567,7 +570,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
               payload: {
                 fromPeriod,
                 toPeriod,
-                seconds: QUARTER_LENGTH_SECONDS,
+                seconds: rules.quarterLengthSeconds,
               },
             },
             clockBefore,
@@ -587,6 +590,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
           game.gameEnded,
           game.periodEnded,
           game.clock,
+          game.rulesetId,
         )
       ) {
         return state
@@ -632,12 +636,14 @@ export const useAppStore = create<AppStore>((set, get) => ({
           game.gameEnded,
           game.periodEnded,
           game.clock,
+          game.rulesetId,
         )
       ) {
         return state
       }
 
-      const toPeriod = REGULATION_QUARTERS + 1
+      const rules = getFootballRuleset(game.rulesetId)
+      const toPeriod = rules.regulationPeriods + 1
       const clockBefore = {
         seconds: game.clock.seconds,
         period: game.clock.period,
@@ -649,7 +655,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
           periodEnded: false,
           clock: {
             period: toPeriod,
-            seconds: QUARTER_LENGTH_SECONDS,
+            seconds: rules.quarterLengthSeconds,
             running: true,
           },
           plays: [...g.plays, createQuarterStartPlay(g, toPeriod)],
@@ -660,7 +666,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
             fixtureId,
             {
               type: 'overtime_start',
-              payload: { seconds: QUARTER_LENGTH_SECONDS },
+              payload: { seconds: rules.quarterLengthSeconds },
             },
             clockBefore,
           ),
@@ -679,8 +685,9 @@ export const useAppStore = create<AppStore>((set, get) => ({
           game.gameStarted,
           game.gameEnded,
           game.clock,
+          game.rulesetId,
         ) && game.periodEnded
-      const inOvertime = isOvertimePeriod(game.clock.period)
+      const inOvertime = isOvertimePeriod(game.clock.period, game.rulesetId)
 
       if (!atRegulationDecision && !inOvertime) return state
 
@@ -727,6 +734,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
         currentPossessionIsHome: game.possessionIsHome,
         nextPossessionIsHome: possessionIsHome,
         ballOn: game.ballOn,
+        rules: game.rulesetId,
       })
 
       return {

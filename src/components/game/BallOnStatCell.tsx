@@ -1,6 +1,11 @@
 import { type CSSProperties } from 'react'
 import { cn } from '@/lib/utils'
-import { getBallOnDisplay, yardsFromHomeGoal, type BallOnArrowSide } from '@/lib/playSimulation'
+import {
+  getBallOnDisplay,
+  yardsFromHomeGoal,
+  type BallOnArrowSide,
+  type FootballCode,
+} from '@/lib/football'
 import { MATCH_ENDED_STAT } from '@/lib/scoreboard'
 import { usePushPulse } from '@/hooks/usePushPulse'
 
@@ -15,6 +20,7 @@ interface BallOnStatCellProps {
   shellClassName?: string
   labelClassName?: string
   valueClassName?: string
+  rulesetId?: FootballCode
 }
 
 export function BallOnStatCell({
@@ -28,10 +34,12 @@ export function BallOnStatCell({
   shellClassName,
   labelClassName,
   valueClassName,
+  rulesetId,
 }: BallOnStatCellProps) {
   const { yardLine, arrowSide } = getBallOnDisplay(
-    yardsFromHomeGoal(ballOn, offenseIsHome),
+    yardsFromHomeGoal(ballOn, offenseIsHome, rulesetId),
     homeAttacksRight,
+    rulesetId,
   )
   const pulsing = usePushPulse(inactive ? null : ballOn)
 

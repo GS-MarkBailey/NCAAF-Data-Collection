@@ -73,6 +73,7 @@ export function ScoreboardPanelShadcn({
   const down = useAppStore((s) => s.games[fixtureId]?.down ?? 1)
   const distance = useAppStore((s) => s.games[fixtureId]?.distance ?? 10)
   const ballOn = useAppStore((s) => s.games[fixtureId]?.ballOn ?? 25)
+  const rulesetId = useAppStore((s) => s.games[fixtureId]?.rulesetId)
   const possessionIsHome = useAppStore(
     (s) => s.games[fixtureId]?.possessionIsHome ?? true,
   )
@@ -733,6 +734,7 @@ export function ScoreboardPanelShadcn({
                 shellClassName="border-border"
                 labelClassName="text-muted-foreground"
                 valueClassName="text-foreground"
+                rulesetId={rulesetId}
               />
             ) : null}
           </div>
@@ -855,6 +857,7 @@ export function ScoreboardPanelShadcn({
             initialTab={downDistanceTab}
             downInputRef={downInputRef}
             distanceInputRef={distanceInputRef}
+            rulesetId={rulesetId}
           />
         </div>
         <DialogFooter className="m-0 flex-col items-stretch gap-2 rounded-none border-t border-border bg-muted/30 px-4 py-3 sm:flex-row sm:justify-stretch">

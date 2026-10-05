@@ -1,7 +1,6 @@
 import type { GameState, PlayEntry, PlaySimulationState } from '@/types'
 import { formatClock } from '@/lib/format'
-import { QUARTER_LENGTH_SECONDS, REGULATION_QUARTERS } from './clock'
-import { FIRST_DOWN_DISTANCE } from './downDistance'
+import { getFootballRuleset } from './rulesets'
 import {
   formatBallOn,
   endSwitchCount,
@@ -77,10 +76,17 @@ export function createInitialSimulation(offenseIsHome = true): PlaySimulationSta
 export function createQuarterStartPlay(
   game: Pick<
     GameState,
-    'fixture' | 'down' | 'distance' | 'ballOn' | 'possessionIsHome' | 'simulation'
+    | 'fixture'
+    | 'down'
+    | 'distance'
+    | 'ballOn'
+    | 'possessionIsHome'
+    | 'simulation'
+    | 'rulesetId'
   >,
   quarter: number,
 ): PlayEntry {
+  const rules = getFootballRuleset(game.rulesetId)
   const offenseIsHome =
     game.simulation?.offenseIsHome ?? game.possessionIsHome
   const { homeAbbr, awayAbbr, id: fixtureId } = game.fixture
@@ -90,12 +96,18 @@ export function createQuarterStartPlay(
     quarter,
     down: game.down,
     distance: game.distance,
-    ballOn: formatBallOn(offenseIsHome, game.ballOn, homeAbbr, awayAbbr),
+    ballOn: formatBallOn(
+      offenseIsHome,
+      game.ballOn,
+      homeAbbr,
+      awayAbbr,
+      rules,
+    ),
     description:
-      quarter > REGULATION_QUARTERS
+      quarter > rules.regulationPeriods
         ? 'Start of overtime'
         : `Start of quarter ${quarter}`,
-    clock: formatClock(QUARTER_LENGTH_SECONDS),
+    clock: formatClock(rules.quarterLengthSeconds),
   }
 }
 
@@ -104,10 +116,14 @@ function turnoverPossession(
   simulation: PlaySimulationState,
   description: string,
 ): SimulatedPlayResult {
+  const rules = getFootballRuleset(game.rulesetId)
   const offenseIsHome = !simulation.offenseIsHome
-  const ballOn = randomInt(22, 32)
-  const down = 1
-  const distance = FIRST_DOWN_DISTANCE
+  const ballOn = randomInt(
+    Math.max(rules.minBallOn, rules.defaultBallOn - 3),
+    Math.min(rules.maxBallOn, rules.defaultBallOn + 7),
+  )
+  const down = rules.minDown
+  const distance = rules.firstDownDistance
   const sequence = simulation.sequence + 1
 
   return {
@@ -121,6 +137,7 @@ function turnoverPossession(
         ballOn,
         game.fixture.homeAbbr,
         game.fixture.awayAbbr,
+        rules,
       ),
       description,
       clock: formatClock(game.clock.seconds),
@@ -142,6 +159,7 @@ export function simulateLivePlay(
   game: GameState,
   simulation: PlaySimulationState,
 ): SimulatedPlayResult {
+  const rules = getFootballRuleset(game.rulesetId)
   const { fixture, clock, down, distance, ballOn } = game
   const { homeAbbr: H, awayAbbr: A } = fixture
   let offenseIsHome = simulation.offenseIsHome
@@ -171,15 +189,15 @@ export function simulateLivePlay(
 
   if (roll < 0.11) {
     const penalty = pick(PENALTIES)
-    nextBallOn = Math.max(1, nextBallOn - penalty.yards)
+    nextBallOn = Math.max(rules.minBallOn, nextBallOn - penalty.yards)
     description = penalty.label
   } else if (roll < 0.28) {
     const yards = randomInt(2, 9)
     description = `Rush for ${yards} yard${yards === 1 ? '' : 's'} (${pick(RUSHERS)})`
     if (yards >= nextDistance) {
       nextBallOn += yards
-      nextDown = 1
-      nextDistance = FIRST_DOWN_DISTANCE
+      nextDown = rules.minDown
+      nextDistance = rules.firstDownDistance
     } else {
       nextDown += 1
       nextDistance -= yards
@@ -190,8 +208,8 @@ export function simulateLivePlay(
     description = `Pass complete for ${yards} yard${yards === 1 ? '' : 's'} (${pick(RECEIVERS)})`
     if (yards >= nextDistance) {
       nextBallOn += yards
-      nextDown = 1
-      nextDistance = FIRST_DOWN_DISTANCE
+      nextDown = rules.minDown
+      nextDistance = rules.firstDownDistance
     } else {
       nextDown += 1
       nextDistance -= yards
@@ -200,41 +218,44 @@ export function simulateLivePlay(
   } else if (roll < 0.68) {
     description = pick(INCOMPLETE)
     nextDown += 1
-  } else if (roll < 0.78 && nextDown === 4) {
+  } else if (roll < 0.78 && nextDown === rules.maxDown) {
     return turnoverPossession(
       game,
       simulation,
-      'Punt — fair catch at the 25',
+      `Punt — fair catch at the ${rules.defaultBallOn}`,
     )
   } else if (roll < 0.88) {
     const yards = randomInt(12, 28)
     description = `Pass complete for ${yards} yards — big gain (${pick(RECEIVERS)})`
     nextBallOn += yards
-    nextDown = 1
-    nextDistance = FIRST_DOWN_DISTANCE
+    nextDown = rules.minDown
+    nextDistance = rules.firstDownDistance
   } else {
-    const yardsToGoal = 100 - nextBallOn
+    const yardsToGoal = rules.fieldLengthYards - nextBallOn
     const yards = Math.max(yardsToGoal, randomInt(8, 25))
     description = `Pass complete for TOUCHDOWN — ${yards} yards (${pick(RECEIVERS)})`
-    nextBallOn = 25
-    nextDown = 1
-    nextDistance = FIRST_DOWN_DISTANCE
-    if (offenseIsHome) score.home += 6
-    else score.away += 6
+    nextBallOn = rules.defaultBallOn
+    nextDown = rules.minDown
+    nextDistance = rules.firstDownDistance
+    if (offenseIsHome) score.home += rules.touchdownPoints
+    else score.away += rules.touchdownPoints
     offenseIsHome = !offenseIsHome
   }
 
-  if (nextBallOn >= 100 && !description.includes('TOUCHDOWN')) {
+  if (
+    nextBallOn >= rules.fieldLengthYards &&
+    !description.includes('TOUCHDOWN')
+  ) {
     description = `Rush for TOUCHDOWN (${pick(RUSHERS)})`
-    nextBallOn = 25
-    nextDown = 1
-    nextDistance = FIRST_DOWN_DISTANCE
-    if (offenseIsHome) score.home += 6
-    else score.away += 6
+    nextBallOn = rules.defaultBallOn
+    nextDown = rules.minDown
+    nextDistance = rules.firstDownDistance
+    if (offenseIsHome) score.home += rules.touchdownPoints
+    else score.away += rules.touchdownPoints
     offenseIsHome = !offenseIsHome
   }
 
-  if (nextDown > 4) {
+  if (nextDown > rules.maxDown) {
     return turnoverPossession(
       game,
       simulation,
@@ -250,7 +271,7 @@ export function simulateLivePlay(
       quarter: clock.period,
       down: nextDown,
       distance: nextDistance,
-      ballOn: formatBallOn(offenseIsHome, nextBallOn, H, A),
+      ballOn: formatBallOn(offenseIsHome, nextBallOn, H, A, rules),
       description,
       clock: formatClock(clock.seconds),
     },

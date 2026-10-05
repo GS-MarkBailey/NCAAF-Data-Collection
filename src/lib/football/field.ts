@@ -1,5 +1,8 @@
-import { FIELD_LENGTH_YARDS } from './possession'
 import { clampBallOn } from './ballOn'
+import {
+  resolveFootballRuleset,
+  type RulesetRef,
+} from './rulesets'
 
 /** Format offense-relative ball-on for play-by-play (e.g. "CONC 25"). */
 export function formatBallOn(
@@ -7,12 +10,14 @@ export function formatBallOn(
   yardsFromOwnGoal: number,
   homeAbbr: string,
   awayAbbr: string,
+  rulesRef?: RulesetRef,
 ): string {
-  const yards = clampBallOn(yardsFromOwnGoal)
-  if (yards <= 50) {
+  const rules = resolveFootballRuleset(rulesRef)
+  const yards = clampBallOn(yardsFromOwnGoal, rules)
+  if (yards <= rules.midfieldYards) {
     return `${offenseIsHome ? homeAbbr : awayAbbr} ${yards}`
   }
-  const oppYards = FIELD_LENGTH_YARDS - yards
+  const oppYards = rules.fieldLengthYards - yards
   return `${offenseIsHome ? awayAbbr : homeAbbr} ${oppYards}`
 }
 
@@ -27,9 +32,11 @@ export interface BallOnDisplay {
 export function yardsFromHomeGoal(
   yardsFromOwnGoal: number,
   offenseIsHome: boolean,
+  rulesRef?: RulesetRef,
 ): number {
-  const yards = clampBallOn(yardsFromOwnGoal)
-  return offenseIsHome ? yards : FIELD_LENGTH_YARDS - yards
+  const rules = resolveFootballRuleset(rulesRef)
+  const yards = clampBallOn(yardsFromOwnGoal, rules)
+  return offenseIsHome ? yards : rules.fieldLengthYards - yards
 }
 
 /**
@@ -50,24 +57,32 @@ export function getEffectiveHomeAttacksRight(
   return endSwitchCount(period) % 2 === 1 ? !homeAttacksRight : homeAttacksRight
 }
 
-/** Yard line (1–50) and attack-direction arrow from yards-from-home-goal. */
+/** Yard line (1–midfield) and attack-direction arrow from yards-from-home-goal. */
 export function getBallOnDisplay(
   yardsFromHomeGoalValue: number,
   homeAttacksRight: boolean,
+  rulesRef?: RulesetRef,
 ): BallOnDisplay {
-  const yards = clampBallOn(yardsFromHomeGoalValue)
-  const onHomeSide = yards <= 50
+  const rules = resolveFootballRuleset(rulesRef)
+  const yards = clampBallOn(yardsFromHomeGoalValue, rules)
+  const onHomeSide = yards <= rules.midfieldYards
   const homeSideArrow: BallOnArrowSide = homeAttacksRight ? 'right' : 'left'
   const awaySideArrow: BallOnArrowSide = homeAttacksRight ? 'left' : 'right'
 
   return {
-    yardLine: onHomeSide ? yards : FIELD_LENGTH_YARDS - yards,
+    yardLine: onHomeSide ? yards : rules.fieldLengthYards - yards,
     arrowSide: onHomeSide ? homeSideArrow : awaySideArrow,
   }
 }
 
-/** Display yard line (1–50) from offense-relative field position. */
-export function getBallOnYardLine(yardsFromOwnGoal: number): number {
-  const yards = clampBallOn(yardsFromOwnGoal)
-  return yards <= 50 ? yards : FIELD_LENGTH_YARDS - yards
+/** Display yard line (1–midfield) from offense-relative field position. */
+export function getBallOnYardLine(
+  yardsFromOwnGoal: number,
+  rulesRef?: RulesetRef,
+): number {
+  const rules = resolveFootballRuleset(rulesRef)
+  const yards = clampBallOn(yardsFromOwnGoal, rules)
+  return yards <= rules.midfieldYards
+    ? yards
+    : rules.fieldLengthYards - yards
 }

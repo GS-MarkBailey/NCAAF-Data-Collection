@@ -1,3 +1,7 @@
+import type { FootballCode } from '@/lib/football/rulesets'
+
+export type { FootballCode }
+
 export type RiskType =
   | 'challengeReview'
   | 'statDelay'
@@ -37,6 +41,8 @@ export interface PlaySimulationState {
 
 export interface GameState {
   fixture: Fixture
+  /** League rules pack (college / NFL / CFL). Defaults to NCAA for this product. */
+  rulesetId: FootballCode
   /** null until the operator sets field direction on first open */
   homeAttacksRight: boolean | null
   score: { home: number; away: number }

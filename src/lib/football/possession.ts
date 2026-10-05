@@ -1,25 +1,37 @@
 import { clampBallOn } from './ballOn'
+import {
+  DEFAULT_FOOTBALL_RULESET,
+  resolveFootballRuleset,
+  type RulesetRef,
+} from './rulesets'
 
-/** Field length used for absolute ↔ offense-relative yard conversion. */
-export const FIELD_LENGTH_YARDS = 100
+/** @deprecated Prefer `rules.fieldLengthYards`. NCAA default. */
+export const FIELD_LENGTH_YARDS = DEFAULT_FOOTBALL_RULESET.fieldLengthYards
 
 /**
- * `ballOn` is yards from the *offense’s* own goal (1–99).
+ * `ballOn` is yards from the *offense’s* own goal.
  * Absolute yards are measured from the home team’s goal.
  */
 export function toAbsoluteYards(
   possessionIsHome: boolean,
   ballOn: number,
+  rulesRef?: RulesetRef,
 ): number {
-  return possessionIsHome ? ballOn : FIELD_LENGTH_YARDS - ballOn
+  const fieldLength = resolveFootballRuleset(rulesRef).fieldLengthYards
+  return possessionIsHome ? ballOn : fieldLength - ballOn
 }
 
 export function toOffenseBallOn(
   possessionIsHome: boolean,
   absoluteYards: number,
+  rulesRef?: RulesetRef,
 ): number {
+  const rules = resolveFootballRuleset(rulesRef)
   return clampBallOn(
-    possessionIsHome ? absoluteYards : FIELD_LENGTH_YARDS - absoluteYards,
+    possessionIsHome
+      ? absoluteYards
+      : rules.fieldLengthYards - absoluteYards,
+    rules,
   )
 }
 
@@ -27,12 +39,18 @@ export function toOffenseBallOn(
 export function flipPossessionAtSpot(params: {
   possessionIsHome: boolean
   ballOn: number
+  rules?: RulesetRef
 }): { possessionIsHome: boolean; ballOn: number } {
-  const absoluteYards = toAbsoluteYards(params.possessionIsHome, params.ballOn)
+  const rules = resolveFootballRuleset(params.rules)
+  const absoluteYards = toAbsoluteYards(
+    params.possessionIsHome,
+    params.ballOn,
+    rules,
+  )
   const possessionIsHome = !params.possessionIsHome
   return {
     possessionIsHome,
-    ballOn: toOffenseBallOn(possessionIsHome, absoluteYards),
+    ballOn: toOffenseBallOn(possessionIsHome, absoluteYards, rules),
   }
 }
 
@@ -41,13 +59,16 @@ export function ballOnForPossession(params: {
   currentPossessionIsHome: boolean
   nextPossessionIsHome: boolean
   ballOn: number
+  rules?: RulesetRef
 }): number {
+  const rules = resolveFootballRuleset(params.rules)
   if (params.currentPossessionIsHome === params.nextPossessionIsHome) {
-    return clampBallOn(params.ballOn)
+    return clampBallOn(params.ballOn, rules)
   }
   const absoluteYards = toAbsoluteYards(
     params.currentPossessionIsHome,
     params.ballOn,
+    rules,
   )
-  return toOffenseBallOn(params.nextPossessionIsHome, absoluteYards)
+  return toOffenseBallOn(params.nextPossessionIsHome, absoluteYards, rules)
 }

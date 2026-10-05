@@ -1,14 +1,13 @@
 import type { Fixture, PlayEntry } from '@/types'
 import { formatClock } from '@/lib/format'
 import { applyYardDelta } from './ballOn'
-import {
-  FIRST_DOWN_DISTANCE,
-  clampDistance,
-  clampDown,
-  MAX_DOWN,
-} from './downDistance'
+import { clampDistance, clampDown } from './downDistance'
 import { flipPossessionAtSpot } from './possession'
 import { formatBallOn } from './field'
+import {
+  resolveFootballRuleset,
+  type RulesetRef,
+} from './rulesets'
 
 export interface LivePlaySituation {
   down: number
@@ -57,6 +56,7 @@ export interface ResolveEndedPlayInput {
   awayAbbr: string
   /** Optional id for the play-by-play entry (defaults to crypto.randomUUID). */
   playId?: string
+  rules?: RulesetRef
 }
 
 export interface ResolveEndedPlayResult {
@@ -94,11 +94,13 @@ export function adjustLivePlayYards(params: {
   distance: number
   playYardsGained: number
   delta: number
+  rules?: RulesetRef
 }): PlayYardAdjustResult {
   const { ballOn, distance } = applyYardDelta({
     ballOn: params.ballOn,
     distance: params.distance,
     delta: params.delta,
+    rules: params.rules,
   })
   const actualDelta = ballOn - params.ballOn
   return {
@@ -133,11 +135,12 @@ function describeEndedPlay(params: {
 
 /**
  * Resolve END PLAY into the next down/distance/possession and a play-by-play row.
- * Does not award touchdowns or other scores — those can plug in later.
+ * Does not award touchdowns or other scores — those can plug in later via ruleset scoring.
  */
 export function resolveEndedPlay(
   input: ResolveEndedPlayInput,
 ): ResolveEndedPlayResult {
+  const rules = resolveFootballRuleset(input.rules)
   const yardsGained = input.playYardsGained
   const firstDown = yardsGained >= input.playStartDistance
 
@@ -149,22 +152,23 @@ export function resolveEndedPlay(
 
   if (firstDown) {
     outcome = 'first_down'
-    down = 1
-    distance = FIRST_DOWN_DISTANCE
-  } else if (input.down >= MAX_DOWN) {
+    down = rules.minDown
+    distance = rules.firstDownDistance
+  } else if (input.down >= rules.maxDown) {
     outcome = 'turnover_on_downs'
     const flipped = flipPossessionAtSpot({
       possessionIsHome: input.possessionIsHome,
       ballOn: input.ballOn,
+      rules,
     })
     possessionIsHome = flipped.possessionIsHome
     ballOn = flipped.ballOn
-    down = 1
-    distance = FIRST_DOWN_DISTANCE
+    down = rules.minDown
+    distance = rules.firstDownDistance
   } else {
     outcome = 'next_down'
-    down = clampDown(input.down + 1)
-    distance = clampDistance(input.playStartDistance - yardsGained)
+    down = clampDown(input.down + 1, rules)
+    distance = clampDistance(input.playStartDistance - yardsGained, rules)
   }
 
   const description = describeEndedPlay({ yardsGained, outcome })
@@ -178,6 +182,7 @@ export function resolveEndedPlay(
       input.ballOn,
       input.homeAbbr,
       input.awayAbbr,
+      rules,
     ),
     description,
     clock: formatClock(input.clockSeconds),
@@ -210,6 +215,7 @@ export function resolveEndedPlayFromGame(params: {
   playStartDown: number
   playStartDistance: number
   playId?: string
+  rules?: RulesetRef
 }): ResolveEndedPlayResult {
   return resolveEndedPlay({
     down: params.down,
@@ -224,5 +230,6 @@ export function resolveEndedPlayFromGame(params: {
     homeAbbr: params.fixture.homeAbbr,
     awayAbbr: params.fixture.awayAbbr,
     playId: params.playId,
+    rules: params.rules,
   })
 }

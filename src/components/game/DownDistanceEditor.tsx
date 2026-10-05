@@ -1,15 +1,13 @@
 import { useEffect, useState, type Ref } from 'react'
 import { Minus, Plus } from 'lucide-react'
 import {
-  MAX_DISTANCE,
-  MAX_DOWN,
-  MIN_DISTANCE,
-  MIN_DOWN,
   clampDistance,
   clampDown,
+  getFootballRuleset,
   parseDistanceInput,
   parseDownInput,
-} from '@/lib/downDistance'
+  type FootballCode,
+} from '@/lib/football'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -25,6 +23,8 @@ interface DownDistanceEditorProps {
   initialTab?: DownDistanceEditTab
   downInputRef?: Ref<HTMLInputElement>
   distanceInputRef?: Ref<HTMLInputElement>
+  /** League rules pack — drives max downs (4 NCAA/NFL, 3 CFL). */
+  rulesetId?: FootballCode
 }
 
 function StepperField({
@@ -167,10 +167,12 @@ export function DownDistanceEditor({
   initialTab = 'down',
   downInputRef,
   distanceInputRef,
+  rulesetId,
 }: DownDistanceEditorProps) {
+  const rules = getFootballRuleset(rulesetId)
   const [tab, setTab] = useState<DownDistanceEditTab>(initialTab)
-  const clampedDown = clampDown(down)
-  const clampedDistance = clampDistance(distance)
+  const clampedDown = clampDown(down, rules)
+  const clampedDistance = clampDistance(distance, rules)
 
   useEffect(() => {
     setTab(initialTab)
@@ -211,13 +213,13 @@ export function DownDistanceEditor({
           id="down-edit-value"
           label="Down"
           value={clampedDown}
-          min={MIN_DOWN}
-          max={MAX_DOWN}
+          min={rules.minDown}
+          max={rules.maxDown}
           displayValue={String(clampedDown)}
           autoFocus={tab === 'down'}
           inputRef={downInputRef}
-          parseInput={parseDownInput}
-          onChange={(next) => onDownChange(clampDown(next))}
+          parseInput={(raw) => parseDownInput(raw, rules)}
+          onChange={(next) => onDownChange(clampDown(next, rules))}
           groupLabel="Edit down"
         />
       </TabsContent>
@@ -227,13 +229,13 @@ export function DownDistanceEditor({
           id="distance-edit-value"
           label="To go"
           value={clampedDistance}
-          min={MIN_DISTANCE}
-          max={MAX_DISTANCE}
+          min={rules.minDistance}
+          max={rules.maxDistance}
           displayValue={String(clampedDistance)}
           autoFocus={tab === 'distance'}
           inputRef={distanceInputRef}
-          parseInput={parseDistanceInput}
-          onChange={(next) => onDistanceChange(clampDistance(next))}
+          parseInput={(raw) => parseDistanceInput(raw, rules)}
+          onChange={(next) => onDistanceChange(clampDistance(next, rules))}
           groupLabel="Edit yards to go"
         />
       </TabsContent>
