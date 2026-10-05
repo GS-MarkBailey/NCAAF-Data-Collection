@@ -82,96 +82,89 @@ export function GamePageShadcn() {
 
       <div
         className={cn(
-          'flex min-h-0 flex-1 flex-col overscroll-none safe-l safe-r pb-3 landscape-mobile:pb-2',
-          displayResilience ? 'layout-console-shell overflow-y-auto' : 'overflow-hidden',
+          'flex min-h-0 flex-1 flex-col gap-3 overscroll-none safe-l safe-r pb-3 landscape-mobile:gap-3 landscape-mobile:pb-2',
+          displayResilience
+            ? 'layout-console-shell overflow-y-auto'
+            : 'overflow-hidden',
+          takeControl && 'rounded-xl border-[3px] border-destructive bg-destructive/10 p-3',
         )}
       >
-        <div
-          className={cn(
-            'flex min-h-0 flex-1 flex-col gap-3 overscroll-none rounded-xl border-[3px] p-3 transition-colors landscape-mobile:gap-3 landscape-mobile:p-3',
-            displayResilience ? 'overflow-visible' : 'overflow-hidden',
-            takeControl
-              ? 'border-destructive bg-destructive/10'
-              : 'border-border/30 bg-white/55 backdrop-blur-md',
-          )}
-        >
-          {portraitPanelCount > 0 ? (
-            <div
-              className={cn(
-                'flex min-h-0 flex-1 flex-col gap-2 overscroll-none md:hidden landscape-mobile:hidden',
-                displayResilience
-                  ? 'layout-console-portrait'
-                  : 'overflow-hidden',
-              )}
-            >
-              {showScoreboard ? (
-                <div className="flex min-h-0 flex-1 flex-col">
-                  <ScoreboardPanelShadcn fixtureId={fixtureId} layout="stack" />
-                </div>
-              ) : null}
-              {showPlayByPlay ? (
-                <div className="flex min-h-0 flex-1 flex-col">
-                  <PlayByPlayPanelShadcn game={game} />
-                </div>
-              ) : null}
-              {showPlayControls ? (
-                <div className="flex min-h-0 flex-1 flex-col">
-                  <PlayControlsPanelShadcn fixtureId={fixtureId} layout="stack" />
-                </div>
-              ) : null}
-              {showRiskManagement ? (
-                <div className="flex min-h-0 flex-1 flex-col">
-                  <RiskManagementPanelShadcn
-                    game={game}
-                    layout="stack"
-                    onToggleRisk={(risk) => toggleRisk(fixtureId, risk)}
-                  />
-                </div>
-              ) : null}
-            </div>
-          ) : (
-            <div className="flex min-h-0 flex-1 items-center justify-center rounded-lg border border-dashed border-border md:hidden landscape-mobile:hidden">
-              <p className="px-4 text-center text-sm text-muted-foreground">
-                All game console panels are disabled. Re-enable them in Settings →
-                Features.
-              </p>
-            </div>
-          )}
-
-          {desktopPanelCount > 0 ? (
-            <div
-              className={cn(
-                'hidden min-h-0 flex-1 gap-3 md:grid landscape-mobile:grid',
-                desktopPanelCount === 1 && 'grid-cols-1',
-                desktopPanelCount === 2 && 'grid-cols-2',
-                desktopPanelCount === 3 && 'grid-cols-3',
-                desktopPanelCount >= 4 && 'grid-cols-4',
-              )}
-            >
-              {showScoreboard ? (
-                <ScoreboardPanelShadcn fixtureId={fixtureId} layout="column" />
-              ) : null}
-              {showPlayByPlay ? <PlayByPlayPanelShadcn game={game} /> : null}
-              {showPlayControls ? (
-                <PlayControlsPanelShadcn fixtureId={fixtureId} layout="column" />
-              ) : null}
-              {showRiskManagement ? (
+        {portraitPanelCount > 0 ? (
+          <div
+            className={cn(
+              'flex min-h-0 flex-1 flex-col gap-2 overscroll-none md:hidden landscape-mobile:hidden',
+              displayResilience
+                ? 'layout-console-portrait'
+                : 'overflow-hidden',
+            )}
+          >
+            {showScoreboard ? (
+              <div className="flex min-h-0 flex-1 flex-col">
+                <ScoreboardPanelShadcn fixtureId={fixtureId} layout="stack" />
+              </div>
+            ) : null}
+            {showPlayByPlay ? (
+              <div className="flex min-h-0 flex-1 flex-col">
+                <PlayByPlayPanelShadcn game={game} />
+              </div>
+            ) : null}
+            {showPlayControls ? (
+              <div className="flex min-h-0 flex-1 flex-col">
+                <PlayControlsPanelShadcn fixtureId={fixtureId} layout="stack" />
+              </div>
+            ) : null}
+            {showRiskManagement ? (
+              <div className="flex min-h-0 flex-1 flex-col">
                 <RiskManagementPanelShadcn
                   game={game}
-                  layout="column"
+                  layout="stack"
                   onToggleRisk={(risk) => toggleRisk(fixtureId, risk)}
                 />
-              ) : null}
-            </div>
-          ) : (
-            <div className="hidden min-h-0 flex-1 items-center justify-center rounded-lg border border-dashed border-border md:flex landscape-mobile:flex">
-              <p className="px-4 text-center text-sm text-muted-foreground">
-                All game console panels are disabled. Re-enable them in Settings →
-                Features.
-              </p>
-            </div>
-          )}
-        </div>
+              </div>
+            ) : null}
+          </div>
+        ) : (
+          <div className="flex min-h-0 flex-1 items-center justify-center rounded-lg border border-dashed border-border md:hidden landscape-mobile:hidden">
+            <p className="px-4 text-center text-sm text-muted-foreground">
+              All game console panels are disabled. Re-enable them in Settings →
+              Features.
+            </p>
+          </div>
+        )}
+
+        {desktopPanelCount > 0 ? (
+          <div
+            className={cn(
+              'hidden min-h-0 flex-1 gap-3 md:grid landscape-mobile:grid',
+              desktopPanelCount === 1 && 'grid-cols-1',
+              desktopPanelCount === 2 && 'grid-cols-2',
+              desktopPanelCount === 3 && 'grid-cols-3',
+              desktopPanelCount >= 4 && 'grid-cols-4',
+            )}
+          >
+            {showScoreboard ? (
+              <ScoreboardPanelShadcn fixtureId={fixtureId} layout="column" />
+            ) : null}
+            {showPlayByPlay ? <PlayByPlayPanelShadcn game={game} /> : null}
+            {showPlayControls ? (
+              <PlayControlsPanelShadcn fixtureId={fixtureId} layout="column" />
+            ) : null}
+            {showRiskManagement ? (
+              <RiskManagementPanelShadcn
+                game={game}
+                layout="column"
+                onToggleRisk={(risk) => toggleRisk(fixtureId, risk)}
+              />
+            ) : null}
+          </div>
+        ) : (
+          <div className="hidden min-h-0 flex-1 items-center justify-center rounded-lg border border-dashed border-border md:flex landscape-mobile:flex">
+            <p className="px-4 text-center text-sm text-muted-foreground">
+              All game console panels are disabled. Re-enable them in Settings →
+              Features.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   )
