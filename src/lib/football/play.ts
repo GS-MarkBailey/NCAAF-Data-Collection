@@ -1,6 +1,6 @@
 import type { Fixture, PlayEntry } from '@/types'
 import { formatClock } from '@/lib/format'
-import { applyYardDelta } from './ballOn'
+import { applyYardDelta, clampBallOn } from './ballOn'
 import { clampDistance, clampDown } from './downDistance'
 import { flipPossessionAtSpot } from './possession'
 import { formatBallOn } from './field'
@@ -36,6 +36,15 @@ export interface PlayYardAdjustResult {
   playYardsGained: number
   /** Actual yards applied after ball-on clamping (0 if nothing moved). */
   actualDelta: number
+}
+
+export interface BetweenPlayYardAdjustResult {
+  ballOn: number
+  distance: number
+  down: number
+  /** Actual yards applied after ball-on clamping (0 if nothing moved). */
+  actualDelta: number
+  awardedFirstDown: boolean
 }
 
 export type EndedPlayOutcome =
@@ -255,6 +264,50 @@ export function adjustLivePlayYards(params: {
     distance,
     actualDelta,
     playYardsGained: params.playYardsGained + actualDelta,
+  }
+}
+
+/**
+ * Spot the ball between plays. If the nudge covers remaining to-go
+ * (play ended short of the sticks, operator adds yards), award 1st & 10.
+ */
+export function adjustBetweenPlayYards(params: {
+  ballOn: number
+  distance: number
+  down: number
+  delta: number
+  rules?: RulesetRef
+}): BetweenPlayYardAdjustResult {
+  const rules = resolveFootballRuleset(params.rules)
+  const nextBallOn = clampBallOn(params.ballOn + params.delta, rules)
+  const actualDelta = nextBallOn - params.ballOn
+  if (actualDelta === 0) {
+    return {
+      ballOn: params.ballOn,
+      distance: params.distance,
+      down: params.down,
+      actualDelta: 0,
+      awardedFirstDown: false,
+    }
+  }
+
+  const remaining = params.distance - actualDelta
+  if (remaining <= 0) {
+    return {
+      ballOn: nextBallOn,
+      down: rules.minDown,
+      distance: distanceForNewSeries(nextBallOn, rules),
+      actualDelta,
+      awardedFirstDown: true,
+    }
+  }
+
+  return {
+    ballOn: nextBallOn,
+    distance: clampDistance(remaining, rules),
+    down: params.down,
+    actualDelta,
+    awardedFirstDown: false,
   }
 }
 

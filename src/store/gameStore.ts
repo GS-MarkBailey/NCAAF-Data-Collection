@@ -5,8 +5,8 @@ import { FIXTURES, createGameStateForFixture } from '@/data/fixtures'
 import { appendAction, createUserAction } from '@/lib/actionLog'
 import { formatClock } from '@/lib/format'
 import {
+  adjustBetweenPlayYards,
   adjustLivePlayYards,
-  applyYardDelta,
   ballOnForPossession,
   canEndCurrentPeriod,
   canStartNextPeriod,
@@ -554,29 +554,53 @@ export const useAppStore = create<AppStore>((set, get) => ({
       }
 
       // Live play: move ball + accumulate play yards.
-      // Between plays: spot the ball and keep to-go in sync with the move.
-      const adjusted = game.playInProgress
-        ? adjustLivePlayYards({
-            ballOn: game.ballOn,
-            distance: game.distance,
-            playYardsGained: game.playYardsGained,
-            delta,
-            rules: game.rulesetId,
-          })
-        : {
-            ...applyYardDelta({
-              ballOn: game.ballOn,
-              distance: game.distance,
-              delta,
-              rules: game.rulesetId,
-            }),
-            actualDelta: 0,
-            playYardsGained: game.playYardsGained,
-          }
+      // Between plays on scrimmage: spot the ball; if the nudge covers
+      // remaining to-go, award 1st & 10 (play ended short, operator corrects).
+      let nextBallOn: number
+      let nextDistance: number
+      let nextDown: number
+      let nextPlayYards: number
+      let actualDelta: number
 
-      const actualDelta = game.playInProgress
-        ? adjusted.actualDelta
-        : adjusted.ballOn - game.ballOn
+      if (game.playInProgress) {
+        const live = adjustLivePlayYards({
+          ballOn: game.ballOn,
+          distance: game.distance,
+          playYardsGained: game.playYardsGained,
+          delta,
+          rules: game.rulesetId,
+        })
+        nextBallOn = live.ballOn
+        nextDistance = live.distance
+        nextDown = game.down
+        nextPlayYards = live.playYardsGained
+        actualDelta = live.actualDelta
+      } else if (game.seriesKind === 'scrimmage') {
+        const between = adjustBetweenPlayYards({
+          ballOn: game.ballOn,
+          distance: game.distance,
+          down: game.down,
+          delta,
+          rules: game.rulesetId,
+        })
+        nextBallOn = between.ballOn
+        nextDistance = between.distance
+        nextDown = between.down
+        nextPlayYards = game.playYardsGained
+        actualDelta = between.actualDelta
+      } else {
+        // Kickoff / try spotting — move ball + to-go only.
+        const rules = getFootballRuleset(game.rulesetId)
+        nextBallOn = Math.max(
+          rules.minBallOn,
+          Math.min(rules.maxBallOn, Math.round(game.ballOn + delta)),
+        )
+        actualDelta = nextBallOn - game.ballOn
+        nextDistance = Math.max(rules.minDistance, game.distance - actualDelta)
+        nextDown = game.down
+        nextPlayYards = game.playYardsGained
+      }
+
       if (actualDelta === 0) return state
 
       const clockBefore = {
@@ -605,9 +629,10 @@ export const useAppStore = create<AppStore>((set, get) => ({
           }
           return {
             ...withUndo,
-            ballOn: adjusted.ballOn,
-            distance: adjusted.distance,
-            playYardsGained: adjusted.playYardsGained,
+            ballOn: nextBallOn,
+            distance: nextDistance,
+            down: nextDown,
+            playYardsGained: nextPlayYards,
             collectedDatapoints: [
               ...(withUndo.collectedDatapoints ?? []),
               yardPoint,
@@ -622,9 +647,9 @@ export const useAppStore = create<AppStore>((set, get) => ({
               type: 'yards_adjust',
               payload: {
                 delta: actualDelta,
-                yardsGained: adjusted.playYardsGained,
-                ballOn: adjusted.ballOn,
-                distance: adjusted.distance,
+                yardsGained: nextPlayYards,
+                ballOn: nextBallOn,
+                distance: nextDistance,
               },
             },
             clockBefore,
