@@ -21,12 +21,15 @@ import {
   INITIAL_TRY_COLLECTION_STEP,
   TRY_SPOT_BALL_ON,
   applyMatchTransition,
+  applyPlayUndoSnapshot,
+  canUndoPlayAction,
   getFootballRuleset,
   isAwaitingRegulationDecision,
   isOvertimePeriod,
   labelForDatapointKey,
   labelForYardsDelta,
   nextClockRunning,
+  pushPlayUndoSnapshot,
   resolveEndedPlayFromGame,
   resolvePlayCollectionChoice,
   startLivePlay,
@@ -53,10 +56,12 @@ interface AppStore {
   setDown: (fixtureId: string, down: number) => void
   setDistance: (fixtureId: string, distance: number) => void
   snapPlay: (fixtureId: string) => void
-  endPlay: (fixtureId: string) => void
+  endPlay: (fixtureId: string, options?: { skipUndoPush?: boolean }) => void
   adjustYards: (fixtureId: string, delta: number) => void
   /** Advance progressive play-collection (rush/throw → result → …). */
   selectPlayCollectionOption: (fixtureId: string, optionId: string) => void
+  /** Restore the previous play-controls action (collection / yards / snap / end). */
+  undoPlayControl: (fixtureId: string) => void
   startPeriod: (fixtureId: string) => void
   endPeriod: (fixtureId: string) => void
   startOvertime: (fixtureId: string) => void
@@ -423,19 +428,22 @@ export const useAppStore = create<AppStore>((set, get) => ({
       }
 
       return {
-        games: updateGame(state.games, fixtureId, (g) => ({
-          ...g,
-          ...snap,
-          seriesKind: match.seriesKind,
-          playInProgress: match.playInProgress,
-          playCollectionStep: INITIAL_PLAY_COLLECTION_STEP,
-          playCollectionPath: [],
-          collectedDatapoints: appendCollectedDatapoint(g, 'snap'),
-          clock: {
-            ...g.clock,
-            running: nextClockRunning({ type: 'snap' }, g.clock),
-          },
-        })),
+        games: updateGame(state.games, fixtureId, (g) => {
+          const withUndo = pushPlayUndoSnapshot(g)
+          return {
+            ...withUndo,
+            ...snap,
+            seriesKind: match.seriesKind,
+            playInProgress: match.playInProgress,
+            playCollectionStep: INITIAL_PLAY_COLLECTION_STEP,
+            playCollectionPath: [],
+            collectedDatapoints: appendCollectedDatapoint(withUndo, 'snap'),
+            clock: {
+              ...withUndo.clock,
+              running: nextClockRunning({ type: 'snap' }, withUndo.clock),
+            },
+          }
+        }),
         actionLogs: appendAction(
           state.actionLogs,
           createUserAction(
@@ -474,19 +482,21 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
       return {
         games: updateGame(state.games, fixtureId, (g) => {
-          const path = [...g.playCollectionPath, optionId]
+          const withUndo = pushPlayUndoSnapshot(g)
+          const path = [...withUndo.playCollectionPath, optionId]
           return {
-            ...g,
+            ...withUndo,
             playCollectionStep: resolved.nextStep,
             playCollectionPath: path,
-            collectedDatapoints: appendCollectedDatapoint(g, optionId),
+            collectedDatapoints: appendCollectedDatapoint(withUndo, optionId),
           }
         }),
       }
     })
     // Terminal choices without a yards pause (incomplete, PAT good, TD, …).
+    // One undo step covers the selection + auto END PLAY.
     if (shouldAutoEnd) {
-      get().endPlay(fixtureId)
+      get().endPlay(fixtureId, { skipUndoPush: true })
     }
   },
 
@@ -529,21 +539,22 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
       return {
         games: updateGame(state.games, fixtureId, (g) => {
+          const withUndo = pushPlayUndoSnapshot(g)
           const yardPoint: CollectedDatapoint = {
             id: crypto.randomUUID(),
             key: 'yards',
             label: labelForYardsDelta(actualDelta),
-            period: g.clock.period,
-            clock: formatClock(g.clock.seconds),
+            period: withUndo.clock.period,
+            clock: formatClock(withUndo.clock.seconds),
             collectedAt: Date.now(),
           }
           return {
-            ...g,
+            ...withUndo,
             ballOn: adjusted.ballOn,
             distance: adjusted.distance,
             playYardsGained: adjusted.playYardsGained,
             collectedDatapoints: [
-              ...(g.collectedDatapoints ?? []),
+              ...(withUndo.collectedDatapoints ?? []),
               yardPoint,
             ],
           }
@@ -568,7 +579,22 @@ export const useAppStore = create<AppStore>((set, get) => ({
     })
   },
 
-  endPlay: (fixtureId) => {
+  undoPlayControl: (fixtureId) => {
+    set((state) => {
+      const game = state.games[fixtureId]
+      if (!canUndoPlayAction(game)) return state
+      const stack = game!.playUndoStack
+      const snapshot = stack[stack.length - 1]
+      if (!snapshot) return state
+      return {
+        games: updateGame(state.games, fixtureId, (g) =>
+          applyPlayUndoSnapshot(g, snapshot),
+        ),
+      }
+    })
+  },
+
+  endPlay: (fixtureId, options) => {
     set((state) => {
       const game = state.games[fixtureId]
       if (!game || game.gameEnded || !game.playInProgress) return state
@@ -631,11 +657,14 @@ export const useAppStore = create<AppStore>((set, get) => ({
             },
       )
 
+      const skipUndoPush = Boolean(options?.skipUndoPush)
+
       return {
         games: updateGame(state.games, fixtureId, (g) => {
-          const withEnd = appendCollectedDatapoint(g, 'end_play')
+          const withUndo = skipUndoPush ? g : pushPlayUndoSnapshot(g)
+          const withEnd = appendCollectedDatapoint(withUndo, 'end_play')
           const base = {
-            ...g,
+            ...withUndo,
             playYardsGained: resolved.playYardsGained,
             seriesKind: match.seriesKind,
             down: resolved.down,
@@ -643,20 +672,23 @@ export const useAppStore = create<AppStore>((set, get) => ({
             ballOn: resolved.ballOn,
             possessionIsHome: resolved.possessionIsHome,
             score: {
-              home: g.score.home + resolved.scoreHomeDelta,
-              away: g.score.away + resolved.scoreAwayDelta,
+              home: withUndo.score.home + resolved.scoreHomeDelta,
+              away: withUndo.score.away + resolved.scoreAwayDelta,
             },
             clock: {
-              ...g.clock,
+              ...withUndo.clock,
               running: nextClockRunning(
                 { type: 'play_ended', stopClock: resolved.stopClock },
-                g.clock,
+                withUndo.clock,
               ),
             },
-            simulation: g.simulation
-              ? { ...g.simulation, offenseIsHome: resolved.possessionIsHome }
-              : g.simulation,
-            plays: [...g.plays, resolved.play],
+            simulation: withUndo.simulation
+              ? {
+                  ...withUndo.simulation,
+                  offenseIsHome: resolved.possessionIsHome,
+                }
+              : withUndo.simulation,
+            plays: [...withUndo.plays, resolved.play],
           }
 
           // Touchdown → open try/convert collection (1-pt / 2-pt).
@@ -677,8 +709,8 @@ export const useAppStore = create<AppStore>((set, get) => ({
                   id: crypto.randomUUID(),
                   key: 'try',
                   label: labelForDatapointKey('try'),
-                  period: g.clock.period,
-                  clock: formatClock(g.clock.seconds),
+                  period: withUndo.clock.period,
+                  clock: formatClock(withUndo.clock.seconds),
                   collectedAt: Date.now(),
                 },
               ],
@@ -702,8 +734,8 @@ export const useAppStore = create<AppStore>((set, get) => ({
                   id: crypto.randomUUID(),
                   key: 'kickoff',
                   label: labelForDatapointKey('kickoff'),
-                  period: g.clock.period,
-                  clock: formatClock(g.clock.seconds),
+                  period: withUndo.clock.period,
+                  clock: formatClock(withUndo.clock.seconds),
                   collectedAt: Date.now(),
                 },
               ],
@@ -763,42 +795,45 @@ export const useAppStore = create<AppStore>((set, get) => ({
         })
         const spot = rules.defaultBallOn
         return {
-          games: updateGame(state.games, fixtureId, (g) => ({
-            ...g,
-            gameStarted: match.gameStarted,
-            periodEnded: match.periodEnded,
-            playInProgress: match.playInProgress,
-            seriesKind: match.seriesKind,
-            playCollectionStep: INITIAL_KICKOFF_COLLECTION_STEP,
-            playCollectionPath: ['kickoff'],
-            collectedDatapoints: [
-              ...(g.collectedDatapoints ?? []),
-              {
-                id: crypto.randomUUID(),
-                key: 'kickoff',
-                label: labelForDatapointKey('kickoff'),
+          games: updateGame(state.games, fixtureId, (g) => {
+            const withUndo = pushPlayUndoSnapshot(g)
+            return {
+              ...withUndo,
+              gameStarted: match.gameStarted,
+              periodEnded: match.periodEnded,
+              playInProgress: match.playInProgress,
+              seriesKind: match.seriesKind,
+              playCollectionStep: INITIAL_KICKOFF_COLLECTION_STEP,
+              playCollectionPath: ['kickoff'],
+              collectedDatapoints: [
+                ...(withUndo.collectedDatapoints ?? []),
+                {
+                  id: crypto.randomUUID(),
+                  key: 'kickoff',
+                  label: labelForDatapointKey('kickoff'),
+                  period: 1,
+                  clock: formatClock(rules.quarterLengthSeconds),
+                  collectedAt: Date.now(),
+                },
+              ],
+              playYardsGained: 0,
+              playStartDown: rules.minDown,
+              playStartDistance: rules.firstDownDistance,
+              playStartBallOn: spot,
+              ballOn: spot,
+              down: rules.minDown,
+              distance: rules.firstDownDistance,
+              clock: {
                 period: 1,
-                clock: formatClock(rules.quarterLengthSeconds),
-                collectedAt: Date.now(),
+                seconds: rules.quarterLengthSeconds,
+                running: nextClockRunning(
+                  { type: 'kickoff_opened' },
+                  { seconds: rules.quarterLengthSeconds, running: false },
+                ),
               },
-            ],
-            playYardsGained: 0,
-            playStartDown: rules.minDown,
-            playStartDistance: rules.firstDownDistance,
-            playStartBallOn: spot,
-            ballOn: spot,
-            down: rules.minDown,
-            distance: rules.firstDownDistance,
-            clock: {
-              period: 1,
-              seconds: rules.quarterLengthSeconds,
-              running: nextClockRunning(
-                { type: 'kickoff_opened' },
-                { seconds: rules.quarterLengthSeconds, running: false },
-              ),
-            },
-            plays: [...g.plays, createQuarterStartPlay(g, 1)],
-          })),
+              plays: [...withUndo.plays, createQuarterStartPlay(withUndo, 1)],
+            }
+          }),
           actionLogs: appendAction(
             state.actionLogs,
             createUserAction(

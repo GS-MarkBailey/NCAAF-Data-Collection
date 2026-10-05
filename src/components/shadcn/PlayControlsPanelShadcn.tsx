@@ -1,4 +1,4 @@
-import { MoveHorizontal, Zap } from 'lucide-react'
+import { MoveHorizontal, Undo2, Zap } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
   OPERATOR_PRIMARY_SURFACE,
@@ -6,6 +6,7 @@ import {
   operatorButtonTextClass,
 } from '@/lib/operatorChrome'
 import {
+  canUndoPlayAction,
   getMatchStateView,
   getPlayCollectionView,
   getPlayControlCapabilities,
@@ -19,6 +20,7 @@ import { useAppStore } from '@/store/gameStore'
 import { Button } from '@/components/ui/button'
 import {
   Card,
+  CardAction,
   CardContent,
   CardHeader,
   CardTitle,
@@ -72,7 +74,9 @@ export function PlayControlsPanelShadcn({
   const selectPlayCollectionOption = useAppStore(
     (s) => s.selectPlayCollectionOption,
   )
+  const undoPlayControl = useAppStore((s) => s.undoPlayControl)
   const startPeriod = useAppStore((s) => s.startPeriod)
+  const canUndo = canUndoPlayAction(game)
 
   const showSnap = useFeatureFlag('playControls.snap')
   const showEndPlay = useFeatureFlag('playControls.endPlay')
@@ -163,6 +167,24 @@ export function PlayControlsPanelShadcn({
           <Zap className="size-4 text-muted-foreground" />
           Play controls
         </CardTitle>
+        <CardAction>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            disabled={!canUndo}
+            title="Undo last play-control action"
+            aria-label="Undo last play-control action"
+            className={cn(
+              'h-7 gap-1 px-2 text-xs font-medium',
+              OPERATOR_SECONDARY_SURFACE,
+            )}
+            onClick={() => undoPlayControl(fixtureId)}
+          >
+            <Undo2 className="size-3.5" aria-hidden />
+            Undo
+          </Button>
+        </CardAction>
       </CardHeader>
       <CardContent className="flex min-h-0 flex-1 flex-col gap-2 overflow-hidden">
         {showMatchStateGuide && matchView && matchControls ? (

@@ -1,5 +1,6 @@
 import type { FootballCode } from '@/lib/football/rulesets'
 import type { PlayCollectionStepId } from '@/lib/football/playCollectionFlow'
+import type { PlayUndoSnapshot } from '@/lib/football/playUndo'
 
 export type { FootballCode, PlayCollectionStepId }
 
@@ -96,6 +97,8 @@ export interface GameState {
   playCollectionPath: string[]
   /** Session log of datapoints collected (survives END PLAY). */
   collectedDatapoints: CollectedDatapoint[]
+  /** Snapshots for Play controls Undo (collection / yards / snap / end). */
+  playUndoStack: PlayUndoSnapshot[]
   /** Net yards gained for the offense since the last SNAP */
   playYardsGained: number
   /** Down / distance / ball-on at SNAP (used when ending the play) */
