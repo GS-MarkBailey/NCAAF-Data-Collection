@@ -126,13 +126,13 @@ export function toMatchStateInput(
   >,
 ): MatchStateInput {
   return {
-    rulesetId: game.rulesetId,
-    gameStarted: game.gameStarted,
-    gameEnded: game.gameEnded,
-    periodEnded: game.periodEnded,
-    playInProgress: game.playInProgress,
-    seriesKind: game.seriesKind,
-    clock: game.clock,
+    rulesetId: game.rulesetId ?? 'ncaa',
+    gameStarted: game.gameStarted ?? false,
+    gameEnded: game.gameEnded ?? false,
+    periodEnded: game.periodEnded ?? false,
+    playInProgress: game.playInProgress ?? false,
+    seriesKind: game.seriesKind ?? 'scrimmage',
+    clock: game.clock ?? { seconds: 0, period: 1, running: false },
   }
 }
 

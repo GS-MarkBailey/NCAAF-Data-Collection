@@ -58,20 +58,24 @@ export function PlayControlsPanelShadcn({
   const showYardAdjust = useFeatureFlag('playControls.yardAdjust')
   const showMatchStateGuide = useFeatureFlag('playControls.matchStateGuide')
 
-  const matchView = game ? getMatchStateView(toMatchStateInput(game)) : null
-  const controls = game
-    ? getPlayControlCapabilities(toMatchStateInput(game))
-    : {
-        canSnap: false,
-        canEndPlay: false,
-        canAdjustYards: false,
-        phase: 'pregame' as const,
-      }
+  const matchInput = game ? toMatchStateInput(game) : null
+  const matchView = matchInput ? getMatchStateView(matchInput) : null
+  const matchControls = matchInput
+    ? getPlayControlCapabilities(matchInput)
+    : null
 
   const stacked = layout === 'stack'
+  const gameEnded = game?.gameEnded ?? false
   const playInProgress = game?.playInProgress ?? false
-  const canSnap = controls.canSnap
-  const canEndOrAdjust = controls.canEndPlay || controls.canAdjustYards
+
+  // Classic mode: simple play-in-progress gating (unchanged from original).
+  // Match-state guide: phase-driven capabilities from the state machine.
+  const canSnap = showMatchStateGuide
+    ? (matchControls?.canSnap ?? false)
+    : !gameEnded && !playInProgress
+  const canEndOrAdjust = showMatchStateGuide
+    ? Boolean(matchControls?.canEndPlay || matchControls?.canAdjustYards)
+    : !gameEnded && playInProgress
 
   const yardsLabel =
     playYardsGained === 0
@@ -134,7 +138,7 @@ export function PlayControlsPanelShadcn({
             matchView={matchView}
             yardsLabel={yardsLabel}
             playInProgress={playInProgress}
-            canAdjustYards={controls.canAdjustYards}
+            canAdjustYards={matchControls?.canAdjustYards ?? false}
             onAction={runAction}
             onAdjustYards={(delta) => adjustYards(fixtureId, delta)}
           />
