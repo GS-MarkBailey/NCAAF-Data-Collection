@@ -56,9 +56,11 @@ export function CollectedDatapointsDialogShadcn({
               appears here, newest first.
             </p>
           ) : (
-            <ol className="flex flex-col gap-1.5">
+            <ol className="flex flex-col gap-1.5" reversed>
               {[...datapoints].reverse().map((entry, index) => {
                 const isUndo = entry.key === 'undo'
+                // Newest first; numbers keep collection order (n … 1).
+                const orderNumber = datapoints.length - index
                 return (
                   <li
                     key={entry.id}
@@ -69,7 +71,7 @@ export function CollectedDatapointsDialogShadcn({
                     }
                   >
                     <span className="w-6 shrink-0 text-xs tabular-nums text-muted-foreground">
-                      {index + 1}
+                      {orderNumber}
                     </span>
                     <div className="min-w-0 flex-1">
                       <p
