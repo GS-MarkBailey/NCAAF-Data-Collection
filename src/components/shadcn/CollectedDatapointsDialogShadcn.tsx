@@ -53,11 +53,11 @@ export function CollectedDatapointsDialogShadcn({
           {datapoints.length === 0 ? (
             <p className="px-2 text-sm text-muted-foreground">
               Kick off and collect plays — each choice, yard press, and undo
-              appears here in order.
+              appears here, newest first.
             </p>
           ) : (
             <ol className="flex flex-col gap-1.5">
-              {datapoints.map((entry, index) => {
+              {[...datapoints].reverse().map((entry, index) => {
                 const isUndo = entry.key === 'undo'
                 return (
                   <li
