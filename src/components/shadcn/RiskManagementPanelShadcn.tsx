@@ -2,6 +2,9 @@ import { useMemo } from 'react'
 import { AlertTriangle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
+  CONSOLE_PANEL_CARD_CLASS,
+  CONSOLE_PANEL_HEADER_CLASS,
+  CONSOLE_PANEL_TITLE_CLASS,
   OPERATOR_SECONDARY_SURFACE,
   operatorButtonTextClass,
 } from '@/lib/operatorChrome'
@@ -55,8 +58,6 @@ function getRiskGridRowCount(
     : Math.ceil(standardCount / 2)
 }
 
-const PORTRAIT_PANEL_CLASS = 'min-h-0 flex-1 border border-border ring-0'
-
 interface RiskManagementPanelShadcnProps {
   game: GameState
   layout?: 'stack' | 'column'
@@ -92,7 +93,6 @@ export function RiskManagementPanelShadcn({
     Boolean(unreliableRisk),
   )
   const stacked = layout === 'stack'
-  const portraitPanelClass = PORTRAIT_PANEL_CLASS
 
   const handleValueChange = (values: string[]) => {
     for (const { key } of visibleRisks) {
@@ -103,16 +103,10 @@ export function RiskManagementPanelShadcn({
   }
 
   return (
-    <Card
-      size="compact"
-      className={cn(
-        'flex min-h-0 flex-1 flex-col',
-        stacked && portraitPanelClass,
-      )}
-    >
-      <CardHeader className="border-b border-border">
-        <CardTitle className="flex items-center gap-2 text-sm">
-          <AlertTriangle className="size-4 text-muted-foreground" />
+    <Card size="compact" className={CONSOLE_PANEL_CARD_CLASS}>
+      <CardHeader className={CONSOLE_PANEL_HEADER_CLASS}>
+        <CardTitle className={CONSOLE_PANEL_TITLE_CLASS}>
+          <AlertTriangle className="size-4 shrink-0 text-muted-foreground" />
           Risk Management
         </CardTitle>
       </CardHeader>

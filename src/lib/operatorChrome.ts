@@ -14,6 +14,19 @@ export const OPERATOR_PRIMARY_SURFACE = cn(
   'hover:bg-[var(--color-brand-hover)]',
 )
 
+/** Shared shell for Scoreboard / Play controls / Risk / Play-by-play cards. */
+export const CONSOLE_PANEL_CARD_CLASS = cn(
+  'flex min-h-0 flex-1 flex-col border border-border bg-card shadow-sm ring-0',
+)
+
+export const CONSOLE_PANEL_HEADER_CLASS = cn(
+  'min-h-10 items-center border-b border-border py-0',
+)
+
+export const CONSOLE_PANEL_TITLE_CLASS = cn(
+  'flex items-center gap-2 text-sm font-semibold leading-none',
+)
+
 /** Match Risk Management tile type: sm desktop, xs on landscape mobile / portrait stack. */
 export function operatorButtonTextClass(stacked = false): string {
   return stacked

@@ -1,6 +1,9 @@
 import { MoveHorizontal, Undo2, Zap } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
+  CONSOLE_PANEL_CARD_CLASS,
+  CONSOLE_PANEL_HEADER_CLASS,
+  CONSOLE_PANEL_TITLE_CLASS,
   OPERATOR_PRIMARY_SURFACE,
   OPERATOR_SECONDARY_SURFACE,
   operatorButtonTextClass,
@@ -25,8 +28,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-
-const PORTRAIT_PANEL_CLASS = 'min-h-0 flex-1 border border-border ring-0'
 
 const YARD_DELTAS = [1, 5, -5, -1] as const
 
@@ -158,19 +159,13 @@ export function PlayControlsPanelShadcn({
   }
 
   return (
-    <Card
-      size="compact"
-      className={cn(
-        'flex min-h-0 flex-1 flex-col',
-        stacked && PORTRAIT_PANEL_CLASS,
-      )}
-    >
-      <CardHeader className="border-b border-border">
-        <CardTitle className="flex items-center gap-2 text-sm">
-          <Zap className="size-4 text-muted-foreground" />
+    <Card size="compact" className={CONSOLE_PANEL_CARD_CLASS}>
+      <CardHeader className={CONSOLE_PANEL_HEADER_CLASS}>
+        <CardTitle className={CONSOLE_PANEL_TITLE_CLASS}>
+          <Zap className="size-4 shrink-0 text-muted-foreground" />
           Play controls
         </CardTitle>
-        <CardAction>
+        <CardAction className="self-center">
           <Button
             type="button"
             variant="secondary"

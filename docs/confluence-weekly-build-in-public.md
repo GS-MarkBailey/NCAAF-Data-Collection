@@ -437,6 +437,7 @@ With **Match-state guide** on, scheduled fixtures open in **pregame** so the ful
 - **Clock:** awarded first down keeps the game clock running (NCAA 2023+), except last **2:00** of Q2/Q4 or out of bounds
 - Collected datapoints show the credited team abbr (e.g. **Touchdown - MISS**); after a score the scoring team keeps possession through **KICK OFF** (they kick), then possession flips on the kickoff result
 - App shell uses a cool blue–teal gradient wash behind fixtures and the game console (no frosted outer frame — panels sit directly on the gradient)
+- Game console panels (Scoreboard / Play controls / Risk / Play-by-play) share one card chrome — same border, header height, and title style
 - **END PLAY** appears when the chosen result is ready
 - Later quarters: **End period** on the scoreboard, then **Start** on the clock (no Start Q / Kick off badges on the scoreboard)
 

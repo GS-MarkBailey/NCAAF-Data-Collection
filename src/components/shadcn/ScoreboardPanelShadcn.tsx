@@ -21,6 +21,11 @@ import { useFeatureFlag } from '@/hooks/useFeatureFlag'
 import { useAppStore } from '@/store/gameStore'
 import { getEffectiveHomeAttacksRight } from '@/lib/playSimulation'
 import { MATCH_ENDED_STAT } from '@/lib/scoreboard'
+import {
+  CONSOLE_PANEL_CARD_CLASS,
+  CONSOLE_PANEL_HEADER_CLASS,
+  CONSOLE_PANEL_TITLE_CLASS,
+} from '@/lib/operatorChrome'
 import { BallOnStatCell } from '@/components/game/BallOnStatCell'
 import { ClockNumericEditor, type ClockEditTab } from '@/components/game/ClockNumericEditor'
 import { DownDistanceEditor, type DownDistanceEditTab } from '@/components/game/DownDistanceEditor'
@@ -48,8 +53,6 @@ interface ScoreboardPanelShadcnProps {
 
 const PRIMARY_ACTION_BADGE_CLASS =
   'rounded-full border-[var(--color-primary-border)] bg-[var(--color-primary-chip-bg)] text-[10px] font-bold tracking-wider text-[var(--color-primary-chip-text)] uppercase'
-
-const PORTRAIT_PANEL_CLASS = 'min-h-0 flex-1 border border-border ring-0'
 
 type PendingConfirmation = 'endPeriod' | 'endGame' | 'startOvertime'
 
@@ -449,16 +452,10 @@ export function ScoreboardPanelShadcn({
 
   return (
     <>
-    <Card
-      size="compact"
-      className={cn(
-        'flex min-h-0 flex-1 flex-col',
-        stacked && PORTRAIT_PANEL_CLASS,
-      )}
-    >
-      <CardHeader className="border-b border-border">
-        <CardTitle className="flex items-center gap-2 text-sm">
-          <LayoutGrid className="size-4 text-muted-foreground" />
+    <Card size="compact" className={CONSOLE_PANEL_CARD_CLASS}>
+      <CardHeader className={CONSOLE_PANEL_HEADER_CLASS}>
+        <CardTitle className={CONSOLE_PANEL_TITLE_CLASS}>
+          <LayoutGrid className="size-4 shrink-0 text-muted-foreground" />
           Scoreboard
         </CardTitle>
       </CardHeader>
