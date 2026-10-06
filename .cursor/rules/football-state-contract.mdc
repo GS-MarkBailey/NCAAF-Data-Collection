@@ -42,12 +42,14 @@ Before changing match/game/play-control logic, read and follow this contract. Do
    (or `flagTypesForGame(game)`). NCAA, NFL, and CFL differ (DPI spot vs 10 yards,
    OPI 15 vs 10, defensive holding 10 vs 5, CFL no yards / objectionable conduct,
    NCAA targeting, etc.). Do not hardcode a single yardage for all associations.
-   Operator **FLAG** in play controls opens `choose_flag_*` steps
-   (`flagCollection.ts`). Categories and types are filtered by **match situation**
-   (`deriveFlagSituation`: pre-snap, kickoff, try, run, pass, punt, live) from
-   `seriesKind` + play-tree path + `playInProgress`, then by association/series.
-   **ACCEPT** applies `enforceAcceptedFlag` and stops the clock via
-   `flag_accepted`. **DECLINE** restores the prior collection step.
+   Flag collection steps live in `flagCollection.ts` (`choose_flag_*`); categories
+   and types are filtered by **match situation** (`deriveFlagSituation`: pre-snap,
+   kickoff, try, run, pass, punt, live) from `seriesKind` + play-tree path +
+   `playInProgress`, then by association/series. **ACCEPT** applies
+   `enforceAcceptedFlag` and stops the clock via `flag_accepted`. **DECLINE**
+   restores the prior collection step.
+   The play-controls **FLAG** entry button is temporarily hidden; keep the store /
+   collection / enforcement path ready to re-enable.
 
 ## Kickoff collection tree (current product)
 

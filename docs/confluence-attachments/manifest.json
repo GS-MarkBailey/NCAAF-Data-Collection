@@ -1,5 +1,5 @@
 {
-  "stagedAt": "2026-10-06T14:57:06.997Z",
+  "stagedAt": "2026-10-06T15:22:35.595Z",
   "files": [
     {
       "relPath": "week-1/features/action-log.png",
@@ -104,18 +104,6 @@
     {
       "relPath": "week-4/features/play-controls-choose-type.png",
       "attachmentName": "week-4--features--play-controls-choose-type.png"
-    },
-    {
-      "relPath": "week-4/features/play-controls-flag-kickoff.png",
-      "attachmentName": "week-4--features--play-controls-flag-kickoff.png"
-    },
-    {
-      "relPath": "week-4/features/play-controls-flag-pass.png",
-      "attachmentName": "week-4--features--play-controls-flag-pass.png"
-    },
-    {
-      "relPath": "week-4/features/play-controls-flag.png",
-      "attachmentName": "week-4--features--play-controls-flag.png"
     },
     {
       "relPath": "week-4/features/play-controls-idle.png",

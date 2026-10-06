@@ -446,11 +446,7 @@ With **Match-state guide** on, scheduled fixtures open in **pregame** so the ful
 - Game-state flag catalog (`flagRules.ts`): NCAA / NFL / CFL penalty types with **per-association** enforcement (yardage, spot, down effect, DQ)
 - Risk management chip is **Flag** (not Penalty)
 - Landscape console order is Scoreboard → Risk → **Play controls** (play controls on the right)
-- Play controls **FLAG**: category → type (filtered to the current match phase and play tree — e.g. PROCEDURE before the snap, KICK on kickoff, PASS after a pass attempt) then association rules → who it is on → accept / decline. Accept applies NCAA / NFL / CFL enforcement and stops the clock; decline restores the previous collection step
-
-<!-- AUTO-SNAPSHOTS:week-4-shipped-play-flag:START -->
-![Play controls — flag collection](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/play-controls-flag.png) ![Play controls — flag on kickoff](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/play-controls-flag-kickoff.png) ![Play controls — flag after throw](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/play-controls-flag-pass.png)
-<!-- AUTO-SNAPSHOTS:week-4-shipped-play-flag:END -->
+- Play controls **FLAG** entry is temporarily hidden (collection + association enforcement logic kept in the game layer for a later re-enable)
 - **END PLAY** appears when the chosen result is ready
 - Later quarters: **End period** on the scoreboard, then **Start** on the clock (no Start Q / Kick off badges on the scoreboard)
 
@@ -532,7 +528,7 @@ The table below is a checklist of what the prototype supports today on the live 
 | Play controls — snap, end play, yard adjust (feature-flagged) | ✅ |
 | Progressive play datapoints — pregame KICK OFF → SNAP → rush/throw → result (match-state guide) | ✅ |
 | Flag / penalty types in game state with NCAA vs NFL vs CFL enforcement (no collection UI yet) | ✅ |
-| Play controls FLAG collection (match-state types → against → accept/decline, association enforcement) | ✅ |
+| Play controls FLAG collection (logic ready; entry button temporarily hidden) | ⏸ |
 | Play-by-play (feature-flagged, off by default) | ✅ |
 | Action log + CSV export | ✅ |
 | Feature flags with Vercel deploy (Confirm & deploy) | ✅ |
@@ -574,7 +570,7 @@ The app is a single-page React application with no server-side rendering. Game a
 These are deliberate prototype boundaries or open items identified during the four-week build. They are useful context for anyone evaluating the demo: the UI and flows are largely representative of target operator experience, but data, connectivity, and configuration security are not production-ready yet.
 
 - Demo data only — no live feed or backend integration yet
-- Flag / penalty catalog is collectable from play controls (**FLAG**); enforcement is a simplified operator walk-off, not a full referee book (offsetting / 10-second runoff / decline-vs-result still need later work)
+- Flag / penalty catalog + enforcement live in the game layer; play-controls **FLAG** entry is temporarily hidden (offsetting / 10-second runoff / decline-vs-result still need later work)
 - Feature flag deploy requires **Confirm & deploy** in Settings → Features (toggles alone are local preview); passphrase required on production if configured
 - Git push deploys code only — not in-browser feature flag drafts
 - Clock wheel initialisation on iPhone may need further device testing

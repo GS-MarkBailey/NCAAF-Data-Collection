@@ -124,12 +124,8 @@ export function PlayControlsPanelShadcn({
     ? (matchControls?.canSnap ?? false)
     : !gameEnded && gameStarted && !playInProgress
 
-  const canCollectFlag =
-    showMatchStateGuide &&
-    gameStarted &&
-    !gameEnded &&
-    !inFlagFlow &&
-    (canSnap || playInProgress)
+  // FLAG collection logic stays in the store / flagCollection; entry point hidden for now.
+  const canCollectFlag = false
 
   // Progressive collection gates END PLAY; yards stay available to adjust anytime.
   const canEndPlay = showMatchStateGuide
