@@ -338,7 +338,7 @@ export function createInitialGameState(
       challengeReview: false,
       statDelay: false,
       bigPlay: false,
-      penalty: false,
+      flag: false,
       touchdown: false,
       playAboutToStart: false,
     },

@@ -12,7 +12,7 @@ export type RiskType =
   | 'challengeReview'
   | 'statDelay'
   | 'bigPlay'
-  | 'penalty'
+  | 'flag'
   | 'touchdown'
   | 'playAboutToStart'
 

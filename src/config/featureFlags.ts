@@ -207,7 +207,7 @@ export const FEATURE_FLAGS = [
   },
   {
     id: 'risk.penalty',
-    label: 'Penalty',
+    label: 'Flag',
     group: 'Risk Management',
     parent: 'game.riskManagement',
     defaultEnabled: true,
@@ -316,7 +316,7 @@ export const RISK_FEATURE_FLAGS: Record<RiskType, FeatureFlagId> = {
   challengeReview: 'risk.challengeReview',
   statDelay: 'risk.statDelay',
   bigPlay: 'risk.bigPlay',
-  penalty: 'risk.penalty',
+  flag: 'risk.penalty',
   touchdown: 'risk.touchdown',
   playAboutToStart: 'risk.playAboutToStart',
 }

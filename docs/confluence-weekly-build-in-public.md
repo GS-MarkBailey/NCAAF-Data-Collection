@@ -82,7 +82,7 @@ By the end of the week, a reviewer could add the app to their home screen, open 
 **Game console (landscape mobile)**
 - **Scoreboard panel** — game clock, quarter, down/distance, ball-on, possession, score
 - **Play-by-play panel** — live feed grouped by quarter, newest events first
-- **Risk management panel** — toggle chips for challenge, stat delay, big play, penalty, touchdown, play about to start, etc.
+- **Risk management panel** — toggle chips for challenge, stat delay, big play, flag, touchdown, play about to start, etc.
 
 **Core interactions**
 
@@ -444,6 +444,7 @@ With **Match-state guide** on, scheduled fixtures open in **pregame** so the ful
 - Kickoff: possession switches to the **receiving** team (e.g. MSST kicks → MISS); touchback / return keeps them for the first snap
 - Between plays, forward yard nudges that cover to-go — or any forward nudge while already on 1st — lock **1st & 10** at the new spot (no 1st & 9 / 8 / 7 from spotting)
 - Game-state flag catalog (`flagRules.ts`): NCAA / NFL / CFL penalty types with **per-association** enforcement (yardage, spot, down effect, DQ). Not operator-collectable in the UI yet; `GameState.flagEvents` is ready for a later feature.
+- Risk management chip is **Flag** (not Penalty); specific flag types come later
 - **END PLAY** appears when the chosen result is ready
 - Later quarters: **End period** on the scoreboard, then **Start** on the clock (no Start Q / Kick off badges on the scoreboard)
 

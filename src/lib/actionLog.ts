@@ -6,7 +6,7 @@ const RISK_LABELS: Record<RiskType, string> = {
   challengeReview: 'Challenge / Review',
   statDelay: 'Unreliable',
   bigPlay: 'Big Play',
-  penalty: 'Penalty',
+  flag: 'Flag',
   touchdown: 'Touchdown',
   playAboutToStart: 'Play About to Start',
 }

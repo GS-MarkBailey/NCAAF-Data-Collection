@@ -6,7 +6,7 @@ const RISKS: { key: RiskType; label: string; fullWidth?: boolean }[] = [
   { key: 'challengeReview', label: 'Challenge / Review' },
   { key: 'statDelay', label: 'Unreliable' },
   { key: 'bigPlay', label: 'Big Play' },
-  { key: 'penalty', label: 'Penalty' },
+  { key: 'flag', label: 'Flag' },
   { key: 'touchdown', label: 'Touchdown' },
   { key: 'playAboutToStart', label: 'Play About to Start' },
 ]
