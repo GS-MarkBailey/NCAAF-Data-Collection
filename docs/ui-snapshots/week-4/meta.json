@@ -1,8 +1,8 @@
 {
   "label": "week-4",
   "portrait": true,
-  "capturedAt": "2026-10-05T21:38:23.009Z",
-  "baseUrl": "http://127.0.0.1:4173",
+  "capturedAt": "2026-10-06T08:17:05.235Z",
+  "baseUrl": "https://ncaaf-data-collection.vercel.app",
   "views": [
     "fixtures-landscape",
     "game-landscape"
