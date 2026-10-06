@@ -108,11 +108,6 @@ export function GamePageShadcn() {
                 <PlayByPlayPanelShadcn game={game} />
               </div>
             ) : null}
-            {showPlayControls ? (
-              <div className="flex min-h-0 flex-1 flex-col">
-                <PlayControlsPanelShadcn fixtureId={fixtureId} layout="stack" />
-              </div>
-            ) : null}
             {showRiskManagement ? (
               <div className="flex min-h-0 flex-1 flex-col">
                 <RiskManagementPanelShadcn
@@ -120,6 +115,11 @@ export function GamePageShadcn() {
                   layout="stack"
                   onToggleRisk={(risk) => toggleRisk(fixtureId, risk)}
                 />
+              </div>
+            ) : null}
+            {showPlayControls ? (
+              <div className="flex min-h-0 flex-1 flex-col">
+                <PlayControlsPanelShadcn fixtureId={fixtureId} layout="stack" />
               </div>
             ) : null}
           </div>
@@ -146,15 +146,15 @@ export function GamePageShadcn() {
               <ScoreboardPanelShadcn fixtureId={fixtureId} layout="column" />
             ) : null}
             {showPlayByPlay ? <PlayByPlayPanelShadcn game={game} /> : null}
-            {showPlayControls ? (
-              <PlayControlsPanelShadcn fixtureId={fixtureId} layout="column" />
-            ) : null}
             {showRiskManagement ? (
               <RiskManagementPanelShadcn
                 game={game}
                 layout="column"
                 onToggleRisk={(risk) => toggleRisk(fixtureId, risk)}
               />
+            ) : null}
+            {showPlayControls ? (
+              <PlayControlsPanelShadcn fixtureId={fixtureId} layout="column" />
             ) : null}
           </div>
         ) : (

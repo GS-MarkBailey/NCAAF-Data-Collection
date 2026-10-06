@@ -417,7 +417,7 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 <!-- AUTO-SNAPSHOTS:week-4-shipped-unreliable-risk:END -->
 
 **Play controls panel**
-- New console panel beside scoreboard / risk: **SNAP**, **END PLAY**, and **+1 / +5 / −5 / −1** yard buttons
+- New console panel on the **right** of the game console (scoreboard / risk / play-by-play to the left): **SNAP**, **END PLAY**, and **+1 / +5 / −5 / −1** yard buttons
 - Snap starts a live play (pauses auto play-by-play sim); yard buttons move ball-on and update to-go; End Play advances down / first down / turnover on downs
 - Feature-flagged under Settings → Features → **Play Controls** (`game.playControls` + Snap / End play / Yard adjustments)
 
@@ -445,6 +445,7 @@ With **Match-state guide** on, scheduled fixtures open in **pregame** so the ful
 - Between plays, forward yard nudges that cover to-go — or any forward nudge while already on 1st — lock **1st & 10** at the new spot (no 1st & 9 / 8 / 7 from spotting)
 - Game-state flag catalog (`flagRules.ts`): NCAA / NFL / CFL penalty types with **per-association** enforcement (yardage, spot, down effect, DQ). Not operator-collectable in the UI yet; `GameState.flagEvents` is ready for a later feature.
 - Risk management chip is **Flag** (not Penalty); specific flag types come later
+- Landscape console order is Scoreboard → Risk → **Play controls** (play controls on the right)
 - **END PLAY** appears when the chosen result is ready
 - Later quarters: **End period** on the scoreboard, then **Start** on the clock (no Start Q / Kick off badges on the scoreboard)
 
