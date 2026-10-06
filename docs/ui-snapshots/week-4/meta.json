@@ -1,8 +1,8 @@
 {
   "label": "week-4",
   "portrait": true,
-  "capturedAt": "2026-10-06T12:25:37.462Z",
-  "baseUrl": "https://ncaaf-data-collection.vercel.app",
+  "capturedAt": "2026-10-06T14:44:26.572Z",
+  "baseUrl": "http://127.0.0.1:4173",
   "views": [
     "fixtures-landscape",
     "game-landscape"
@@ -71,6 +71,11 @@
       "id": "play-controls-idle",
       "title": "Play controls panel (idle)",
       "file": "features/play-controls-idle.png"
+    },
+    {
+      "id": "play-controls-flag",
+      "title": "Play controls — flag collection",
+      "file": "features/play-controls-flag.png"
     }
   ]
 }

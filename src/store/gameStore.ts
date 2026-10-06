@@ -23,18 +23,26 @@ import {
   TRY_SPOT_BALL_ON,
   applyMatchTransition,
   applyPlayUndoSnapshot,
+  againstHomeFromChoice,
   canUndoPlayAction,
+  enforceAcceptedFlag,
+  FLAG_PATH_KEY,
+  getFlagType,
   getFootballRuleset,
+  inferredAgainst,
+  isFlagCollectionStep,
   isAwaitingRegulationDecision,
   isOvertimePeriod,
   labelForDatapointWithTeam,
   labelForYardsDeltaWithTeam,
   nextClockRunning,
-  teamAbbrForDatapoint,
+  parseFlagCollectionPath,
   pushPlayUndoSnapshot,
   resolveEndedPlayFromGame,
+  resolveFlagCollectionChoice,
   resolvePlayCollectionChoice,
   startLivePlay,
+  teamAbbrForDatapoint,
   tickPlaySimulation,
   toMatchStateInput,
 } from '@/lib/football'
@@ -62,6 +70,8 @@ interface AppStore {
   adjustYards: (fixtureId: string, delta: number) => void
   /** Advance progressive play-collection (rush/throw → result → …). */
   selectPlayCollectionOption: (fixtureId: string, optionId: string) => void
+  /** Open flag type / accept-decline collection (association rules apply). */
+  openFlagCollection: (fixtureId: string) => void
   /** Restore the previous play-controls action (collection / yards / snap / end). */
   undoPlayControl: (fixtureId: string) => void
   startPeriod: (fixtureId: string) => void
@@ -92,10 +102,13 @@ function appendCollectedDatapoint(
   game: GameState,
   key: string,
   path: readonly string[] = game.playCollectionPath,
+  foulingIsHome?: boolean,
 ): CollectedDatapoint[] {
+  const possessionForLabel =
+    foulingIsHome === undefined ? game.possessionIsHome : foulingIsHome
   const teamAbbr = teamAbbrForDatapoint(
     key,
-    game.possessionIsHome,
+    possessionForLabel,
     game.fixture.homeAbbr,
     game.fixture.awayAbbr,
     path,
@@ -509,9 +522,180 @@ export const useAppStore = create<AppStore>((set, get) => ({
     let shouldAutoEnd = false
     set((state) => {
       const game = state.games[fixtureId]
-      if (!game || game.gameEnded || !game.playInProgress) return state
+      if (!game || game.gameEnded) return state
       const stepId = game.playCollectionStep
       if (!stepId) return state
+
+      if (isFlagCollectionStep(stepId)) {
+        const flagResolved = resolveFlagCollectionChoice(
+          stepId,
+          optionId,
+          game.playCollectionPath,
+          game.rulesetId,
+          game.seriesKind,
+        )
+        if (!flagResolved) return state
+
+        return {
+          games: updateGame(state.games, fixtureId, (g) => {
+            const withUndo = pushPlayUndoSnapshot(g)
+            const path = [...withUndo.playCollectionPath, optionId]
+            const parsed = parseFlagCollectionPath(path)
+            const against =
+              parsed.against ?? inferredAgainst(parsed.typeId)
+            const againstHome =
+              against != null
+                ? againstHomeFromChoice(against, withUndo.possessionIsHome)
+                : undefined
+
+            if (flagResolved.decision === 'declined') {
+              const resume = withUndo.flagResume
+              const type = parsed.typeId ? getFlagType(parsed.typeId) : undefined
+              const flagEvent = {
+                id: crypto.randomUUID(),
+                typeId: parsed.typeId ?? ('flag.personal_foul' as const),
+                againstHome: againstHome ?? withUndo.possessionIsHome,
+                decision: 'declined' as const,
+                rulesetId: withUndo.rulesetId,
+                period: withUndo.clock.period,
+                clockSeconds: withUndo.clock.seconds,
+                collectedAt: Date.now(),
+              }
+              return {
+                ...withUndo,
+                playInProgress: resume?.playInProgress ?? false,
+                playCollectionStep: resume?.playCollectionStep ?? null,
+                playCollectionPath: resume?.playCollectionPath ?? [],
+                flagResume: null,
+                flagEvents: [...(withUndo.flagEvents ?? []), flagEvent],
+                collectedDatapoints: appendCollectedDatapoint(
+                  withUndo,
+                  optionId,
+                  path,
+                  againstHome,
+                ),
+                plays: type
+                  ? [
+                      ...withUndo.plays,
+                      {
+                        id: crypto.randomUUID(),
+                        quarter: withUndo.clock.period,
+                        down: withUndo.down,
+                        distance: withUndo.distance,
+                        ballOn: String(withUndo.ballOn),
+                        description: `${type.label} — declined`,
+                        clock: formatClock(withUndo.clock.seconds),
+                      },
+                    ]
+                  : withUndo.plays,
+              }
+            }
+
+            if (flagResolved.decision === 'accepted') {
+              if (!parsed.typeId || against == null || againstHome == null) {
+                return withUndo
+              }
+              const enforced = enforceAcceptedFlag({
+                typeId: parsed.typeId,
+                against,
+                againstHome,
+                ballOn: withUndo.ballOn,
+                down: withUndo.down,
+                distance: withUndo.distance,
+                possessionIsHome: withUndo.possessionIsHome,
+                playStartBallOn: withUndo.playStartBallOn,
+                playStartDistance: withUndo.playStartDistance,
+                seriesKind: withUndo.seriesKind,
+                rulesetId: withUndo.rulesetId,
+                playInProgress: withUndo.flagResume?.playInProgress ?? withUndo.playInProgress,
+              })
+              if (!enforced) return withUndo
+              const rules = getFootballRuleset(withUndo.rulesetId)
+              const flagEvent = {
+                id: crypto.randomUUID(),
+                typeId: parsed.typeId,
+                againstHome,
+                decision: 'accepted' as const,
+                rulesetId: withUndo.rulesetId,
+                period: withUndo.clock.period,
+                clockSeconds: withUndo.clock.seconds,
+                collectedAt: Date.now(),
+              }
+              const score = { ...withUndo.score }
+              if (enforced.scoredSafety) {
+                if (enforced.safetyDefenseIsHome) {
+                  score.home += rules.safetyPoints
+                } else {
+                  score.away += rules.safetyPoints
+                }
+              }
+              return {
+                ...withUndo,
+                playInProgress: false,
+                seriesKind: enforced.nextSeries,
+                playCollectionStep: null,
+                playCollectionPath: [],
+                flagResume: null,
+                ballOn: enforced.ballOn,
+                down: enforced.down,
+                distance: enforced.distance,
+                possessionIsHome: enforced.possessionIsHome,
+                playYardsGained: 0,
+                playStartDown: enforced.down,
+                playStartDistance: enforced.distance,
+                playStartBallOn: enforced.ballOn,
+                score,
+                flagEvents: [...(withUndo.flagEvents ?? []), flagEvent],
+                collectedDatapoints: appendCollectedDatapoint(
+                  withUndo,
+                  optionId,
+                  path,
+                  againstHome,
+                ),
+                clock: {
+                  ...withUndo.clock,
+                  running: nextClockRunning(
+                    { type: 'flag_accepted' },
+                    withUndo.clock,
+                  ),
+                },
+                simulation: withUndo.simulation
+                  ? {
+                      ...withUndo.simulation,
+                      offenseIsHome: enforced.possessionIsHome,
+                    }
+                  : withUndo.simulation,
+                plays: [
+                  ...withUndo.plays,
+                  {
+                    id: crypto.randomUUID(),
+                    quarter: withUndo.clock.period,
+                    down: withUndo.playStartDown,
+                    distance: withUndo.playStartDistance,
+                    ballOn: String(withUndo.playStartBallOn),
+                    description: enforced.summary,
+                    clock: formatClock(withUndo.clock.seconds),
+                  },
+                ],
+              }
+            }
+
+            return {
+              ...withUndo,
+              playCollectionStep: flagResolved.nextStep,
+              playCollectionPath: path,
+              collectedDatapoints: appendCollectedDatapoint(
+                withUndo,
+                optionId,
+                path,
+                againstHome,
+              ),
+            }
+          }),
+        }
+      }
+
+      if (!game.playInProgress) return state
 
       const resolved = resolvePlayCollectionChoice(
         stepId,
@@ -539,11 +723,40 @@ export const useAppStore = create<AppStore>((set, get) => ({
         }),
       }
     })
-    // Terminal choices without a yards pause (incomplete, PAT good, TD, …).
-    // One undo step covers the selection + auto END PLAY.
     if (shouldAutoEnd) {
       get().endPlay(fixtureId, { skipUndoPush: true })
     }
+  },
+
+  openFlagCollection: (fixtureId) => {
+    set((state) => {
+      const game = state.games[fixtureId]
+      if (!game || game.gameEnded || isFlagCollectionStep(game.playCollectionStep)) {
+        return state
+      }
+      if (!game.gameStarted) return state
+
+      return {
+        games: updateGame(state.games, fixtureId, (g) => {
+          const withUndo = pushPlayUndoSnapshot(g)
+          return {
+            ...withUndo,
+            flagResume: {
+              playInProgress: withUndo.playInProgress,
+              playCollectionStep: withUndo.playCollectionStep,
+              playCollectionPath: [...withUndo.playCollectionPath],
+            },
+            playCollectionStep: 'choose_flag_category',
+            playCollectionPath: [...withUndo.playCollectionPath, FLAG_PATH_KEY],
+            collectedDatapoints: appendCollectedDatapoint(
+              withUndo,
+              FLAG_PATH_KEY,
+              [...withUndo.playCollectionPath, FLAG_PATH_KEY],
+            ),
+          }
+        }),
+      }
+    })
   },
 
   adjustYards: (fixtureId, delta) => {

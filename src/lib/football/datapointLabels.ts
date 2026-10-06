@@ -1,6 +1,8 @@
 /**
  * Keys credited to the defense on scrimmage (opposite of possession).
  */
+import { getFlagType, type FlagTypeId } from './flagRules'
+
 const DEFENSE_KEYS = new Set([
   'interception',
   'recovery_defense',
@@ -51,10 +53,33 @@ const DATAPOINT_LABELS: Record<string, string> = {
   two_point_no_good: 'TwoPointNoGood',
   defensive_two_point: 'DefensiveConversion',
   undo: 'Undo',
+  flag: 'Flag',
+  flag_accept: 'FlagAccepted',
+  flag_decline: 'FlagDeclined',
+  flag_offense: 'Offense',
+  flag_defense: 'Defense',
+  flag_kicking: 'Kicking',
+  flag_receiving: 'Receiving',
+  flag_cat_pre_snap: 'Procedure',
+  flag_cat_clock: 'Clock',
+  flag_cat_line: 'HoldingBlock',
+  flag_cat_pass: 'Pass',
+  flag_cat_personal: 'Personal',
+  flag_cat_kick: 'Kick',
+  flag_cat_unsportsmanlike: 'Conduct',
+  flag_cat_substitution: 'Substitution',
+  flag_cat_other: 'Other',
 }
 
 export function labelForDatapointKey(key: string): string {
-  return DATAPOINT_LABELS[key] ?? key
+  if (DATAPOINT_LABELS[key]) return DATAPOINT_LABELS[key]
+  if (key.startsWith('flag.')) {
+    const type = getFlagType(key as FlagTypeId)
+    if (type) {
+      return type.label.replace(/[^a-zA-Z0-9]+/g, '')
+    }
+  }
+  return key
 }
 
 /** Team abbr credited for a datapoint given current possession / kickoff context. */

@@ -104,10 +104,18 @@ export interface GameState {
   playUndoStack: PlayUndoSnapshot[]
   /**
    * Flags (penalties) collected this session.
-   * Empty until operator flag collection ships. Enforcement must use
-   * `flagRules` for `rulesetId` — never a single-association default.
+   * Enforcement uses `flagRules` for `rulesetId`.
    */
   flagEvents: FlagEvent[]
+  /**
+   * Play-collection snapshot to restore if a flag is declined / undone
+   * while a live play was in progress.
+   */
+  flagResume: {
+    playInProgress: boolean
+    playCollectionStep: PlayCollectionStepId | null
+    playCollectionPath: string[]
+  } | null
   /** Net yards gained for the offense since the last SNAP */
   playYardsGained: number
   /** Down / distance / ball-on at SNAP (used when ending the play) */

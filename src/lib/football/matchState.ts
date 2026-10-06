@@ -238,7 +238,7 @@ function actionsForPhase(
       return [
         action('kickoff', 'Kickoff / free kick', 'Collect the free-kick play'),
         action('record_special_teams', 'Special teams result', 'Return, touchback, OOB, onside, …'),
-        action('record_penalty', 'Penalty', 'Foul on the kick'),
+        action('record_penalty', 'Flag', 'Foul on the kick'),
         action('record_score', 'Score', 'Return TD, rouge (CFL), safety, …'),
         action('edit_clock', 'Edit clock', 'Adjust game clock'),
         action('toggle_clock', 'Start / pause clock', 'Run or stop the game clock'),
@@ -253,7 +253,7 @@ function actionsForPhase(
         action('set_possession', 'Set possession', 'Offense'),
         action('punt', 'Punt', 'Declare a scrimmage kick (punt)'),
         action('field_goal_attempt', 'Field goal', 'Declare a field-goal attempt'),
-        action('record_penalty', 'Pre-snap penalty', 'False start, offside, delay, …'),
+        action('record_penalty', 'Flag', 'False start, offside, delay, …'),
         action('edit_clock', 'Edit clock', 'Adjust game clock / period'),
         action('toggle_clock', 'Start / pause clock', 'Run or stop the game clock'),
         action('end_period', 'End period', 'End the current period'),
@@ -263,7 +263,7 @@ function actionsForPhase(
         action('adjust_yards', 'Adjust yards', '± yardage during the live play'),
         action('record_play_result', 'Play result', 'Rush, pass, sack, incomplete, …'),
         action('record_turnover', 'Turnover', 'INT, fumble, …'),
-        action('record_penalty', 'Penalty', 'Foul during the play'),
+        action('record_penalty', 'Flag', 'Foul during the play'),
         action('record_score', 'Score', 'TD, safety, …'),
         action('end_play', 'End play', 'Finalize down / distance / possession'),
         action('edit_clock', 'Edit clock', 'Adjust game clock if needed'),
@@ -272,7 +272,7 @@ function actionsForPhase(
       return [
         action('conversion_attempt', 'Convert attempt', 'Kick or two-point try'),
         action('record_score', 'Convert result', '1-pt, 2-pt, miss, defensive convert'),
-        action('record_penalty', 'Penalty', 'Foul on the try'),
+        action('record_penalty', 'Flag', 'Foul on the try'),
         action('edit_clock', 'Edit clock', 'Adjust game clock'),
       ]
     case 'period_break': {
@@ -366,7 +366,7 @@ function collectablesForPhase(
         }),
         collectable({
           id: 'penalty',
-          label: 'Penalty',
+          label: 'Flag',
           description: 'Foul on the kick / return',
           catalogIds: penalties.map((e) => e.id),
         }),
@@ -411,7 +411,7 @@ function collectablesForPhase(
         }),
         collectable({
           id: 'pre_snap_penalty',
-          label: 'Pre-snap penalty',
+          label: 'Pre-snap flag',
           description: 'False start, offside, delay, …',
           catalogIds: penalties
             .filter((e) => e.id.includes('false_start') || e.id.includes('offside') || e.id.includes('delay') || e.id.includes('illegal_procedure') || e.id.includes('encroachment') || e.id.includes('neutral_zone') || e.id.includes('time_count'))
@@ -447,7 +447,7 @@ function collectablesForPhase(
         }),
         collectable({
           id: 'penalty',
-          label: 'Penalty',
+          label: 'Flag',
           description: 'Foul during the play (if any)',
           catalogIds: penalties.map((e) => e.id),
         }),
@@ -481,7 +481,7 @@ function collectablesForPhase(
         }),
         collectable({
           id: 'penalty',
-          label: 'Penalty',
+          label: 'Flag',
           description: 'Foul on the try',
           catalogIds: penalties.map((e) => e.id),
         }),

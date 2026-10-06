@@ -152,5 +152,6 @@ export const WEEK_SHIPPED = {
         'play-controls-live',
       ],
     },
+    'play-flag': { featureIds: ['play-controls-flag'] },
   },
 }

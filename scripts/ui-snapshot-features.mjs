@@ -357,6 +357,10 @@ export const WEEK_FEATURES = {
           .filter({ visible: true })
           .click()
         await page
+          .getByRole('button', { name: 'TOUCHBACK' })
+          .filter({ visible: true })
+          .click()
+        await page
           .getByRole('button', { name: 'SNAP' })
           .filter({ visible: true })
           .click()
@@ -390,6 +394,10 @@ export const WEEK_FEATURES = {
       async prepare(page) {
         await page
           .getByRole('button', { name: 'KICK OFF' })
+          .filter({ visible: true })
+          .click()
+        await page
+          .getByRole('button', { name: 'TOUCHBACK' })
           .filter({ visible: true })
           .click()
         await page
@@ -429,6 +437,10 @@ export const WEEK_FEATURES = {
           .filter({ visible: true })
           .click()
         await page
+          .getByRole('button', { name: 'TOUCHBACK' })
+          .filter({ visible: true })
+          .click()
+        await page
           .getByRole('button', { name: 'SNAP' })
           .filter({ visible: true })
           .click()
@@ -452,6 +464,38 @@ export const WEEK_FEATURES = {
           .getByText('+5 YARDS')
           .filter({ visible: true })
           .first()
+          .waitFor({ state: 'visible', timeout: 5000 })
+      },
+    },
+    {
+      id: 'play-controls-flag',
+      title: 'Play controls — flag collection',
+      path: '/game/NCAAF-2026-001',
+      viewport: 'game-landscape',
+      gameSetup: { fieldDirection: 'dismiss', errorToast: 'dismiss' },
+      featureFlagOverrides: {
+        'game.playControls': true,
+        'playControls.snap': true,
+        'playControls.endPlay': true,
+        'playControls.yardAdjust': true,
+        'playControls.matchStateGuide': true,
+      },
+      async prepare(page) {
+        await page
+          .getByRole('button', { name: 'KICK OFF' })
+          .filter({ visible: true })
+          .click()
+        await page
+          .getByRole('button', { name: 'TOUCHBACK' })
+          .filter({ visible: true })
+          .click()
+        await page
+          .getByRole('button', { name: 'FLAG', exact: true })
+          .filter({ visible: true })
+          .click()
+        await page
+          .getByRole('button', { name: 'PROCEDURE' })
+          .filter({ visible: true })
           .waitFor({ state: 'visible', timeout: 5000 })
       },
     },

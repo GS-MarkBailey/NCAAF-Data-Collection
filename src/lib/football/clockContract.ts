@@ -7,6 +7,7 @@
  * Product rules (operator collection, not full referee mechanics):
  * - Kickoff button opens kickoff collection — clock stays STOPPED.
  * - SNAP starts the game clock (when time remains).
+ * - Accepted flag stops the clock (`flag_accepted`).
  * - END PLAY stops the clock when resolution says so (incomplete, OOB,
  *   change of possession, kickoff dead ball, awarded 1st down only in the
  *   last 2:00 of either half, etc.).
@@ -22,6 +23,7 @@ export type ClockContractEvent =
   | { type: 'overtime_opened' }
   | { type: 'game_ended' }
   | { type: 'period_ended' }
+  | { type: 'flag_accepted' }
 
 /**
  * NCAA DI/DII (2023+): an awarded first down does **not** stop the game clock
@@ -50,6 +52,8 @@ export function nextClockRunning(
     case 'period_opened':
     case 'overtime_opened':
       // Next period is ready; clock starts on SNAP (or manual Start).
+      return false
+    case 'flag_accepted':
       return false
     case 'period_ended':
     case 'game_ended':

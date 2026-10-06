@@ -10,9 +10,11 @@ import {
 } from '@/lib/operatorChrome'
 import {
   canUndoPlayAction,
+  flagCollectionButtons,
   getMatchStateView,
   getPlayCollectionView,
   getPlayControlCapabilities,
+  isFlagCollectionStep,
   toMatchStateInput,
   type CollectionButtonEmphasis,
   type MatchActionId,
@@ -78,6 +80,7 @@ export function PlayControlsPanelShadcn({
   const undoPlayControl = useAppStore((s) => s.undoPlayControl)
   const startPeriod = useAppStore((s) => s.startPeriod)
   const openKickoffCollection = useAppStore((s) => s.openKickoffCollection)
+  const openFlagCollection = useAppStore((s) => s.openFlagCollection)
   const canUndo = canUndoPlayAction(game)
 
   const showSnap = useFeatureFlag('playControls.snap')
@@ -90,10 +93,22 @@ export function PlayControlsPanelShadcn({
   const matchControls = matchInput
     ? getPlayControlCapabilities(matchInput)
     : null
-  const collectionView = getPlayCollectionView(
-    game?.playCollectionStep,
-    game?.playCollectionPath ?? [],
-  )
+  const inFlagFlow = isFlagCollectionStep(game?.playCollectionStep)
+  const collectionView = inFlagFlow
+    ? {
+        buttons: flagCollectionButtons(
+          game!.playCollectionStep!,
+          game!.playCollectionPath,
+          game!.rulesetId,
+          game!.seriesKind,
+        ),
+        canEndPlay: false,
+        showYards: true,
+      }
+    : getPlayCollectionView(
+        game?.playCollectionStep,
+        game?.playCollectionPath ?? [],
+      )
 
   const stacked = layout === 'stack'
   const gameEnded = game?.gameEnded ?? false
@@ -109,11 +124,20 @@ export function PlayControlsPanelShadcn({
     ? (matchControls?.canSnap ?? false)
     : !gameEnded && gameStarted && !playInProgress
 
+  const canCollectFlag =
+    showMatchStateGuide &&
+    gameStarted &&
+    !gameEnded &&
+    !inFlagFlow &&
+    (canSnap || playInProgress)
+
   // Progressive collection gates END PLAY; yards stay available to adjust anytime.
   const canEndPlay = showMatchStateGuide
-    ? inLivePlay
-      ? collectionView.canEndPlay
-      : Boolean(matchControls?.canEndPlay)
+    ? inFlagFlow
+      ? false
+      : inLivePlay
+        ? collectionView.canEndPlay
+        : Boolean(matchControls?.canEndPlay)
     : showEndPlay && inLivePlay
 
   const canAdjustYards = showYardAdjust && !gameEnded
@@ -190,8 +214,10 @@ export function PlayControlsPanelShadcn({
             canKickOff={canKickOff}
             canSnap={canSnap}
             canEndPlay={canEndPlay}
+            canCollectFlag={canCollectFlag}
+            inFlagFlow={inFlagFlow}
             yardsLabel={yardsLabel}
-            playInProgress={playInProgress}
+            playInProgress={playInProgress || inFlagFlow}
             canAdjustYards={canAdjustYards}
             collectionButtons={collectionView.buttons}
             stacked={stacked}
@@ -199,6 +225,7 @@ export function PlayControlsPanelShadcn({
             onCollectionOption={(optionId) =>
               selectPlayCollectionOption(fixtureId, optionId)
             }
+            onOpenFlag={() => openFlagCollection(fixtureId)}
             onAdjustYards={(delta) => adjustYards(fixtureId, delta)}
           />
         ) : !showSnap && !showEndPlay && !showYardAdjust ? (
@@ -243,6 +270,8 @@ function MatchStateGuideBody({
   canKickOff,
   canSnap,
   canEndPlay,
+  canCollectFlag,
+  inFlagFlow,
   yardsLabel,
   playInProgress,
   canAdjustYards,
@@ -250,11 +279,14 @@ function MatchStateGuideBody({
   stacked,
   onAction,
   onCollectionOption,
+  onOpenFlag,
   onAdjustYards,
 }: {
   canKickOff: boolean
   canSnap: boolean
   canEndPlay: boolean
+  canCollectFlag: boolean
+  inFlagFlow: boolean
   yardsLabel: string
   playInProgress: boolean
   canAdjustYards: boolean
@@ -262,11 +294,29 @@ function MatchStateGuideBody({
   stacked: boolean
   onAction: (actionId: MatchActionId) => void
   onCollectionOption: (optionId: string) => void
+  onOpenFlag: () => void
   onAdjustYards: (delta: number) => void
 }) {
   const buttons: ControlButton[] = []
 
-  if (canKickOff) {
+  if (inFlagFlow) {
+    const maxLikelihood = Math.max(
+      0,
+      ...collectionButtons.map((option) => option.likelihood),
+    )
+    for (const option of collectionButtons) {
+      buttons.push({
+        id: `collect:${option.id}`,
+        label: option.label,
+        emphasis: option.emphasis,
+        wide:
+          option.emphasis === 'primary' &&
+          option.likelihood >= maxLikelihood * 0.85 &&
+          collectionButtons.length >= 3,
+        title: option.id,
+      })
+    }
+  } else if (canKickOff) {
     buttons.push({
       id: 'kickoff',
       label: 'KICK OFF',
@@ -299,6 +349,14 @@ function MatchStateGuideBody({
         title: 'Finalize down / distance / possession',
       })
     }
+    if (canCollectFlag) {
+      buttons.push({
+        id: 'flag',
+        label: 'FLAG',
+        emphasis: 'tertiary',
+        title: 'Collect a flag (association rules apply)',
+      })
+    }
   } else {
     if (canSnap) {
       buttons.push({
@@ -307,6 +365,14 @@ function MatchStateGuideBody({
         emphasis: 'primary',
         wide: true,
         title: 'Start collecting the live scrimmage play',
+      })
+    }
+    if (canCollectFlag) {
+      buttons.push({
+        id: 'flag',
+        label: 'FLAG',
+        emphasis: 'secondary',
+        title: 'Collect a flag (association rules apply)',
       })
     }
     if (canEndPlay) {
@@ -334,6 +400,10 @@ function MatchStateGuideBody({
           buttons={buttons}
           stacked={stacked}
           onAction={(id) => {
+            if (id === 'flag') {
+              onOpenFlag()
+              return
+            }
             if (id.startsWith('collect:')) {
               onCollectionOption(id.slice('collect:'.length))
               return

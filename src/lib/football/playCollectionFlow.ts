@@ -23,6 +23,10 @@ export type PlayCollectionStepId =
   | 'choose_pat_result'
   | 'choose_two_point_result'
   | 'choose_fumble_recovery'
+  | 'choose_flag_category'
+  | 'choose_flag_type'
+  | 'choose_flag_against'
+  | 'choose_flag_decision'
   | 'ready_to_end'
 
 /** Visual emphasis derived from relative likelihood (not shown as text). */
@@ -402,6 +406,38 @@ const STEPS: Record<PlayCollectionStepId, PlayCollectionStepDef> = {
         canEndPlay: true,
       },
     ],
+  },
+  choose_flag_category: {
+    id: 'choose_flag_category',
+    label: 'Flag',
+    prompt: 'What kind of flag?',
+    showYards: true,
+    canEndPlay: false,
+    options: [],
+  },
+  choose_flag_type: {
+    id: 'choose_flag_type',
+    label: 'Flag type',
+    prompt: 'Which flag?',
+    showYards: true,
+    canEndPlay: false,
+    options: [],
+  },
+  choose_flag_against: {
+    id: 'choose_flag_against',
+    label: 'Flag against',
+    prompt: 'Who is the flag on?',
+    showYards: true,
+    canEndPlay: false,
+    options: [],
+  },
+  choose_flag_decision: {
+    id: 'choose_flag_decision',
+    label: 'Accept flag',
+    prompt: 'Accept or decline?',
+    showYards: true,
+    canEndPlay: false,
+    options: [],
   },
   ready_to_end: {
     id: 'ready_to_end',

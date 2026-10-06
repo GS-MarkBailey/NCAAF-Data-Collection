@@ -24,6 +24,8 @@ export interface PlayUndoSnapshot {
   periodEnded: boolean
   collectedDatapointsLength: number
   playsLength: number
+  flagEventsLength: number
+  flagResume: GameState['flagResume']
 }
 
 const MAX_UNDO = 40
@@ -49,6 +51,14 @@ export function capturePlayUndoSnapshot(game: GameState): PlayUndoSnapshot {
     periodEnded: game.periodEnded,
     collectedDatapointsLength: game.collectedDatapoints?.length ?? 0,
     playsLength: game.plays?.length ?? 0,
+    flagEventsLength: game.flagEvents?.length ?? 0,
+    flagResume: game.flagResume
+      ? {
+          playInProgress: game.flagResume.playInProgress,
+          playCollectionStep: game.flagResume.playCollectionStep,
+          playCollectionPath: [...game.flagResume.playCollectionPath],
+        }
+      : null,
   }
 }
 
@@ -103,6 +113,14 @@ export function applyPlayUndoSnapshot(
     // Keep history — append Undo instead of deleting reversed datapoints.
     collectedDatapoints: [...prior, undoEntry],
     plays: (game.plays ?? []).slice(0, snapshot.playsLength),
+    flagEvents: (game.flagEvents ?? []).slice(0, snapshot.flagEventsLength ?? 0),
+    flagResume: snapshot.flagResume
+      ? {
+          playInProgress: snapshot.flagResume.playInProgress,
+          playCollectionStep: snapshot.flagResume.playCollectionStep,
+          playCollectionPath: [...snapshot.flagResume.playCollectionPath],
+        }
+      : null,
     simulation: game.simulation
       ? { ...game.simulation, offenseIsHome: snapshot.possessionIsHome }
       : game.simulation,
