@@ -13,6 +13,7 @@ Before changing match/game/play-control logic, read and follow this contract. Do
 | Concern | Module |
 |---------|--------|
 | League timing / field / downs | `src/lib/football/rulesets.ts` → `FootballRuleset` |
+| Flag types / enforcement by association | `src/lib/football/flagRules.ts` → `FLAG_TYPES` / `getAssociationFlagRule` |
 | Clock value clamp | `src/lib/football/clock.ts` → `clampClockSeconds` |
 | Clock auto start/stop | `src/lib/football/clockContract.ts` → `nextClockRunning` |
 | Play result → down/possession/score | `src/lib/football/play.ts` → `resolveEndedPlay` / `getPlayResultKind` |
@@ -37,6 +38,10 @@ Before changing match/game/play-control logic, read and follow this contract. Do
 6. **Play-control buttons** must only show datapoints from `playCollectionFlow` for the current step. Do not dump unrelated match-state actions (clock, end period, OT) into play controls.
 7. **Collection path is authoritative** for resolution. Do not resolve INT/punt/incomplete/kickoff as yards-only.
 8. Prefer extending the contract modules over one-off UI/store conditionals.
+9. **Flags / penalties:** look up enforcement with `getAssociationFlagRule(type, game.rulesetId)`
+   (or `flagTypesForGame(game)`). NCAA, NFL, and CFL differ (DPI spot vs 10 yards,
+   OPI 15 vs 10, defensive holding 10 vs 5, CFL no yards / objectionable conduct,
+   NCAA targeting, etc.). Do not hardcode a single yardage for all associations.
 
 ## Kickoff collection tree (current product)
 

@@ -352,6 +352,7 @@ export function createInitialGameState(
     playCollectionPath: [],
     collectedDatapoints: [],
     playUndoStack: [],
+    flagEvents: [],
     playYardsGained: 0,
     playStartDown: rules.minDown,
     playStartDistance: rules.firstDownDistance,

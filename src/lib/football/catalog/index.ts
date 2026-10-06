@@ -10,7 +10,7 @@
  * - plays.ts            — scrimmage / result play types
  * - turnovers.ts        — turnover vocabulary
  * - specialTeams.ts     — kickoff / punt / FG / convert
- * - penalties.ts        — fouls with typical yardage + league flags
+ * - penalties.ts        — fouls (derived from `flagRules.ts`; per-association enforcement lives there)
  * - clock.ts            — clock / timeout / period events
  * - situations.ts       — down/distance & situational tags
  */

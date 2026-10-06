@@ -4,7 +4,7 @@
 **Live demo:** https://ncaaf-data-collection.vercel.app  
 **Repository:** GitHub (auto-deployed to Vercel on each change)  
 **Period covered:** 16 June 2026 – 21 July 2026  
-**Last updated:** 5 Oct 2026 (snapshots synced automatically)
+**Last updated:** 6 Oct 2026 (snapshots synced automatically)
 
 **Confluence images:** Auto-synced by GitHub Actions on push to `main` (capture → publish). Manual fallback: `npm run publish:confluence`.
 
@@ -443,6 +443,7 @@ With **Match-state guide** on, scheduled fixtures open in **pregame** so the ful
 - Game clock capped at American football period length **15:00** via `FootballRuleset.quarterLengthSeconds` / `clampClockSeconds`
 - Kickoff: possession switches to the **receiving** team (e.g. MSST kicks → MISS); touchback / return keeps them for the first snap
 - Between plays, forward yard nudges that cover to-go — or any forward nudge while already on 1st — lock **1st & 10** at the new spot (no 1st & 9 / 8 / 7 from spotting)
+- Game-state flag catalog (`flagRules.ts`): NCAA / NFL / CFL penalty types with **per-association** enforcement (yardage, spot, down effect, DQ). Not operator-collectable in the UI yet; `GameState.flagEvents` is ready for a later feature.
 - **END PLAY** appears when the chosen result is ready
 - Later quarters: **End period** on the scoreboard, then **Start** on the clock (no Start Q / Kick off badges on the scoreboard)
 
@@ -523,6 +524,7 @@ The table below is a checklist of what the prototype supports today on the live 
 | Risk management toggles (Unreliable emphasised, bottom-right) | ✅ |
 | Play controls — snap, end play, yard adjust (feature-flagged) | ✅ |
 | Progressive play datapoints — pregame KICK OFF → SNAP → rush/throw → result (match-state guide) | ✅ |
+| Flag / penalty types in game state with NCAA vs NFL vs CFL enforcement (no collection UI yet) | ✅ |
 | Play-by-play (feature-flagged, off by default) | ✅ |
 | Action log + CSV export | ✅ |
 | Feature flags with Vercel deploy (Confirm & deploy) | ✅ |
@@ -564,6 +566,7 @@ The app is a single-page React application with no server-side rendering. Game a
 These are deliberate prototype boundaries or open items identified during the four-week build. They are useful context for anyone evaluating the demo: the UI and flows are largely representative of target operator experience, but data, connectivity, and configuration security are not production-ready yet.
 
 - Demo data only — no live feed or backend integration yet
+- Flag / penalty catalog is in the game layer; operators cannot record flags in play controls yet
 - Feature flag deploy requires **Confirm & deploy** in Settings → Features (toggles alone are local preview); passphrase required on production if configured
 - Git push deploys code only — not in-browser feature flag drafts
 - Clock wheel initialisation on iPhone may need further device testing

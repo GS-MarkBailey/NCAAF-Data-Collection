@@ -1,8 +1,9 @@
 import type { FootballCode } from '@/lib/football/rulesets'
+import type { FlagEvent, FlagTypeId } from '@/lib/football/flagRules'
 import type { PlayCollectionStepId } from '@/lib/football/playCollectionFlow'
 import type { PlayUndoSnapshot } from '@/lib/football/playUndo'
 
-export type { FootballCode, PlayCollectionStepId }
+export type { FootballCode, PlayCollectionStepId, FlagEvent, FlagTypeId }
 
 /** How the ball will next be put in play. */
 export type SeriesKind = 'scrimmage' | 'free_kick' | 'try'
@@ -101,6 +102,12 @@ export interface GameState {
   collectedDatapoints: CollectedDatapoint[]
   /** Snapshots for Play controls Undo (collection / yards / snap / end). */
   playUndoStack: PlayUndoSnapshot[]
+  /**
+   * Flags (penalties) collected this session.
+   * Empty until operator flag collection ships. Enforcement must use
+   * `flagRules` for `rulesetId` — never a single-association default.
+   */
+  flagEvents: FlagEvent[]
   /** Net yards gained for the offense since the last SNAP */
   playYardsGained: number
   /** Down / distance / ball-on at SNAP (used when ending the play) */
