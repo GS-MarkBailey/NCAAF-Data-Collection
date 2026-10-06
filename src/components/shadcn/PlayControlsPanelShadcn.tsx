@@ -11,6 +11,7 @@ import {
 import {
   canUndoPlayAction,
   flagCollectionButtons,
+  flagMatchContextFromGame,
   getMatchStateView,
   getPlayCollectionView,
   getPlayControlCapabilities,
@@ -99,8 +100,7 @@ export function PlayControlsPanelShadcn({
         buttons: flagCollectionButtons(
           game!.playCollectionStep!,
           game!.playCollectionPath,
-          game!.rulesetId,
-          game!.seriesKind,
+          flagMatchContextFromGame(game!),
         ),
         canEndPlay: false,
         showYards: true,

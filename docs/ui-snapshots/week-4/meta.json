@@ -1,8 +1,8 @@
 {
   "label": "week-4",
   "portrait": true,
-  "capturedAt": "2026-10-06T14:48:01.512Z",
-  "baseUrl": "https://ncaaf-data-collection.vercel.app",
+  "capturedAt": "2026-10-06T14:56:50.167Z",
+  "baseUrl": "http://localhost:5174",
   "views": [
     "fixtures-landscape",
     "game-landscape"
@@ -73,9 +73,24 @@
       "file": "features/play-controls-idle.png"
     },
     {
+      "id": "play-controls-choose-type",
+      "title": "Play controls — choose rush / throw",
+      "file": "features/play-controls-choose-type.png"
+    },
+    {
       "id": "play-controls-flag",
       "title": "Play controls — flag collection",
       "file": "features/play-controls-flag.png"
+    },
+    {
+      "id": "play-controls-flag-kickoff",
+      "title": "Play controls — flag on kickoff",
+      "file": "features/play-controls-flag-kickoff.png"
+    },
+    {
+      "id": "play-controls-flag-pass",
+      "title": "Play controls — flag after throw",
+      "file": "features/play-controls-flag-pass.png"
     }
   ]
 }

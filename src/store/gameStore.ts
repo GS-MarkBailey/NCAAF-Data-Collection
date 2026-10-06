@@ -27,6 +27,7 @@ import {
   canUndoPlayAction,
   enforceAcceptedFlag,
   FLAG_PATH_KEY,
+  flagMatchContextFromGame,
   getFlagType,
   getFootballRuleset,
   inferredAgainst,
@@ -531,8 +532,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
           stepId,
           optionId,
           game.playCollectionPath,
-          game.rulesetId,
-          game.seriesKind,
+          flagMatchContextFromGame(game),
         )
         if (!flagResolved) return state
 

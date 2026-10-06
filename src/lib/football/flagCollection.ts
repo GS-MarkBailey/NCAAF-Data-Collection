@@ -42,6 +42,169 @@ export function isFlagCollectionStep(
 
 export const FLAG_PATH_KEY = 'flag'
 
+export type FlagSituation =
+  | 'pre_snap'
+  | 'kickoff'
+  | 'try'
+  | 'try_kick'
+  | 'run'
+  | 'pass'
+  | 'punt'
+  | 'live'
+
+export interface FlagMatchContext {
+  rulesetId: FootballCode
+  seriesKind: SeriesKind
+  playInProgress: boolean
+  /** Play-tree path *before* FLAG was opened. */
+  collectionPath: readonly string[]
+}
+
+const CATEGORIES_BY_SITUATION: Record<FlagSituation, readonly FlagCategory[]> = {
+  pre_snap: ['pre_snap', 'clock', 'substitution', 'unsportsmanlike', 'other'],
+  kickoff: ['kick', 'personal', 'unsportsmanlike', 'pre_snap', 'substitution', 'other'],
+  try: ['pre_snap', 'clock', 'kick', 'pass', 'line', 'personal', 'unsportsmanlike'],
+  try_kick: ['kick', 'personal', 'unsportsmanlike', 'substitution', 'clock'],
+  run: ['line', 'personal', 'unsportsmanlike', 'other', 'substitution'],
+  pass: ['pass', 'line', 'personal', 'unsportsmanlike', 'other'],
+  punt: ['kick', 'line', 'personal', 'unsportsmanlike', 'other'],
+  live: ['line', 'pass', 'personal', 'kick', 'unsportsmanlike', 'other', 'substitution'],
+}
+
+const PRE_SNAP_ONLY_IDS = new Set<FlagTypeId>([
+  'flag.false_start',
+  'flag.illegal_procedure',
+  'flag.encroachment',
+  'flag.neutral_zone_infraction',
+  'flag.delay_of_game',
+  'flag.delay_of_game_defense',
+  'flag.time_count',
+  'flag.illegal_formation',
+  'flag.illegal_motion',
+  'flag.illegal_shift',
+  'flag.illegal_snap',
+  'flag.ineligible_number',
+  'flag.twelve_men',
+])
+
+const PASS_PLAY_IDS = new Set<FlagTypeId>([
+  'flag.defensive_pass_interference',
+  'flag.offensive_pass_interference',
+  'flag.illegal_contact',
+  'flag.illegal_contact_receiver',
+  'flag.ineligible_downfield',
+  'flag.illegal_forward_pass',
+  'flag.intentional_grounding',
+  'flag.illegal_touching',
+  'flag.illegal_forward_handing',
+  'flag.roughing_passer',
+])
+
+const KICK_PLAY_IDS = new Set<FlagTypeId>([
+  'flag.roughing_kicker',
+  'flag.running_into_kicker',
+  'flag.roughing_snapper',
+  'flag.leaping',
+  'flag.fair_catch_interference',
+  'flag.kick_catch_interference',
+  'flag.no_yards',
+  'flag.illegally_downfield_on_kick',
+  'flag.kickoff_out_of_bounds',
+  'flag.illegal_touching_free_kick',
+  'flag.free_kick_offside',
+  'flag.illegal_wedge',
+  'flag.illegal_fair_catch',
+])
+
+export function playPathWithoutFlag(path: readonly string[]): string[] {
+  const out: string[] = []
+  for (const key of path) {
+    if (key === FLAG_PATH_KEY || key.startsWith('flag_') || isFlagTypeId(key)) {
+      break
+    }
+    out.push(key)
+  }
+  return out
+}
+
+export function flagMatchContextFromGame(game: {
+  rulesetId: FootballCode
+  seriesKind: SeriesKind
+  playInProgress: boolean
+  playCollectionPath: readonly string[]
+  flagResume: {
+    playInProgress: boolean
+    playCollectionPath: readonly string[]
+  } | null
+}): FlagMatchContext {
+  const resume = game.flagResume
+  const sourcePath = resume?.playCollectionPath ?? game.playCollectionPath
+  return {
+    rulesetId: game.rulesetId,
+    seriesKind: game.seriesKind,
+    playInProgress: resume?.playInProgress ?? game.playInProgress,
+    collectionPath: playPathWithoutFlag(sourcePath),
+  }
+}
+
+export function deriveFlagSituation(ctx: FlagMatchContext): FlagSituation {
+  const path = ctx.collectionPath
+  if (ctx.seriesKind === 'free_kick' || path.includes('kickoff')) return 'kickoff'
+  if (ctx.seriesKind === 'try' || path.includes('try')) {
+    if (path.includes('pat_kick')) return 'try_kick'
+    if (path.includes('throw')) return 'pass'
+    if (path.includes('rush') || path.includes('two_point')) return 'run'
+    return 'try'
+  }
+  if (!ctx.playInProgress) return 'pre_snap'
+  if (path.includes('punt')) return 'punt'
+  if (path.includes('throw')) return 'pass'
+  if (path.includes('rush')) return 'run'
+  return 'live'
+}
+
+function typeFitsSituation(type: FlagType, situation: FlagSituation): boolean {
+  const allowed = CATEGORIES_BY_SITUATION[situation]
+  if (!allowed.includes(type.category)) return false
+
+  const id = type.id
+  if (PRE_SNAP_ONLY_IDS.has(id)) {
+    return situation === 'pre_snap' || situation === 'try'
+  }
+  if (PASS_PLAY_IDS.has(id)) {
+    return situation === 'pass' || situation === 'live' || situation === 'try'
+  }
+  if (KICK_PLAY_IDS.has(id)) {
+    return (
+      situation === 'kickoff' ||
+      situation === 'punt' ||
+      situation === 'try_kick' ||
+      situation === 'try' ||
+      situation === 'live'
+    )
+  }
+  if (id === 'flag.offside') {
+    return (
+      situation === 'pre_snap' ||
+      situation === 'kickoff' ||
+      situation === 'try'
+    )
+  }
+  return true
+}
+
+/** Association + series + current phase / play tree. */
+export function flagTypesForMatchState(
+  ctx: FlagMatchContext,
+  category: FlagCategory | null = null,
+): FlagType[] {
+  const situation = deriveFlagSituation(ctx)
+  return flagTypesForSeries(ctx.rulesetId, ctx.seriesKind).filter((type) => {
+    if (category && type.category !== category) return false
+    return typeFitsSituation(type, situation)
+  })
+}
+
 const CATEGORY_META: {
   id: FlagCategory
   optionId: string
@@ -126,13 +289,10 @@ export function parseFlagCollectionPath(path: readonly string[]): {
 }
 
 function typesForContext(
-  code: FootballCode,
-  seriesKind: SeriesKind,
+  ctx: FlagMatchContext,
   category: FlagCategory | null,
 ): FlagType[] {
-  return flagTypesForSeries(code, seriesKind).filter((type) =>
-    category ? type.category === category : true,
-  )
+  return flagTypesForMatchState(ctx, category)
 }
 
 function againstChoices(type: FlagType, seriesKind: SeriesKind): FlagAgainst[] {
@@ -148,35 +308,39 @@ function option(
   return partial
 }
 
-export function flagCategoryOptions(
-  code: FootballCode,
-  seriesKind: SeriesKind,
-): PlayCollectionOption[] {
-  const available = new Set(
-    flagTypesForSeries(code, seriesKind).map((type) => type.category),
-  )
+export function flagCategoryOptions(ctx: FlagMatchContext): PlayCollectionOption[] {
+  const available = new Set(flagTypesForMatchState(ctx).map((type) => type.category))
+  const situation = deriveFlagSituation(ctx)
   return CATEGORY_META.filter((entry) => available.has(entry.id)).map((entry) =>
     option({
       id: entry.optionId,
       label: entry.label,
-      likelihood: entry.likelihood,
+      likelihood:
+        situation === 'pass' && entry.id === 'pass'
+          ? 90
+          : situation === 'kickoff' && entry.id === 'kick'
+            ? 90
+            : situation === 'pre_snap' && entry.id === 'pre_snap'
+              ? 90
+              : situation === 'run' && entry.id === 'line'
+                ? 90
+                : entry.likelihood,
       nextStep: 'choose_flag_type',
     }),
   )
 }
 
 export function flagTypeOptions(
-  code: FootballCode,
-  seriesKind: SeriesKind,
+  ctx: FlagMatchContext,
   category: FlagCategory | null,
 ): PlayCollectionOption[] {
-  return typesForContext(code, seriesKind, category)
+  return typesForContext(ctx, category)
     .map((type) =>
       option({
         id: type.id,
         label: type.label.toUpperCase(),
         likelihood: TYPE_LIKELIHOOD[type.id] ?? 10,
-        nextStep: againstChoices(type, seriesKind).length === 1
+        nextStep: againstChoices(type, ctx.seriesKind).length === 1
           ? 'choose_flag_decision'
           : 'choose_flag_against',
       }),
@@ -225,8 +389,7 @@ export function flagDecisionOptions(): PlayCollectionOption[] {
 export function getFlagCollectionStepDef(
   stepId: PlayCollectionStepId,
   path: readonly string[],
-  code: FootballCode,
-  seriesKind: SeriesKind,
+  ctx: FlagMatchContext,
 ): PlayCollectionStepDef | null {
   const parsed = parseFlagCollectionPath(path)
   if (stepId === 'choose_flag_category') {
@@ -236,7 +399,7 @@ export function getFlagCollectionStepDef(
       prompt: 'What kind of flag?',
       showYards: true,
       canEndPlay: false,
-      options: flagCategoryOptions(code, seriesKind),
+      options: flagCategoryOptions(ctx),
     }
   }
   if (stepId === 'choose_flag_type') {
@@ -246,7 +409,7 @@ export function getFlagCollectionStepDef(
       prompt: 'Which flag?',
       showYards: true,
       canEndPlay: false,
-      options: flagTypeOptions(code, seriesKind, parsed.category),
+      options: flagTypeOptions(ctx, parsed.category),
     }
   }
   if (stepId === 'choose_flag_against') {
@@ -256,7 +419,7 @@ export function getFlagCollectionStepDef(
       prompt: 'Who is the flag on?',
       showYards: true,
       canEndPlay: false,
-      options: flagAgainstOptions(parsed.typeId, seriesKind),
+      options: flagAgainstOptions(parsed.typeId, ctx.seriesKind),
     }
   }
   if (stepId === 'choose_flag_decision') {
@@ -275,10 +438,9 @@ export function getFlagCollectionStepDef(
 export function flagCollectionButtons(
   stepId: PlayCollectionStepId,
   path: readonly string[],
-  code: FootballCode,
-  seriesKind: SeriesKind,
+  ctx: FlagMatchContext,
 ): PlayCollectionButton[] {
-  const step = getFlagCollectionStepDef(stepId, path, code, seriesKind)
+  const step = getFlagCollectionStepDef(stepId, path, ctx)
   if (!step) return []
   const weights = step.options.map((entry) => entry.likelihood)
   return step.options.map((entry) => ({
@@ -293,13 +455,12 @@ export function resolveFlagCollectionChoice(
   stepId: PlayCollectionStepId,
   optionId: string,
   path: readonly string[],
-  code: FootballCode,
-  seriesKind: SeriesKind,
+  ctx: FlagMatchContext,
 ): {
   nextStep: PlayCollectionStepId | null
   decision: 'accepted' | 'declined' | null
 } | null {
-  const step = getFlagCollectionStepDef(stepId, path, code, seriesKind)
+  const step = getFlagCollectionStepDef(stepId, path, ctx)
   const chosen = step?.options.find((entry) => entry.id === optionId)
   if (!step || !chosen) return null
   if (optionId === 'flag_accept') {

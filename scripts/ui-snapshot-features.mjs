@@ -365,11 +365,11 @@ export const WEEK_FEATURES = {
           .filter({ visible: true })
           .click()
         await page
-          .getByRole('button', { name: 'RUSH' })
+          .getByRole('button', { name: 'RUN' })
           .filter({ visible: true })
           .waitFor({ state: 'visible', timeout: 5000 })
         await page
-          .getByRole('button', { name: 'THROW' })
+          .getByRole('button', { name: 'PASS ATTEMPT' })
           .filter({ visible: true })
           .waitFor({ state: 'visible', timeout: 5000 })
         await page
@@ -405,15 +405,15 @@ export const WEEK_FEATURES = {
           .filter({ visible: true })
           .click()
         await page
-          .getByRole('button', { name: 'THROW' })
+          .getByRole('button', { name: 'PASS ATTEMPT' })
           .filter({ visible: true })
           .click()
         await page
-          .getByRole('button', { name: 'CATCH' })
+          .getByRole('button', { name: 'COMPLETE PASS', exact: true })
           .filter({ visible: true })
           .waitFor({ state: 'visible', timeout: 5000 })
         await page
-          .getByRole('button', { name: 'INCOMPLETE' })
+          .getByRole('button', { name: 'INCOMPLETE PASS' })
           .filter({ visible: true })
           .waitFor({ state: 'visible', timeout: 5000 })
       },
@@ -445,11 +445,11 @@ export const WEEK_FEATURES = {
           .filter({ visible: true })
           .click()
         await page
-          .getByRole('button', { name: 'THROW' })
+          .getByRole('button', { name: 'PASS ATTEMPT' })
           .filter({ visible: true })
           .click()
         await page
-          .getByRole('button', { name: 'CATCH' })
+          .getByRole('button', { name: 'COMPLETE PASS', exact: true })
           .filter({ visible: true })
           .click()
         await page
@@ -495,6 +495,82 @@ export const WEEK_FEATURES = {
           .click()
         await page
           .getByRole('button', { name: 'PROCEDURE' })
+          .filter({ visible: true })
+          .waitFor({ state: 'visible', timeout: 5000 })
+      },
+    },
+    {
+      id: 'play-controls-flag-kickoff',
+      title: 'Play controls — flag on kickoff',
+      path: '/game/NCAAF-2026-001',
+      viewport: 'game-landscape',
+      gameSetup: { fieldDirection: 'dismiss', errorToast: 'dismiss' },
+      featureFlagOverrides: {
+        'game.playControls': true,
+        'playControls.snap': true,
+        'playControls.endPlay': true,
+        'playControls.yardAdjust': true,
+        'playControls.matchStateGuide': true,
+      },
+      async prepare(page) {
+        await page
+          .getByRole('button', { name: 'KICK OFF' })
+          .filter({ visible: true })
+          .click()
+        await page
+          .getByRole('button', { name: 'FLAG', exact: true })
+          .filter({ visible: true })
+          .click()
+        await page
+          .getByRole('button', { name: 'KICK' })
+          .filter({ visible: true })
+          .waitFor({ state: 'visible', timeout: 5000 })
+      },
+    },
+    {
+      id: 'play-controls-flag-pass',
+      title: 'Play controls — flag after throw',
+      path: '/game/NCAAF-2026-001',
+      viewport: 'game-landscape',
+      gameSetup: { fieldDirection: 'dismiss', errorToast: 'dismiss' },
+      featureFlagOverrides: {
+        'game.playControls': true,
+        'playControls.snap': true,
+        'playControls.endPlay': true,
+        'playControls.yardAdjust': true,
+        'playControls.matchStateGuide': true,
+      },
+      async prepare(page) {
+        await page
+          .getByRole('button', { name: 'KICK OFF' })
+          .filter({ visible: true })
+          .click()
+        await page
+          .getByRole('button', { name: 'TOUCHBACK' })
+          .filter({ visible: true })
+          .click()
+        await page
+          .getByRole('button', { name: 'SNAP' })
+          .filter({ visible: true })
+          .waitFor({ state: 'visible', timeout: 8000 })
+        await page
+          .getByRole('button', { name: 'SNAP' })
+          .filter({ visible: true })
+          .click()
+        await page
+          .getByRole('button', { name: 'PASS ATTEMPT' })
+          .filter({ visible: true })
+          .waitFor({ state: 'visible', timeout: 8000 })
+        await page
+          .getByRole('button', { name: 'PASS ATTEMPT' })
+          .filter({ visible: true })
+          .click()
+        await page
+          .getByRole('button', { name: 'FLAG', exact: true })
+          .filter({ visible: true })
+          .click()
+        await page
+          .getByRole('button', { name: 'PASS' })
           .filter({ visible: true })
           .waitFor({ state: 'visible', timeout: 5000 })
       },

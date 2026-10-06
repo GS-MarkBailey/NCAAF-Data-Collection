@@ -1,5 +1,5 @@
 {
-  "stagedAt": "2026-07-22T10:22:35.461Z",
+  "stagedAt": "2026-10-06T14:57:06.997Z",
   "files": [
     {
       "relPath": "week-1/features/action-log.png",
@@ -78,8 +78,16 @@
       "attachmentName": "week-4--features--clock-period-editor.png"
     },
     {
+      "relPath": "week-4/features/clock-side-nudge.png",
+      "attachmentName": "week-4--features--clock-side-nudge.png"
+    },
+    {
       "relPath": "week-4/features/design-variants-panel.png",
       "attachmentName": "week-4--features--design-variants-panel.png"
+    },
+    {
+      "relPath": "week-4/features/down-distance-editor.png",
+      "attachmentName": "week-4--features--down-distance-editor.png"
     },
     {
       "relPath": "week-4/features/fixture-status-chips.png",
@@ -92,6 +100,34 @@
     {
       "relPath": "week-4/features/past-fixture-ended.png",
       "attachmentName": "week-4--features--past-fixture-ended.png"
+    },
+    {
+      "relPath": "week-4/features/play-controls-choose-type.png",
+      "attachmentName": "week-4--features--play-controls-choose-type.png"
+    },
+    {
+      "relPath": "week-4/features/play-controls-flag-kickoff.png",
+      "attachmentName": "week-4--features--play-controls-flag-kickoff.png"
+    },
+    {
+      "relPath": "week-4/features/play-controls-flag-pass.png",
+      "attachmentName": "week-4--features--play-controls-flag-pass.png"
+    },
+    {
+      "relPath": "week-4/features/play-controls-flag.png",
+      "attachmentName": "week-4--features--play-controls-flag.png"
+    },
+    {
+      "relPath": "week-4/features/play-controls-idle.png",
+      "attachmentName": "week-4--features--play-controls-idle.png"
+    },
+    {
+      "relPath": "week-4/features/play-controls-live.png",
+      "attachmentName": "week-4--features--play-controls-live.png"
+    },
+    {
+      "relPath": "week-4/features/play-controls-pass-result.png",
+      "attachmentName": "week-4--features--play-controls-pass-result.png"
     },
     {
       "relPath": "week-4/features/portrait-stack.png",

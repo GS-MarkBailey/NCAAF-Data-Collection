@@ -446,10 +446,10 @@ With **Match-state guide** on, scheduled fixtures open in **pregame** so the ful
 - Game-state flag catalog (`flagRules.ts`): NCAA / NFL / CFL penalty types with **per-association** enforcement (yardage, spot, down effect, DQ)
 - Risk management chip is **Flag** (not Penalty)
 - Landscape console order is Scoreboard → Risk → **Play controls** (play controls on the right)
-- Play controls **FLAG**: category → type (association-filtered) → who it is on → accept / decline. Accept applies NCAA / NFL / CFL enforcement and stops the clock; decline restores the previous collection step
+- Play controls **FLAG**: category → type (filtered to the current match phase and play tree — e.g. PROCEDURE before the snap, KICK on kickoff, PASS after a pass attempt) then association rules → who it is on → accept / decline. Accept applies NCAA / NFL / CFL enforcement and stops the clock; decline restores the previous collection step
 
 <!-- AUTO-SNAPSHOTS:week-4-shipped-play-flag:START -->
-![Play controls — flag collection](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/play-controls-flag.png)
+![Play controls — flag collection](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/play-controls-flag.png) ![Play controls — flag on kickoff](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/play-controls-flag-kickoff.png) ![Play controls — flag after throw](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/play-controls-flag-pass.png)
 <!-- AUTO-SNAPSHOTS:week-4-shipped-play-flag:END -->
 - **END PLAY** appears when the chosen result is ready
 - Later quarters: **End period** on the scoreboard, then **Start** on the clock (no Start Q / Kick off badges on the scoreboard)
@@ -532,7 +532,7 @@ The table below is a checklist of what the prototype supports today on the live 
 | Play controls — snap, end play, yard adjust (feature-flagged) | ✅ |
 | Progressive play datapoints — pregame KICK OFF → SNAP → rush/throw → result (match-state guide) | ✅ |
 | Flag / penalty types in game state with NCAA vs NFL vs CFL enforcement (no collection UI yet) | ✅ |
-| Play controls FLAG collection (type → against → accept/decline, association enforcement) | ✅ |
+| Play controls FLAG collection (match-state types → against → accept/decline, association enforcement) | ✅ |
 | Play-by-play (feature-flagged, off by default) | ✅ |
 | Action log + CSV export | ✅ |
 | Feature flags with Vercel deploy (Confirm & deploy) | ✅ |
