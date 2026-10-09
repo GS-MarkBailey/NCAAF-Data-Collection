@@ -4,7 +4,7 @@
 **Live demo:** https://ncaaf-data-collection.vercel.app  
 **Repository:** GitHub (auto-deployed to Vercel on each change)  
 **Period covered:** 16 June 2026 – 21 July 2026  
-**Last updated:** 6 Oct 2026 (snapshots synced automatically)
+**Last updated:** 9 Oct 2026 (snapshots synced automatically)
 
 **Confluence images:** Auto-synced by GitHub Actions on push to `main` (capture → publish). Manual fallback: `npm run publish:confluence`.
 
@@ -447,6 +447,7 @@ With **Match-state guide** on, scheduled fixtures open in **pregame** so the ful
 - Risk management chip is **Flag** (not Penalty)
 - Landscape console order is Scoreboard → Risk → **Play controls** (play controls on the right)
 - Play controls **FLAG** entry is temporarily hidden (collection + association enforcement logic kept in the game layer for a later re-enable)
+- Risk toggles write a session event (e.g. **Big Play flagged** / **cleared**) into collected datapoints and the Settings action log
 - **END PLAY** appears when the chosen result is ready
 - Later quarters: **End period** on the scoreboard, then **Start** on the clock (no Start Q / Kick off badges on the scoreboard)
 
@@ -524,7 +525,7 @@ The table below is a checklist of what the prototype supports today on the live 
 | Play / pause clock with icons + colour chips (no kick-off required in MVP) | ✅ |
 | Full period / overtime / game-end flow (feature-flagged, off in MVP) | ✅ |
 | Field direction + quarter-end flip | ✅ |
-| Risk management toggles (Unreliable emphasised, bottom-right) | ✅ |
+| Risk management toggles (Unreliable emphasised, bottom-right; logged to datapoints + action log) | ✅ |
 | Play controls — snap, end play, yard adjust (feature-flagged) | ✅ |
 | Progressive play datapoints — pregame KICK OFF → SNAP → rush/throw → result (match-state guide) | ✅ |
 | Flag / penalty types in game state with NCAA vs NFL vs CFL enforcement (no collection UI yet) | ✅ |

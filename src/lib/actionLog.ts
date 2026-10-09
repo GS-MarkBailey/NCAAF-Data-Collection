@@ -11,6 +11,11 @@ const RISK_LABELS: Record<RiskType, string> = {
   playAboutToStart: 'Play About to Start',
 }
 
+export function riskToggleLabel(risk: RiskType, active: boolean): string {
+  const label = RISK_LABELS[risk]
+  return active ? `${label} flagged` : `${label} cleared`
+}
+
 export function createUserAction<T extends UserActionType>(
   fixtureId: string,
   action: {
@@ -57,12 +62,8 @@ export function formatActionLabel(action: UserAction): string {
   switch (action.type) {
     case 'take_control':
       return action.payload.active ? 'Take Control enabled' : 'Take Control stopped'
-    case 'risk_toggle': {
-      const label = RISK_LABELS[action.payload.risk]
-      return action.payload.active
-        ? `${label} flagged`
-        : `${label} cleared`
-    }
+    case 'risk_toggle':
+      return riskToggleLabel(action.payload.risk, action.payload.active)
     case 'clock_toggle':
       return action.payload.running
         ? `Clock started (${formatClock(action.payload.seconds)})`

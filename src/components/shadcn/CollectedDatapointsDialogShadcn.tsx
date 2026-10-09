@@ -52,8 +52,8 @@ export function CollectedDatapointsDialogShadcn({
         <div className="min-h-0 flex-1 overflow-y-auto px-1 py-3">
           {datapoints.length === 0 ? (
             <p className="px-2 text-sm text-muted-foreground">
-              Kick off and collect plays — each choice, yard press, and undo
-              appears here, newest first.
+              Kick off and collect plays — each choice, yard press, risk
+              toggle, and undo appears here, newest first.
             </p>
           ) : (
             <ol className="flex flex-col gap-1.5" reversed>

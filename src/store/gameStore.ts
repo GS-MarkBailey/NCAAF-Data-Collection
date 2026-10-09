@@ -2,7 +2,11 @@ import { create } from 'zustand'
 import type { CollectedDatapoint, Fixture, GameState, RiskType } from '@/types'
 import type { ActionLogsByFixture, UserAction } from '@/types/actions'
 import { FIXTURES, createGameStateForFixture } from '@/data/fixtures'
-import { appendAction, createUserAction } from '@/lib/actionLog'
+import {
+  appendAction,
+  createUserAction,
+  riskToggleLabel,
+} from '@/lib/actionLog'
 import { formatClock } from '@/lib/format'
 import {
   adjustBetweenPlayYards,
@@ -212,10 +216,19 @@ export const useAppStore = create<AppStore>((set, get) => ({
       const game = state.games[fixtureId]
       if (!game) return state
       const active = !game.risks[risk]
+      const riskEntry: CollectedDatapoint = {
+        id: crypto.randomUUID(),
+        key: active ? `risk.${risk}` : `risk.${risk}.cleared`,
+        label: riskToggleLabel(risk, active),
+        period: game.clock.period,
+        clock: formatClock(game.clock.seconds),
+        collectedAt: Date.now(),
+      }
       return {
         games: updateGame(state.games, fixtureId, (g) => ({
           ...g,
           risks: { ...g.risks, [risk]: active },
+          collectedDatapoints: [...(g.collectedDatapoints ?? []), riskEntry],
         })),
         actionLogs: appendAction(
           state.actionLogs,
