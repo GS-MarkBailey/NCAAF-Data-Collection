@@ -103,31 +103,76 @@ function updateGame(
   return { ...games, [fixtureId]: updater(game) }
 }
 
+const BALL_ON_EXPORT_KEYS = new Set(['kickoff', 'yards'])
+
+function situationOnDatapoint(
+  game: GameState,
+  key: string,
+  ballOnOverride?: number | null,
+): Pick<CollectedDatapoint, 'period' | 'ballOn' | 'drive' | 'play' | 'down' | 'toGo'> {
+  const drive = game.driveNumber ?? 0
+  const play = game.playNumber ?? 0
+  const inDrive = drive > 0 && play > 0
+  const includeBallOn =
+    ballOnOverride !== undefined || BALL_ON_EXPORT_KEYS.has(key)
+  return {
+    period: game.clock.period,
+    ballOn: includeBallOn
+      ? (ballOnOverride !== undefined ? ballOnOverride : game.ballOn)
+      : null,
+    drive: inDrive ? drive : null,
+    play: inDrive ? play : null,
+    down: inDrive ? game.down : null,
+    toGo: inDrive ? game.distance : null,
+  }
+}
+
+function makeCollectedDatapoint(
+  game: GameState,
+  key: string,
+  options: {
+    path?: readonly string[]
+    foulingIsHome?: boolean
+    label?: string
+    teamAbbr?: string
+    ballOn?: number | null
+  } = {},
+): CollectedDatapoint {
+  const path = options.path ?? game.playCollectionPath
+  const possessionForLabel =
+    options.foulingIsHome === undefined
+      ? game.possessionIsHome
+      : options.foulingIsHome
+  const teamAbbr =
+    options.teamAbbr ??
+    teamAbbrForDatapoint(
+      key,
+      possessionForLabel,
+      game.fixture.homeAbbr,
+      game.fixture.awayAbbr,
+      path,
+    )
+  return {
+    id: crypto.randomUUID(),
+    key,
+    teamAbbr,
+    label: options.label ?? labelForDatapointWithTeam(key, teamAbbr),
+    clock: formatClock(game.clock.seconds),
+    collectedAt: Date.now(),
+    ...situationOnDatapoint(game, key, options.ballOn),
+  }
+}
+
 function appendCollectedDatapoint(
   game: GameState,
   key: string,
   path: readonly string[] = game.playCollectionPath,
   foulingIsHome?: boolean,
 ): CollectedDatapoint[] {
-  const possessionForLabel =
-    foulingIsHome === undefined ? game.possessionIsHome : foulingIsHome
-  const teamAbbr = teamAbbrForDatapoint(
-    key,
-    possessionForLabel,
-    game.fixture.homeAbbr,
-    game.fixture.awayAbbr,
-    path,
-  )
-  const entry: CollectedDatapoint = {
-    id: crypto.randomUUID(),
-    key,
-    teamAbbr,
-    label: labelForDatapointWithTeam(key, teamAbbr),
-    period: game.clock.period,
-    clock: formatClock(game.clock.seconds),
-    collectedAt: Date.now(),
-  }
-  return [...(game.collectedDatapoints ?? []), entry]
+  return [
+    ...(game.collectedDatapoints ?? []),
+    makeCollectedDatapoint(game, key, { path, foulingIsHome }),
+  ]
 }
 
 function makeTeamDatapoint(
@@ -135,21 +180,28 @@ function makeTeamDatapoint(
   key: string,
   path: readonly string[] = game.playCollectionPath,
 ): CollectedDatapoint {
-  const teamAbbr = teamAbbrForDatapoint(
-    key,
-    game.possessionIsHome,
-    game.fixture.homeAbbr,
-    game.fixture.awayAbbr,
-    path,
-  )
+  return makeCollectedDatapoint(game, key, { path })
+}
+
+function advanceDriveForSnap(game: GameState): Pick<
+  GameState,
+  'driveNumber' | 'playNumber' | 'awaitingNewDrive'
+> {
+  const driveNumber = game.driveNumber ?? 0
+  const playNumber = game.playNumber ?? 0
+  const awaitingNewDrive = game.awaitingNewDrive ?? true
+
+  if (awaitingNewDrive || driveNumber === 0) {
+    return {
+      driveNumber: driveNumber === 0 ? 1 : driveNumber + 1,
+      playNumber: 1,
+      awaitingNewDrive: false,
+    }
+  }
   return {
-    id: crypto.randomUUID(),
-    key,
-    teamAbbr,
-    label: labelForDatapointWithTeam(key, teamAbbr),
-    period: game.clock.period,
-    clock: formatClock(game.clock.seconds),
-    collectedAt: Date.now(),
+    driveNumber,
+    playNumber: playNumber === 0 ? 1 : playNumber,
+    awaitingNewDrive: false,
   }
 }
 
@@ -216,14 +268,11 @@ export const useAppStore = create<AppStore>((set, get) => ({
       const game = state.games[fixtureId]
       if (!game) return state
       const active = !game.risks[risk]
-      const riskEntry: CollectedDatapoint = {
-        id: crypto.randomUUID(),
-        key: active ? `risk.${risk}` : `risk.${risk}.cleared`,
-        label: riskToggleLabel(risk, active),
-        period: game.clock.period,
-        clock: formatClock(game.clock.seconds),
-        collectedAt: Date.now(),
-      }
+      const riskEntry = makeCollectedDatapoint(
+        game,
+        active ? `risk.${risk}` : `risk.${risk}.cleared`,
+        { label: riskToggleLabel(risk, active) },
+      )
       return {
         games: updateGame(state.games, fixtureId, (g) => ({
           ...g,
@@ -499,17 +548,19 @@ export const useAppStore = create<AppStore>((set, get) => ({
       return {
         games: updateGame(state.games, fixtureId, (g) => {
           const withUndo = pushPlayUndoSnapshot(g)
+          const driveState = advanceDriveForSnap(withUndo)
+          const snapped = { ...withUndo, ...driveState }
           return {
-            ...withUndo,
+            ...snapped,
             ...snap,
             seriesKind: match.seriesKind,
             playInProgress: match.playInProgress,
             playCollectionStep: INITIAL_PLAY_COLLECTION_STEP,
             playCollectionPath: [],
-            collectedDatapoints: appendCollectedDatapoint(withUndo, 'snap'),
+            collectedDatapoints: appendCollectedDatapoint(snapped, 'snap'),
             clock: {
-              ...withUndo.clock,
-              running: nextClockRunning({ type: 'snap' }, withUndo.clock),
+              ...snapped.clock,
+              running: nextClockRunning({ type: 'snap' }, snapped.clock),
             },
           }
         }),
@@ -844,21 +895,20 @@ export const useAppStore = create<AppStore>((set, get) => ({
             withUndo.fixture.awayAbbr,
             withUndo.playCollectionPath,
           )
-          const yardPoint: CollectedDatapoint = {
-            id: crypto.randomUUID(),
-            key: 'yards',
-            teamAbbr,
-            label: labelForYardsDeltaWithTeam(actualDelta, teamAbbr),
-            period: withUndo.clock.period,
-            clock: formatClock(withUndo.clock.seconds),
-            collectedAt: Date.now(),
-          }
-          return {
+          const afterYards = {
             ...withUndo,
             ballOn: nextBallOn,
             distance: nextDistance,
             down: nextDown,
             playYardsGained: nextPlayYards,
+          }
+          const yardPoint = makeCollectedDatapoint(afterYards, 'yards', {
+            teamAbbr,
+            label: labelForYardsDeltaWithTeam(actualDelta, teamAbbr),
+            ballOn: nextBallOn,
+          })
+          return {
+            ...afterYards,
             collectedDatapoints: [
               ...(withUndo.collectedDatapoints ?? []),
               yardPoint,
@@ -968,15 +1018,37 @@ export const useAppStore = create<AppStore>((set, get) => ({
       return {
         games: updateGame(state.games, fixtureId, (g) => {
           const withUndo = skipUndoPush ? g : pushPlayUndoSnapshot(g)
-          const withEnd = appendCollectedDatapoint(withUndo, 'end_play')
-          const base = {
+          const possessionChanged =
+            resolved.possessionIsHome !== withUndo.possessionIsHome
+          const opensNewDrive =
+            withUndo.seriesKind === 'free_kick' ||
+            endingTry ||
+            resolved.scoredTouchdown ||
+            possessionChanged ||
+            resolved.nextSeries === 'free_kick' ||
+            resolved.nextSeries === 'try'
+          const continuingScrimmage =
+            !opensNewDrive && withUndo.seriesKind === 'scrimmage'
+
+          const afterDrive = {
             ...withUndo,
-            playYardsGained: resolved.playYardsGained,
-            seriesKind: match.seriesKind,
+            awaitingNewDrive: opensNewDrive
+              ? true
+              : (withUndo.awaitingNewDrive ?? false),
+            playNumber: continuingScrimmage
+              ? (withUndo.playNumber ?? 0) + 1
+              : (withUndo.playNumber ?? 0),
+            // Spot down/distance for the upcoming play on "next play" rows.
             down: resolved.down,
             distance: resolved.distance,
             ballOn: resolved.ballOn,
             possessionIsHome: resolved.possessionIsHome,
+          }
+          const withEnd = appendCollectedDatapoint(afterDrive, 'end_play')
+          const base = {
+            ...afterDrive,
+            playYardsGained: resolved.playYardsGained,
+            seriesKind: match.seriesKind,
             score: {
               home: withUndo.score.home + resolved.scoreHomeDelta,
               away: withUndo.score.away + resolved.scoreAwayDelta,
@@ -999,19 +1071,23 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
           // Touchdown → open try/convert collection (1-pt / 2-pt).
           if (resolved.scoredTouchdown) {
-            return {
+            const forTry = {
               ...base,
               playInProgress: true,
-              seriesKind: 'try',
+              seriesKind: 'try' as const,
               ballOn: TRY_SPOT_BALL_ON,
               playStartBallOn: TRY_SPOT_BALL_ON,
               playStartDown: resolved.down,
               playStartDistance: resolved.distance,
               playCollectionStep: INITIAL_TRY_COLLECTION_STEP,
               playCollectionPath: ['try'],
+              awaitingNewDrive: true,
+            }
+            return {
+              ...forTry,
               collectedDatapoints: [
                 ...withEnd,
-                makeTeamDatapoint(withUndo, 'try'),
+                makeTeamDatapoint(forTry, 'try'),
               ],
             }
           }
@@ -1027,6 +1103,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
               playStartBallOn: resolved.ballOn,
               playStartDown: resolved.down,
               playStartDistance: resolved.distance,
+              awaitingNewDrive: true,
               collectedDatapoints: withEnd,
             }
           }
@@ -1084,6 +1161,8 @@ export const useAppStore = create<AppStore>((set, get) => ({
           const kickoffGame = {
             ...withUndo,
             possessionIsHome: receivingIsHome,
+            ballOn: spot,
+            awaitingNewDrive: true,
           }
           return {
             ...withUndo,
@@ -1099,6 +1178,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
             ballOn: spot,
             down: rules.minDown,
             distance: rules.firstDownDistance,
+            awaitingNewDrive: true,
             simulation: withUndo.simulation
               ? {
                   ...withUndo.simulation,
@@ -1107,7 +1187,10 @@ export const useAppStore = create<AppStore>((set, get) => ({
               : withUndo.simulation,
             collectedDatapoints: [
               ...(withUndo.collectedDatapoints ?? []),
-              makeTeamDatapoint(kickoffGame, 'kickoff', ['kickoff']),
+              makeCollectedDatapoint(kickoffGame, 'kickoff', {
+                path: ['kickoff'],
+                ballOn: spot,
+              }),
             ],
             clock: {
               ...withUndo.clock,
@@ -1147,6 +1230,13 @@ export const useAppStore = create<AppStore>((set, get) => ({
             const kickoffGame = {
               ...withUndo,
               possessionIsHome: receivingIsHome,
+              ballOn: spot,
+              awaitingNewDrive: true,
+              clock: {
+                period: 1,
+                seconds: rules.quarterLengthSeconds,
+                running: false,
+              },
             }
             return {
               ...withUndo,
@@ -1157,13 +1247,15 @@ export const useAppStore = create<AppStore>((set, get) => ({
               possessionIsHome: receivingIsHome,
               playCollectionStep: INITIAL_KICKOFF_COLLECTION_STEP,
               playCollectionPath: ['kickoff'],
+              awaitingNewDrive: true,
+              driveNumber: 0,
+              playNumber: 0,
               collectedDatapoints: [
                 ...(withUndo.collectedDatapoints ?? []),
-                {
-                  ...makeTeamDatapoint(kickoffGame, 'kickoff', ['kickoff']),
-                  period: 1,
-                  clock: formatClock(rules.quarterLengthSeconds),
-                },
+                makeCollectedDatapoint(kickoffGame, 'kickoff', {
+                  path: ['kickoff'],
+                  ballOn: spot,
+                }),
               ],
               playYardsGained: 0,
               playStartDown: rules.minDown,

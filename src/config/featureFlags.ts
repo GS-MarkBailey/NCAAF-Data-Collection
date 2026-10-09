@@ -243,7 +243,8 @@ export const FEATURE_FLAGS = [
   {
     id: 'settings.csvExport',
     label: 'CSV export',
-    description: 'Download action log as CSV from the log tab.',
+    description:
+      'Download events log CSV (mins, seconds, datapoint, ball on, period, drive, play, down, to go).',
     group: 'Settings',
     parent: 'settings.actionLog',
     defaultEnabled: true,

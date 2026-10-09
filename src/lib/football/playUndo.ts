@@ -22,6 +22,9 @@ export interface PlayUndoSnapshot {
   gameStarted: boolean
   gameEnded: boolean
   periodEnded: boolean
+  driveNumber: number
+  playNumber: number
+  awaitingNewDrive: boolean
   collectedDatapointsLength: number
   playsLength: number
   flagEventsLength: number
@@ -49,6 +52,9 @@ export function capturePlayUndoSnapshot(game: GameState): PlayUndoSnapshot {
     gameStarted: game.gameStarted,
     gameEnded: game.gameEnded,
     periodEnded: game.periodEnded,
+    driveNumber: game.driveNumber ?? 0,
+    playNumber: game.playNumber ?? 0,
+    awaitingNewDrive: game.awaitingNewDrive ?? true,
     collectedDatapointsLength: game.collectedDatapoints?.length ?? 0,
     playsLength: game.plays?.length ?? 0,
     flagEventsLength: game.flagEvents?.length ?? 0,
@@ -82,6 +88,9 @@ export function applyPlayUndoSnapshot(
     .filter((entry) => entry.key !== 'undo')
     .map((entry) => entry.label)
 
+  const restoredDrive = snapshot.driveNumber
+  const restoredPlay = snapshot.playNumber
+  const inDrive = restoredDrive > 0 && restoredPlay > 0
   const undoEntry: CollectedDatapoint = {
     id: crypto.randomUUID(),
     key: 'undo',
@@ -89,6 +98,11 @@ export function applyPlayUndoSnapshot(
     period: game.clock.period,
     clock: formatClock(game.clock.seconds),
     collectedAt: Date.now(),
+    ballOn: null,
+    drive: inDrive ? restoredDrive : null,
+    play: inDrive ? restoredPlay : null,
+    down: inDrive ? snapshot.down : null,
+    toGo: inDrive ? snapshot.distance : null,
   }
 
   return {
@@ -110,6 +124,9 @@ export function applyPlayUndoSnapshot(
     gameStarted: snapshot.gameStarted,
     gameEnded: snapshot.gameEnded,
     periodEnded: snapshot.periodEnded,
+    driveNumber: restoredDrive,
+    playNumber: restoredPlay,
+    awaitingNewDrive: snapshot.awaitingNewDrive,
     // Keep history — append Undo instead of deleting reversed datapoints.
     collectedDatapoints: [...prior, undoEntry],
     plays: (game.plays ?? []).slice(0, snapshot.playsLength),

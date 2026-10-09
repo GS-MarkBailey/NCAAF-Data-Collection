@@ -52,6 +52,16 @@ export interface CollectedDatapoint {
   clock: string
   /** Wall-clock ms when collected. */
   collectedAt: number
+  /** Spotting yard line when relevant for export (kickoff / yards); else null. */
+  ballOn?: number | null
+  /** Drive number when in a scrimmage drive; else null. */
+  drive?: number | null
+  /** Play number within the drive; else null. */
+  play?: number | null
+  /** Down at collection time when in a drive; else null. */
+  down?: number | null
+  /** Yards to go at collection time when in a drive; else null. */
+  toGo?: number | null
 }
 
 export interface PlaySimulationState {
@@ -100,6 +110,12 @@ export interface GameState {
   playCollectionPath: string[]
   /** Session log of datapoints collected (survives END PLAY). */
   collectedDatapoints: CollectedDatapoint[]
+  /** Current drive number (0 until first scrimmage snap). */
+  driveNumber: number
+  /** Current play number within the drive (0 until first snap). */
+  playNumber: number
+  /** Next snap should open a new drive (after kickoff / possession change). */
+  awaitingNewDrive: boolean
   /** Snapshots for Play controls Undo (collection / yards / snap / end). */
   playUndoStack: PlayUndoSnapshot[]
   /**

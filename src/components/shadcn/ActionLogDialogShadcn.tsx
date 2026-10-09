@@ -1,11 +1,11 @@
 import { Download, Settings } from 'lucide-react'
 import {
-  downloadActionLogCsv,
   formatActionGameClock,
   formatActionLabel,
   formatActionTime,
   formatActionType,
 } from '@/lib/actionLog'
+import { downloadEventsLogCsv } from '@/lib/eventsLog'
 import { FieldDirectionPicker } from '@/components/game/FieldDirectionPicker'
 import { FeatureFlagsPanel } from '@/components/shadcn/FeatureFlagsPanel'
 import { useFeatureFlag } from '@/hooks/useFeatureFlag'
@@ -42,6 +42,9 @@ const SETTINGS_TAB_SCROLL = 'min-h-0 flex-1 overflow-y-auto'
 export function ActionLogDialogShadcn({ fixtureId }: ActionLogDialogShadcnProps) {
   const actions = useAppStore(
     (s) => s.actionLogs[fixtureId] ?? EMPTY_ACTIONS,
+  )
+  const datapoints = useAppStore(
+    (s) => s.games[fixtureId]?.collectedDatapoints ?? [],
   )
   const game = useAppStore((s) => s.games[fixtureId])
   const showFieldTab = useFeatureFlag('settings.fieldDirection')
@@ -120,13 +123,19 @@ export function ActionLogDialogShadcn({ fixtureId }: ActionLogDialogShadcnProps)
                     <p className="text-sm text-muted-foreground">
                       {actions.length} recorded action
                       {actions.length === 1 ? '' : 's'}
+                      {datapoints.length > 0
+                        ? ` · ${datapoints.length} event${datapoints.length === 1 ? '' : 's'} for CSV`
+                        : ''}
                     </p>
                     {showCsvExport ? (
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => downloadActionLogCsv(actions, fixtureId)}
-                        disabled={actions.length === 0}
+                        onClick={() =>
+                          downloadEventsLogCsv(datapoints, fixtureId)
+                        }
+                        disabled={datapoints.length === 0}
+                        title="Download events log (wall-clock mins/seconds + situation columns)"
                       >
                         <Download data-icon="inline-start" />
                         CSV

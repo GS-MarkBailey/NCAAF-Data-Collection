@@ -1,5 +1,7 @@
-import { ListTree } from 'lucide-react'
+import { Download, ListTree } from 'lucide-react'
 import { formatPeriodLabel } from '@/lib/football'
+import { downloadEventsLogCsv } from '@/lib/eventsLog'
+import { useFeatureFlag } from '@/hooks/useFeatureFlag'
 import { useAppStore } from '@/store/gameStore'
 import { Button } from '@/components/ui/button'
 import {
@@ -23,6 +25,7 @@ export function CollectedDatapointsDialogShadcn({
     (s) => s.games[fixtureId]?.collectedDatapoints ?? [],
   )
   const rulesetId = useAppStore((s) => s.games[fixtureId]?.rulesetId)
+  const showCsvExport = useFeatureFlag('settings.csvExport')
 
   return (
     <Dialog>
@@ -41,12 +44,29 @@ export function CollectedDatapointsDialogShadcn({
 
       <DialogContent className="flex max-h-[min(80dvh,32rem)] flex-col gap-0 overflow-hidden sm:max-w-md">
         <DialogHeader className="shrink-0 border-b border-border px-1 pb-3">
-          <DialogTitle>Collected datapoints</DialogTitle>
-          <DialogDescription>
-            {datapoints.length === 0
-              ? 'No datapoints collected yet this session.'
-              : `${datapoints.length} datapoint${datapoints.length === 1 ? '' : 's'} this session`}
-          </DialogDescription>
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0 space-y-1.5">
+              <DialogTitle>Collected datapoints</DialogTitle>
+              <DialogDescription>
+                {datapoints.length === 0
+                  ? 'No datapoints collected yet this session.'
+                  : `${datapoints.length} datapoint${datapoints.length === 1 ? '' : 's'} this session`}
+              </DialogDescription>
+            </div>
+            {showCsvExport ? (
+              <Button
+                variant="outline"
+                size="sm"
+                className="shrink-0"
+                disabled={datapoints.length === 0}
+                title="Download events log CSV"
+                onClick={() => downloadEventsLogCsv(datapoints, fixtureId)}
+              >
+                <Download data-icon="inline-start" />
+                CSV
+              </Button>
+            ) : null}
+          </div>
         </DialogHeader>
 
         <div className="min-h-0 flex-1 overflow-y-auto px-1 py-3">

@@ -448,6 +448,7 @@ With **Match-state guide** on, scheduled fixtures open in **pregame** so the ful
 - Landscape console order is Scoreboard → Risk → **Play controls** (play controls on the right)
 - Play controls **FLAG** entry is temporarily hidden (collection + association enforcement logic kept in the game layer for a later re-enable)
 - Risk toggles write a session event (e.g. **Big Play flagged** / **cleared**) into collected datapoints and the Settings action log
+- Events log CSV (Settings → Log or Collected datapoints → CSV): `mins, seconds, datapoint, ball on, period, drive, play, down, to go` — **mins/seconds are wall-clock elapsed** from the first event (not game clock)
 - **END PLAY** appears when the chosen result is ready
 - Later quarters: **End period** on the scoreboard, then **Start** on the clock (no Start Q / Kick off badges on the scoreboard)
 
@@ -531,7 +532,7 @@ The table below is a checklist of what the prototype supports today on the live 
 | Flag / penalty types in game state with NCAA vs NFL vs CFL enforcement (no collection UI yet) | ✅ |
 | Play controls FLAG collection (logic ready; entry button temporarily hidden) | ⏸ |
 | Play-by-play (feature-flagged, off by default) | ✅ |
-| Action log + CSV export | ✅ |
+| Action log + events CSV export (wall-clock mins/seconds + drive/play situation) | ✅ |
 | Feature flags with Vercel deploy (Confirm & deploy) | ✅ |
 | Design variants group (A display resilience, B clock panel) | ✅ |
 | Connection status chip (feature-flagged) | ✅ |

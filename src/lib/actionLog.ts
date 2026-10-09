@@ -148,6 +148,7 @@ function escapeCsvValue(value: string | number | boolean): string {
   return str
 }
 
+/** @deprecated Prefer `datapointsToEventsCsv` / `downloadEventsLogCsv`. */
 export function actionsToCsv(actions: UserAction[]): string {
   const headers = [
     'id',
@@ -178,6 +179,7 @@ export function actionsToCsv(actions: UserAction[]): string {
     .join('\n')
 }
 
+/** @deprecated Prefer `downloadEventsLogCsv` from `@/lib/eventsLog`. */
 export function downloadActionLogCsv(
   actions: UserAction[],
   fixtureId: string,
