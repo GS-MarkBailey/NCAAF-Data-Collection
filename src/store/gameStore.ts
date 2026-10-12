@@ -205,6 +205,38 @@ function advanceDriveForSnap(game: GameState): Pick<
   }
 }
 
+/** Scoreboard edits always carry current down / to-go (even before a drive). */
+function makeScoreboardDatapoint(
+  game: GameState,
+  key: string,
+  label: string,
+): CollectedDatapoint {
+  const drive = game.driveNumber ?? 0
+  const play = game.playNumber ?? 0
+  return {
+    ...makeCollectedDatapoint(game, key, { label }),
+    ballOn: null,
+    drive: drive > 0 ? drive : null,
+    play: play > 0 ? play : null,
+    down: game.down,
+    toGo: game.distance,
+  }
+}
+
+function withScoreboardDatapoint(
+  game: GameState,
+  key: string,
+  label: string,
+): GameState {
+  return {
+    ...game,
+    collectedDatapoints: [
+      ...(game.collectedDatapoints ?? []),
+      makeScoreboardDatapoint(game, key, label),
+    ],
+  }
+}
+
 export const useAppStore = create<AppStore>((set, get) => ({
   fixtures: FIXTURES,
   games: {},
@@ -328,10 +360,13 @@ export const useAppStore = create<AppStore>((set, get) => ({
       const running = !current.clock.running
       const seconds = current.clock.seconds
       return {
-        games: updateGame(state.games, fixtureId, (g) => ({
-          ...g,
-          clock: { ...g.clock, running },
-        })),
+        games: updateGame(state.games, fixtureId, (g) =>
+          withScoreboardDatapoint(
+            { ...g, clock: { ...g.clock, running } },
+            running ? 'clock_start' : 'clock_pause',
+            running ? 'Clock started' : 'Clock paused',
+          ),
+        ),
         actionLogs: appendAction(
           state.actionLogs,
           createUserAction(
@@ -360,13 +395,20 @@ export const useAppStore = create<AppStore>((set, get) => ({
         seconds: game.clock.seconds,
         period: game.clock.period,
       }
+      const sign = delta > 0 ? '+' : ''
       // Works while running or stopped — only the displayed time changes.
       return {
-        games: updateGame(state.games, fixtureId, (g) => ({
-          ...g,
-          periodEnded: seconds > 0 ? false : g.periodEnded,
-          clock: { ...g.clock, seconds },
-        })),
+        games: updateGame(state.games, fixtureId, (g) =>
+          withScoreboardDatapoint(
+            {
+              ...g,
+              periodEnded: seconds > 0 ? false : g.periodEnded,
+              clock: { ...g.clock, seconds },
+            },
+            'clock_nudge',
+            `Clock ${sign}${delta}s → ${formatClock(seconds)}`,
+          ),
+        ),
         actionLogs: appendAction(
           state.actionLogs,
           createUserAction(
@@ -397,11 +439,17 @@ export const useAppStore = create<AppStore>((set, get) => ({
       }
 
       return {
-        games: updateGame(state.games, fixtureId, (g) => ({
-          ...g,
-          periodEnded: nextSeconds > 0 ? false : g.periodEnded,
-          clock: { ...g.clock, seconds: nextSeconds },
-        })),
+        games: updateGame(state.games, fixtureId, (g) =>
+          withScoreboardDatapoint(
+            {
+              ...g,
+              periodEnded: nextSeconds > 0 ? false : g.periodEnded,
+              clock: { ...g.clock, seconds: nextSeconds },
+            },
+            'clock_set',
+            `Clock set ${formatClock(nextSeconds)}`,
+          ),
+        ),
         actionLogs: appendAction(
           state.actionLogs,
           createUserAction(
@@ -432,10 +480,13 @@ export const useAppStore = create<AppStore>((set, get) => ({
       }
 
       return {
-        games: updateGame(state.games, fixtureId, (g) => ({
-          ...g,
-          clock: { ...g.clock, period: toPeriod },
-        })),
+        games: updateGame(state.games, fixtureId, (g) =>
+          withScoreboardDatapoint(
+            { ...g, clock: { ...g.clock, period: toPeriod } },
+            'period_set',
+            `Period Q${fromPeriod} → Q${toPeriod}`,
+          ),
+        ),
         actionLogs: appendAction(
           state.actionLogs,
           createUserAction(
@@ -466,10 +517,13 @@ export const useAppStore = create<AppStore>((set, get) => ({
       }
 
       return {
-        games: updateGame(state.games, fixtureId, (g) => ({
-          ...g,
-          down: toDown,
-        })),
+        games: updateGame(state.games, fixtureId, (g) =>
+          withScoreboardDatapoint(
+            { ...g, down: toDown },
+            'down_set',
+            `Down ${fromDown} → ${toDown}`,
+          ),
+        ),
         actionLogs: appendAction(
           state.actionLogs,
           createUserAction(
@@ -500,10 +554,13 @@ export const useAppStore = create<AppStore>((set, get) => ({
       }
 
       return {
-        games: updateGame(state.games, fixtureId, (g) => ({
-          ...g,
-          distance: toDistance,
-        })),
+        games: updateGame(state.games, fixtureId, (g) =>
+          withScoreboardDatapoint(
+            { ...g, distance: toDistance },
+            'distance_set',
+            `To go ${fromDistance} → ${toDistance}`,
+          ),
+        ),
         actionLogs: appendAction(
           state.actionLogs,
           createUserAction(
@@ -1324,21 +1381,27 @@ export const useAppStore = create<AppStore>((set, get) => ({
       })
 
       return {
-        games: updateGame(state.games, fixtureId, (g) => ({
-          ...g,
-          periodEnded: match.periodEnded,
-          playInProgress: match.playInProgress,
-          seriesKind: match.seriesKind,
-          clock: {
-            period: toPeriod,
-            seconds: rules.quarterLengthSeconds,
-            running: nextClockRunning(
-              { type: 'period_opened' },
-              { seconds: rules.quarterLengthSeconds, running: false },
-            ),
-          },
-          plays: [...g.plays, createQuarterStartPlay(g, toPeriod)],
-        })),
+        games: updateGame(state.games, fixtureId, (g) =>
+          withScoreboardDatapoint(
+            {
+              ...g,
+              periodEnded: match.periodEnded,
+              playInProgress: match.playInProgress,
+              seriesKind: match.seriesKind,
+              clock: {
+                period: toPeriod,
+                seconds: rules.quarterLengthSeconds,
+                running: nextClockRunning(
+                  { type: 'period_opened' },
+                  { seconds: rules.quarterLengthSeconds, running: false },
+                ),
+              },
+              plays: [...g.plays, createQuarterStartPlay(g, toPeriod)],
+            },
+            'quarter_start',
+            `Quarter ${toPeriod} started`,
+          ),
+        ),
         actionLogs: appendAction(
           state.actionLogs,
           createUserAction(
@@ -1383,20 +1446,26 @@ export const useAppStore = create<AppStore>((set, get) => ({
       }
 
       return {
-        games: updateGame(state.games, fixtureId, (g) => ({
-          ...g,
-          periodEnded: match.periodEnded,
-          playInProgress: match.playInProgress,
-          seriesKind: match.seriesKind,
-          clock: {
-            ...g.clock,
-            seconds: 0,
-            running: nextClockRunning(
-              { type: 'period_ended' },
-              { ...g.clock, seconds: 0 },
-            ),
-          },
-        })),
+        games: updateGame(state.games, fixtureId, (g) =>
+          withScoreboardDatapoint(
+            {
+              ...g,
+              periodEnded: match.periodEnded,
+              playInProgress: match.playInProgress,
+              seriesKind: match.seriesKind,
+              clock: {
+                ...g.clock,
+                seconds: 0,
+                running: nextClockRunning(
+                  { type: 'period_ended' },
+                  { ...g.clock, seconds: 0 },
+                ),
+              },
+            },
+            'period_end',
+            `Period Q${game.clock.period} ended`,
+          ),
+        ),
         actionLogs: appendAction(
           state.actionLogs,
           createUserAction(
@@ -1439,21 +1508,27 @@ export const useAppStore = create<AppStore>((set, get) => ({
       }
 
       return {
-        games: updateGame(state.games, fixtureId, (g) => ({
-          ...g,
-          periodEnded: match.periodEnded,
-          playInProgress: match.playInProgress,
-          seriesKind: match.seriesKind,
-          clock: {
-            period: toPeriod,
-            seconds: rules.quarterLengthSeconds,
-            running: nextClockRunning(
-              { type: 'overtime_opened' },
-              { seconds: rules.quarterLengthSeconds, running: false },
-            ),
-          },
-          plays: [...g.plays, createQuarterStartPlay(g, toPeriod)],
-        })),
+        games: updateGame(state.games, fixtureId, (g) =>
+          withScoreboardDatapoint(
+            {
+              ...g,
+              periodEnded: match.periodEnded,
+              playInProgress: match.playInProgress,
+              seriesKind: match.seriesKind,
+              clock: {
+                period: toPeriod,
+                seconds: rules.quarterLengthSeconds,
+                running: nextClockRunning(
+                  { type: 'overtime_opened' },
+                  { seconds: rules.quarterLengthSeconds, running: false },
+                ),
+              },
+              plays: [...g.plays, createQuarterStartPlay(g, toPeriod)],
+            },
+            'overtime_start',
+            'Overtime started',
+          ),
+        ),
         actionLogs: appendAction(
           state.actionLogs,
           createUserAction(
@@ -1494,21 +1569,27 @@ export const useAppStore = create<AppStore>((set, get) => ({
       }
 
       return {
-        games: updateGame(state.games, fixtureId, (g) => ({
-          ...g,
-          gameEnded: match.gameEnded,
-          periodEnded: match.periodEnded,
-          playInProgress: match.playInProgress,
-          seriesKind: match.seriesKind,
-          clock: {
-            ...g.clock,
-            seconds: 0,
-            running: nextClockRunning(
-              { type: 'game_ended' },
-              { ...g.clock, seconds: 0 },
-            ),
-          },
-        })),
+        games: updateGame(state.games, fixtureId, (g) =>
+          withScoreboardDatapoint(
+            {
+              ...g,
+              gameEnded: match.gameEnded,
+              periodEnded: match.periodEnded,
+              playInProgress: match.playInProgress,
+              seriesKind: match.seriesKind,
+              clock: {
+                ...g.clock,
+                seconds: 0,
+                running: nextClockRunning(
+                  { type: 'game_ended' },
+                  { ...g.clock, seconds: 0 },
+                ),
+              },
+            },
+            'game_end',
+            'Game ended',
+          ),
+        ),
         actionLogs: appendAction(
           state.actionLogs,
           createUserAction(
@@ -1541,14 +1622,20 @@ export const useAppStore = create<AppStore>((set, get) => ({
       })
 
       return {
-        games: updateGame(state.games, fixtureId, (g) => ({
-          ...g,
-          ballOn: nextBallOn,
-          possessionIsHome,
-          simulation: g.simulation
-            ? { ...g.simulation, offenseIsHome: possessionIsHome }
-            : g.simulation,
-        })),
+        games: updateGame(state.games, fixtureId, (g) =>
+          withScoreboardDatapoint(
+            {
+              ...g,
+              ballOn: nextBallOn,
+              possessionIsHome,
+              simulation: g.simulation
+                ? { ...g.simulation, offenseIsHome: possessionIsHome }
+                : g.simulation,
+            },
+            'possession',
+            `Possession → ${teamAbbr}`,
+          ),
+        ),
         actionLogs: appendAction(
           state.actionLogs,
           createUserAction(

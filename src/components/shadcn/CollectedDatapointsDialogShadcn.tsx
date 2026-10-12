@@ -73,7 +73,7 @@ export function CollectedDatapointsDialogShadcn({
           {datapoints.length === 0 ? (
             <p className="px-2 text-sm text-muted-foreground">
               Kick off and collect plays — each choice, yard press, risk
-              toggle, and undo appears here, newest first.
+              toggle, scoreboard edit, and undo appears here, newest first.
             </p>
           ) : (
             <ol className="flex flex-col gap-1.5" reversed>

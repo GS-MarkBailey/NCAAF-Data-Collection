@@ -4,7 +4,7 @@
 **Live demo:** https://ncaaf-data-collection.vercel.app  
 **Repository:** GitHub (auto-deployed to Vercel on each change)  
 **Period covered:** 16 June 2026 – 21 July 2026  
-**Last updated:** 9 Oct 2026 (snapshots synced automatically)
+**Last updated:** 12 Oct 2026 (snapshots synced automatically)
 
 **Confluence images:** Auto-synced by GitHub Actions on push to `main` (capture → publish). Manual fallback: `npm run publish:confluence`.
 
@@ -449,6 +449,7 @@ With **Match-state guide** on, scheduled fixtures open in **pregame** so the ful
 - Play controls **FLAG** entry is temporarily hidden (collection + association enforcement logic kept in the game layer for a later re-enable)
 - Risk toggles write a session event (e.g. **Big Play flagged** / **cleared**) into collected datapoints and the Settings action log
 - Events log CSV (Settings → Log or Collected datapoints → CSV): `mins, seconds, datapoint, ball on, period, drive, play, down, to go` — **mins/seconds are wall-clock elapsed** from the first event (not game clock)
+- Scoreboard edits (Start/Pause, ±1s, clock/period set, down, to go, possession, end period / OT / end game) also append datapoints to that log
 - **END PLAY** appears when the chosen result is ready
 - Later quarters: **End period** on the scoreboard, then **Start** on the clock (no Start Q / Kick off badges on the scoreboard)
 

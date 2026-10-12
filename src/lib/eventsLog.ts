@@ -58,6 +58,18 @@ const DATAPOINT_EXPORT_NAMES: Record<string, string> = {
   flag: 'flag',
   flag_accept: 'flag accepted',
   flag_decline: 'flag declined',
+  clock_start: 'clock started',
+  clock_pause: 'clock paused',
+  clock_nudge: 'clock nudge',
+  clock_set: 'clock set',
+  period_set: 'period set',
+  period_end: 'period ended',
+  quarter_start: 'quarter started',
+  overtime_start: 'overtime started',
+  game_end: 'game ended',
+  down_set: 'down set',
+  distance_set: 'to go set',
+  possession: 'possession',
 }
 
 function escapeCsvValue(value: string | number): string {
@@ -73,12 +85,21 @@ function cell(value: string | number | null | undefined): string {
   return escapeCsvValue(value)
 }
 
+const USE_LABEL_AS_EXPORT = new Set([
+  'clock_nudge',
+  'clock_set',
+  'period_set',
+  'down_set',
+  'distance_set',
+  'possession',
+])
+
 export function exportDatapointName(entry: CollectedDatapoint): string {
+  if (USE_LABEL_AS_EXPORT.has(entry.key) || entry.key.startsWith('risk.')) {
+    return entry.label.toLowerCase()
+  }
   if (DATAPOINT_EXPORT_NAMES[entry.key]) {
     return DATAPOINT_EXPORT_NAMES[entry.key]
-  }
-  if (entry.key.startsWith('risk.')) {
-    return entry.label.toLowerCase()
   }
   if (entry.key.startsWith('flag.')) {
     return entry.label.replace(/\s*-\s*[A-Z]{2,4}\s*$/, '').toLowerCase()
