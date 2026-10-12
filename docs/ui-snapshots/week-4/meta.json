@@ -1,7 +1,7 @@
 {
   "label": "week-4",
   "portrait": true,
-  "capturedAt": "2026-10-09T19:59:25.857Z",
+  "capturedAt": "2026-10-12T09:14:43.739Z",
   "baseUrl": "https://ncaaf-data-collection.vercel.app",
   "views": [
     "fixtures-landscape",
@@ -12,11 +12,6 @@
     "/game/NCAAF-2026-001"
   ],
   "features": [
-    {
-      "id": "fixtures-search",
-      "title": "Fixtures search and refresh",
-      "file": "features/fixtures-search.png"
-    },
     {
       "id": "fixture-status-chips",
       "title": "Scheduled and past fixture chips",
