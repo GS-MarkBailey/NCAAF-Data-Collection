@@ -391,7 +391,7 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 **Scoreboard / clock polish**
 - Start/Pause chips: Play/Pause icons; green Start / red Pause with matching chip style; larger invisible tap target around the chip
 - Stat cells (DOWN, TO GO, QTR, ball-on): tighter spacing between label and value
-- **QTR / DOWN / TO GO / BL ON** show a small pencil when editable; tap replaces the bottom stats + possession panel with the editor (no popup) — Cancel / Confirm stay in that panel
+- **QTR** shows a small pencil when editable; tap **QTR / DOWN / TO GO / BL ON** replaces the bottom stats + possession panel with the editor (no popup) — Cancel / Confirm stay in that panel
 - **DOWN / TO GO editing:** **Down** and **To go** tabs with −/+ steppers and direct entry (same pattern as QTR/period)
 - **BL ON editing:** −/+ steppers and direct entry for offense-relative ball-on
 

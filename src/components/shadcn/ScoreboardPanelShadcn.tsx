@@ -849,7 +849,6 @@ export function ScoreboardPanelShadcn({
                       displayValue={gameEnded ? MATCH_ENDED_STAT : undefined}
                       compact={stacked}
                       interactive={canOpenDownDistanceEditor}
-                      showEditIcon={canOpenDownDistanceEditor}
                       onClick={
                         canOpenDownDistanceEditor
                           ? () => handleOpenDownDistanceEditor('down')
@@ -867,7 +866,6 @@ export function ScoreboardPanelShadcn({
                       displayValue={gameEnded ? MATCH_ENDED_STAT : undefined}
                       compact={stacked}
                       interactive={canOpenDownDistanceEditor}
-                      showEditIcon={canOpenDownDistanceEditor}
                       onClick={
                         canOpenDownDistanceEditor
                           ? () => handleOpenDownDistanceEditor('distance')
@@ -890,7 +888,6 @@ export function ScoreboardPanelShadcn({
                     compact={stacked}
                     showArrow={showBallOnArrow}
                     interactive={canOpenBallOnEditor}
-                    showEditIcon={canOpenBallOnEditor}
                     onClick={
                       canOpenBallOnEditor ? handleOpenBallOnEditor : undefined
                     }
