@@ -1,8 +1,8 @@
 {
   "label": "week-4",
   "portrait": true,
-  "capturedAt": "2026-11-04T14:54:01.652Z",
-  "baseUrl": "http://127.0.0.1:5173",
+  "capturedAt": "2026-11-04T15:01:10.273Z",
+  "baseUrl": "https://ncaaf-data-collection.vercel.app",
   "views": [
     "fixtures-landscape",
     "game-landscape"
@@ -41,11 +41,6 @@
       "id": "clock-side-nudge",
       "title": "Clock ±1 second side buttons",
       "file": "features/clock-side-nudge.png"
-    },
-    {
-      "id": "start-pause-chips",
-      "title": "Start / Pause clock chips",
-      "file": "features/start-pause-chips.png"
     },
     {
       "id": "end-period-chip",
