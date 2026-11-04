@@ -1,5 +1,5 @@
 {
-  "stagedAt": "2026-10-12T09:09:41.460Z",
+  "stagedAt": "2026-11-04T14:54:03.387Z",
   "files": [
     {
       "relPath": "week-1/features/action-log.png",
@@ -88,6 +88,10 @@
     {
       "relPath": "week-4/features/down-distance-editor.png",
       "attachmentName": "week-4--features--down-distance-editor.png"
+    },
+    {
+      "relPath": "week-4/features/end-period-chip.png",
+      "attachmentName": "week-4--features--end-period-chip.png"
     },
     {
       "relPath": "week-4/features/fixture-status-chips.png",

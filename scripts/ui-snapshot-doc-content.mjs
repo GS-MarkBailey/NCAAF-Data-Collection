@@ -85,6 +85,10 @@ export const WEEK_INTERACTIONS = {
       featureIds: ['start-pause-chips'],
     },
     {
+      text: '**END PERIOD** — red chip top-right on the scoreboard clock once the match is underway',
+      featureIds: ['end-period-chip'],
+    },
+    {
       text: '**Profile** — header icon opens signed-in email dialog',
       featureIds: ['profile-dialog'],
     },
@@ -133,7 +137,9 @@ export const WEEK_SHIPPED = {
         'clock-period-editor',
       ],
     },
-    'clock-polish': { featureIds: ['start-pause-chips', 'clock-side-nudge'] },
+    'clock-polish': {
+      featureIds: ['start-pause-chips', 'clock-side-nudge', 'end-period-chip'],
+    },
     'down-distance': { featureIds: ['down-distance-editor'] },
     profile: { featureIds: ['profile-dialog'] },
     'unreliable-risk': { featureIds: ['unreliable-risk'] },

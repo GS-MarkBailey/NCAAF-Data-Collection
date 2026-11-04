@@ -286,12 +286,29 @@ export const WEEK_FEATURES = {
     {
       id: 'start-pause-chips',
       title: 'Start / Pause clock chips',
-      path: '/game/NCAAF-2026-001',
+      path: '/game/NCAAF-2026-012',
       viewport: 'game-landscape',
       gameSetup: { fieldDirection: 'dismiss', errorToast: 'dismiss' },
       async prepare(page) {
         const start = page.getByRole('button', { name: 'Start clock' })
         await start.waitFor({ state: 'visible', timeout: 5000 })
+      },
+    },
+    {
+      id: 'end-period-chip',
+      title: 'End period chip on scoreboard clock',
+      path: '/game/NCAAF-2026-012',
+      viewport: 'game-landscape',
+      gameSetup: { fieldDirection: 'dismiss', errorToast: 'dismiss' },
+      async prepare(page) {
+        await page
+          .getByRole('button', { name: 'KICK OFF' })
+          .filter({ visible: true })
+          .click()
+        await page
+          .getByRole('button', { name: 'End period' })
+          .filter({ visible: true })
+          .waitFor({ state: 'visible', timeout: 5000 })
       },
     },
     {

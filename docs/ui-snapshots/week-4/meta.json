@@ -1,8 +1,8 @@
 {
   "label": "week-4",
   "portrait": true,
-  "capturedAt": "2026-10-12T09:14:43.739Z",
-  "baseUrl": "https://ncaaf-data-collection.vercel.app",
+  "capturedAt": "2026-11-04T14:54:01.652Z",
+  "baseUrl": "http://127.0.0.1:5173",
   "views": [
     "fixtures-landscape",
     "game-landscape"
@@ -12,6 +12,11 @@
     "/game/NCAAF-2026-001"
   ],
   "features": [
+    {
+      "id": "fixtures-search",
+      "title": "Fixtures search and refresh",
+      "file": "features/fixtures-search.png"
+    },
     {
       "id": "fixture-status-chips",
       "title": "Scheduled and past fixture chips",
@@ -33,24 +38,19 @@
       "file": "features/design-variants-panel.png"
     },
     {
-      "id": "clock-numeric-editor",
-      "title": "Clock edit panel — Time tab (Variant B)",
-      "file": "features/clock-numeric-editor.png"
-    },
-    {
-      "id": "clock-period-editor",
-      "title": "Clock edit panel — Period tab (Variant B)",
-      "file": "features/clock-period-editor.png"
-    },
-    {
       "id": "clock-side-nudge",
       "title": "Clock ±1 second side buttons",
       "file": "features/clock-side-nudge.png"
     },
     {
-      "id": "down-distance-editor",
-      "title": "Down & to-go editor",
-      "file": "features/down-distance-editor.png"
+      "id": "start-pause-chips",
+      "title": "Start / Pause clock chips",
+      "file": "features/start-pause-chips.png"
+    },
+    {
+      "id": "end-period-chip",
+      "title": "End period chip on scoreboard clock",
+      "file": "features/end-period-chip.png"
     },
     {
       "id": "profile-dialog",
@@ -61,21 +61,6 @@
       "id": "unreliable-risk",
       "title": "Unreliable risk chip placement",
       "file": "features/unreliable-risk.png"
-    },
-    {
-      "id": "play-controls-idle",
-      "title": "Play controls panel (idle)",
-      "file": "features/play-controls-idle.png"
-    },
-    {
-      "id": "play-controls-choose-type",
-      "title": "Play controls — choose rush / throw",
-      "file": "features/play-controls-choose-type.png"
-    },
-    {
-      "id": "play-controls-pass-result",
-      "title": "Play controls — pass result after throw",
-      "file": "features/play-controls-pass-result.png"
     }
   ]
 }

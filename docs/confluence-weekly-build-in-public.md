@@ -4,7 +4,7 @@
 **Live demo:** https://ncaaf-data-collection.vercel.app  
 **Repository:** GitHub (auto-deployed to Vercel on each change)  
 **Period covered:** 16 June 2026 – 21 July 2026  
-**Last updated:** 12 Oct 2026 (snapshots synced automatically)
+**Last updated:** 4 Nov 2026 (snapshots synced automatically)
 
 **Confluence images:** Auto-synced by GitHub Actions on push to `main` (capture → publish). Manual fallback: `npm run publish:confluence`.
 
@@ -398,7 +398,7 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 <!-- AUTO-SNAPSHOTS:week-4-shipped-down-distance:END -->
 
 <!-- AUTO-SNAPSHOTS:week-4-shipped-clock-polish:START -->
-![Start / Pause clock chips](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/start-pause-chips.png) ![Clock ±1 second side buttons](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-side-nudge.png)
+![Start / Pause clock chips](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/start-pause-chips.png) ![Clock ±1 second side buttons](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-side-nudge.png) ![End period chip on scoreboard clock](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/end-period-chip.png)
 <!-- AUTO-SNAPSHOTS:week-4-shipped-clock-polish:END -->
 
 **Game header (landscape)**
@@ -450,8 +450,9 @@ With **Match-state guide** on, scheduled fixtures open in **pregame** so the ful
 - Risk toggles write a session event (e.g. **Big Play flagged** / **cleared**) into collected datapoints and the Settings action log
 - Events log CSV (Settings → Log or Collected datapoints → CSV): `mins, seconds, datapoint, ball on, period, drive, play, down, to go` — **mins/seconds are wall-clock elapsed** from the first event (not game clock)
 - Scoreboard edits (Start/Pause, ±1s, clock/period set, down, to go, possession, end period / OT / end game) also append datapoints to that log
+- Scoreboard clock card has an **END PERIOD** chip (top-right, same badge style as Start/Pause) once the match is underway
 - **END PLAY** appears when the chosen result is ready
-- Later quarters: **End period** on the scoreboard, then **Start** on the clock (no Start Q / Kick off badges on the scoreboard)
+- Later quarters: **END PERIOD** on the scoreboard clock, then **Start** on the clock (no Start Q / Kick off badges on the scoreboard)
 
 Classic SNAP → yards → END PLAY remains available when Match-state guide is off.
 
@@ -488,6 +489,10 @@ Classic SNAP → yards → END PLAY remains available when Match-state guide is 
 - **Start / Pause chips** — Play/Pause icons with green Start / red Pause; larger invisible tap target
 
 ![Start / Pause clock chips](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/start-pause-chips.png)
+
+- **END PERIOD** — red chip top-right on the scoreboard clock once the match is underway
+
+![End period chip on scoreboard clock](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/end-period-chip.png)
 
 - **Profile** — header icon opens signed-in email dialog
 
