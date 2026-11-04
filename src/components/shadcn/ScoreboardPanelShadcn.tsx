@@ -315,7 +315,9 @@ export function ScoreboardPanelShadcn({
   const bottomEditorTitle = editingBallOn
     ? 'Edit ball on'
     : editingDownDistance
-      ? 'Edit down & distance'
+      ? downDistanceTab === 'distance'
+        ? 'Edit to go'
+        : 'Edit down'
       : clockEditTab === 'period'
         ? 'Edit period'
         : 'Edit clock'

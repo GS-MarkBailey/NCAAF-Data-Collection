@@ -381,18 +381,18 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 **Design variants** (Settings → Features → **Design variants**)
 - Dedicated group with clear **Variant A / Variant B** labels and “Compare vs original” guidance
 - **Variant A — Display resilience:** soft-caps rem growth, improves bottom safe-area padding, allows console panels to scroll under larger fonts / bold text / display scaling / zoom
-- **Variant B — Clock edit panel:** tap the clock or **QTR** opens **Time** / **Period** editors **inline in the bottom scoreboard panel** (not a dialog) with **− / +** steppers and direct entry — separate tabs, no scroll wheels
+- **Variant B — Clock edit panel:** tap the clock opens **Time**, tap **QTR** opens **Period** — each **inline in the bottom scoreboard panel** (no dialog / no Period↔Time switcher) with **− / +** steppers and direct entry
 - Documented **supported phone display & browser settings** baseline (Default font, Bold off, Display Default, Zoom 100%)
 
 <!-- AUTO-SNAPSHOTS:week-4-shipped-design-variants:START -->
-![Design variants in Features settings](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/design-variants-panel.png) ![Inline clock edit — Time tab (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-numeric-editor.png) ![Inline period edit — Period tab (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-period-editor.png)
+![Design variants in Features settings](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/design-variants-panel.png) ![Inline clock edit — Time (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-numeric-editor.png) ![Inline period edit (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-period-editor.png)
 <!-- AUTO-SNAPSHOTS:week-4-shipped-design-variants:END -->
 
 **Scoreboard / clock polish**
 - Start/Pause chips: Play/Pause icons; green Start / red Pause with matching chip style; larger invisible tap target around the chip
 - Stat cells (DOWN, TO GO, QTR, ball-on): tighter spacing between label and value
 - **QTR** shows a small pencil when editable; tap **QTR / DOWN / TO GO / BL ON** replaces the bottom stats + possession panel with the editor (no popup) — Cancel / Confirm stay in that panel
-- **DOWN / TO GO editing:** **Down** and **To go** tabs with −/+ steppers and direct entry (same pattern as QTR/period)
+- **DOWN / TO GO editing:** tap opens that field’s −/+ steppers and direct entry (no Down↔To go switcher; same pattern as QTR/period)
 - **BL ON editing:** −/+ steppers and direct entry for offense-relative ball-on
 
 <!-- AUTO-SNAPSHOTS:week-4-shipped-down-distance:START -->
@@ -482,11 +482,11 @@ Classic SNAP → yards → END PLAY remains available when Match-state guide is 
 
 - **Design variants** — Settings → Features → Design variants (Variant A display resilience, Variant B clock edit panel with Period / Time tabs)
 
-![Design variants in Features settings](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/design-variants-panel.png) ![Inline clock edit — Time tab (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-numeric-editor.png) ![Inline period edit — Period tab (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-period-editor.png)
+![Design variants in Features settings](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/design-variants-panel.png) ![Inline clock edit — Time (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-numeric-editor.png) ![Inline period edit (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-period-editor.png)
 
 - **Inline scoreboard edits** — tap QTR / DOWN / TO GO / BL ON to edit in the bottom stats panel (no popup)
 
-![Inline period edit — Period tab (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-period-editor.png) ![Inline down & to-go editor](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/down-distance-editor.png) ![Inline ball-on editor](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/ball-on-editor.png)
+![Inline period edit (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-period-editor.png) ![Inline down & to-go editor](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/down-distance-editor.png) ![Inline ball-on editor](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/ball-on-editor.png)
 
 - **Start / Pause chips** — Play/Pause icons with green Start / red Pause; larger invisible tap target
 

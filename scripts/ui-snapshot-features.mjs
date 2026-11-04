@@ -211,7 +211,7 @@ export const WEEK_FEATURES = {
     },
     {
       id: 'clock-numeric-editor',
-      title: 'Inline clock edit — Time tab (Variant B)',
+      title: 'Inline clock edit — Time (Variant B)',
       path: '/game/NCAAF-2026-012',
       viewport: 'game-landscape',
       gameSetup: { fieldDirection: 'dismiss', errorToast: 'dismiss' },
@@ -221,14 +221,13 @@ export const WEEK_FEATURES = {
       },
       async prepare(page) {
         await page.getByRole('button', { name: /edit game clock time/i }).click()
-        await page.getByRole('tab', { name: 'Time' }).waitFor({ state: 'visible' })
         await page.getByRole('button', { name: 'Confirm' }).waitFor({ state: 'visible' })
         await page.getByLabel('Min').waitFor({ state: 'visible', timeout: 5000 })
       },
     },
     {
       id: 'clock-period-editor',
-      title: 'Inline period edit — Period tab (Variant B)',
+      title: 'Inline period edit (Variant B)',
       path: '/game/NCAAF-2026-012',
       viewport: 'game-landscape',
       gameSetup: { fieldDirection: 'dismiss', errorToast: 'dismiss' },
@@ -241,7 +240,6 @@ export const WEEK_FEATURES = {
           .getByRole('button', { name: /edit period/i })
           .filter({ visible: true })
           .click()
-        await page.getByRole('tab', { name: 'Period' }).waitFor({ state: 'visible' })
         await page.getByRole('button', { name: 'Confirm' }).waitFor({ state: 'visible' })
         await page.getByRole('textbox', { name: 'Period' }).waitFor({
           state: 'visible',
@@ -275,7 +273,6 @@ export const WEEK_FEATURES = {
           .getByRole('button', { name: /edit down/i })
           .filter({ visible: true })
           .click()
-        await page.getByRole('tab', { name: 'Down' }).waitFor({ state: 'visible' })
         await page.getByRole('button', { name: 'Confirm' }).waitFor({ state: 'visible' })
         await page.getByRole('textbox', { name: 'Down' }).waitFor({
           state: 'visible',

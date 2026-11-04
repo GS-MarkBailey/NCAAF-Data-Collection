@@ -10,7 +10,6 @@ import {
 } from '@/lib/football'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { cn } from '@/lib/utils'
 
 export type DownDistanceEditTab = 'down' | 'distance'
@@ -170,75 +169,40 @@ export function DownDistanceEditor({
   rulesetId,
 }: DownDistanceEditorProps) {
   const rules = getFootballRuleset(rulesetId)
-  const [tab, setTab] = useState<DownDistanceEditTab>(initialTab)
   const clampedDown = clampDown(down, rules)
   const clampedDistance = clampDistance(distance, rules)
 
-  useEffect(() => {
-    setTab(initialTab)
-  }, [initialTab])
-
-  const handleTabChange = (value: string | number | null) => {
-    if (value === 'down' || value === 'distance') {
-      setTab(value)
-    }
+  if (initialTab === 'distance') {
+    return (
+      <StepperField
+        id="distance-edit-value"
+        label="To go"
+        value={clampedDistance}
+        min={rules.minDistance}
+        max={rules.maxDistance}
+        displayValue={String(clampedDistance)}
+        autoFocus
+        inputRef={distanceInputRef}
+        parseInput={(raw) => parseDistanceInput(raw, rules)}
+        onChange={(next) => onDistanceChange(clampDistance(next, rules))}
+        groupLabel="Edit yards to go"
+      />
+    )
   }
 
-  useEffect(() => {
-    const frame = requestAnimationFrame(() => {
-      const target =
-        tab === 'down'
-          ? document.getElementById('down-edit-value')
-          : document.getElementById('distance-edit-value')
-      if (target instanceof HTMLInputElement && !target.disabled) {
-        target.focus()
-      }
-    })
-    return () => cancelAnimationFrame(frame)
-  }, [tab])
-
   return (
-    <Tabs value={tab} onValueChange={handleTabChange} className="w-full gap-3">
-      <TabsList className="mx-auto w-full max-w-xs">
-        <TabsTrigger value="down" className="flex-1">
-          Down
-        </TabsTrigger>
-        <TabsTrigger value="distance" className="flex-1">
-          To go
-        </TabsTrigger>
-      </TabsList>
-
-      <TabsContent value="down" className="outline-none">
-        <StepperField
-          id="down-edit-value"
-          label="Down"
-          value={clampedDown}
-          min={rules.minDown}
-          max={rules.maxDown}
-          displayValue={String(clampedDown)}
-          autoFocus={tab === 'down'}
-          inputRef={downInputRef}
-          parseInput={(raw) => parseDownInput(raw, rules)}
-          onChange={(next) => onDownChange(clampDown(next, rules))}
-          groupLabel="Edit down"
-        />
-      </TabsContent>
-
-      <TabsContent value="distance" className="outline-none">
-        <StepperField
-          id="distance-edit-value"
-          label="To go"
-          value={clampedDistance}
-          min={rules.minDistance}
-          max={rules.maxDistance}
-          displayValue={String(clampedDistance)}
-          autoFocus={tab === 'distance'}
-          inputRef={distanceInputRef}
-          parseInput={(raw) => parseDistanceInput(raw, rules)}
-          onChange={(next) => onDistanceChange(clampDistance(next, rules))}
-          groupLabel="Edit yards to go"
-        />
-      </TabsContent>
-    </Tabs>
+    <StepperField
+      id="down-edit-value"
+      label="Down"
+      value={clampedDown}
+      min={rules.minDown}
+      max={rules.maxDown}
+      displayValue={String(clampedDown)}
+      autoFocus
+      inputRef={downInputRef}
+      parseInput={(raw) => parseDownInput(raw, rules)}
+      onChange={(next) => onDownChange(clampDown(next, rules))}
+      groupLabel="Edit down"
+    />
   )
 }
