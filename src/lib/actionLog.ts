@@ -92,6 +92,8 @@ export function formatActionLabel(action: UserAction): string {
       return `Down ${action.payload.fromDown} → ${action.payload.toDown}`
     case 'distance_set':
       return `To go ${action.payload.fromDistance} → ${action.payload.toDistance}`
+    case 'ball_on_set':
+      return `Ball on ${action.payload.fromBallOn} → ${action.payload.toBallOn}`
     case 'play_snap':
       return `Snap — ${action.payload.down} & ${action.payload.distance}`
     case 'play_end':
@@ -131,6 +133,8 @@ export function formatActionType(action: UserAction): string {
       return 'Down'
     case 'distance_set':
       return 'To Go'
+    case 'ball_on_set':
+      return 'Ball On'
     case 'play_snap':
       return 'Snap'
     case 'play_end':

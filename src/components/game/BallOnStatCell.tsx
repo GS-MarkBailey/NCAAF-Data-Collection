@@ -1,4 +1,5 @@
 import { type CSSProperties } from 'react'
+import { Pencil } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
   getBallOnDisplay,
@@ -16,6 +17,10 @@ interface BallOnStatCellProps {
   inactive?: boolean
   compact?: boolean
   showArrow?: boolean
+  interactive?: boolean
+  showEditIcon?: boolean
+  onClick?: () => void
+  ariaLabel?: string
   pulseEndColor?: string
   shellClassName?: string
   labelClassName?: string
@@ -30,6 +35,10 @@ export function BallOnStatCell({
   inactive = false,
   compact = false,
   showArrow = true,
+  interactive = false,
+  showEditIcon = false,
+  onClick,
+  ariaLabel,
   pulseEndColor = 'var(--color-panel)',
   shellClassName,
   labelClassName,
@@ -45,14 +54,41 @@ export function BallOnStatCell({
 
   return (
     <div
+      role={interactive ? 'button' : undefined}
+      tabIndex={interactive ? 0 : undefined}
+      aria-label={ariaLabel}
+      onClick={interactive ? onClick : undefined}
+      onKeyDown={
+        interactive
+          ? (event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault()
+                onClick?.()
+              }
+            }
+          : undefined
+      }
       className={cn(
-        'flex h-full min-h-0 flex-1 flex-col items-center border-r border-[var(--color-panel-border)] px-1 last:border-r-0 landscape-mobile:py-3',
-        compact ? 'min-h-10 shrink-0 justify-center gap-0.5 py-1' : 'justify-center gap-0 py-4 landscape-mobile:py-3',
+        'relative flex h-full min-h-0 flex-1 flex-col items-center border-r border-[var(--color-panel-border)] px-1 last:border-r-0 landscape-mobile:py-3',
+        compact
+          ? 'min-h-10 shrink-0 justify-center gap-0.5 py-1'
+          : 'justify-center gap-0 py-4 landscape-mobile:py-3',
         pulsing && 'push-data-pulse',
+        interactive &&
+          'cursor-pointer transition-colors hover:bg-muted/50 active:bg-muted/70',
         shellClassName,
       )}
       style={{ '--push-pulse-end': pulseEndColor } as CSSProperties}
     >
+      {showEditIcon ? (
+        <Pencil
+          aria-hidden
+          className={cn(
+            'pointer-events-none absolute text-muted-foreground/70',
+            compact ? 'top-0.5 right-0.5 size-2.5' : 'top-1.5 right-1.5 size-3',
+          )}
+        />
+      ) : null}
       <span
         className={cn(
           'font-medium uppercase tracking-wide leading-none text-[var(--color-text-muted)]',

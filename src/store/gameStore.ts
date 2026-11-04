@@ -15,6 +15,7 @@ import {
   canEndCurrentPeriod,
   canStartNextPeriod,
   canStartOvertime,
+  clampBallOn,
   clampClockSeconds,
   clampDistance,
   clampDown,
@@ -70,6 +71,7 @@ interface AppStore {
   setClockPeriod: (fixtureId: string, period: number) => void
   setDown: (fixtureId: string, down: number) => void
   setDistance: (fixtureId: string, distance: number) => void
+  setBallOn: (fixtureId: string, ballOn: number) => void
   snapPlay: (fixtureId: string) => void
   endPlay: (fixtureId: string, options?: { skipUndoPush?: boolean }) => void
   adjustYards: (fixtureId: string, delta: number) => void
@@ -573,6 +575,43 @@ export const useAppStore = create<AppStore>((set, get) => ({
             {
               type: 'distance_set',
               payload: { fromDistance, toDistance },
+            },
+            clockBefore,
+          ),
+        ),
+      }
+    })
+  },
+
+  setBallOn: (fixtureId, ballOn) => {
+    set((state) => {
+      const game = state.games[fixtureId]
+      if (!game || game.gameEnded) return state
+
+      const toBallOn = clampBallOn(ballOn, game.rulesetId)
+      if (toBallOn === game.ballOn) return state
+
+      const fromBallOn = game.ballOn
+      const clockBefore = {
+        seconds: game.clock.seconds,
+        period: game.clock.period,
+      }
+
+      return {
+        games: updateGame(state.games, fixtureId, (g) =>
+          withScoreboardDatapoint(
+            { ...g, ballOn: toBallOn },
+            'ball_on_set',
+            `Ball on ${fromBallOn} → ${toBallOn}`,
+          ),
+        ),
+        actionLogs: appendAction(
+          state.actionLogs,
+          createUserAction(
+            fixtureId,
+            {
+              type: 'ball_on_set',
+              payload: { fromBallOn, toBallOn },
             },
             clockBefore,
           ),

@@ -1,5 +1,5 @@
 {
-  "stagedAt": "2026-11-04T14:54:03.387Z",
+  "stagedAt": "2026-11-04T15:34:20.447Z",
   "files": [
     {
       "relPath": "week-1/features/action-log.png",
@@ -68,6 +68,10 @@
     {
       "relPath": "week-3/game-landscape.png",
       "attachmentName": "week-3--game-landscape.png"
+    },
+    {
+      "relPath": "week-4/features/ball-on-editor.png",
+      "attachmentName": "week-4--features--ball-on-editor.png"
     },
     {
       "relPath": "week-4/features/clock-numeric-editor.png",

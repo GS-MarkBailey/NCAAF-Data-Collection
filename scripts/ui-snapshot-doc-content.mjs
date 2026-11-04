@@ -77,8 +77,12 @@ export const WEEK_INTERACTIONS = {
       ],
     },
     {
-      text: '**Down & to go** — tap DOWN or TO GO to edit with −/+ steppers (Down / To go tabs)',
-      featureIds: ['down-distance-editor'],
+      text: '**Inline scoreboard edits** — tap QTR / DOWN / TO GO / BL ON to edit in the bottom stats panel (no popup)',
+      featureIds: [
+        'clock-period-editor',
+        'down-distance-editor',
+        'ball-on-editor',
+      ],
     },
     {
       text: '**Start / Pause chips** — Play/Pause icons with green Start / red Pause; larger invisible tap target',
@@ -140,7 +144,9 @@ export const WEEK_SHIPPED = {
     'clock-polish': {
       featureIds: ['start-pause-chips', 'clock-side-nudge', 'end-period-chip'],
     },
-    'down-distance': { featureIds: ['down-distance-editor'] },
+    'down-distance': {
+      featureIds: ['down-distance-editor', 'ball-on-editor'],
+    },
     profile: { featureIds: ['profile-dialog'] },
     'unreliable-risk': { featureIds: ['unreliable-risk'] },
     'play-controls': {

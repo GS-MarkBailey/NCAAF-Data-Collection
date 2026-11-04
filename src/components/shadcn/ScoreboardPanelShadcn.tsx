@@ -27,6 +27,7 @@ import {
   CONSOLE_PANEL_HEADER_CLASS,
   CONSOLE_PANEL_TITLE_CLASS,
 } from '@/lib/operatorChrome'
+import { BallOnEditor } from '@/components/game/BallOnEditor'
 import { BallOnStatCell } from '@/components/game/BallOnStatCell'
 import { ClockNumericEditor, type ClockEditTab } from '@/components/game/ClockNumericEditor'
 import { DownDistanceEditor, type DownDistanceEditTab } from '@/components/game/DownDistanceEditor'
@@ -39,13 +40,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
 
 interface ScoreboardPanelShadcnProps {
   fixtureId: string
@@ -105,6 +99,7 @@ export function ScoreboardPanelShadcn({
   const setPossession = useAppStore((s) => s.setPossession)
   const setDown = useAppStore((s) => s.setDown)
   const setDistance = useAppStore((s) => s.setDistance)
+  const setBallOn = useAppStore((s) => s.setBallOn)
   const showQuarterStatus = useFeatureFlag('scoreboard.quarterStatus')
   const showPossessionSwitch = useFeatureFlag('scoreboard.possessionSwitch')
   const showClockWheelEditor = useFeatureFlag('scoreboard.clockWheelEditor')
@@ -134,6 +129,10 @@ export function ScoreboardPanelShadcn({
   const [downDistanceSession, setDownDistanceSession] = useState(0)
   const downInputRef = useRef<HTMLInputElement>(null)
   const distanceInputRef = useRef<HTMLInputElement>(null)
+  const [editingBallOn, setEditingBallOn] = useState(false)
+  const [draftBallOn, setDraftBallOn] = useState(25)
+  const [ballOnSession, setBallOnSession] = useState(0)
+  const ballOnInputRef = useRef<HTMLInputElement>(null)
 
   const paused = !clockRunning
   const pregame = !gameStarted
@@ -193,6 +192,8 @@ export function ScoreboardPanelShadcn({
     if (!showClockWheelEditor || clockLocked || inOvertime || pendingConfirmation) return
 
     const parts = clockToParts(clockSeconds)
+    setEditingDownDistance(false)
+    setEditingBallOn(false)
     setDraftPeriod(clockPeriod)
     setDraftMinutes(parts.minutes)
     setDraftSeconds(parts.seconds)
@@ -207,13 +208,27 @@ export function ScoreboardPanelShadcn({
   const canOpenDownDistanceEditor =
     showDownDistance && !gameEnded && !pendingConfirmation
 
+  const canOpenBallOnEditor =
+    showBallOn && !gameEnded && !pendingConfirmation
+
   const handleOpenDownDistanceEditor = (tab: DownDistanceEditTab) => {
     if (!canOpenDownDistanceEditor) return
+    setEditingClock(false)
+    setEditingBallOn(false)
     setDraftDown(down)
     setDraftDistance(distance)
     setDownDistanceTab(tab)
     setDownDistanceSession((session) => session + 1)
     setEditingDownDistance(true)
+  }
+
+  const handleOpenBallOnEditor = () => {
+    if (!canOpenBallOnEditor) return
+    setEditingClock(false)
+    setEditingDownDistance(false)
+    setDraftBallOn(ballOn)
+    setBallOnSession((session) => session + 1)
+    setEditingBallOn(true)
   }
 
   const handleCancelDownDistanceEdit = () => {
@@ -224,6 +239,15 @@ export function ScoreboardPanelShadcn({
     setDown(fixtureId, draftDown)
     setDistance(fixtureId, draftDistance)
     setEditingDownDistance(false)
+  }
+
+  const handleCancelBallOnEdit = () => {
+    setEditingBallOn(false)
+  }
+
+  const handleConfirmBallOnEdit = () => {
+    setBallOn(fixtureId, draftBallOn)
+    setEditingBallOn(false)
   }
 
   const handleCancelClockEdit = () => {
@@ -281,8 +305,20 @@ export function ScoreboardPanelShadcn({
     !clockLocked && canUsePlayPause && !showClockWheelEditor
 
   const useClockEditPanel = showClockWheelEditor && showClockNumericEditor
-  const editingClockInline = editingClock && !useClockEditPanel
-  const editingClockPanel = editingClock && useClockEditPanel
+  // Period (QTR) and Variant B time edits use the bottom stats panel — no dialog.
+  // Wheel-only time edit still replaces the top clock face.
+  const editingClockPanel =
+    editingClock && (useClockEditPanel || clockEditTab === 'period')
+  const editingClockInline = editingClock && !editingClockPanel
+  const editingBottomPanel =
+    editingClockPanel || editingDownDistance || editingBallOn
+  const bottomEditorTitle = editingBallOn
+    ? 'Edit ball on'
+    : editingDownDistance
+      ? 'Edit down & distance'
+      : clockEditTab === 'period'
+        ? 'Edit period'
+        : 'Edit clock'
 
   const handleEndPeriod = (event: MouseEvent<HTMLButtonElement>) => {
     openConfirmation('endPeriod', event)
@@ -694,237 +730,227 @@ export function ScoreboardPanelShadcn({
         </div>
 
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-border">
-          <div
-            className={cn(
-              'flex items-stretch',
-              stacked ? 'min-h-10 shrink-0' : 'min-h-0 flex-1',
-            )}
-          >
-            <StatCell
-              label="QTR"
-              value={clockPeriod}
-              displayValue={
-                gameEnded ? MATCH_ENDED_STAT : formatPeriodLabel(clockPeriod)
-              }
-              compact={stacked}
-              interactive={canOpenClockEditor}
-              showEditIcon={canOpenClockEditor}
-              onClick={
-                canOpenClockEditor
-                  ? () => handleOpenClockEditor('period')
-                  : undefined
-              }
-              ariaLabel={
-                canOpenClockEditor
-                  ? `Edit period, currently ${formatPeriodLabel(clockPeriod)}`
-                  : undefined
-              }
-              status={
-                showQuarterStatus
-                  ? pregame || gameEnded
-                    ? 'ended'
-                    : getQuarterStatus({
-                        seconds: clockSeconds,
-                        running: clockRunning,
-                      })
-                  : undefined
-              }
-            />
-            {showDownDistance ? (
-              <>
-                <StatCell
-                  label="DOWN"
-                  value={down}
-                  displayValue={gameEnded ? MATCH_ENDED_STAT : undefined}
-                  compact={stacked}
-                  interactive={canOpenDownDistanceEditor}
-                  onClick={
-                    canOpenDownDistanceEditor
-                      ? () => handleOpenDownDistanceEditor('down')
-                      : undefined
-                  }
-                  ariaLabel={
-                    canOpenDownDistanceEditor
-                      ? `Edit down, currently ${down}`
-                      : undefined
-                  }
-                />
-                <StatCell
-                  label="TO GO"
-                  value={distance}
-                  displayValue={gameEnded ? MATCH_ENDED_STAT : undefined}
-                  compact={stacked}
-                  interactive={canOpenDownDistanceEditor}
-                  onClick={
-                    canOpenDownDistanceEditor
-                      ? () => handleOpenDownDistanceEditor('distance')
-                      : undefined
-                  }
-                  ariaLabel={
-                    canOpenDownDistanceEditor
-                      ? `Edit yards to go, currently ${distance}`
-                      : undefined
-                  }
-                />
-              </>
-            ) : null}
-            {showBallOn ? (
-              <BallOnStatCell
-                ballOn={ballOn}
-                offenseIsHome={offenseIsHome}
-                homeAttacksRight={homeAttacksRight}
-                inactive={gameEnded}
-                compact={stacked}
-                showArrow={showBallOnArrow}
-                pulseEndColor="var(--card)"
-                shellClassName="border-border"
-                labelClassName="text-muted-foreground"
-                valueClassName="text-foreground"
-                rulesetId={rulesetId}
-              />
-            ) : null}
-          </div>
-
-          {showPossessionSwitch ? (
-            <div className="grid min-h-0 flex-1 grid-cols-2 border-t border-border">
-              <Button
-                type="button"
-                variant="ghost"
-                disabled={gameEnded}
-                onClick={() => setPossession(fixtureId, true)}
-                aria-pressed={gameEnded ? false : possessionIsHome}
-                aria-label={`Give possession to ${homeAbbr}`}
-                className={cn(
-                  'h-full min-h-0 rounded-none border-0 border-r border-border py-0 font-semibold',
-                  stacked ? 'text-base' : 'text-lg',
-                  !gameEnded &&
-                    possessionIsHome &&
-                    'rounded-bl-lg bg-[var(--color-score-bg)] text-white hover:bg-[var(--color-score-bg)] hover:text-white',
+          {editingBottomPanel ? (
+            <div className="grid h-full min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden">
+              <div className="shrink-0 border-b border-border px-3 py-2">
+                <p className="text-center text-sm font-semibold text-foreground">
+                  {bottomEditorTitle}
+                </p>
+              </div>
+              <div className="flex min-h-0 flex-1 items-center justify-center overflow-auto px-2 py-3">
+                {editingBallOn ? (
+                  <BallOnEditor
+                    key={ballOnSession}
+                    ballOn={draftBallOn}
+                    onBallOnChange={setDraftBallOn}
+                    inputRef={ballOnInputRef}
+                    rulesetId={rulesetId}
+                  />
+                ) : editingDownDistance ? (
+                  <DownDistanceEditor
+                    key={downDistanceSession}
+                    down={draftDown}
+                    distance={draftDistance}
+                    onDownChange={setDraftDown}
+                    onDistanceChange={setDraftDistance}
+                    initialTab={downDistanceTab}
+                    downInputRef={downInputRef}
+                    distanceInputRef={distanceInputRef}
+                    rulesetId={rulesetId}
+                  />
+                ) : (
+                  <ClockNumericEditor
+                    key={clockEditSession}
+                    period={draftPeriod}
+                    minutes={draftMinutes}
+                    seconds={draftSeconds}
+                    onPeriodChange={setDraftPeriod}
+                    onMinutesChange={setDraftMinutes}
+                    onSecondsChange={setDraftSeconds}
+                    initialTab={clockEditTab}
+                    periodInputRef={clockPeriodInputRef}
+                    minutesInputRef={clockMinutesInputRef}
+                  />
                 )}
-              >
-                {homeAbbr}
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                disabled={gameEnded}
-                onClick={() => setPossession(fixtureId, false)}
-                aria-pressed={gameEnded ? false : !possessionIsHome}
-                aria-label={`Give possession to ${awayAbbr}`}
-                className={cn(
-                  'h-full min-h-0 rounded-none border-0 py-0 font-semibold',
-                  stacked ? 'text-base' : 'text-lg',
-                  !gameEnded &&
-                    !possessionIsHome &&
-                    'rounded-br-lg bg-[var(--color-score-bg)] text-white hover:bg-[var(--color-score-bg)] hover:text-white',
-                )}
-              >
-                {awayAbbr}
-              </Button>
+              </div>
+              <div className="flex shrink-0 gap-2 border-t border-border bg-background p-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-8 min-h-8 flex-1 shrink-0"
+                  onClick={
+                    editingBallOn
+                      ? handleCancelBallOnEdit
+                      : editingDownDistance
+                        ? handleCancelDownDistanceEdit
+                        : handleCancelClockEdit
+                  }
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  className="h-8 min-h-8 flex-1 shrink-0 bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
+                  onClick={
+                    editingBallOn
+                      ? handleConfirmBallOnEdit
+                      : editingDownDistance
+                        ? handleConfirmDownDistanceEdit
+                        : handleConfirmClockEdit
+                  }
+                >
+                  Confirm
+                </Button>
+              </div>
             </div>
-          ) : null}
+          ) : (
+            <>
+              <div
+                className={cn(
+                  'flex items-stretch',
+                  stacked ? 'min-h-10 shrink-0' : 'min-h-0 flex-1',
+                )}
+              >
+                <StatCell
+                  label="QTR"
+                  value={clockPeriod}
+                  displayValue={
+                    gameEnded ? MATCH_ENDED_STAT : formatPeriodLabel(clockPeriod)
+                  }
+                  compact={stacked}
+                  interactive={canOpenClockEditor}
+                  showEditIcon={canOpenClockEditor}
+                  onClick={
+                    canOpenClockEditor
+                      ? () => handleOpenClockEditor('period')
+                      : undefined
+                  }
+                  ariaLabel={
+                    canOpenClockEditor
+                      ? `Edit period, currently ${formatPeriodLabel(clockPeriod)}`
+                      : undefined
+                  }
+                  status={
+                    showQuarterStatus
+                      ? pregame || gameEnded
+                        ? 'ended'
+                        : getQuarterStatus({
+                            seconds: clockSeconds,
+                            running: clockRunning,
+                          })
+                      : undefined
+                  }
+                />
+                {showDownDistance ? (
+                  <>
+                    <StatCell
+                      label="DOWN"
+                      value={down}
+                      displayValue={gameEnded ? MATCH_ENDED_STAT : undefined}
+                      compact={stacked}
+                      interactive={canOpenDownDistanceEditor}
+                      showEditIcon={canOpenDownDistanceEditor}
+                      onClick={
+                        canOpenDownDistanceEditor
+                          ? () => handleOpenDownDistanceEditor('down')
+                          : undefined
+                      }
+                      ariaLabel={
+                        canOpenDownDistanceEditor
+                          ? `Edit down, currently ${down}`
+                          : undefined
+                      }
+                    />
+                    <StatCell
+                      label="TO GO"
+                      value={distance}
+                      displayValue={gameEnded ? MATCH_ENDED_STAT : undefined}
+                      compact={stacked}
+                      interactive={canOpenDownDistanceEditor}
+                      showEditIcon={canOpenDownDistanceEditor}
+                      onClick={
+                        canOpenDownDistanceEditor
+                          ? () => handleOpenDownDistanceEditor('distance')
+                          : undefined
+                      }
+                      ariaLabel={
+                        canOpenDownDistanceEditor
+                          ? `Edit yards to go, currently ${distance}`
+                          : undefined
+                      }
+                    />
+                  </>
+                ) : null}
+                {showBallOn ? (
+                  <BallOnStatCell
+                    ballOn={ballOn}
+                    offenseIsHome={offenseIsHome}
+                    homeAttacksRight={homeAttacksRight}
+                    inactive={gameEnded}
+                    compact={stacked}
+                    showArrow={showBallOnArrow}
+                    interactive={canOpenBallOnEditor}
+                    showEditIcon={canOpenBallOnEditor}
+                    onClick={
+                      canOpenBallOnEditor ? handleOpenBallOnEditor : undefined
+                    }
+                    ariaLabel={
+                      canOpenBallOnEditor
+                        ? `Edit ball on, currently ${ballOn}`
+                        : undefined
+                    }
+                    pulseEndColor="var(--card)"
+                    shellClassName="border-border"
+                    labelClassName="text-muted-foreground"
+                    valueClassName="text-foreground"
+                    rulesetId={rulesetId}
+                  />
+                ) : null}
+              </div>
+
+              {showPossessionSwitch ? (
+                <div className="grid min-h-0 flex-1 grid-cols-2 border-t border-border">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    disabled={gameEnded}
+                    onClick={() => setPossession(fixtureId, true)}
+                    aria-pressed={gameEnded ? false : possessionIsHome}
+                    aria-label={`Give possession to ${homeAbbr}`}
+                    className={cn(
+                      'h-full min-h-0 rounded-none border-0 border-r border-border py-0 font-semibold',
+                      stacked ? 'text-base' : 'text-lg',
+                      !gameEnded &&
+                        possessionIsHome &&
+                        'rounded-bl-lg bg-[var(--color-score-bg)] text-white hover:bg-[var(--color-score-bg)] hover:text-white',
+                    )}
+                  >
+                    {homeAbbr}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    disabled={gameEnded}
+                    onClick={() => setPossession(fixtureId, false)}
+                    aria-pressed={gameEnded ? false : !possessionIsHome}
+                    aria-label={`Give possession to ${awayAbbr}`}
+                    className={cn(
+                      'h-full min-h-0 rounded-none border-0 py-0 font-semibold',
+                      stacked ? 'text-base' : 'text-lg',
+                      !gameEnded &&
+                        !possessionIsHome &&
+                        'rounded-br-lg bg-[var(--color-score-bg)] text-white hover:bg-[var(--color-score-bg)] hover:text-white',
+                    )}
+                  >
+                    {awayAbbr}
+                  </Button>
+                </div>
+              ) : null}
+            </>
+          )}
         </div>
       </CardContent>
     </Card>
-
-    <Dialog
-      open={editingClockPanel}
-      onOpenChange={(open) => {
-        if (!open) handleCancelClockEdit()
-      }}
-    >
-      <DialogContent
-        className="gap-0 overflow-hidden p-0 sm:max-w-md"
-        showCloseButton={false}
-        initialFocus={
-          clockEditTab === 'period' ? clockPeriodInputRef : clockMinutesInputRef
-        }
-      >
-        <DialogHeader className="border-b border-border px-4 pt-4 pb-3">
-          <DialogTitle>Edit clock</DialogTitle>
-        </DialogHeader>
-        <div className="flex justify-center px-3 py-4">
-          <ClockNumericEditor
-            key={clockEditSession}
-            period={draftPeriod}
-            minutes={draftMinutes}
-            seconds={draftSeconds}
-            onPeriodChange={setDraftPeriod}
-            onMinutesChange={setDraftMinutes}
-            onSecondsChange={setDraftSeconds}
-            initialTab={clockEditTab}
-            periodInputRef={clockPeriodInputRef}
-            minutesInputRef={clockMinutesInputRef}
-          />
-        </div>
-        <DialogFooter className="m-0 flex-col items-stretch gap-2 rounded-none border-t border-border bg-muted/30 px-4 py-3 sm:flex-row sm:justify-stretch">
-          <Button
-            type="button"
-            variant="outline"
-            className="h-8 min-h-8 w-full shrink-0 sm:w-auto sm:flex-1"
-            onClick={handleCancelClockEdit}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="button"
-            className="h-8 min-h-8 w-full shrink-0 bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)] sm:w-auto sm:flex-1"
-            onClick={handleConfirmClockEdit}
-          >
-            Confirm
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-
-    <Dialog
-      open={editingDownDistance}
-      onOpenChange={(open) => {
-        if (!open) handleCancelDownDistanceEdit()
-      }}
-    >
-      <DialogContent
-        className="gap-0 overflow-hidden p-0 sm:max-w-md"
-        showCloseButton={false}
-        initialFocus={
-          downDistanceTab === 'down' ? downInputRef : distanceInputRef
-        }
-      >
-        <DialogHeader className="border-b border-border px-4 pt-4 pb-3">
-          <DialogTitle>Edit down & distance</DialogTitle>
-        </DialogHeader>
-        <div className="flex justify-center px-3 py-4">
-          <DownDistanceEditor
-            key={downDistanceSession}
-            down={draftDown}
-            distance={draftDistance}
-            onDownChange={setDraftDown}
-            onDistanceChange={setDraftDistance}
-            initialTab={downDistanceTab}
-            downInputRef={downInputRef}
-            distanceInputRef={distanceInputRef}
-            rulesetId={rulesetId}
-          />
-        </div>
-        <DialogFooter className="m-0 flex-col items-stretch gap-2 rounded-none border-t border-border bg-muted/30 px-4 py-3 sm:flex-row sm:justify-stretch">
-          <Button
-            type="button"
-            variant="outline"
-            className="h-8 min-h-8 w-full shrink-0 sm:w-auto sm:flex-1"
-            onClick={handleCancelDownDistanceEdit}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="button"
-            className="h-8 min-h-8 w-full shrink-0 bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)] sm:w-auto sm:flex-1"
-            onClick={handleConfirmDownDistanceEdit}
-          >
-            Confirm
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
     </>
   )
 }

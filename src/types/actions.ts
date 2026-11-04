@@ -14,6 +14,7 @@ export type UserActionType =
   | 'field_direction_set'
   | 'down_set'
   | 'distance_set'
+  | 'ball_on_set'
   | 'play_snap'
   | 'play_end'
   | 'yards_adjust'
@@ -126,6 +127,14 @@ export type DistanceSetAction = UserActionBase & {
   }
 }
 
+export type BallOnSetAction = UserActionBase & {
+  type: 'ball_on_set'
+  payload: {
+    fromBallOn: number
+    toBallOn: number
+  }
+}
+
 export type PlaySnapAction = UserActionBase & {
   type: 'play_snap'
   payload: {
@@ -170,6 +179,7 @@ export type UserAction =
   | FieldDirectionSetAction
   | DownSetAction
   | DistanceSetAction
+  | BallOnSetAction
   | PlaySnapAction
   | PlayEndAction
   | YardsAdjustAction

@@ -211,8 +211,8 @@ export const WEEK_FEATURES = {
     },
     {
       id: 'clock-numeric-editor',
-      title: 'Clock edit panel — Time tab (Variant B)',
-      path: '/game/NCAAF-2026-001',
+      title: 'Inline clock edit — Time tab (Variant B)',
+      path: '/game/NCAAF-2026-012',
       viewport: 'game-landscape',
       gameSetup: { fieldDirection: 'dismiss', errorToast: 'dismiss' },
       featureFlagOverrides: {
@@ -228,8 +228,8 @@ export const WEEK_FEATURES = {
     },
     {
       id: 'clock-period-editor',
-      title: 'Clock edit panel — Period tab (Variant B)',
-      path: '/game/NCAAF-2026-001',
+      title: 'Inline period edit — Period tab (Variant B)',
+      path: '/game/NCAAF-2026-012',
       viewport: 'game-landscape',
       gameSetup: { fieldDirection: 'dismiss', errorToast: 'dismiss' },
       featureFlagOverrides: {
@@ -266,8 +266,8 @@ export const WEEK_FEATURES = {
     },
     {
       id: 'down-distance-editor',
-      title: 'Down & to-go editor',
-      path: '/game/NCAAF-2026-001',
+      title: 'Inline down & to-go editor',
+      path: '/game/NCAAF-2026-012',
       viewport: 'game-landscape',
       gameSetup: { fieldDirection: 'dismiss', errorToast: 'dismiss' },
       async prepare(page) {
@@ -278,6 +278,24 @@ export const WEEK_FEATURES = {
         await page.getByRole('tab', { name: 'Down' }).waitFor({ state: 'visible' })
         await page.getByRole('button', { name: 'Confirm' }).waitFor({ state: 'visible' })
         await page.getByRole('textbox', { name: 'Down' }).waitFor({
+          state: 'visible',
+          timeout: 5000,
+        })
+      },
+    },
+    {
+      id: 'ball-on-editor',
+      title: 'Inline ball-on editor',
+      path: '/game/NCAAF-2026-012',
+      viewport: 'game-landscape',
+      gameSetup: { fieldDirection: 'dismiss', errorToast: 'dismiss' },
+      async prepare(page) {
+        await page
+          .getByRole('button', { name: /edit ball on/i })
+          .filter({ visible: true })
+          .click()
+        await page.getByRole('button', { name: 'Confirm' }).waitFor({ state: 'visible' })
+        await page.getByRole('textbox', { name: 'Ball on' }).waitFor({
           state: 'visible',
           timeout: 5000,
         })
