@@ -491,7 +491,7 @@ Classic SNAP → yards → END PLAY remains available when Match-state guide is 
 
 ![Start / Pause clock chips](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/start-pause-chips.png)
 
-- **END PERIOD** — red chip top-right on the scoreboard clock after Start begins the period (kickoff not required)
+- **END PERIOD** — red chip top-right on the scoreboard clock after Start begins the period
 
 ![End period chip on scoreboard clock](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/end-period-chip.png)
 

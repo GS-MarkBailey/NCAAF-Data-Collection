@@ -1,7 +1,7 @@
 {
   "label": "week-4",
   "portrait": true,
-  "capturedAt": "2026-11-04T15:07:11.218Z",
+  "capturedAt": "2026-11-04T15:22:51.941Z",
   "baseUrl": "https://ncaaf-data-collection.vercel.app",
   "views": [
     "fixtures-landscape",
@@ -36,6 +36,26 @@
       "id": "design-variants-panel",
       "title": "Design variants in Features settings",
       "file": "features/design-variants-panel.png"
+    },
+    {
+      "id": "clock-side-nudge",
+      "title": "Clock ±1 second side buttons",
+      "file": "features/clock-side-nudge.png"
+    },
+    {
+      "id": "end-period-chip",
+      "title": "End period chip on scoreboard clock",
+      "file": "features/end-period-chip.png"
+    },
+    {
+      "id": "profile-dialog",
+      "title": "Profile dialog",
+      "file": "features/profile-dialog.png"
+    },
+    {
+      "id": "unreliable-risk",
+      "title": "Unreliable risk chip placement",
+      "file": "features/unreliable-risk.png"
     }
   ]
 }
