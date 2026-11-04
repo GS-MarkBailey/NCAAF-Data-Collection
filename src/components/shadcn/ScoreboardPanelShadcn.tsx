@@ -1,5 +1,5 @@
 import { useRef, useState, type CSSProperties, type KeyboardEvent, type MouseEvent } from 'react'
-import { LayoutGrid, Minus, Pause, Play, Plus } from 'lucide-react'
+import { LayoutGrid, Minus, Pause, Pencil, Play, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { formatClock } from '@/lib/format'
 import {
@@ -711,6 +711,7 @@ export function ScoreboardPanelShadcn({
               }
               compact={stacked}
               interactive={canOpenClockEditor}
+              showEditIcon={canOpenClockEditor}
               onClick={
                 canOpenClockEditor
                   ? () => handleOpenClockEditor('period')
@@ -947,6 +948,7 @@ function StatCell({
   status,
   compact = false,
   interactive = false,
+  showEditIcon = false,
   onClick,
   ariaLabel,
 }: {
@@ -956,6 +958,7 @@ function StatCell({
   status?: QuarterStatus
   compact?: boolean
   interactive?: boolean
+  showEditIcon?: boolean
   onClick?: () => void
   ariaLabel?: string
 }) {
@@ -979,7 +982,7 @@ function StatCell({
           : undefined
       }
       className={cn(
-        'flex h-full min-h-0 flex-1 flex-col items-center border-r border-border px-1 last:border-r-0 landscape-mobile:py-3',
+        'relative flex h-full min-h-0 flex-1 flex-col items-center border-r border-border px-1 last:border-r-0 landscape-mobile:py-3',
         compact
           ? 'min-h-10 shrink-0 justify-center gap-0.5 py-1'
           : 'justify-center gap-0 py-4',
@@ -994,6 +997,15 @@ function StatCell({
         } as CSSProperties
       }
     >
+      {showEditIcon ? (
+        <Pencil
+          aria-hidden
+          className={cn(
+            'pointer-events-none absolute text-muted-foreground/70',
+            compact ? 'top-0.5 right-0.5 size-2.5' : 'top-1.5 right-1.5 size-3',
+          )}
+        />
+      ) : null}
       <span
         className={cn(
           'font-medium uppercase tracking-wide text-muted-foreground leading-none',

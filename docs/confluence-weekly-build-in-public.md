@@ -391,6 +391,7 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 **Scoreboard / clock polish**
 - Start/Pause chips: Play/Pause icons; green Start / red Pause with matching chip style; larger invisible tap target around the chip
 - Stat cells (DOWN, TO GO, QTR, ball-on): tighter spacing between label and value
+- **QTR** cell shows a small pencil icon (top-right) when the period is editable
 - **DOWN / TO GO editing:** tap either cell to open a dialog with **Down** and **To go** tabs, −/+ steppers, and direct entry (same pattern as QTR/period)
 
 <!-- AUTO-SNAPSHOTS:week-4-shipped-down-distance:START -->
