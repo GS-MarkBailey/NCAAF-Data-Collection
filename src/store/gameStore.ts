@@ -1483,45 +1483,121 @@ export const useAppStore = create<AppStore>((set, get) => ({
         return state
       }
 
-      const match = applyMatchTransition(toMatchStateInput(game), {
-        type: 'period_ended',
-      })
+      const rules = getFootballRuleset(game.rulesetId)
+      const fromPeriod = game.clock.period
       const clockBefore = {
         seconds: game.clock.seconds,
-        period: game.clock.period,
+        period: fromPeriod,
+      }
+      const endedMatch = applyMatchTransition(toMatchStateInput(game), {
+        type: 'period_ended',
+      })
+
+      // Final regulation period: park at 0:00 for OT / end-game decision.
+      if (fromPeriod >= rules.regulationPeriods) {
+        return {
+          games: updateGame(state.games, fixtureId, (g) =>
+            withScoreboardDatapoint(
+              {
+                ...g,
+                periodEnded: endedMatch.periodEnded,
+                periodActive: false,
+                playInProgress: endedMatch.playInProgress,
+                seriesKind: endedMatch.seriesKind,
+                clock: {
+                  ...g.clock,
+                  seconds: 0,
+                  running: nextClockRunning(
+                    { type: 'period_ended' },
+                    { ...g.clock, seconds: 0 },
+                  ),
+                },
+              },
+              'period_end',
+              `Period Q${fromPeriod} ended`,
+            ),
+          ),
+          actionLogs: appendAction(
+            state.actionLogs,
+            createUserAction(
+              fixtureId,
+              {
+                type: 'period_end',
+                payload: { period: fromPeriod },
+              },
+              clockBefore,
+            ),
+          ),
+        }
       }
 
+      // Earlier periods: advance QTR and reset the clock to a full quarter.
+      const toPeriod = fromPeriod + 1
+      const openedMatch = applyMatchTransition(
+        {
+          ...toMatchStateInput({
+            ...game,
+            periodEnded: true,
+            playInProgress: false,
+            clock: { ...game.clock, seconds: 0, running: false },
+          }),
+          periodEnded: true,
+          playInProgress: false,
+        },
+        { type: 'period_started' },
+      )
+
+      const afterEnd = withScoreboardDatapoint(
+        {
+          ...game,
+          periodEnded: false,
+          periodActive: false,
+          playInProgress: openedMatch.playInProgress,
+          seriesKind: openedMatch.seriesKind,
+          clock: {
+            period: toPeriod,
+            seconds: rules.quarterLengthSeconds,
+            running: nextClockRunning(
+              { type: 'period_opened' },
+              { seconds: rules.quarterLengthSeconds, running: false },
+            ),
+          },
+          plays: [...game.plays, createQuarterStartPlay(game, toPeriod)],
+        },
+        'period_end',
+        `Period Q${fromPeriod} ended`,
+      )
+      const afterStart = withScoreboardDatapoint(
+        afterEnd,
+        'quarter_start',
+        `Quarter ${toPeriod} started`,
+      )
+
       return {
-        games: updateGame(state.games, fixtureId, (g) =>
-          withScoreboardDatapoint(
-            {
-              ...g,
-              periodEnded: match.periodEnded,
-              periodActive: false,
-              playInProgress: match.playInProgress,
-              seriesKind: match.seriesKind,
-              clock: {
-                ...g.clock,
-                seconds: 0,
-                running: nextClockRunning(
-                  { type: 'period_ended' },
-                  { ...g.clock, seconds: 0 },
-                ),
-              },
-            },
-            'period_end',
-            `Period Q${game.clock.period} ended`,
-          ),
-        ),
+        games: updateGame(state.games, fixtureId, () => afterStart),
         actionLogs: appendAction(
-          state.actionLogs,
+          appendAction(
+            state.actionLogs,
+            createUserAction(
+              fixtureId,
+              {
+                type: 'period_end',
+                payload: { period: fromPeriod },
+              },
+              clockBefore,
+            ),
+          ),
           createUserAction(
             fixtureId,
             {
-              type: 'period_end',
-              payload: { period: game.clock.period },
+              type: 'quarter_start',
+              payload: {
+                fromPeriod,
+                toPeriod,
+                seconds: rules.quarterLengthSeconds,
+              },
             },
-            clockBefore,
+            { seconds: 0, period: fromPeriod },
           ),
         ),
       }

@@ -127,9 +127,8 @@ export function canEndCurrentPeriod(
     return true
   }
 
-  if (clock.seconds === 0) return true
-
-  return !clock.running && clock.seconds > 0
+  // Allow ending while the clock is still running (chip is shown after Start).
+  return clock.seconds >= 0
 }
 
 /** True when the operator can start overtime after the final regulation period. */

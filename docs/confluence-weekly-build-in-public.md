@@ -452,9 +452,9 @@ With **Match-state guide** on, scheduled fixtures open in **pregame** so the ful
 - Risk toggles write a session event (e.g. **Big Play flagged** / **cleared**) into collected datapoints and the Settings action log
 - Events log CSV (Settings → Log or Collected datapoints → CSV): `mins, seconds, datapoint, ball on, period, drive, play, down, to go` — **mins/seconds are wall-clock elapsed** from the first event (not game clock)
 - Scoreboard edits (Start/Pause, ±1s, clock/period set, down, to go, possession, end period / OT / end game) also append datapoints to that log
-- Scoreboard clock card has an **END PERIOD** chip (top-right, same badge style as Start/Pause) after **Start** begins the period (kickoff not required); it hides on end period and returns when Start opens the next quarter
+- Scoreboard clock card has an **END PERIOD** chip (top-right, same badge style as Start/Pause) after **Start** begins the period (kickoff not required); confirming end period advances **QTR** and resets the clock to **15:00** (final regulation period still parks at 0:00 for OT / end game)
 - **END PLAY** appears when the chosen result is ready
-- Later quarters: **END PERIOD** on the scoreboard clock, then **Start** on the clock (no Start Q / Kick off badges on the scoreboard)
+- Later quarters: confirm **END PERIOD** to open the next quarter at 15:00; press **Start** to run the clock (no Start Q / Kick off badges on the scoreboard)
 
 Classic SNAP → yards → END PLAY remains available when Match-state guide is off.
 
