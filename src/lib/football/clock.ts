@@ -120,7 +120,8 @@ export function canEndCurrentPeriod(
   clock: { seconds: number; period: number; running: boolean },
   rulesRef?: RulesetRef,
 ): boolean {
-  if (!gameStarted || gameEnded || periodEnded) return false
+  // Kickoff (gameStarted) is not required — Start alone can arm END PERIOD.
+  if (gameEnded || periodEnded) return false
   if (isOvertimePeriod(clock.period, rulesRef)) return false
   if (isAwaitingRegulationDecision(gameStarted, gameEnded, clock, rulesRef)) {
     return true

@@ -374,13 +374,10 @@ export function ScoreboardPanelShadcn({
     </button>
   )
 
-  // END PERIOD appears after Start begins the period (clock start or next-quarter Start).
+  // END PERIOD appears after Start begins the period (clock Start or next-quarter Start).
+  // Kickoff is not required — Start alone arms the chip.
   const showEndPeriodChip =
-    gameStarted &&
-    periodActive &&
-    !gameEnded &&
-    !periodEnded &&
-    !inOvertime
+    periodActive && !gameEnded && !periodEnded && !inOvertime
 
   const endPeriodChip = showEndPeriodChip ? (
     <Badge

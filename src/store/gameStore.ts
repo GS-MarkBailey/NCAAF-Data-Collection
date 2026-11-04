@@ -364,9 +364,8 @@ export const useAppStore = create<AppStore>((set, get) => ({
           withScoreboardDatapoint(
             {
               ...g,
-              // Start arms the current period so END PERIOD can show (once match underway).
-              periodActive:
-                running && g.gameStarted ? true : (g.periodActive ?? false),
+              // Start arms the current period so END PERIOD can show (kickoff not required).
+              periodActive: running ? true : (g.periodActive ?? false),
               clock: { ...g.clock, running },
             },
             running ? 'clock_start' : 'clock_pause',

@@ -451,7 +451,7 @@ With **Match-state guide** on, scheduled fixtures open in **pregame** so the ful
 - Risk toggles write a session event (e.g. **Big Play flagged** / **cleared**) into collected datapoints and the Settings action log
 - Events log CSV (Settings → Log or Collected datapoints → CSV): `mins, seconds, datapoint, ball on, period, drive, play, down, to go` — **mins/seconds are wall-clock elapsed** from the first event (not game clock)
 - Scoreboard edits (Start/Pause, ±1s, clock/period set, down, to go, possession, end period / OT / end game) also append datapoints to that log
-- Scoreboard clock card has an **END PERIOD** chip (top-right, same badge style as Start/Pause) after **Start** begins the period; it hides on end period and returns when Start opens the next quarter
+- Scoreboard clock card has an **END PERIOD** chip (top-right, same badge style as Start/Pause) after **Start** begins the period (kickoff not required); it hides on end period and returns when Start opens the next quarter
 - **END PLAY** appears when the chosen result is ready
 - Later quarters: **END PERIOD** on the scoreboard clock, then **Start** on the clock (no Start Q / Kick off badges on the scoreboard)
 
@@ -491,7 +491,7 @@ Classic SNAP → yards → END PLAY remains available when Match-state guide is 
 
 ![Start / Pause clock chips](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/start-pause-chips.png)
 
-- **END PERIOD** — red chip top-right on the scoreboard clock after Start begins the period
+- **END PERIOD** — red chip top-right on the scoreboard clock after Start begins the period (kickoff not required)
 
 ![End period chip on scoreboard clock](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/end-period-chip.png)
 
