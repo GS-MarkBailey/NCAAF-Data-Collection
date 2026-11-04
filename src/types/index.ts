@@ -94,6 +94,11 @@ export interface GameState {
   gameEnded: boolean
   /** True after the operator ends the current period (before the next starts) */
   periodEnded: boolean
+  /**
+   * True after Start begins the current period (clock start or next-quarter Start).
+   * Gates the scoreboard END PERIOD chip.
+   */
+  periodActive: boolean
   /** True between SNAP and END PLAY while the operator is collecting a play */
   playInProgress: boolean
   /**

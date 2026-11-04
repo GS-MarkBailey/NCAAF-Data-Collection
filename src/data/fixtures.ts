@@ -346,6 +346,7 @@ export function createInitialGameState(
     gameStarted: false,
     gameEnded: false,
     periodEnded: false,
+    periodActive: false,
     playInProgress: false,
     seriesKind: 'scrimmage',
     playCollectionStep: null,

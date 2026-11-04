@@ -362,7 +362,13 @@ export const useAppStore = create<AppStore>((set, get) => ({
       return {
         games: updateGame(state.games, fixtureId, (g) =>
           withScoreboardDatapoint(
-            { ...g, clock: { ...g.clock, running } },
+            {
+              ...g,
+              // Start arms the current period so END PERIOD can show (once match underway).
+              periodActive:
+                running && g.gameStarted ? true : (g.periodActive ?? false),
+              clock: { ...g.clock, running },
+            },
             running ? 'clock_start' : 'clock_pause',
             running ? 'Clock started' : 'Clock paused',
           ),
@@ -1386,6 +1392,8 @@ export const useAppStore = create<AppStore>((set, get) => ({
             {
               ...g,
               periodEnded: match.periodEnded,
+              // Start (next period) arms END PERIOD for the new quarter.
+              periodActive: true,
               playInProgress: match.playInProgress,
               seriesKind: match.seriesKind,
               clock: {
@@ -1451,6 +1459,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
             {
               ...g,
               periodEnded: match.periodEnded,
+              periodActive: false,
               playInProgress: match.playInProgress,
               seriesKind: match.seriesKind,
               clock: {

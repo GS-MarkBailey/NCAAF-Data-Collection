@@ -73,6 +73,7 @@ export function ScoreboardPanelShadcn({
   const gameStarted = useAppStore((s) => s.games[fixtureId]?.gameStarted ?? false)
   const gameEnded = useAppStore((s) => s.games[fixtureId]?.gameEnded ?? false)
   const periodEnded = useAppStore((s) => s.games[fixtureId]?.periodEnded ?? false)
+  const periodActive = useAppStore((s) => s.games[fixtureId]?.periodActive ?? false)
   const down = useAppStore((s) => s.games[fixtureId]?.down ?? 1)
   const distance = useAppStore((s) => s.games[fixtureId]?.distance ?? 10)
   const ballOn = useAppStore((s) => s.games[fixtureId]?.ballOn ?? 25)
@@ -181,9 +182,11 @@ export function ScoreboardPanelShadcn({
   const showPlayPauseButton = showPeriodManagement
     ? !gameEnded &&
       (periodInProgress || showStartPeriodButton)
-    : canUsePlayPauseWithoutPeriodManagement(gameEnded, {
-        seconds: clockSeconds,
-      })
+    : !gameEnded &&
+      (canUsePlayPauseWithoutPeriodManagement(gameEnded, {
+          seconds: clockSeconds,
+        }) ||
+        showStartPeriodButton)
   const clockLocked = gameEnded
 
   const handleOpenClockEditor = (tab: ClockEditTab = 'time') => {
@@ -371,8 +374,13 @@ export function ScoreboardPanelShadcn({
     </button>
   )
 
+  // END PERIOD appears after Start begins the period (clock start or next-quarter Start).
   const showEndPeriodChip =
-    gameStarted && !gameEnded && !periodEnded && !inOvertime
+    gameStarted &&
+    periodActive &&
+    !gameEnded &&
+    !periodEnded &&
+    !inOvertime
 
   const endPeriodChip = showEndPeriodChip ? (
     <Badge

@@ -22,6 +22,7 @@ export interface PlayUndoSnapshot {
   gameStarted: boolean
   gameEnded: boolean
   periodEnded: boolean
+  periodActive: boolean
   driveNumber: number
   playNumber: number
   awaitingNewDrive: boolean
@@ -52,6 +53,7 @@ export function capturePlayUndoSnapshot(game: GameState): PlayUndoSnapshot {
     gameStarted: game.gameStarted,
     gameEnded: game.gameEnded,
     periodEnded: game.periodEnded,
+    periodActive: game.periodActive ?? false,
     driveNumber: game.driveNumber ?? 0,
     playNumber: game.playNumber ?? 0,
     awaitingNewDrive: game.awaitingNewDrive ?? true,
@@ -124,6 +126,7 @@ export function applyPlayUndoSnapshot(
     gameStarted: snapshot.gameStarted,
     gameEnded: snapshot.gameEnded,
     periodEnded: snapshot.periodEnded,
+    periodActive: snapshot.periodActive,
     driveNumber: restoredDrive,
     playNumber: restoredPlay,
     awaitingNewDrive: snapshot.awaitingNewDrive,

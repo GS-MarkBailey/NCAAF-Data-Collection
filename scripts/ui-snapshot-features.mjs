@@ -305,6 +305,10 @@ export const WEEK_FEATURES = {
           .getByRole('button', { name: 'KICK OFF' })
           .filter({ visible: true })
           .click()
+        // END PERIOD only appears after Start begins the period.
+        const start = page.getByRole('button', { name: 'Start clock' })
+        await start.waitFor({ state: 'visible', timeout: 5000 })
+        await start.click()
         await page
           .getByRole('button', { name: 'End period' })
           .filter({ visible: true })

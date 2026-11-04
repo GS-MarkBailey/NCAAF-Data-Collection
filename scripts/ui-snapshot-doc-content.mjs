@@ -85,7 +85,7 @@ export const WEEK_INTERACTIONS = {
       featureIds: ['start-pause-chips'],
     },
     {
-      text: '**END PERIOD** — red chip top-right on the scoreboard clock once the match is underway',
+      text: '**END PERIOD** — red chip top-right on the scoreboard clock after Start begins the period',
       featureIds: ['end-period-chip'],
     },
     {
