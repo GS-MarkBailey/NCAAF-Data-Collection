@@ -779,7 +779,7 @@ export function ScoreboardPanelShadcn({
                 <Button
                   type="button"
                   variant="outline"
-                  className="h-8 min-h-8 flex-1 shrink-0"
+                  className="h-10 min-h-10 flex-1 shrink-0 touch-manipulation"
                   onClick={
                     editingBallOn
                       ? handleCancelBallOnEdit
@@ -792,7 +792,7 @@ export function ScoreboardPanelShadcn({
                 </Button>
                 <Button
                   type="button"
-                  className="h-8 min-h-8 flex-1 shrink-0 bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
+                  className="h-10 min-h-10 flex-1 shrink-0 touch-manipulation bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
                   onClick={
                     editingBallOn
                       ? handleConfirmBallOnEdit

@@ -1,15 +1,13 @@
-import { useEffect, useRef, useState, type Ref } from 'react'
-import { Minus, Plus } from 'lucide-react'
+import { useRef, type Ref } from 'react'
 import {
   CLOCK_EDIT_MAX_MINUTES,
   CLOCK_EDIT_MAX_SECONDS,
   MAX_PERIOD,
   MIN_PERIOD,
-  clampPeriod,
   formatPeriodLabel,
   parsePeriodInput,
 } from '@/lib/clock'
-import { Button } from '@/components/ui/button'
+import { ScoreboardStepperField } from '@/components/game/ScoreboardStepperField'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 
@@ -109,9 +107,8 @@ function NumericField({
         value={display}
         aria-label={label}
         className={cn(
-          // Fluid size from editor width; override base Input `text-base md:text-sm`
-          'h-[clamp(2.75rem,18cqw,4rem)] w-full max-w-[6.5rem] px-[clamp(0.25rem,2cqw,0.625rem)]',
-          'text-center text-[length:clamp(1.25rem,12cqw,2.25rem)] font-bold tabular-nums md:text-[length:clamp(1.25rem,12cqw,2.25rem)]',
+          'h-11 min-h-11 w-full min-w-0 px-2',
+          'text-center text-2xl font-bold tabular-nums',
           // Active field = focus ring only — never blue text-selection highlight
           'caret-[var(--color-brand)] selection:bg-transparent selection:text-inherit',
           'focus-visible:border-[var(--color-brand)] focus-visible:ring-[var(--color-brand)]/35',
@@ -184,125 +181,6 @@ function NumericField({
   )
 }
 
-function PeriodEditor({
-  period,
-  onPeriodChange,
-  autoFocus,
-  inputRef,
-}: {
-  period: number
-  onPeriodChange: (period: number) => void
-  autoFocus?: boolean
-  inputRef?: Ref<HTMLInputElement>
-}) {
-  const value = clampPeriod(period)
-  const label = formatPeriodLabel(value)
-  const [draft, setDraft] = useState(label)
-  const [editing, setEditing] = useState(false)
-
-  useEffect(() => {
-    if (!editing) setDraft(formatPeriodLabel(value))
-  }, [value, editing])
-
-  const commitDraft = (raw: string) => {
-    const parsed = parsePeriodInput(raw)
-    if (parsed == null) {
-      setDraft(formatPeriodLabel(value))
-      return
-    }
-    onPeriodChange(parsed)
-    setDraft(formatPeriodLabel(parsed))
-  }
-
-  return (
-    <div
-      className="flex w-full items-center justify-center gap-3 px-1"
-      role="group"
-      aria-label="Edit period"
-    >
-      <Button
-        type="button"
-        variant="outline"
-        size="icon"
-        className="size-12 min-h-12 min-w-12 shrink-0"
-        disabled={value <= MIN_PERIOD}
-        aria-label="Decrease period"
-        onClick={() => onPeriodChange(clampPeriod(value - 1))}
-      >
-        <Minus className="size-5" />
-      </Button>
-      <div className="flex min-w-0 max-w-[7rem] flex-none flex-col items-center gap-2">
-        <label
-          htmlFor="clock-edit-period"
-          className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase"
-        >
-          Period
-        </label>
-        <Input
-          ref={inputRef}
-          id="clock-edit-period"
-          type="text"
-          inputMode="text"
-          autoComplete="off"
-          autoCorrect="off"
-          spellCheck={false}
-          enterKeyHint="done"
-          autoFocus={autoFocus}
-          value={editing ? draft : label}
-          aria-label="Period"
-          className={cn(
-            'h-[clamp(2.75rem,18cqw,4rem)] w-full max-w-[6.5rem] px-[clamp(0.25rem,2cqw,0.625rem)]',
-            'text-center text-[length:clamp(1.25rem,12cqw,2.25rem)] font-bold tabular-nums md:text-[length:clamp(1.25rem,12cqw,2.25rem)]',
-            'caret-[var(--color-brand)] selection:bg-transparent selection:text-inherit',
-            'focus-visible:border-[var(--color-brand)] focus-visible:ring-[var(--color-brand)]/35',
-          )}
-          onFocus={(event) => {
-            setEditing(true)
-            setDraft(formatPeriodLabel(value))
-            const el = event.currentTarget
-            requestAnimationFrame(() => {
-              const len = el.value.length
-              try {
-                el.setSelectionRange(len, len)
-              } catch {
-                /* ignore */
-              }
-            })
-          }}
-          onBlur={() => {
-            commitDraft(draft)
-            setEditing(false)
-          }}
-          onChange={(event) => {
-            const next = event.target.value.toUpperCase()
-            setDraft(next)
-            const parsed = parsePeriodInput(next)
-            if (parsed != null && /^(?:\d+|OT\d*)$/i.test(next.trim())) {
-              onPeriodChange(parsed)
-            }
-          }}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter') {
-              event.currentTarget.blur()
-            }
-          }}
-        />
-      </div>
-      <Button
-        type="button"
-        variant="outline"
-        size="icon"
-        className="size-12 min-h-12 min-w-12 shrink-0"
-        disabled={value >= MAX_PERIOD}
-        aria-label="Increase period"
-        onClick={() => onPeriodChange(clampPeriod(value + 1))}
-      >
-        <Plus className="size-5" />
-      </Button>
-    </div>
-  )
-}
-
 /** Variant B — numeric clock / period editor (not the scroll wheel). */
 export function ClockNumericEditor({
   period,
@@ -317,6 +195,7 @@ export function ClockNumericEditor({
 }: ClockNumericEditorProps) {
   const secondsLocked = minutes >= CLOCK_EDIT_MAX_MINUTES
   const clampedSeconds = secondsLocked ? 0 : seconds
+  const clampedPeriod = Math.max(MIN_PERIOD, Math.min(MAX_PERIOD, period))
 
   const handleMinutesChange = (nextMinutes: number) => {
     const clamped = clampInt(nextMinutes, 0, CLOCK_EDIT_MAX_MINUTES)
@@ -328,18 +207,28 @@ export function ClockNumericEditor({
 
   if (initialTab === 'period') {
     return (
-      <PeriodEditor
-        period={period}
-        onPeriodChange={onPeriodChange}
+      <ScoreboardStepperField
+        id="clock-edit-period"
+        label="Period"
+        value={clampedPeriod}
+        displayValue={formatPeriodLabel(clampedPeriod)}
+        min={MIN_PERIOD}
+        max={MAX_PERIOD}
+        groupLabel="Edit period"
         autoFocus
         inputRef={periodInputRef}
+        inputMode="text"
+        parseInput={parsePeriodInput}
+        shouldLiveCommit={(raw) => /^(?:\d+|OT\d*)$/i.test(raw.trim())}
+        normalizeDraft={(raw) => raw.toUpperCase()}
+        onChange={onPeriodChange}
       />
     )
   }
 
   return (
     <div
-      className="@container flex w-full max-w-md items-center justify-center gap-[clamp(0.25rem,2cqw,0.75rem)] px-1"
+      className="@container flex w-full max-w-sm items-end justify-center gap-2 px-1"
       role="group"
       aria-label="Edit game clock time"
     >
@@ -354,7 +243,7 @@ export function ClockNumericEditor({
         onChange={handleMinutesChange}
       />
       <span
-        className="mt-[clamp(1rem,4cqw,1.5rem)] shrink-0 text-[length:clamp(1.25rem,12cqw,2.25rem)] font-bold text-muted-foreground"
+        className="mb-2 shrink-0 text-2xl font-bold text-muted-foreground"
         aria-hidden
       >
         :

@@ -4,7 +4,7 @@
 **Live demo:** https://ncaaf-data-collection.vercel.app  
 **Repository:** GitHub (auto-deployed to Vercel on each change)  
 **Period covered:** 16 June 2026 – 21 July 2026  
-**Last updated:** 4 Nov 2026 (snapshots synced automatically)
+**Last updated:** 5 Nov 2026 (snapshots synced automatically)
 
 **Confluence images:** Auto-synced by GitHub Actions on push to `main` (capture → publish). Manual fallback: `npm run publish:confluence`.
 
@@ -392,6 +392,7 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 - Start/Pause chips: Play/Pause icons; green Start / red Pause with matching chip style; larger invisible tap target around the chip
 - Stat cells (DOWN, TO GO, QTR, ball-on): tighter spacing between label and value
 - **QTR** shows a small pencil when editable; tap **QTR / DOWN / TO GO / BL ON** replaces the bottom stats + possession panel with the editor (no popup) — Cancel / Confirm stay in that panel
+- Inline steppers are mobile-friendly: label above, − / value / + on one full-width row with 44px touch targets (value field flexes in narrow scoreboard columns)
 - **DOWN / TO GO editing:** tap opens that field’s −/+ steppers and direct entry (no Down↔To go switcher; same pattern as QTR/period)
 - **BL ON editing:** −/+ steppers and direct entry for offense-relative ball-on
 
