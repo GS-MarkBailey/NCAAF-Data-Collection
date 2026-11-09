@@ -874,6 +874,11 @@ export function ScoreboardPanelShadcn({
                       ? `Edit period, currently ${formatPeriodLabel(clockPeriod)}`
                       : undefined
                   }
+                  periodPhase={getPeriodPhase({
+                    periodActive,
+                    periodEnded,
+                    gameEnded,
+                  })}
                   status={
                     showQuarterStatus
                       ? pregame || gameEnded
@@ -950,7 +955,7 @@ export function ScoreboardPanelShadcn({
               </div>
 
               {showPossessionSwitch ? (
-                <div className="grid min-h-0 flex-1 grid-cols-2 border-t border-border">
+                <div className="grid h-9 shrink-0 grid-cols-2 border-t border-border">
                   <Button
                     type="button"
                     variant="ghost"
@@ -959,8 +964,7 @@ export function ScoreboardPanelShadcn({
                     aria-pressed={gameEnded ? false : possessionIsHome}
                     aria-label={`Give possession to ${homeAbbr}`}
                     className={cn(
-                      'h-full min-h-0 rounded-none border-0 border-r border-border py-0 font-semibold',
-                      stacked ? 'text-base' : 'text-lg',
+                      'h-9 min-h-9 rounded-none border-0 border-r border-border py-0 text-sm font-semibold',
                       !gameEnded &&
                         possessionIsHome &&
                         'rounded-bl-lg bg-[var(--color-score-bg)] text-white hover:bg-[var(--color-score-bg)] hover:text-white',
@@ -976,8 +980,7 @@ export function ScoreboardPanelShadcn({
                     aria-pressed={gameEnded ? false : !possessionIsHome}
                     aria-label={`Give possession to ${awayAbbr}`}
                     className={cn(
-                      'h-full min-h-0 rounded-none border-0 py-0 font-semibold',
-                      stacked ? 'text-base' : 'text-lg',
+                      'h-9 min-h-9 rounded-none border-0 py-0 text-sm font-semibold',
                       !gameEnded &&
                         !possessionIsHome &&
                         'rounded-br-lg bg-[var(--color-score-bg)] text-white hover:bg-[var(--color-score-bg)] hover:text-white',
@@ -1005,11 +1008,39 @@ const QUARTER_STATUS_CLASS: Record<
   ended: { className: 'bg-red-50', pulseEnd: '#fef2f2' },
 }
 
+type PeriodPhase = 'not_started' | 'in_progress' | 'ended'
+
+const PERIOD_PHASE_LABEL: Record<PeriodPhase, string> = {
+  not_started: 'Not Started',
+  in_progress: 'In Progress',
+  ended: 'Ended',
+}
+
+const PERIOD_PHASE_CLASS: Record<
+  PeriodPhase,
+  { className: string; pulseEnd: string }
+> = {
+  not_started: { className: 'bg-amber-50', pulseEnd: '#fffbeb' },
+  in_progress: { className: 'bg-emerald-50', pulseEnd: '#ecfdf5' },
+  ended: { className: 'bg-red-50', pulseEnd: '#fef2f2' },
+}
+
+function getPeriodPhase(params: {
+  periodActive: boolean
+  periodEnded: boolean
+  gameEnded: boolean
+}): PeriodPhase {
+  if (params.gameEnded || params.periodEnded) return 'ended'
+  if (params.periodActive) return 'in_progress'
+  return 'not_started'
+}
+
 function StatCell({
   label,
   value,
   displayValue,
   status,
+  periodPhase,
   compact = false,
   interactive = false,
   showEditIcon = false,
@@ -1020,6 +1051,7 @@ function StatCell({
   value: number
   displayValue?: string
   status?: QuarterStatus
+  periodPhase?: PeriodPhase
   compact?: boolean
   interactive?: boolean
   showEditIcon?: boolean
@@ -1027,7 +1059,10 @@ function StatCell({
   ariaLabel?: string
 }) {
   const pulsing = usePushPulse(value)
+  const phaseStyle = periodPhase ? PERIOD_PHASE_CLASS[periodPhase] : undefined
   const statusStyle = status ? QUARTER_STATUS_CLASS[status] : undefined
+  const surfaceStyle = phaseStyle ?? statusStyle
+  const phaseLabel = periodPhase ? PERIOD_PHASE_LABEL[periodPhase] : undefined
 
   return (
     <div
@@ -1046,18 +1081,18 @@ function StatCell({
           : undefined
       }
       className={cn(
-        'relative flex h-full min-h-0 flex-1 flex-col items-center border-r border-border px-1 last:border-r-0 landscape-mobile:py-3',
+        'relative flex h-full min-h-0 flex-1 flex-col items-center border-r border-border px-1 last:border-r-0',
         compact
           ? 'min-h-10 shrink-0 justify-center gap-0.5 py-1'
-          : 'justify-center gap-0 py-4',
-        statusStyle?.className,
+          : 'justify-center gap-0.5 py-2 landscape-mobile:py-2',
+        surfaceStyle?.className,
         pulsing && 'push-data-pulse',
         interactive &&
           'cursor-pointer transition-colors hover:bg-muted/50 active:bg-muted/70',
       )}
       style={
         {
-          '--push-pulse-end': statusStyle?.pulseEnd ?? 'var(--card)',
+          '--push-pulse-end': surfaceStyle?.pulseEnd ?? 'var(--card)',
         } as CSSProperties
       }
     >
@@ -1066,7 +1101,7 @@ function StatCell({
           aria-hidden
           className={cn(
             'pointer-events-none absolute text-muted-foreground/70',
-            compact ? 'top-0.5 right-0.5 size-2.5' : 'top-1.5 right-1.5 size-3',
+            compact ? 'top-0.5 right-0.5 size-2.5' : 'top-1 right-1 size-3',
           )}
         />
       ) : null}
@@ -1081,11 +1116,21 @@ function StatCell({
       <span
         className={cn(
           'font-bold leading-none',
-          compact ? 'text-lg' : 'text-2xl landscape-mobile:text-xl',
+          compact ? 'text-lg' : 'text-xl landscape-mobile:text-lg',
         )}
       >
         {displayValue ?? value}
       </span>
+      {phaseLabel ? (
+        <span
+          className={cn(
+            'max-w-full truncate px-0.5 text-center font-semibold leading-none tracking-wide text-muted-foreground uppercase',
+            compact ? 'text-[7px]' : 'text-[8px]',
+          )}
+        >
+          {phaseLabel}
+        </span>
+      ) : null}
     </div>
   )
 }
