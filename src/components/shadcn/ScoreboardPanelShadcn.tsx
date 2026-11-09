@@ -36,6 +36,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Card,
+  CardAction,
   CardContent,
   CardHeader,
   CardTitle,
@@ -412,29 +413,25 @@ export function ScoreboardPanelShadcn({
     </button>
   )
 
-  // END PERIOD appears after Start begins the period (clock Start or next-quarter Start).
-  // Kickoff is not required — Start alone arms the chip.
+  // END PERIOD appears in the scoreboard header after Start begins the period.
+  // Kickoff is not required — Start alone arms it.
   const showEndPeriodChip =
     periodActive && !gameEnded && !periodEnded && !inOvertime
 
-  const endPeriodChip = showEndPeriodChip ? (
-    <Badge
-      variant="outline"
-      render={
-        <button
-          type="button"
-          onClick={handleEndPeriod}
-          aria-label="End period"
-        />
-      }
-      className={cn(
-        'relative gap-1 border font-semibold uppercase tracking-wide',
-        'before:absolute before:-inset-y-3 before:-inset-x-3 before:content-[""]',
-        'border-red-200 bg-red-50 text-red-800 hover:bg-red-100',
-      )}
-    >
-      END PERIOD
-    </Badge>
+  const endPeriodHeaderAction = showEndPeriodChip ? (
+    <CardAction className="static row-span-1 self-center justify-self-auto">
+      <Button
+        type="button"
+        variant="secondary"
+        size="sm"
+        title="End period"
+        aria-label="End period"
+        className="h-7 gap-1 border border-red-200 bg-red-50 px-2 text-xs font-medium text-red-800 hover:bg-red-100 hover:text-red-800"
+        onClick={handleEndPeriod}
+      >
+        END PERIOD
+      </Button>
+    </CardAction>
   ) : null
 
   const actionBadges = (
@@ -545,6 +542,7 @@ export function ScoreboardPanelShadcn({
           <LayoutGrid className="size-4 shrink-0 text-muted-foreground" />
           Scoreboard
         </CardTitle>
+        {endPeriodHeaderAction}
       </CardHeader>
       <CardContent
         className={cn(
@@ -641,27 +639,19 @@ export function ScoreboardPanelShadcn({
                   onKeyDown={canToggleClock ? handleContainerKeyDown : undefined}
                 >
                   {clockEditButton}
-                  {endPeriodChip ||
-                  (showPeriodManagement &&
-                    awaitingRegulationDecision &&
-                    periodEnded) ? (
+                  {showPeriodManagement &&
+                  awaitingRegulationDecision &&
+                  periodEnded ? (
                     <div className="pointer-events-none absolute top-2 right-2 z-10 flex flex-col items-end gap-1">
-                      {endPeriodChip ? (
-                        <div className="pointer-events-auto">{endPeriodChip}</div>
-                      ) : null}
-                      {showPeriodManagement &&
-                      awaitingRegulationDecision &&
-                      periodEnded ? (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          className="pointer-events-auto h-7 text-[10px] font-bold tracking-wider uppercase shadow-sm"
-                          onClick={handleEndGame}
-                        >
-                          End game
-                        </Button>
-                      ) : null}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="pointer-events-auto h-7 text-[10px] font-bold tracking-wider uppercase shadow-sm"
+                        onClick={handleEndGame}
+                      >
+                        End game
+                      </Button>
                     </div>
                   ) : null}
                 </div>
@@ -697,27 +687,19 @@ export function ScoreboardPanelShadcn({
                 )}
               >
                 {clockEditButton}
-                {endPeriodChip ||
-                (showPeriodManagement &&
-                  awaitingRegulationDecision &&
-                  periodEnded) ? (
+                {showPeriodManagement &&
+                awaitingRegulationDecision &&
+                periodEnded ? (
                   <div className="pointer-events-none absolute top-2 right-2 z-10 flex flex-col items-end gap-1">
-                    {endPeriodChip ? (
-                      <div className="pointer-events-auto">{endPeriodChip}</div>
-                    ) : null}
-                    {showPeriodManagement &&
-                    awaitingRegulationDecision &&
-                    periodEnded ? (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="pointer-events-auto h-7 text-[10px] font-bold tracking-wider uppercase shadow-sm"
-                        onClick={handleEndGame}
-                      >
-                        End game
-                      </Button>
-                    ) : null}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="pointer-events-auto h-7 text-[10px] font-bold tracking-wider uppercase shadow-sm"
+                      onClick={handleEndGame}
+                    >
+                      End game
+                    </Button>
                   </div>
                 ) : null}
               </div>

@@ -311,16 +311,12 @@ export const WEEK_FEATURES = {
     },
     {
       id: 'end-period-chip',
-      title: 'End period chip on scoreboard clock',
+      title: 'End period action on scoreboard header',
       path: '/game/NCAAF-2026-012',
       viewport: 'game-landscape',
       gameSetup: { fieldDirection: 'dismiss', errorToast: 'dismiss' },
       async prepare(page) {
-        await page
-          .getByRole('button', { name: 'KICK OFF' })
-          .filter({ visible: true })
-          .click()
-        // END PERIOD only appears after Start begins the period.
+        // END PERIOD appears in the scoreboard header after Start (kickoff not required).
         const start = page.getByRole('button', { name: 'Start clock' })
         await start.waitFor({ state: 'visible', timeout: 5000 })
         await start.click()

@@ -1,8 +1,8 @@
 {
   "label": "week-4",
   "portrait": true,
-  "capturedAt": "2026-11-05T13:45:43.083Z",
-  "baseUrl": "https://ncaaf-data-collection.vercel.app",
+  "capturedAt": "2026-11-09T10:24:46.012Z",
+  "baseUrl": "http://127.0.0.1:5173",
   "views": [
     "fixtures-landscape",
     "game-landscape"
@@ -38,34 +38,9 @@
       "file": "features/design-variants-panel.png"
     },
     {
-      "id": "clock-numeric-editor",
-      "title": "Inline clock edit — Time (Variant B)",
-      "file": "features/clock-numeric-editor.png"
-    },
-    {
-      "id": "clock-period-editor",
-      "title": "Inline period edit (Variant B)",
-      "file": "features/clock-period-editor.png"
-    },
-    {
       "id": "clock-side-nudge",
       "title": "Clock ±1 second side buttons",
       "file": "features/clock-side-nudge.png"
-    },
-    {
-      "id": "down-distance-editor",
-      "title": "Inline down & to-go editor",
-      "file": "features/down-distance-editor.png"
-    },
-    {
-      "id": "ball-on-editor",
-      "title": "Inline ball-on editor",
-      "file": "features/ball-on-editor.png"
-    },
-    {
-      "id": "end-period-chip",
-      "title": "End period chip on scoreboard clock",
-      "file": "features/end-period-chip.png"
     },
     {
       "id": "profile-dialog",
