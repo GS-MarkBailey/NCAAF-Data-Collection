@@ -852,11 +852,18 @@ export function ScoreboardPanelShadcn({
               )}
             </div>
 
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-border">
+            <div
+              className={cn(
+                'grid min-h-0 flex-1 overflow-hidden rounded-lg border border-border',
+                showPossessionSwitch
+                  ? 'grid-rows-[minmax(0,1fr)_auto]'
+                  : 'grid-rows-[minmax(0,1fr)]',
+              )}
+            >
               <div
                 className={cn(
-                  'flex items-stretch',
-                  stacked ? 'min-h-10 shrink-0' : 'min-h-0 flex-1',
+                  'flex min-h-0 items-stretch',
+                  stacked && 'min-h-10',
                 )}
               >
                 <StatCell
@@ -959,16 +966,17 @@ export function ScoreboardPanelShadcn({
               </div>
 
               {showPossessionSwitch ? (
-                <div className="grid h-9 shrink-0 grid-cols-2 border-t border-border">
+                <div className="grid shrink-0 grid-cols-2 border-t border-border">
                   <Button
                     type="button"
                     variant="ghost"
+                    size="sm"
                     disabled={gameEnded}
                     onClick={() => setPossession(fixtureId, true)}
                     aria-pressed={gameEnded ? false : possessionIsHome}
                     aria-label={`Give possession to ${homeAbbr}`}
                     className={cn(
-                      'h-9 min-h-9 rounded-none border-0 border-r border-border py-0 text-sm font-semibold',
+                      'h-8 min-h-8 rounded-none border-0 border-r border-border py-0 text-sm font-semibold',
                       !gameEnded &&
                         possessionIsHome &&
                         'rounded-bl-lg bg-[var(--color-score-bg)] text-white hover:bg-[var(--color-score-bg)] hover:text-white',
@@ -979,12 +987,13 @@ export function ScoreboardPanelShadcn({
                   <Button
                     type="button"
                     variant="ghost"
+                    size="sm"
                     disabled={gameEnded}
                     onClick={() => setPossession(fixtureId, false)}
                     aria-pressed={gameEnded ? false : !possessionIsHome}
                     aria-label={`Give possession to ${awayAbbr}`}
                     className={cn(
-                      'h-9 min-h-9 rounded-none border-0 py-0 text-sm font-semibold',
+                      'h-8 min-h-8 rounded-none border-0 py-0 text-sm font-semibold',
                       !gameEnded &&
                         !possessionIsHome &&
                         'rounded-br-lg bg-[var(--color-score-bg)] text-white hover:bg-[var(--color-score-bg)] hover:text-white',

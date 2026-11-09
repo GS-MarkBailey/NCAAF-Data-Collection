@@ -69,10 +69,10 @@ export function BallOnStatCell({
           : undefined
       }
       className={cn(
-        'relative flex h-full min-h-0 flex-1 flex-col items-center border-r border-[var(--color-panel-border)] px-1 last:border-r-0 landscape-mobile:py-3',
+        'relative flex h-full min-h-0 flex-1 flex-col items-center border-r border-[var(--color-panel-border)] px-1 last:border-r-0',
         compact
           ? 'min-h-10 shrink-0 justify-center gap-0.5 py-1'
-          : 'justify-center gap-0 py-4 landscape-mobile:py-3',
+          : 'justify-center gap-0.5 py-2 landscape-mobile:py-2',
         pulsing && 'push-data-pulse',
         interactive &&
           'cursor-pointer transition-colors hover:bg-muted/50 active:bg-muted/70',

@@ -392,7 +392,7 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 - Start/Pause chips: Play/Pause icons; green Start / red Pause with matching chip style; larger invisible tap target around the chip
 - Stat cells (DOWN, TO GO, QTR, ball-on): tighter spacing between label and value
 - **QTR** shows a small pencil when editable, plus a compact status under the number (**Not Started** / **In Progress** / **Ended**); tap **QTR / DOWN / TO GO / BL ON** fills the whole Scoreboard card content with the editor (clock + stats hide until Cancel / Confirm)
-- Possession switch is a shorter fixed-height row so the stats row (and QTR status) keep room in the bottom scoreboard panel
+- Bottom scoreboard panel uses fill + hug: QTR / DOWN / TO GO / BL ON stretch to fill remaining height; possession is a short content-sized row under them
 - Inline steppers are mobile-friendly: − / value / + on one full-width row with 44px touch targets (panel title names the field; value flexes in narrow columns)
 - **DOWN / TO GO editing:** tap opens that field’s −/+ steppers and direct entry (no Down↔To go switcher; same pattern as QTR/period)
 - **BL ON editing:** −/+ steppers and direct entry for offense-relative ball-on
