@@ -407,7 +407,11 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 
 **Game header (landscape)**
 - Team names no longer float absolutely over side controls — five-column grid so long names **truncate with ellipsis** when space is tight (full name via `title`)
+- **Undo** icon sits next to Collected datapoints — reverses the last operator change (scoreboard, risks, possession, play controls)
 - **Profile** icon opens signed-in email dialog (`collector@geniussports.com`)
+
+<!-- AUTO-SNAPSHOTS:week-4-shipped-header-undo:START -->
+<!-- AUTO-SNAPSHOTS:week-4-shipped-header-undo:END -->
 
 <!-- AUTO-SNAPSHOTS:week-4-shipped-profile:START -->
 ![Profile dialog](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/profile-dialog.png)
@@ -456,6 +460,7 @@ With **Match-state guide** on, scheduled fixtures open in **pregame** so the ful
 - Scoreboard edits (Start/Pause, ±1s, clock/period set, down, to go, possession, end period / OT / end game) also append datapoints to that log
 - Scoreboard header has an **END PERIOD** action (Undo-sized, red) after **Start** begins the period (kickoff not required); confirming end period advances **QTR** and resets the clock to **15:00** (final regulation period still parks at 0:00 for OT / end game)
 - After confirming a **period** edit or **END PERIOD**, the bottom panel asks **period in progress?** with secondary **Yes** / **No** (arms or clears END PERIOD)
+- **Undo** is a global header icon (next to Collected datapoints) — reverses the last operator change across scoreboard, risks, possession, and play controls (not only play-control steps)
 - **END PLAY** appears when the chosen result is ready
 - Later quarters: confirm **END PERIOD** to open the next quarter at 15:00; press **Start** to run the clock (no Start Q / Kick off badges on the scoreboard)
 

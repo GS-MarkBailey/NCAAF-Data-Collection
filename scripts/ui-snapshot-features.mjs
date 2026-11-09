@@ -327,6 +327,23 @@ export const WEEK_FEATURES = {
       },
     },
     {
+      id: 'header-undo',
+      title: 'Global Undo in game header',
+      path: '/game/NCAAF-2026-001',
+      viewport: 'game-landscape',
+      gameSetup: { fieldDirection: 'dismiss', errorToast: 'dismiss' },
+      async prepare(page) {
+        await page.getByRole('button', { name: 'Start clock' }).click()
+        const undo = page.getByRole('button', { name: 'Undo last action' })
+        await undo.waitFor({ state: 'visible', timeout: 5000 })
+        await undo.waitFor({ state: 'attached' })
+        // Enabled after Start so the header control is clearly actionable.
+        if (await undo.isDisabled()) {
+          throw new Error('Expected Undo to be enabled after Start clock')
+        }
+      },
+    },
+    {
       id: 'profile-dialog',
       title: 'Profile dialog',
       path: '/game/NCAAF-2026-001',

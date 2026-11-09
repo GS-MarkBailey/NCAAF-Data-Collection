@@ -5,6 +5,7 @@ import { ActionLogDialogShadcn } from '@/components/shadcn/ActionLogDialogShadcn
 import { CollectedDatapointsDialogShadcn } from '@/components/shadcn/CollectedDatapointsDialogShadcn'
 import { ConnectionStatusChip } from '@/components/shadcn/ConnectionStatusChip'
 import { ProfileDialogShadcn } from '@/components/shadcn/ProfileDialogShadcn'
+import { UndoActionButtonShadcn } from '@/components/shadcn/UndoActionButtonShadcn'
 import { FeatureGate } from '@/components/game/FeatureGate'
 import { TakeControlButton } from '@/components/game/TakeControlButton'
 import { Badge } from '@/components/ui/badge'
@@ -42,6 +43,7 @@ export function GameHeaderShadcn({
           </div>
 
           <div className="layout-header-actions flex shrink-0 items-center gap-2">
+            <UndoActionButtonShadcn fixtureId={fixture.id} />
             <CollectedDatapointsDialogShadcn fixtureId={fixture.id} />
             <FeatureGate flag="header.settings">
               <ActionLogDialogShadcn fixtureId={fixture.id} />
@@ -101,6 +103,7 @@ export function GameHeaderShadcn({
         </span>
 
         <div className="layout-header-actions z-10 flex shrink-0 items-center justify-end gap-2 justify-self-end">
+          <UndoActionButtonShadcn fixtureId={fixture.id} />
           <CollectedDatapointsDialogShadcn fixtureId={fixture.id} />
           <FeatureGate flag="header.settings">
             <ActionLogDialogShadcn fixtureId={fixture.id} />

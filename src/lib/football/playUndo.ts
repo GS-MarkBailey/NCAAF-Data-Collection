@@ -1,9 +1,14 @@
-import type { CollectedDatapoint, GameState, SeriesKind } from '@/types'
+import type {
+  CollectedDatapoint,
+  GameState,
+  RiskType,
+  SeriesKind,
+} from '@/types'
 import { formatClock } from '@/lib/format'
 import { labelForUndo } from './datapointLabels'
 import type { PlayCollectionStepId } from './playCollectionFlow'
 
-/** Snapshot of play-control-relevant game fields for one undo step. */
+/** Snapshot of operator-mutable game fields for one global undo step. */
 export interface PlayUndoSnapshot {
   playInProgress: boolean
   seriesKind: SeriesKind
@@ -26,6 +31,9 @@ export interface PlayUndoSnapshot {
   driveNumber: number
   playNumber: number
   awaitingNewDrive: boolean
+  risks: Record<RiskType, boolean>
+  homeAttacksRight: boolean | null
+  takeControlActive: boolean
   collectedDatapointsLength: number
   playsLength: number
   flagEventsLength: number
@@ -57,6 +65,9 @@ export function capturePlayUndoSnapshot(game: GameState): PlayUndoSnapshot {
     driveNumber: game.driveNumber ?? 0,
     playNumber: game.playNumber ?? 0,
     awaitingNewDrive: game.awaitingNewDrive ?? true,
+    risks: { ...game.risks },
+    homeAttacksRight: game.homeAttacksRight,
+    takeControlActive: game.takeControlActive,
     collectedDatapointsLength: game.collectedDatapoints?.length ?? 0,
     playsLength: game.plays?.length ?? 0,
     flagEventsLength: game.flagEvents?.length ?? 0,
@@ -130,6 +141,9 @@ export function applyPlayUndoSnapshot(
     driveNumber: restoredDrive,
     playNumber: restoredPlay,
     awaitingNewDrive: snapshot.awaitingNewDrive,
+    risks: { ...snapshot.risks },
+    homeAttacksRight: snapshot.homeAttacksRight,
+    takeControlActive: snapshot.takeControlActive,
     // Keep history — append Undo instead of deleting reversed datapoints.
     collectedDatapoints: [...prior, undoEntry],
     plays: (game.plays ?? []).slice(0, snapshot.playsLength),
@@ -148,6 +162,7 @@ export function applyPlayUndoSnapshot(
   }
 }
 
+/** True when the header Undo can reverse the last operator action. */
 export function canUndoPlayAction(game: GameState | undefined): boolean {
-  return Boolean(game && !game.gameEnded && (game.playUndoStack?.length ?? 0) > 0)
+  return Boolean(game && (game.playUndoStack?.length ?? 0) > 0)
 }

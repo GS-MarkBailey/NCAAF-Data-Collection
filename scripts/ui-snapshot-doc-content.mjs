@@ -77,7 +77,7 @@ export const WEEK_INTERACTIONS = {
       ],
     },
     {
-      text: '**Inline scoreboard edits** — tap QTR / DOWN / TO GO / BL ON to edit in the bottom stats panel (no popup)',
+      text: '**Inline scoreboard edits** — tap QTR / DOWN / TO GO / BL ON fills the Scoreboard card content with the editor (no popup)',
       featureIds: [
         'clock-period-editor',
         'down-distance-editor',
@@ -91,6 +91,10 @@ export const WEEK_INTERACTIONS = {
     {
       text: '**END PERIOD** — red header action on the Scoreboard card (Undo-sized) after Start begins the period',
       featureIds: ['end-period-chip'],
+    },
+    {
+      text: '**Global Undo** — header icon next to Collected datapoints reverses the last operator change',
+      featureIds: ['header-undo'],
     },
     {
       text: '**Profile** — header icon opens signed-in email dialog',
@@ -147,6 +151,7 @@ export const WEEK_SHIPPED = {
     'down-distance': {
       featureIds: ['down-distance-editor', 'ball-on-editor'],
     },
+    'header-undo': { featureIds: ['header-undo'] },
     profile: { featureIds: ['profile-dialog'] },
     'unreliable-risk': { featureIds: ['unreliable-risk'] },
     'play-controls': {

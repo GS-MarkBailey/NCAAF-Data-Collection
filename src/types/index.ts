@@ -121,7 +121,7 @@ export interface GameState {
   playNumber: number
   /** Next snap should open a new drive (after kickoff / possession change). */
   awaitingNewDrive: boolean
-  /** Snapshots for Play controls Undo (collection / yards / snap / end). */
+  /** Snapshots for global Undo (scoreboard, risks, play controls, …). */
   playUndoStack: PlayUndoSnapshot[]
   /**
    * Flags (penalties) collected this session.
