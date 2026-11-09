@@ -26,6 +26,7 @@ import {
   CONSOLE_PANEL_CARD_CLASS,
   CONSOLE_PANEL_HEADER_CLASS,
   CONSOLE_PANEL_TITLE_CLASS,
+  OPERATOR_SECONDARY_SURFACE,
 } from '@/lib/operatorChrome'
 import { BallOnEditor } from '@/components/game/BallOnEditor'
 import { BallOnStatCell } from '@/components/game/BallOnStatCell'
@@ -101,6 +102,7 @@ export function ScoreboardPanelShadcn({
   const setDown = useAppStore((s) => s.setDown)
   const setDistance = useAppStore((s) => s.setDistance)
   const setBallOn = useAppStore((s) => s.setBallOn)
+  const setPeriodActive = useAppStore((s) => s.setPeriodActive)
   const showQuarterStatus = useFeatureFlag('scoreboard.quarterStatus')
   const showPossessionSwitch = useFeatureFlag('scoreboard.possessionSwitch')
   const showClockWheelEditor = useFeatureFlag('scoreboard.clockWheelEditor')
@@ -134,6 +136,8 @@ export function ScoreboardPanelShadcn({
   const [draftBallOn, setDraftBallOn] = useState(25)
   const [ballOnSession, setBallOnSession] = useState(0)
   const ballOnInputRef = useRef<HTMLInputElement>(null)
+  /** After confirming period edit / end period — Yes/No for periodActive. */
+  const [askingPeriodInProgress, setAskingPeriodInProgress] = useState(false)
 
   const paused = !clockRunning
   const pregame = !gameStarted
@@ -190,11 +194,19 @@ export function ScoreboardPanelShadcn({
   const clockLocked = gameEnded
 
   const handleOpenClockEditor = (tab: ClockEditTab = 'time') => {
-    if (!showClockWheelEditor || clockLocked || inOvertime || pendingConfirmation) return
+    if (
+      !showClockWheelEditor ||
+      clockLocked ||
+      inOvertime ||
+      pendingConfirmation ||
+      askingPeriodInProgress
+    )
+      return
 
     const parts = clockToParts(clockSeconds)
     setEditingDownDistance(false)
     setEditingBallOn(false)
+    setAskingPeriodInProgress(false)
     setDraftPeriod(clockPeriod)
     setDraftMinutes(parts.minutes)
     setDraftSeconds(parts.seconds)
@@ -213,9 +225,10 @@ export function ScoreboardPanelShadcn({
     showBallOn && !gameEnded && !pendingConfirmation
 
   const handleOpenDownDistanceEditor = (tab: DownDistanceEditTab) => {
-    if (!canOpenDownDistanceEditor) return
+    if (!canOpenDownDistanceEditor || askingPeriodInProgress) return
     setEditingClock(false)
     setEditingBallOn(false)
+    setAskingPeriodInProgress(false)
     setDraftDown(down)
     setDraftDistance(distance)
     setDownDistanceTab(tab)
@@ -224,12 +237,18 @@ export function ScoreboardPanelShadcn({
   }
 
   const handleOpenBallOnEditor = () => {
-    if (!canOpenBallOnEditor) return
+    if (!canOpenBallOnEditor || askingPeriodInProgress) return
     setEditingClock(false)
     setEditingDownDistance(false)
+    setAskingPeriodInProgress(false)
     setDraftBallOn(ballOn)
     setBallOnSession((session) => session + 1)
     setEditingBallOn(true)
+  }
+
+  const handlePeriodInProgressAnswer = (inProgress: boolean) => {
+    setPeriodActive(fixtureId, inProgress)
+    setAskingPeriodInProgress(false)
   }
 
   const handleCancelDownDistanceEdit = () => {
@@ -265,6 +284,10 @@ export function ScoreboardPanelShadcn({
     switch (pendingConfirmation) {
       case 'endPeriod':
         endPeriod(fixtureId)
+        setEditingClock(false)
+        setEditingDownDistance(false)
+        setEditingBallOn(false)
+        setAskingPeriodInProgress(true)
         break
       case 'endGame':
         endGame(fixtureId)
@@ -289,6 +312,9 @@ export function ScoreboardPanelShadcn({
     setClockTime(fixtureId, clockFromParts(draftMinutes, draftSeconds))
     setClockPeriod(fixtureId, draftPeriod)
     setEditingClock(false)
+    if (clockEditTab === 'period') {
+      setAskingPeriodInProgress(true)
+    }
   }
 
   const handlePlayPause = (event?: MouseEvent<HTMLButtonElement>) => {
@@ -312,16 +338,21 @@ export function ScoreboardPanelShadcn({
     editingClock && (useClockEditPanel || clockEditTab === 'period')
   const editingClockInline = editingClock && !editingClockPanel
   const editingBottomPanel =
-    editingClockPanel || editingDownDistance || editingBallOn
-  const bottomEditorTitle = editingBallOn
-    ? 'Edit ball on'
-    : editingDownDistance
-      ? downDistanceTab === 'distance'
-        ? 'Edit to go'
-        : 'Edit down'
-      : clockEditTab === 'period'
-        ? 'Edit period'
-        : 'Edit clock'
+    editingClockPanel ||
+    editingDownDistance ||
+    editingBallOn ||
+    askingPeriodInProgress
+  const bottomEditorTitle = askingPeriodInProgress
+    ? 'period in progress?'
+    : editingBallOn
+      ? 'Edit ball on'
+      : editingDownDistance
+        ? downDistanceTab === 'distance'
+          ? 'Edit to go'
+          : 'Edit down'
+        : clockEditTab === 'period'
+          ? 'Edit period'
+          : 'Edit clock'
 
   const handleEndPeriod = (event: MouseEvent<HTMLButtonElement>) => {
     openConfirmation('endPeriod', event)
@@ -722,7 +753,7 @@ export function ScoreboardPanelShadcn({
                 </p>
               </div>
               <div className="flex min-h-0 flex-1 items-center justify-center overflow-auto px-2 py-3">
-                {editingBallOn ? (
+                {askingPeriodInProgress ? null : editingBallOn ? (
                   <BallOnEditor
                     key={ballOnSession}
                     ballOn={draftBallOn}
@@ -758,33 +789,62 @@ export function ScoreboardPanelShadcn({
                 )}
               </div>
               <div className="flex shrink-0 gap-2 border-t border-border bg-background p-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="h-10 min-h-10 flex-1 shrink-0 touch-manipulation"
-                  onClick={
-                    editingBallOn
-                      ? handleCancelBallOnEdit
-                      : editingDownDistance
-                        ? handleCancelDownDistanceEdit
-                        : handleCancelClockEdit
-                  }
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="button"
-                  className="h-10 min-h-10 flex-1 shrink-0 touch-manipulation bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
-                  onClick={
-                    editingBallOn
-                      ? handleConfirmBallOnEdit
-                      : editingDownDistance
-                        ? handleConfirmDownDistanceEdit
-                        : handleConfirmClockEdit
-                  }
-                >
-                  Confirm
-                </Button>
+                {askingPeriodInProgress ? (
+                  <>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      className={cn(
+                        'h-10 min-h-10 flex-1 shrink-0 touch-manipulation',
+                        OPERATOR_SECONDARY_SURFACE,
+                      )}
+                      onClick={() => handlePeriodInProgressAnswer(true)}
+                    >
+                      Yes
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      className={cn(
+                        'h-10 min-h-10 flex-1 shrink-0 touch-manipulation',
+                        OPERATOR_SECONDARY_SURFACE,
+                      )}
+                      onClick={() => handlePeriodInProgressAnswer(false)}
+                    >
+                      No
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-10 min-h-10 flex-1 shrink-0 touch-manipulation"
+                      onClick={
+                        editingBallOn
+                          ? handleCancelBallOnEdit
+                          : editingDownDistance
+                            ? handleCancelDownDistanceEdit
+                            : handleCancelClockEdit
+                      }
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="button"
+                      className="h-10 min-h-10 flex-1 shrink-0 touch-manipulation bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
+                      onClick={
+                        editingBallOn
+                          ? handleConfirmBallOnEdit
+                          : editingDownDistance
+                            ? handleConfirmDownDistanceEdit
+                            : handleConfirmClockEdit
+                      }
+                    >
+                      Confirm
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           ) : (

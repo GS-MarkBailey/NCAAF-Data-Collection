@@ -72,6 +72,8 @@ interface AppStore {
   setDown: (fixtureId: string, down: number) => void
   setDistance: (fixtureId: string, distance: number) => void
   setBallOn: (fixtureId: string, ballOn: number) => void
+  /** Arms / clears the scoreboard END PERIOD header action. */
+  setPeriodActive: (fixtureId: string, periodActive: boolean) => void
   snapPlay: (fixtureId: string) => void
   endPlay: (fixtureId: string, options?: { skipUndoPush?: boolean }) => void
   adjustYards: (fixtureId: string, delta: number) => void
@@ -616,6 +618,21 @@ export const useAppStore = create<AppStore>((set, get) => ({
             clockBefore,
           ),
         ),
+      }
+    })
+  },
+
+  setPeriodActive: (fixtureId, periodActive) => {
+    set((state) => {
+      const game = state.games[fixtureId]
+      if (!game || game.gameEnded) return state
+      if ((game.periodActive ?? false) === periodActive) return state
+
+      return {
+        games: updateGame(state.games, fixtureId, (g) => ({
+          ...g,
+          periodActive,
+        })),
       }
     })
   },
