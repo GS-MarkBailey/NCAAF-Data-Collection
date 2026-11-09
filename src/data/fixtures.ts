@@ -15,7 +15,7 @@ export const FIXTURES: Fixture[] = [
     awayTeam: 'Rockford',
     awayAbbr: 'ROCK',
     // Keep the primary demo fixture in the future so the live console stays operable.
-    startDate: '2026-10-17',
+    startDate: '2026-12-15',
     startTime: '13:00',
   },
   {
@@ -125,7 +125,8 @@ export const FIXTURES: Fixture[] = [
     homeAbbr: 'MIA',
     awayTeam: 'Florida State Seminoles',
     awayAbbr: 'FSU',
-    startDate: '2026-11-08',
+    // Snapshot / Variant B editor demos — keep scheduled so Start / QTR edit stay available.
+    startDate: '2026-12-12',
     startTime: '20:00',
   },
   {
