@@ -1,8 +1,8 @@
 {
   "label": "week-4",
   "portrait": true,
-  "capturedAt": "2026-11-09T10:49:35.945Z",
-  "baseUrl": "http://127.0.0.1:5173",
+  "capturedAt": "2026-11-09T11:04:08.379Z",
+  "baseUrl": "https://ncaaf-data-collection.vercel.app",
   "views": [
     "fixtures-landscape",
     "game-landscape"
@@ -38,9 +38,29 @@
       "file": "features/design-variants-panel.png"
     },
     {
+      "id": "clock-numeric-editor",
+      "title": "Inline clock edit — Time (Variant B)",
+      "file": "features/clock-numeric-editor.png"
+    },
+    {
+      "id": "clock-period-editor",
+      "title": "Inline period edit (Variant B)",
+      "file": "features/clock-period-editor.png"
+    },
+    {
       "id": "clock-side-nudge",
       "title": "Clock ±1 second side buttons",
       "file": "features/clock-side-nudge.png"
+    },
+    {
+      "id": "down-distance-editor",
+      "title": "Inline down & to-go editor",
+      "file": "features/down-distance-editor.png"
+    },
+    {
+      "id": "ball-on-editor",
+      "title": "Inline ball-on editor",
+      "file": "features/ball-on-editor.png"
     },
     {
       "id": "profile-dialog",
@@ -51,6 +71,21 @@
       "id": "unreliable-risk",
       "title": "Unreliable risk chip placement",
       "file": "features/unreliable-risk.png"
+    },
+    {
+      "id": "play-controls-idle",
+      "title": "Play controls panel (idle)",
+      "file": "features/play-controls-idle.png"
+    },
+    {
+      "id": "play-controls-choose-type",
+      "title": "Play controls — choose rush / throw",
+      "file": "features/play-controls-choose-type.png"
+    },
+    {
+      "id": "play-controls-pass-result",
+      "title": "Play controls — pass result after throw",
+      "file": "features/play-controls-pass-result.png"
     }
   ]
 }

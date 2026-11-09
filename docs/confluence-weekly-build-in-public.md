@@ -411,6 +411,7 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 - **Profile** icon opens signed-in email dialog (`collector@geniussports.com`)
 
 <!-- AUTO-SNAPSHOTS:week-4-shipped-header-undo:START -->
+
 <!-- AUTO-SNAPSHOTS:week-4-shipped-header-undo:END -->
 
 <!-- AUTO-SNAPSHOTS:week-4-shipped-profile:START -->
@@ -492,7 +493,7 @@ Classic SNAP → yards → END PLAY remains available when Match-state guide is 
 
 ![Design variants in Features settings](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/design-variants-panel.png) ![Inline clock edit — Time (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-numeric-editor.png) ![Inline period edit (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-period-editor.png)
 
-- **Inline scoreboard edits** — tap QTR / DOWN / TO GO / BL ON to edit in the bottom stats panel (no popup)
+- **Inline scoreboard edits** — tap QTR / DOWN / TO GO / BL ON fills the Scoreboard card content with the editor (no popup)
 
 ![Inline period edit (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-period-editor.png) ![Inline down & to-go editor](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/down-distance-editor.png) ![Inline ball-on editor](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/ball-on-editor.png)
 
@@ -504,6 +505,7 @@ Classic SNAP → yards → END PLAY remains available when Match-state guide is 
 
 ![End period action on scoreboard header](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/end-period-chip.png)
 
+- **Global Undo** — header icon next to Collected datapoints reverses the last operator change
 - **Profile** — header icon opens signed-in email dialog
 
 ![Profile dialog](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/profile-dialog.png)
