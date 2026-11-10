@@ -126,7 +126,6 @@ export function ScoreboardPanelShadcn({
   const [draftMinutes, setDraftMinutes] = useState(0)
   const [draftSeconds, setDraftSeconds] = useState(0)
   const [clockEditSession, setClockEditSession] = useState(0)
-  const clockPeriodInputRef = useRef<HTMLInputElement>(null)
   const clockMinutesInputRef = useRef<HTMLInputElement>(null)
   const [editingDownDistance, setEditingDownDistance] = useState(false)
   const [downDistanceTab, setDownDistanceTab] =
@@ -676,7 +675,6 @@ export function ScoreboardPanelShadcn({
                   onMinutesChange={setDraftMinutes}
                   onSecondsChange={setDraftSeconds}
                   initialTab={clockEditTab}
-                  periodInputRef={clockPeriodInputRef}
                   minutesInputRef={clockMinutesInputRef}
                 />
               )}

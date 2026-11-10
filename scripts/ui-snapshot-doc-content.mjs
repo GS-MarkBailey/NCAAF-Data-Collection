@@ -69,7 +69,7 @@ export const WEEK_INTERACTIONS = {
       featureIds: ['portrait-stack'],
     },
     {
-      text: '**Inline clock edits** — Variant B numeric clock panel (period / time) and period editor',
+      text: '**Inline clock edits** — Variant B numeric time panel and period scroll wheel',
       featureIds: ['clock-numeric-editor', 'clock-period-editor'],
     },
     {

@@ -4,7 +4,7 @@
 **Live demo:** https://ncaaf-data-collection.vercel.app  
 **Repository:** GitHub (auto-deployed to Vercel on each change)  
 **Period covered:** 16 June 2026 – 21 July 2026  
-**Last updated:** 10 Nov 2026 (snapshots synced automatically)
+**Last updated:** 10 Nov 2026 (period edit scroll wheel) (snapshots synced automatically)
 
 **Confluence images:** Auto-synced by GitHub Actions on push to `main` (capture → publish). Manual fallback: `npm run publish:confluence`.
 
@@ -379,11 +379,11 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 
 **Design variants (shipped behaviour)**
 - **Display resilience:** soft-caps rem growth, safer bottom safe-area padding, scrollable panels under larger fonts / bold text / display scaling / zoom
-- **Clock edit panel:** when enabled in product defaults, tap the clock / QTR opens inline **− / +** steppers and direct entry in the Scoreboard card
+- **Clock edit panel:** when enabled in product defaults, tap the clock opens inline **Min / Sec** numeric fields in the Scoreboard card; tap **QTR** always uses the same scroll wheel as the time picker
 - Documented **supported phone display & browser settings** baseline (Default font, Bold off, Display Default, Zoom 100%)
 
 <!-- AUTO-SNAPSHOTS:week-4-shipped-design-variants:START -->
-![Inline clock edit — Time (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-numeric-editor.png) ![Inline period edit (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-period-editor.png)
+![Inline clock edit — Time (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-numeric-editor.png) ![Inline period edit — scroll wheel](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-period-editor.png)
 <!-- AUTO-SNAPSHOTS:week-4-shipped-design-variants:END -->
 
 **Scoreboard / clock polish**
@@ -391,8 +391,9 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 - Stat cells (DOWN, TO GO, QTR, ball-on): tighter spacing between label and value
 - **QTR** shows a small pencil when editable, plus a compact status under the number (**Not Started** / **In Progress** / **Ended**); tap **QTR / DOWN / TO GO / BL ON** fills the whole Scoreboard card content with the editor (clock + stats hide until Cancel / Confirm)
 - Bottom scoreboard panel uses fill + hug: QTR / DOWN / TO GO / BL ON stretch to fill remaining height; possession is a short content-sized row under them
+- **Period (QTR) editing:** same iOS-style scroll wheel as the time picker (Q1–Q4, then OT…)
 - Inline steppers are mobile-friendly: − / value / + on one full-width row with 44px touch targets (panel title names the field; value flexes in narrow columns)
-- **DOWN / TO GO editing:** tap opens that field’s −/+ steppers and direct entry (no Down↔To go switcher; same pattern as QTR/period)
+- **DOWN / TO GO editing:** tap opens that field’s −/+ steppers and direct entry (no Down↔To go switcher)
 - **BL ON editing:** −/+ steppers and direct entry for offense-relative ball-on
 
 <!-- AUTO-SNAPSHOTS:week-4-shipped-down-distance:START -->
@@ -495,13 +496,13 @@ Ending the final regulation period (Q4) parks the clock at **0:00** and opens a 
 
 ![Portrait game console (stacked panels)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/portrait-stack.png)
 
-- **Inline clock edits** — Variant B numeric clock panel (period / time) and period editor
+- **Inline clock edits** — Variant B numeric time panel and period scroll wheel
 
-![Inline clock edit — Time (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-numeric-editor.png) ![Inline period edit (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-period-editor.png)
+![Inline clock edit — Time (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-numeric-editor.png) ![Inline period edit — scroll wheel](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-period-editor.png)
 
 - **Inline scoreboard edits** — tap QTR / DOWN / TO GO / BL ON fills the Scoreboard card content with the editor (no popup)
 
-![Inline period edit (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-period-editor.png) ![Inline down & to-go editor](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/down-distance-editor.png) ![Inline ball-on editor](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/ball-on-editor.png)
+![Inline period edit — scroll wheel](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-period-editor.png) ![Inline down & to-go editor](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/down-distance-editor.png) ![Inline ball-on editor](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/ball-on-editor.png)
 
 - **Start / Pause chips** — Play/Pause icons with green Start / red Pause; larger invisible tap target
 

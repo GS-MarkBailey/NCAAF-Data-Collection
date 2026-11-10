@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
-import { CLOCK_EDIT_MAX_MINUTES, getClockEditSecondValues } from '@/lib/clock'
+import {
+  CLOCK_EDIT_MAX_MINUTES,
+  formatPeriodLabel,
+  getClockEditSecondValues,
+  MIN_PERIOD,
+} from '@/lib/clock'
 
 const ITEM_HEIGHT = 28
 const INITIAL_SCROLL_SUPPRESS_MS = 400
@@ -9,6 +14,12 @@ export const CLOCK_WHEEL_VIEWPORT_HEIGHT = ITEM_HEIGHT * 3
 
 export const CLOCK_MINUTE_VALUES = Array.from({ length: 16 }, (_, index) => index)
 export const CLOCK_SECOND_VALUES = Array.from({ length: 60 }, (_, index) => index)
+/** Q1–Q4 plus OT…OT12 — enough for the period wheel without a huge list. */
+export const CLOCK_PERIOD_WHEEL_MAX = 16
+export const CLOCK_PERIOD_VALUES = Array.from(
+  { length: CLOCK_PERIOD_WHEEL_MAX - MIN_PERIOD + 1 },
+  (_, index) => MIN_PERIOD + index,
+)
 
 interface ClockWheelColumnProps {
   values: number[]
@@ -182,7 +193,7 @@ interface ClockWheelEditorProps {
   onSecondsChange: (seconds: number) => void
 }
 
-/** Time-only scroll wheels (period is edited from the QTR cell). */
+/** Time-only scroll wheels (minutes : seconds). */
 export function ClockWheelEditor({
   minutes,
   seconds,
@@ -216,6 +227,38 @@ export function ClockWheelEditor({
         values={secondValues}
         value={clampedSeconds}
         onChange={onSecondsChange}
+      />
+    </div>
+  )
+}
+
+interface PeriodWheelEditorProps {
+  period: number
+  onPeriodChange: (period: number) => void
+}
+
+/** Period scroll wheel — same interaction as the time picker. */
+export function PeriodWheelEditor({
+  period,
+  onPeriodChange,
+}: PeriodWheelEditorProps) {
+  const clamped = Math.max(
+    MIN_PERIOD,
+    Math.min(CLOCK_PERIOD_WHEEL_MAX, period),
+  )
+
+  return (
+    <div
+      className="flex w-full items-center justify-center gap-1.5 overflow-hidden px-1"
+      style={{ height: CLOCK_WHEEL_VIEWPORT_HEIGHT }}
+      role="group"
+      aria-label="Edit period"
+    >
+      <ClockWheelColumn
+        values={CLOCK_PERIOD_VALUES}
+        value={clamped}
+        onChange={onPeriodChange}
+        formatValue={(option) => formatPeriodLabel(option)}
       />
     </div>
   )

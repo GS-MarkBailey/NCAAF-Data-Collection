@@ -2,12 +2,8 @@ import { useRef, type Ref } from 'react'
 import {
   CLOCK_EDIT_MAX_MINUTES,
   CLOCK_EDIT_MAX_SECONDS,
-  MAX_PERIOD,
-  MIN_PERIOD,
-  formatPeriodLabel,
-  parsePeriodInput,
 } from '@/lib/clock'
-import { ScoreboardStepperField } from '@/components/game/ScoreboardStepperField'
+import { PeriodWheelEditor } from '@/components/game/ClockWheelEditor'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 
@@ -22,7 +18,6 @@ interface ClockNumericEditorProps {
   onSecondsChange: (seconds: number) => void
   /** Which editor to show — period or time (no in-panel switcher). */
   initialTab?: ClockEditTab
-  periodInputRef?: Ref<HTMLInputElement>
   minutesInputRef?: Ref<HTMLInputElement>
 }
 
@@ -181,7 +176,7 @@ function NumericField({
   )
 }
 
-/** Variant B — numeric clock / period editor (not the scroll wheel). */
+/** Variant B — numeric time editor; period uses the same scroll wheel as time. */
 export function ClockNumericEditor({
   period,
   minutes,
@@ -190,12 +185,10 @@ export function ClockNumericEditor({
   onMinutesChange,
   onSecondsChange,
   initialTab = 'time',
-  periodInputRef,
   minutesInputRef,
 }: ClockNumericEditorProps) {
   const secondsLocked = minutes >= CLOCK_EDIT_MAX_MINUTES
   const clampedSeconds = secondsLocked ? 0 : seconds
-  const clampedPeriod = Math.max(MIN_PERIOD, Math.min(MAX_PERIOD, period))
 
   const handleMinutesChange = (nextMinutes: number) => {
     const clamped = clampInt(nextMinutes, 0, CLOCK_EDIT_MAX_MINUTES)
@@ -207,22 +200,7 @@ export function ClockNumericEditor({
 
   if (initialTab === 'period') {
     return (
-      <ScoreboardStepperField
-        id="clock-edit-period"
-        label="Period"
-        value={clampedPeriod}
-        displayValue={formatPeriodLabel(clampedPeriod)}
-        min={MIN_PERIOD}
-        max={MAX_PERIOD}
-        groupLabel="Edit period"
-        autoFocus
-        inputRef={periodInputRef}
-        inputMode="text"
-        parseInput={parsePeriodInput}
-        shouldLiveCommit={(raw) => /^(?:\d+|OT\d*)$/i.test(raw.trim())}
-        normalizeDraft={(raw) => raw.toUpperCase()}
-        onChange={onPeriodChange}
-      />
+      <PeriodWheelEditor period={period} onPeriodChange={onPeriodChange} />
     )
   }
 

@@ -208,13 +208,12 @@ export const WEEK_FEATURES = {
     },
     {
       id: 'clock-period-editor',
-      title: 'Inline period edit (Variant B)',
+      title: 'Inline period edit — scroll wheel',
       path: '/game/NCAAF-2026-012',
       viewport: 'game-landscape',
       gameSetup: { fieldDirection: 'dismiss', errorToast: 'dismiss' },
       featureFlagOverrides: {
         'scoreboard.clockWheelEditor': true,
-        'scoreboard.clockNumericEditor': true,
       },
       async prepare(page) {
         await page
@@ -222,8 +221,11 @@ export const WEEK_FEATURES = {
           .filter({ visible: true })
           .click()
         await page.getByRole('button', { name: 'Confirm' }).waitFor({ state: 'visible' })
-        await page.getByRole('textbox', { name: 'Period' }).waitFor({
-          state: 'visible',
+        const periodWheel = page.getByRole('group', { name: 'Edit period' })
+        await periodWheel.waitFor({ state: 'visible', timeout: 5000 })
+        // Wheel lists regulation then OT — distinguishes from the old − / + stepper
+        await periodWheel.getByText('OT', { exact: true }).waitFor({
+          state: 'attached',
           timeout: 5000,
         })
       },
