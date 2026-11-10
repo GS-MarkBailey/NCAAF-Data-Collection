@@ -138,6 +138,10 @@ export function ScoreboardPanelShadcn({
   const [ballOnSession, setBallOnSession] = useState(0)
   /** After confirming period edit / end period — Yes/No for periodActive. */
   const [askingPeriodInProgress, setAskingPeriodInProgress] = useState(false)
+  /** Which scoreboard region shows the period-in-progress prompt. */
+  const [periodAskRegion, setPeriodAskRegion] = useState<'clock' | 'stats'>(
+    'stats',
+  )
 
   const paused = !clockRunning
   const pregame = !gameStarted
@@ -296,6 +300,7 @@ export function ScoreboardPanelShadcn({
         // Q4 (final regulation): show OT / end-game decision instead of
         // "period in progress?" — OT only appears when scores are level.
         if (!endingFinalRegulation) {
+          setPeriodAskRegion('clock')
           setAskingPeriodInProgress(true)
         }
         break
@@ -324,6 +329,7 @@ export function ScoreboardPanelShadcn({
     setClockPeriod(fixtureId, draftPeriod)
     setEditingClock(false)
     if (clockEditTab === 'period') {
+      setPeriodAskRegion('stats')
       setAskingPeriodInProgress(true)
     }
   }
@@ -342,18 +348,19 @@ export function ScoreboardPanelShadcn({
   const canToggleClock =
     !clockLocked && canUsePlayPause && !showClockWheelEditor
 
-  const useClockEditPanel = showClockWheelEditor && showClockNumericEditor
-  // Period (QTR) and Variant B time edits use the bottom stats panel — no dialog.
-  // Wheel-only time edit still replaces the top clock face.
-  const editingClockPanel =
-    editingClock && (useClockEditPanel || clockEditTab === 'period')
-  const editingClockInline = editingClock && !editingClockPanel
-  const editingBottomPanel =
-    editingClockPanel ||
+  // Editors stay inside the region that opened them (clock face vs stats strip).
+  const editingClockTime = editingClock && clockEditTab === 'time'
+  const editingPeriodInStats = editingClock && clockEditTab === 'period'
+  const askingInClock =
+    askingPeriodInProgress && periodAskRegion === 'clock'
+  const askingInStats =
+    askingPeriodInProgress && periodAskRegion === 'stats'
+  const editingStatsRegion =
+    editingPeriodInStats ||
     editingDownDistance ||
     editingBallOn ||
-    askingPeriodInProgress
-  const bottomEditorTitle = askingPeriodInProgress
+    askingInStats
+  const statsEditorTitle = askingInStats
     ? 'period in progress?'
     : editingBallOn
       ? 'Edit ball on'
@@ -361,9 +368,7 @@ export function ScoreboardPanelShadcn({
         ? downDistanceTab === 'distance'
           ? 'Edit to go'
           : 'Edit down'
-        : clockEditTab === 'period'
-          ? 'Edit period'
-          : 'Edit clock'
+        : 'Edit period'
 
   const handleEndPeriod = (event: MouseEvent<HTMLButtonElement>) => {
     openConfirmation('endPeriod', event)
@@ -634,104 +639,6 @@ export function ScoreboardPanelShadcn({
               </Button>
             </div>
           </div>
-        ) : editingBottomPanel ? (
-          <div className="grid min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden rounded-lg border border-border">
-            <div className="shrink-0 border-b border-border px-3 py-2">
-              <p className="text-center text-sm font-semibold text-foreground">
-                {bottomEditorTitle}
-              </p>
-            </div>
-            <div className="flex min-h-0 flex-1 items-center justify-center overflow-auto px-2 py-3">
-              {askingPeriodInProgress ? null : editingBallOn ? (
-                <BallOnEditor
-                  key={ballOnSession}
-                  ballOn={draftBallOn}
-                  onBallOnChange={setDraftBallOn}
-                  rulesetId={rulesetId}
-                />
-              ) : editingDownDistance ? (
-                <DownDistanceEditor
-                  key={downDistanceSession}
-                  down={draftDown}
-                  distance={draftDistance}
-                  onDownChange={setDraftDown}
-                  onDistanceChange={setDraftDistance}
-                  initialTab={downDistanceTab}
-                  rulesetId={rulesetId}
-                />
-              ) : (
-                <ClockNumericEditor
-                  key={clockEditSession}
-                  period={draftPeriod}
-                  minutes={draftMinutes}
-                  seconds={draftSeconds}
-                  onPeriodChange={setDraftPeriod}
-                  onMinutesChange={setDraftMinutes}
-                  onSecondsChange={setDraftSeconds}
-                  initialTab={clockEditTab}
-                  minutesInputRef={clockMinutesInputRef}
-                />
-              )}
-            </div>
-            <div className="flex shrink-0 gap-2 border-t border-border bg-background p-2">
-              {askingPeriodInProgress ? (
-                <>
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    className={cn(
-                      'h-10 min-h-10 flex-1 shrink-0 touch-manipulation',
-                      OPERATOR_SECONDARY_SURFACE,
-                    )}
-                    onClick={() => handlePeriodInProgressAnswer(true)}
-                  >
-                    Yes
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    className={cn(
-                      'h-10 min-h-10 flex-1 shrink-0 touch-manipulation',
-                      OPERATOR_SECONDARY_SURFACE,
-                    )}
-                    onClick={() => handlePeriodInProgressAnswer(false)}
-                  >
-                    No
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="h-10 min-h-10 flex-1 shrink-0 touch-manipulation"
-                    onClick={
-                      editingBallOn
-                        ? handleCancelBallOnEdit
-                        : editingDownDistance
-                          ? handleCancelDownDistanceEdit
-                          : handleCancelClockEdit
-                    }
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="button"
-                    className="h-10 min-h-10 flex-1 shrink-0 touch-manipulation bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
-                    onClick={
-                      editingBallOn
-                        ? handleConfirmBallOnEdit
-                        : editingDownDistance
-                          ? handleConfirmDownDistanceEdit
-                          : handleConfirmClockEdit
-                    }
-                  >
-                    Confirm
-                  </Button>
-                </>
-              )}
-            </div>
-          </div>
         ) : (
           <>
             <div
@@ -764,16 +671,62 @@ export function ScoreboardPanelShadcn({
                     </Button>
                   </div>
                 </div>
-              ) : editingClockInline ? (
+              ) : askingInClock ? (
+                <div className="grid h-full min-h-0 flex-1 grid-rows-[minmax(0,1fr)_auto] overflow-hidden">
+                  <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-4 text-center">
+                    <p className="text-sm font-semibold text-foreground">
+                      period in progress?
+                    </p>
+                  </div>
+                  <div className="flex gap-2 border-t border-border bg-background p-2">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      className={cn(
+                        'h-8 min-h-8 flex-1 shrink-0 touch-manipulation',
+                        OPERATOR_SECONDARY_SURFACE,
+                      )}
+                      onClick={() => handlePeriodInProgressAnswer(true)}
+                    >
+                      Yes
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      className={cn(
+                        'h-8 min-h-8 flex-1 shrink-0 touch-manipulation',
+                        OPERATOR_SECONDARY_SURFACE,
+                      )}
+                      onClick={() => handlePeriodInProgressAnswer(false)}
+                    >
+                      No
+                    </Button>
+                  </div>
+                </div>
+              ) : editingClockTime ? (
                 <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
-                  <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden">
-                    <ClockWheelEditor
-                      key={clockEditSession}
-                      minutes={draftMinutes}
-                      seconds={draftSeconds}
-                      onMinutesChange={setDraftMinutes}
-                      onSecondsChange={setDraftSeconds}
-                    />
+                  <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden px-2 py-2">
+                    {showClockNumericEditor ? (
+                      <ClockNumericEditor
+                        key={clockEditSession}
+                        period={draftPeriod}
+                        minutes={draftMinutes}
+                        seconds={draftSeconds}
+                        onPeriodChange={setDraftPeriod}
+                        onMinutesChange={setDraftMinutes}
+                        onSecondsChange={setDraftSeconds}
+                        initialTab="time"
+                        minutesInputRef={clockMinutesInputRef}
+                      />
+                    ) : (
+                      <ClockWheelEditor
+                        key={clockEditSession}
+                        minutes={draftMinutes}
+                        seconds={draftSeconds}
+                        onMinutesChange={setDraftMinutes}
+                        onSecondsChange={setDraftSeconds}
+                      />
+                    )}
                   </div>
                   <div className="relative z-10 flex shrink-0 gap-2 border-t border-border bg-background p-2">
                     <Button
@@ -872,154 +825,266 @@ export function ScoreboardPanelShadcn({
             <div
               className={cn(
                 'grid min-h-0 flex-1 overflow-hidden rounded-lg border border-border',
-                showPossessionSwitch
-                  ? 'grid-rows-[minmax(0,1fr)_auto]'
-                  : 'grid-rows-[minmax(0,1fr)]',
+                editingStatsRegion
+                  ? 'grid-rows-[auto_minmax(0,1fr)_auto]'
+                  : showPossessionSwitch
+                    ? 'grid-rows-[minmax(0,1fr)_auto]'
+                    : 'grid-rows-[minmax(0,1fr)]',
               )}
             >
-              <div
-                className={cn(
-                  'flex min-h-0 items-stretch',
-                  stacked && 'min-h-10',
-                )}
-              >
-                <StatCell
-                  label="QTR"
-                  value={clockPeriod}
-                  displayValue={
-                    gameEnded ? MATCH_ENDED_STAT : formatPeriodLabel(clockPeriod)
-                  }
-                  compact={stacked}
-                  interactive={canOpenClockEditor}
-                  showEditIcon={canOpenClockEditor}
-                  onClick={
-                    canOpenClockEditor
-                      ? () => handleOpenClockEditor('period')
-                      : undefined
-                  }
-                  ariaLabel={
-                    canOpenClockEditor
-                      ? `Edit period, currently ${formatPeriodLabel(clockPeriod)}`
-                      : undefined
-                  }
-                  periodPhase={getPeriodPhase({
-                    periodActive,
-                    periodEnded,
-                    gameEnded,
-                  })}
-                  status={
-                    showQuarterStatus
-                      ? pregame || gameEnded
-                        ? 'ended'
-                        : getQuarterStatus({
-                            seconds: clockSeconds,
-                            running: clockRunning,
-                          })
-                      : undefined
-                  }
-                />
-                {showDownDistance ? (
-                  <>
+              {editingStatsRegion ? (
+                <>
+                  <div className="shrink-0 border-b border-border px-3 py-2">
+                    <p className="text-center text-sm font-semibold text-foreground">
+                      {statsEditorTitle}
+                    </p>
+                  </div>
+                  <div className="flex min-h-0 flex-1 items-center justify-center overflow-auto px-2 py-3">
+                    {askingInStats ? null : editingBallOn ? (
+                      <BallOnEditor
+                        key={ballOnSession}
+                        ballOn={draftBallOn}
+                        onBallOnChange={setDraftBallOn}
+                        rulesetId={rulesetId}
+                      />
+                    ) : editingDownDistance ? (
+                      <DownDistanceEditor
+                        key={downDistanceSession}
+                        down={draftDown}
+                        distance={draftDistance}
+                        onDownChange={setDraftDown}
+                        onDistanceChange={setDraftDistance}
+                        initialTab={downDistanceTab}
+                        rulesetId={rulesetId}
+                      />
+                    ) : (
+                      <ClockNumericEditor
+                        key={clockEditSession}
+                        period={draftPeriod}
+                        minutes={draftMinutes}
+                        seconds={draftSeconds}
+                        onPeriodChange={setDraftPeriod}
+                        onMinutesChange={setDraftMinutes}
+                        onSecondsChange={setDraftSeconds}
+                        initialTab="period"
+                      />
+                    )}
+                  </div>
+                  <div className="flex shrink-0 gap-2 border-t border-border bg-background p-2">
+                    {askingInStats ? (
+                      <>
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          className={cn(
+                            'h-8 min-h-8 flex-1 shrink-0 touch-manipulation',
+                            OPERATOR_SECONDARY_SURFACE,
+                          )}
+                          onClick={() => handlePeriodInProgressAnswer(true)}
+                        >
+                          Yes
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          className={cn(
+                            'h-8 min-h-8 flex-1 shrink-0 touch-manipulation',
+                            OPERATOR_SECONDARY_SURFACE,
+                          )}
+                          onClick={() => handlePeriodInProgressAnswer(false)}
+                        >
+                          No
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="h-8 min-h-8 flex-1 shrink-0 touch-manipulation"
+                          onClick={
+                            editingBallOn
+                              ? handleCancelBallOnEdit
+                              : editingDownDistance
+                                ? handleCancelDownDistanceEdit
+                                : handleCancelClockEdit
+                          }
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          type="button"
+                          className="h-8 min-h-8 flex-1 shrink-0 touch-manipulation bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
+                          onClick={
+                            editingBallOn
+                              ? handleConfirmBallOnEdit
+                              : editingDownDistance
+                                ? handleConfirmDownDistanceEdit
+                                : handleConfirmClockEdit
+                          }
+                        >
+                          Confirm
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div
+                    className={cn(
+                      'flex min-h-0 items-stretch',
+                      stacked && 'min-h-10',
+                    )}
+                  >
                     <StatCell
-                      label="DOWN"
-                      value={down}
-                      displayValue={gameEnded ? MATCH_ENDED_STAT : undefined}
+                      label="QTR"
+                      value={clockPeriod}
+                      displayValue={
+                        gameEnded
+                          ? MATCH_ENDED_STAT
+                          : formatPeriodLabel(clockPeriod)
+                      }
                       compact={stacked}
-                      interactive={canOpenDownDistanceEditor}
+                      interactive={canOpenClockEditor}
+                      showEditIcon={canOpenClockEditor}
                       onClick={
-                        canOpenDownDistanceEditor
-                          ? () => handleOpenDownDistanceEditor('down')
+                        canOpenClockEditor
+                          ? () => handleOpenClockEditor('period')
                           : undefined
                       }
                       ariaLabel={
-                        canOpenDownDistanceEditor
-                          ? `Edit down, currently ${down}`
+                        canOpenClockEditor
+                          ? `Edit period, currently ${formatPeriodLabel(clockPeriod)}`
+                          : undefined
+                      }
+                      periodPhase={getPeriodPhase({
+                        periodActive,
+                        periodEnded,
+                        gameEnded,
+                      })}
+                      status={
+                        showQuarterStatus
+                          ? pregame || gameEnded
+                            ? 'ended'
+                            : getQuarterStatus({
+                                seconds: clockSeconds,
+                                running: clockRunning,
+                              })
                           : undefined
                       }
                     />
-                    <StatCell
-                      label="TO GO"
-                      value={distance}
-                      displayValue={gameEnded ? MATCH_ENDED_STAT : undefined}
-                      compact={stacked}
-                      interactive={canOpenDownDistanceEditor}
-                      onClick={
-                        canOpenDownDistanceEditor
-                          ? () => handleOpenDownDistanceEditor('distance')
-                          : undefined
-                      }
-                      ariaLabel={
-                        canOpenDownDistanceEditor
-                          ? `Edit yards to go, currently ${distance}`
-                          : undefined
-                      }
-                    />
-                  </>
-                ) : null}
-                {showBallOn ? (
-                  <BallOnStatCell
-                    ballOn={ballOn}
-                    offenseIsHome={offenseIsHome}
-                    homeAttacksRight={homeAttacksRight}
-                    inactive={gameEnded}
-                    compact={stacked}
-                    showArrow={showBallOnArrow}
-                    interactive={canOpenBallOnEditor}
-                    onClick={
-                      canOpenBallOnEditor ? handleOpenBallOnEditor : undefined
-                    }
-                    ariaLabel={
-                      canOpenBallOnEditor
-                        ? `Edit ball on, currently ${ballOn}`
-                        : undefined
-                    }
-                    pulseEndColor="var(--card)"
-                    shellClassName="border-border"
-                    labelClassName="text-muted-foreground"
-                    valueClassName="text-foreground"
-                    rulesetId={rulesetId}
-                  />
-                ) : null}
-              </div>
+                    {showDownDistance ? (
+                      <>
+                        <StatCell
+                          label="DOWN"
+                          value={down}
+                          displayValue={
+                            gameEnded ? MATCH_ENDED_STAT : undefined
+                          }
+                          compact={stacked}
+                          interactive={canOpenDownDistanceEditor}
+                          onClick={
+                            canOpenDownDistanceEditor
+                              ? () => handleOpenDownDistanceEditor('down')
+                              : undefined
+                          }
+                          ariaLabel={
+                            canOpenDownDistanceEditor
+                              ? `Edit down, currently ${down}`
+                              : undefined
+                          }
+                        />
+                        <StatCell
+                          label="TO GO"
+                          value={distance}
+                          displayValue={
+                            gameEnded ? MATCH_ENDED_STAT : undefined
+                          }
+                          compact={stacked}
+                          interactive={canOpenDownDistanceEditor}
+                          onClick={
+                            canOpenDownDistanceEditor
+                              ? () =>
+                                  handleOpenDownDistanceEditor('distance')
+                              : undefined
+                          }
+                          ariaLabel={
+                            canOpenDownDistanceEditor
+                              ? `Edit yards to go, currently ${distance}`
+                              : undefined
+                          }
+                        />
+                      </>
+                    ) : null}
+                    {showBallOn ? (
+                      <BallOnStatCell
+                        ballOn={ballOn}
+                        offenseIsHome={offenseIsHome}
+                        homeAttacksRight={homeAttacksRight}
+                        inactive={gameEnded}
+                        compact={stacked}
+                        showArrow={showBallOnArrow}
+                        interactive={canOpenBallOnEditor}
+                        onClick={
+                          canOpenBallOnEditor
+                            ? handleOpenBallOnEditor
+                            : undefined
+                        }
+                        ariaLabel={
+                          canOpenBallOnEditor
+                            ? `Edit ball on, currently ${ballOn}`
+                            : undefined
+                        }
+                        pulseEndColor="var(--card)"
+                        shellClassName="border-border"
+                        labelClassName="text-muted-foreground"
+                        valueClassName="text-foreground"
+                        rulesetId={rulesetId}
+                      />
+                    ) : null}
+                  </div>
 
-              {showPossessionSwitch ? (
-                <div className="grid shrink-0 grid-cols-2 border-t border-border">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    disabled={gameEnded}
-                    onClick={() => setPossession(fixtureId, true)}
-                    aria-pressed={gameEnded ? false : possessionIsHome}
-                    aria-label={`Give possession to ${homeAbbr}`}
-                    className={cn(
-                      'h-8 min-h-8 rounded-none border-0 border-r border-border py-0 text-sm font-semibold',
-                      !gameEnded &&
-                        possessionIsHome &&
-                        'rounded-bl-lg bg-[var(--color-score-bg)] text-white hover:bg-[var(--color-score-bg)] hover:text-white',
-                    )}
-                  >
-                    {homeAbbr}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    disabled={gameEnded}
-                    onClick={() => setPossession(fixtureId, false)}
-                    aria-pressed={gameEnded ? false : !possessionIsHome}
-                    aria-label={`Give possession to ${awayAbbr}`}
-                    className={cn(
-                      'h-8 min-h-8 rounded-none border-0 py-0 text-sm font-semibold',
-                      !gameEnded &&
-                        !possessionIsHome &&
-                        'rounded-br-lg bg-[var(--color-score-bg)] text-white hover:bg-[var(--color-score-bg)] hover:text-white',
-                    )}
-                  >
-                    {awayAbbr}
-                  </Button>
-                </div>
-              ) : null}
+                  {showPossessionSwitch ? (
+                    <div className="grid shrink-0 grid-cols-2 border-t border-border">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        disabled={gameEnded}
+                        onClick={() => setPossession(fixtureId, true)}
+                        aria-pressed={gameEnded ? false : possessionIsHome}
+                        aria-label={`Give possession to ${homeAbbr}`}
+                        className={cn(
+                          'h-8 min-h-8 rounded-none border-0 border-r border-border py-0 text-sm font-semibold',
+                          !gameEnded &&
+                            possessionIsHome &&
+                            'rounded-bl-lg bg-[var(--color-score-bg)] text-white hover:bg-[var(--color-score-bg)] hover:text-white',
+                        )}
+                      >
+                        {homeAbbr}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        disabled={gameEnded}
+                        onClick={() => setPossession(fixtureId, false)}
+                        aria-pressed={gameEnded ? false : !possessionIsHome}
+                        aria-label={`Give possession to ${awayAbbr}`}
+                        className={cn(
+                          'h-8 min-h-8 rounded-none border-0 py-0 text-sm font-semibold',
+                          !gameEnded &&
+                            !possessionIsHome &&
+                            'rounded-br-lg bg-[var(--color-score-bg)] text-white hover:bg-[var(--color-score-bg)] hover:text-white',
+                        )}
+                      >
+                        {awayAbbr}
+                      </Button>
+                    </div>
+                  ) : null}
+                </>
+              )}
             </div>
           </>
         )}
