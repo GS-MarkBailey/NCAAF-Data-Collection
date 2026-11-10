@@ -777,10 +777,8 @@ export function ScoreboardPanelShadcn({
                   <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden">
                     <ClockWheelEditor
                       key={clockEditSession}
-                      period={draftPeriod}
                       minutes={draftMinutes}
                       seconds={draftSeconds}
-                      onPeriodChange={setDraftPeriod}
                       onMinutesChange={setDraftMinutes}
                       onSecondsChange={setDraftSeconds}
                     />

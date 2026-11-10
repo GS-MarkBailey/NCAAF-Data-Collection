@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
-import { MAX_PERIOD, MIN_PERIOD, CLOCK_EDIT_MAX_MINUTES, formatPeriodLabel, getClockEditSecondValues } from '@/lib/clock'
+import { CLOCK_EDIT_MAX_MINUTES, getClockEditSecondValues } from '@/lib/clock'
 
 const ITEM_HEIGHT = 28
 const INITIAL_SCROLL_SUPPRESS_MS = 400
@@ -9,10 +9,6 @@ export const CLOCK_WHEEL_VIEWPORT_HEIGHT = ITEM_HEIGHT * 3
 
 export const CLOCK_MINUTE_VALUES = Array.from({ length: 16 }, (_, index) => index)
 export const CLOCK_SECOND_VALUES = Array.from({ length: 60 }, (_, index) => index)
-export const CLOCK_PERIOD_VALUES = Array.from(
-  { length: MAX_PERIOD - MIN_PERIOD + 1 },
-  (_, index) => MIN_PERIOD + index,
-)
 
 interface ClockWheelColumnProps {
   values: number[]
@@ -180,19 +176,16 @@ export function ClockWheelColumn({
 }
 
 interface ClockWheelEditorProps {
-  period: number
   minutes: number
   seconds: number
-  onPeriodChange: (period: number) => void
   onMinutesChange: (minutes: number) => void
   onSecondsChange: (seconds: number) => void
 }
 
+/** Time-only scroll wheels (period is edited from the QTR cell). */
 export function ClockWheelEditor({
-  period,
   minutes,
   seconds,
-  onPeriodChange,
   onMinutesChange,
   onSecondsChange,
 }: ClockWheelEditorProps) {
@@ -211,15 +204,6 @@ export function ClockWheelEditor({
       className="flex w-full items-center justify-center gap-1.5 overflow-hidden px-1"
       style={{ height: CLOCK_WHEEL_VIEWPORT_HEIGHT }}
     >
-      <ClockWheelColumn
-        values={CLOCK_PERIOD_VALUES}
-        value={period}
-        onChange={onPeriodChange}
-        formatValue={(option) => formatPeriodLabel(option)}
-      />
-      <span className="shrink-0 self-center text-xl font-bold leading-none text-muted-foreground">
-        ·
-      </span>
       <ClockWheelColumn
         values={CLOCK_MINUTE_VALUES}
         value={minutes}
