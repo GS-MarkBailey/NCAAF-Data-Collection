@@ -458,7 +458,7 @@ With **Match-state guide** on, scheduled fixtures open in **pregame** so the ful
 - Events log CSV (Settings → Log or Collected datapoints → CSV): `mins, seconds, datapoint, ball on, period, drive, play, down, to go` — **mins/seconds are wall-clock elapsed** from the first event (not game clock)
 - Scoreboard edits (Start/Pause, ±1s, clock/period set, down, to go, possession, end period / OT / end game) also append datapoints to that log
 - Scoreboard header has an **END PERIOD** action (Undo-sized, red) after **Start** begins the period (kickoff not required); confirming end period advances **QTR** and resets the clock to **15:00** (final regulation period still parks at 0:00 for OT / end game)
-- Tap **END PERIOD** → clock face Confirm/Cancel and QTR status **End Pending**; confirm ends the period, then **period in progress?** Yes / No (stats strip for QTR edit; clock face for END PERIOD)
+- Tap **END PERIOD** → clock face **Cancel / Confirm** (Confirm is the default) and QTR status **End Pending**; confirm ends the period, then **period in progress?** with **Yes / No** options in the body (stats strip for QTR edit; clock face for END PERIOD)
 - **Undo** is a global header icon (next to Collected datapoints) — reverses the last operator change across scoreboard, risks, possession, and play controls (not only play-control steps)
 - **END PLAY** appears when the chosen result is ready
 - Later quarters: confirm **END PERIOD** to open the next quarter at 15:00; press **Start** to run the clock (no Start Q / Kick off badges on the scoreboard)

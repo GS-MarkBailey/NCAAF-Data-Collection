@@ -657,14 +657,17 @@ export function ScoreboardPanelShadcn({
                   </div>
                   <div className="flex gap-2 border-t border-border bg-background p-2">
                     <Button
+                      type="button"
                       variant="outline"
-                      className="h-8 min-h-8 flex-1 shrink-0"
+                      className="h-8 min-h-8 flex-1 shrink-0 touch-manipulation"
                       onClick={handleCancelConfirmation}
                     >
                       Cancel
                     </Button>
                     <Button
-                      className="h-8 min-h-8 flex-1 shrink-0 bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
+                      type="button"
+                      autoFocus
+                      className="h-8 min-h-8 flex-1 shrink-0 touch-manipulation bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
                       onClick={handleConfirmAction}
                     >
                       Confirm
@@ -672,18 +675,22 @@ export function ScoreboardPanelShadcn({
                   </div>
                 </div>
               ) : askingInClock ? (
-                <div className="grid h-full min-h-0 flex-1 grid-rows-[minmax(0,1fr)_auto] overflow-hidden">
-                  <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-4 text-center">
-                    <p className="text-sm font-semibold text-foreground">
+                <div className="grid h-full min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)] overflow-hidden">
+                  <div className="shrink-0 border-b border-border px-3 py-2">
+                    <p className="text-center text-sm font-semibold text-foreground">
                       period in progress?
                     </p>
                   </div>
-                  <div className="flex gap-2 border-t border-border bg-background p-2">
+                  <div
+                    className="flex min-h-0 flex-1 items-center justify-center gap-2 px-3 py-3"
+                    role="group"
+                    aria-label="Period in progress"
+                  >
                     <Button
                       type="button"
                       variant="secondary"
                       className={cn(
-                        'h-8 min-h-8 flex-1 shrink-0 touch-manipulation',
+                        'h-10 min-h-10 flex-1 shrink-0 touch-manipulation',
                         OPERATOR_SECONDARY_SURFACE,
                       )}
                       onClick={() => handlePeriodInProgressAnswer(true)}
@@ -694,7 +701,7 @@ export function ScoreboardPanelShadcn({
                       type="button"
                       variant="secondary"
                       className={cn(
-                        'h-8 min-h-8 flex-1 shrink-0 touch-manipulation',
+                        'h-10 min-h-10 flex-1 shrink-0 touch-manipulation',
                         OPERATOR_SECONDARY_SURFACE,
                       )}
                       onClick={() => handlePeriodInProgressAnswer(false)}
@@ -730,14 +737,17 @@ export function ScoreboardPanelShadcn({
                   </div>
                   <div className="relative z-10 flex shrink-0 gap-2 border-t border-border bg-background p-2">
                     <Button
+                      type="button"
                       variant="outline"
-                      className="h-8 min-h-8 flex-1 shrink-0"
+                      className="h-8 min-h-8 flex-1 shrink-0 touch-manipulation"
                       onClick={handleCancelClockEdit}
                     >
                       Cancel
                     </Button>
                     <Button
-                      className="h-8 min-h-8 flex-1 shrink-0 bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
+                      type="button"
+                      autoFocus
+                      className="h-8 min-h-8 flex-1 shrink-0 touch-manipulation bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
                       onClick={handleConfirmClockEdit}
                     >
                       Confirm
@@ -826,7 +836,9 @@ export function ScoreboardPanelShadcn({
               className={cn(
                 'grid min-h-0 flex-1 overflow-hidden rounded-lg border border-border',
                 editingStatsRegion
-                  ? 'grid-rows-[auto_minmax(0,1fr)_auto]'
+                  ? askingInStats
+                    ? 'grid-rows-[auto_minmax(0,1fr)]'
+                    : 'grid-rows-[auto_minmax(0,1fr)_auto]'
                   : showPossessionSwitch
                     ? 'grid-rows-[minmax(0,1fr)_auto]'
                     : 'grid-rows-[minmax(0,1fr)]',
@@ -839,65 +851,69 @@ export function ScoreboardPanelShadcn({
                       {statsEditorTitle}
                     </p>
                   </div>
-                  <div className="flex min-h-0 flex-1 items-center justify-center overflow-auto px-2 py-3">
-                    {askingInStats ? null : editingBallOn ? (
-                      <BallOnEditor
-                        key={ballOnSession}
-                        ballOn={draftBallOn}
-                        onBallOnChange={setDraftBallOn}
-                        rulesetId={rulesetId}
-                      />
-                    ) : editingDownDistance ? (
-                      <DownDistanceEditor
-                        key={downDistanceSession}
-                        down={draftDown}
-                        distance={draftDistance}
-                        onDownChange={setDraftDown}
-                        onDistanceChange={setDraftDistance}
-                        initialTab={downDistanceTab}
-                        rulesetId={rulesetId}
-                      />
-                    ) : (
-                      <ClockNumericEditor
-                        key={clockEditSession}
-                        period={draftPeriod}
-                        minutes={draftMinutes}
-                        seconds={draftSeconds}
-                        onPeriodChange={setDraftPeriod}
-                        onMinutesChange={setDraftMinutes}
-                        onSecondsChange={setDraftSeconds}
-                        initialTab="period"
-                      />
-                    )}
-                  </div>
-                  <div className="flex shrink-0 gap-2 border-t border-border bg-background p-2">
-                    {askingInStats ? (
-                      <>
-                        <Button
-                          type="button"
-                          variant="secondary"
-                          className={cn(
-                            'h-8 min-h-8 flex-1 shrink-0 touch-manipulation',
-                            OPERATOR_SECONDARY_SURFACE,
-                          )}
-                          onClick={() => handlePeriodInProgressAnswer(true)}
-                        >
-                          Yes
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="secondary"
-                          className={cn(
-                            'h-8 min-h-8 flex-1 shrink-0 touch-manipulation',
-                            OPERATOR_SECONDARY_SURFACE,
-                          )}
-                          onClick={() => handlePeriodInProgressAnswer(false)}
-                        >
-                          No
-                        </Button>
-                      </>
-                    ) : (
-                      <>
+                  {askingInStats ? (
+                    <div
+                      className="flex min-h-0 flex-1 items-center justify-center gap-2 px-3 py-3"
+                      role="group"
+                      aria-label="Period in progress"
+                    >
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        className={cn(
+                          'h-10 min-h-10 flex-1 shrink-0 touch-manipulation',
+                          OPERATOR_SECONDARY_SURFACE,
+                        )}
+                        onClick={() => handlePeriodInProgressAnswer(true)}
+                      >
+                        Yes
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        className={cn(
+                          'h-10 min-h-10 flex-1 shrink-0 touch-manipulation',
+                          OPERATOR_SECONDARY_SURFACE,
+                        )}
+                        onClick={() => handlePeriodInProgressAnswer(false)}
+                      >
+                        No
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex min-h-0 flex-1 items-center justify-center overflow-auto px-2 py-3">
+                        {editingBallOn ? (
+                          <BallOnEditor
+                            key={ballOnSession}
+                            ballOn={draftBallOn}
+                            onBallOnChange={setDraftBallOn}
+                            rulesetId={rulesetId}
+                          />
+                        ) : editingDownDistance ? (
+                          <DownDistanceEditor
+                            key={downDistanceSession}
+                            down={draftDown}
+                            distance={draftDistance}
+                            onDownChange={setDraftDown}
+                            onDistanceChange={setDraftDistance}
+                            initialTab={downDistanceTab}
+                            rulesetId={rulesetId}
+                          />
+                        ) : (
+                          <ClockNumericEditor
+                            key={clockEditSession}
+                            period={draftPeriod}
+                            minutes={draftMinutes}
+                            seconds={draftSeconds}
+                            onPeriodChange={setDraftPeriod}
+                            onMinutesChange={setDraftMinutes}
+                            onSecondsChange={setDraftSeconds}
+                            initialTab="period"
+                          />
+                        )}
+                      </div>
+                      <div className="flex shrink-0 gap-2 border-t border-border bg-background p-2">
                         <Button
                           type="button"
                           variant="outline"
@@ -914,6 +930,7 @@ export function ScoreboardPanelShadcn({
                         </Button>
                         <Button
                           type="button"
+                          autoFocus
                           className="h-8 min-h-8 flex-1 shrink-0 touch-manipulation bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
                           onClick={
                             editingBallOn
@@ -925,9 +942,9 @@ export function ScoreboardPanelShadcn({
                         >
                           Confirm
                         </Button>
-                      </>
-                    )}
-                  </div>
+                      </div>
+                    </>
+                  )}
                 </>
               ) : (
                 <>
