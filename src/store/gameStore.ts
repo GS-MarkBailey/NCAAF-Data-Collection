@@ -1551,6 +1551,8 @@ export const useAppStore = create<AppStore>((set, get) => ({
               withScoreboardDatapoint(
                 {
                   ...base,
+                  // Ensure end-game / OT decision works even without kickoff.
+                  gameStarted: true,
                   periodEnded: endedMatch.periodEnded,
                   periodActive: false,
                   playInProgress: endedMatch.playInProgress,
@@ -1667,6 +1669,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
           game.periodEnded,
           game.clock,
           game.rulesetId,
+          game.score,
         )
       ) {
         return state
@@ -1724,7 +1727,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   endGame: (fixtureId) => {
     set((state) => {
       const game = state.games[fixtureId]
-      if (!game || !game.gameStarted || game.gameEnded) return state
+      if (!game || game.gameEnded) return state
 
       const atRegulationDecision =
         isAwaitingRegulationDecision(

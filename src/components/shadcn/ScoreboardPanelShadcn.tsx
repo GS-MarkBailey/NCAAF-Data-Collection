@@ -103,6 +103,8 @@ export function ScoreboardPanelShadcn({
   const setDistance = useAppStore((s) => s.setDistance)
   const setBallOn = useAppStore((s) => s.setBallOn)
   const setPeriodActive = useAppStore((s) => s.setPeriodActive)
+  const scoreHome = useAppStore((s) => s.games[fixtureId]?.score.home ?? 0)
+  const scoreAway = useAppStore((s) => s.games[fixtureId]?.score.away ?? 0)
   const showQuarterStatus = useFeatureFlag('scoreboard.quarterStatus')
   const showPossessionSwitch = useFeatureFlag('scoreboard.possessionSwitch')
   const showClockWheelEditor = useFeatureFlag('scoreboard.clockWheelEditor')
@@ -113,6 +115,8 @@ export function ScoreboardPanelShadcn({
   const showBallOn = useFeatureFlag('scoreboard.ballOn')
   const showBallOnArrow = useFeatureFlag('scoreboard.ballOnArrow')
   const stacked = layout === 'stack'
+  const score = { home: scoreHome, away: scoreAway }
+  const regulationPeriodCount = getFootballRuleset(rulesetId).regulationPeriods
 
   const [editingClock, setEditingClock] = useState(false)
   const [clockEditTab, setClockEditTab] = useState<ClockEditTab>('time')
@@ -180,9 +184,14 @@ export function ScoreboardPanelShadcn({
       seconds: clockSeconds,
       period: clockPeriod,
     },
+    rulesetId,
+    score,
   )
   const inOvertime = isOvertimePeriod(clockPeriod)
+  const atRegulationDecision =
+    awaitingRegulationDecision && periodEnded && !gameEnded
   const showEndOvertimeButton = inOvertime && !gameEnded
+  const showRegulationEndGame = atRegulationDecision
   const showPlayPauseButton = showPeriodManagement
     ? !gameEnded &&
       (periodInProgress || showStartPeriodButton)
@@ -282,13 +291,19 @@ export function ScoreboardPanelShadcn({
     if (!pendingConfirmation) return
 
     switch (pendingConfirmation) {
-      case 'endPeriod':
+      case 'endPeriod': {
+        const endingFinalRegulation = clockPeriod >= regulationPeriodCount
         endPeriod(fixtureId)
         setEditingClock(false)
         setEditingDownDistance(false)
         setEditingBallOn(false)
-        setAskingPeriodInProgress(true)
+        // Q4 (final regulation): show OT / end-game decision instead of
+        // "period in progress?" — OT only appears when scores are level.
+        if (!endingFinalRegulation) {
+          setAskingPeriodInProgress(true)
+        }
         break
+      }
       case 'endGame':
         endGame(fixtureId)
         break
@@ -467,7 +482,7 @@ export function ScoreboardPanelShadcn({
 
   const actionBadges = (
     <>
-      {showPeriodManagement && showStartOvertimeButton ? (
+      {showStartOvertimeButton ? (
         <Badge
           render={
             <button
@@ -481,7 +496,7 @@ export function ScoreboardPanelShadcn({
           Start overtime
         </Badge>
       ) : null}
-      {showPeriodManagement && showEndOvertimeButton ? (
+      {showEndOvertimeButton || showRegulationEndGame ? (
         <Badge
           render={
             <button
@@ -528,11 +543,10 @@ export function ScoreboardPanelShadcn({
 
   const showActionBar =
     gameEnded ||
-    (showPeriodManagement &&
-      (showStartPeriodButton ||
-        pregame ||
-        showStartOvertimeButton ||
-        showEndOvertimeButton)) ||
+    showStartOvertimeButton ||
+    showEndOvertimeButton ||
+    showRegulationEndGame ||
+    (showPeriodManagement && (showStartPeriodButton || pregame)) ||
     (showPlayPause && showPlayPauseButton)
 
   const clockEditButton = showClockWheelEditor ? (
@@ -581,7 +595,47 @@ export function ScoreboardPanelShadcn({
           stacked && 'gap-1.5',
         )}
       >
-        {editingBottomPanel ? (
+        {atRegulationDecision && !pendingConfirmation ? (
+          <div className="grid min-h-0 flex-1 grid-rows-[minmax(0,1fr)_auto] overflow-hidden rounded-lg border border-border">
+            <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-2 px-4 text-center">
+              <p className="text-sm font-semibold text-foreground">
+                {showStartOvertimeButton
+                  ? 'Scores are level'
+                  : 'Regulation complete'}
+              </p>
+              <p className="text-2xl font-bold tabular-nums text-foreground">
+                {scoreHome} – {scoreAway}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {showStartOvertimeButton
+                  ? 'Start overtime or end the game'
+                  : 'End the game to finalize the result'}
+              </p>
+            </div>
+            <div className="flex shrink-0 gap-2 border-t border-border bg-background p-2">
+              {showStartOvertimeButton ? (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className={cn(
+                    'h-10 min-h-10 flex-1 shrink-0 touch-manipulation',
+                    OPERATOR_SECONDARY_SURFACE,
+                  )}
+                  onClick={handleStartOvertime}
+                >
+                  Start overtime
+                </Button>
+              ) : null}
+              <Button
+                type="button"
+                className="h-10 min-h-10 flex-1 shrink-0 touch-manipulation bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
+                onClick={handleEndGame}
+              >
+                End game
+              </Button>
+            </div>
+          </div>
+        ) : editingBottomPanel ? (
           <div className="grid min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden rounded-lg border border-border">
             <div className="shrink-0 border-b border-border px-3 py-2">
               <p className="text-center text-sm font-semibold text-foreground">
@@ -776,21 +830,6 @@ export function ScoreboardPanelShadcn({
                       }
                     >
                       {clockEditButton}
-                      {showPeriodManagement &&
-                      awaitingRegulationDecision &&
-                      periodEnded ? (
-                        <div className="pointer-events-none absolute top-2 right-2 z-10 flex flex-col items-end gap-1">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            className="pointer-events-auto h-7 text-[10px] font-bold tracking-wider uppercase shadow-sm"
-                            onClick={handleEndGame}
-                          >
-                            End game
-                          </Button>
-                        </div>
-                      ) : null}
                     </div>
                     {clockNudgePlus}
                   </div>
@@ -826,21 +865,6 @@ export function ScoreboardPanelShadcn({
                     )}
                   >
                     {clockEditButton}
-                    {showPeriodManagement &&
-                    awaitingRegulationDecision &&
-                    periodEnded ? (
-                      <div className="pointer-events-none absolute top-2 right-2 z-10 flex flex-col items-end gap-1">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          className="pointer-events-auto h-7 text-[10px] font-bold tracking-wider uppercase shadow-sm"
-                          onClick={handleEndGame}
-                        >
-                          End game
-                        </Button>
-                      </div>
-                    ) : null}
                   </div>
                   {clockNudgePlus}
                   <div className="pointer-events-none absolute inset-x-2 bottom-2 flex justify-center gap-2">

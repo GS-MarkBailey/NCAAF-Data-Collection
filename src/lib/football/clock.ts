@@ -131,6 +131,11 @@ export function canEndCurrentPeriod(
   return clock.seconds >= 0
 }
 
+/** True when regulation ended with a tied score (OT is allowed). */
+export function scoresAreTied(score: { home: number; away: number }): boolean {
+  return score.home === score.away
+}
+
 /** True when the operator can start overtime after the final regulation period. */
 export function canStartOvertime(
   gameStarted: boolean,
@@ -138,13 +143,18 @@ export function canStartOvertime(
   periodEnded: boolean,
   clock: { seconds: number; period: number },
   rulesRef?: RulesetRef,
+  score?: { home: number; away: number },
 ): boolean {
-  return (
-    gameStarted &&
-    !gameEnded &&
-    periodEnded &&
-    isAwaitingRegulationDecision(gameStarted, gameEnded, clock, rulesRef)
-  )
+  if (
+    gameEnded ||
+    !periodEnded ||
+    !isAwaitingRegulationDecision(gameStarted, gameEnded, clock, rulesRef)
+  ) {
+    return false
+  }
+  // OT only when scores are level; callers without a score keep the legacy path.
+  if (score && !scoresAreTied(score)) return false
+  return true
 }
 
 /** True when the operator can start the next regulation period. */
@@ -164,13 +174,14 @@ export function canStartNextPeriod(
 }
 
 export function isAwaitingRegulationDecision(
-  gameStarted: boolean,
+  _gameStarted: boolean,
   gameEnded: boolean,
   clock: { seconds: number; period: number },
   rulesRef?: RulesetRef,
 ): boolean {
+  // Final regulation period parked at 0:00 — offer OT (if tied) or end game.
+  // gameStarted is not required: END PERIOD can run after Start without kickoff.
   return (
-    gameStarted &&
     !gameEnded &&
     clock.seconds === 0 &&
     clock.period === regulationPeriods(rulesRef)

@@ -4,7 +4,7 @@
 **Live demo:** https://ncaaf-data-collection.vercel.app  
 **Repository:** GitHub (auto-deployed to Vercel on each change)  
 **Period covered:** 16 June 2026 – 21 July 2026  
-**Last updated:** 10 Nov 2026 (snapshots synced automatically)
+**Last updated:** 10 Nov 2026 (overtime after tied Q4) (snapshots synced automatically)
 
 **Confluence images:** Auto-synced by GitHub Actions on push to `main` (capture → publish). Manual fallback: `npm run publish:confluence`.
 
@@ -475,6 +475,10 @@ Classic SNAP → yards → END PLAY remains available when Match-state guide is 
 ### 10 Nov — remove feature-flag UI
 
 Settings → **Features** (toggles, Confirm & deploy, Design variants panel) is removed so operators and the dev team work against one shipped configuration. Behaviour still loads from `feature-flag-defaults.json` in the repo; changing product defaults is a normal code change on `main`, not an in-app toggle.
+
+### 10 Nov — overtime after tied Q4
+
+Ending the final regulation period (Q4) parks the clock at **0:00** and opens a regulation decision on the Scoreboard: **Start overtime** when scores are level, plus **End game**. If the score is not tied, only **End game** is offered.
 
 ### Key interactions
 

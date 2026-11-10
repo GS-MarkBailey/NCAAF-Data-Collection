@@ -110,6 +110,7 @@ export interface MatchStateInput {
   playInProgress: boolean
   seriesKind: SeriesKind
   clock: { seconds: number; period: number; running: boolean }
+  score: { home: number; away: number }
 }
 
 export function toMatchStateInput(
@@ -122,6 +123,7 @@ export function toMatchStateInput(
     | 'playInProgress'
     | 'seriesKind'
     | 'clock'
+    | 'score'
   >,
 ): MatchStateInput {
   return {
@@ -132,6 +134,7 @@ export function toMatchStateInput(
     playInProgress: game.playInProgress ?? false,
     seriesKind: game.seriesKind ?? 'scrimmage',
     clock: game.clock ?? { seconds: 0, period: 1, running: false },
+    score: game.score ?? { home: 0, away: 0 },
   }
 }
 
@@ -297,13 +300,14 @@ function actionsForPhase(
           input.periodEnded,
           input.clock,
           input.rulesetId,
+          input.score,
         )
       ) {
         actions.unshift(
           action(
             'start_overtime',
             'Start overtime',
-            'Begin extra period(s)',
+            'Scores are level — begin extra period(s)',
           ),
         )
       }
