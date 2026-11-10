@@ -463,8 +463,13 @@ export function ScoreboardPanelShadcn({
   // Kickoff is not required — Start alone arms it.
   const showEndPeriodChip =
     periodActive && !gameEnded && !periodEnded && !inOvertime
+  // Same header slot as END PERIOD — after regulation ends (or during OT).
+  const showEndGameChip =
+    !showEndPeriodChip &&
+    !gameEnded &&
+    (showRegulationEndGame || showEndOvertimeButton)
 
-  const endPeriodHeaderAction = showEndPeriodChip ? (
+  const scoreboardHeaderAction = showEndPeriodChip ? (
     <CardAction className="static row-span-1 self-center justify-self-auto">
       <Button
         type="button"
@@ -476,6 +481,20 @@ export function ScoreboardPanelShadcn({
         onClick={handleEndPeriod}
       >
         END PERIOD
+      </Button>
+    </CardAction>
+  ) : showEndGameChip ? (
+    <CardAction className="static row-span-1 self-center justify-self-auto">
+      <Button
+        type="button"
+        variant="secondary"
+        size="sm"
+        title="End game"
+        aria-label="End game"
+        className="h-7 gap-1 border border-red-200 bg-red-50 px-2 text-xs font-medium text-red-800 hover:bg-red-100 hover:text-red-800"
+        onClick={handleEndGame}
+      >
+        END GAME
       </Button>
     </CardAction>
   ) : null
@@ -494,20 +513,6 @@ export function ScoreboardPanelShadcn({
           className={PRIMARY_ACTION_BADGE_CLASS}
         >
           Start overtime
-        </Badge>
-      ) : null}
-      {showEndOvertimeButton || showRegulationEndGame ? (
-        <Badge
-          render={
-            <button
-              type="button"
-              onClick={handleEndGame}
-              aria-label="End game"
-            />
-          }
-          className={PRIMARY_ACTION_BADGE_CLASS}
-        >
-          End game
         </Badge>
       ) : null}
       {gameEnded ? <Badge variant="secondary">Final</Badge> : null}
@@ -544,8 +549,6 @@ export function ScoreboardPanelShadcn({
   const showActionBar =
     gameEnded ||
     showStartOvertimeButton ||
-    showEndOvertimeButton ||
-    showRegulationEndGame ||
     (showPeriodManagement && (showStartPeriodButton || pregame)) ||
     (showPlayPause && showPlayPauseButton)
 
@@ -587,7 +590,7 @@ export function ScoreboardPanelShadcn({
           <LayoutGrid className="size-4 shrink-0 text-muted-foreground" />
           Scoreboard
         </CardTitle>
-        {endPeriodHeaderAction}
+        {scoreboardHeaderAction}
       </CardHeader>
       <CardContent
         className={cn(
