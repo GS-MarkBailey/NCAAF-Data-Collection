@@ -1183,9 +1183,7 @@ function StatCell({
       }
       className={cn(
         'relative flex h-full min-h-0 flex-1 flex-col items-center border-r border-border px-1 last:border-r-0',
-        compact
-          ? 'min-h-10 shrink-0 justify-center gap-0.5 py-1'
-          : 'justify-center gap-0.5 py-2 landscape-mobile:py-2',
+        compact ? 'min-h-10 shrink-0 py-1' : 'py-2 landscape-mobile:py-2',
         surfaceStyle?.className,
         pulsing && 'push-data-pulse',
         interactive &&
@@ -1206,27 +1204,29 @@ function StatCell({
           )}
         />
       ) : null}
-      <span
-        className={cn(
-          'font-medium uppercase tracking-wide text-muted-foreground leading-none',
-          compact ? 'text-[9px]' : 'text-[10px]',
-        )}
-      >
-        {label}
-      </span>
-      <span
-        className={cn(
-          'font-bold leading-none',
-          compact ? 'text-lg' : 'text-xl landscape-mobile:text-lg',
-        )}
-      >
-        {displayValue ?? value}
-      </span>
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-0.5">
+        <span
+          className={cn(
+            'font-medium uppercase tracking-wide text-muted-foreground leading-none',
+            compact ? 'text-[9px]' : 'text-[10px]',
+          )}
+        >
+          {label}
+        </span>
+        <span
+          className={cn(
+            'font-bold leading-none',
+            compact ? 'text-lg' : 'text-xl landscape-mobile:text-lg',
+          )}
+        >
+          {displayValue ?? value}
+        </span>
+      </div>
       {phaseLabel ? (
         <span
           className={cn(
-            'max-w-full truncate px-0.5 text-center font-semibold leading-none tracking-wide text-muted-foreground uppercase',
-            compact ? 'text-[7px]' : 'text-[8px]',
+            'max-w-full shrink-0 truncate px-0.5 text-center font-semibold leading-none tracking-wide text-muted-foreground uppercase',
+            compact ? 'pb-0.5 text-[7px]' : 'pb-1.5 text-[8px]',
           )}
         >
           {phaseLabel}

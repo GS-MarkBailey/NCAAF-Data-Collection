@@ -4,7 +4,7 @@
 **Live demo:** https://ncaaf-data-collection.vercel.app  
 **Repository:** GitHub (auto-deployed to Vercel on each change)  
 **Period covered:** 16 June 2026 – 21 July 2026  
-**Last updated:** 10 Nov 2026 (snapshots synced automatically)
+**Last updated:** 10 Nov 2026 (QTR status bottom-aligned) (snapshots synced automatically)
 
 **Confluence images:** Auto-synced by GitHub Actions on push to `main` (capture → publish). Manual fallback: `npm run publish:confluence`.
 
@@ -389,7 +389,7 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 **Scoreboard / clock polish**
 - Start/Pause chips: Play/Pause icons; green Start / red Pause with matching chip style; larger invisible tap target around the chip
 - Stat cells (DOWN, TO GO, QTR, ball-on): tighter spacing between label and value
-- **QTR** shows a small pencil when editable, plus a compact status under the number (**Not Started** / **In Progress** / **End Pending** / **Ended**); tap **END PERIOD** sets **End Pending** while Confirm/Cancel is open; tap **QTR / DOWN / TO GO / BL ON** fills only the stats strip (clock stays visible)
+- **QTR** shows a small pencil when editable, plus a compact status (**Not Started** / **In Progress** / **End Pending** / **Ended**) pinned to the bottom of the cell; tap **END PERIOD** sets **End Pending** while Confirm/Cancel is open; tap **QTR / DOWN / TO GO / BL ON** fills only the stats strip (clock stays visible)
 - Bottom scoreboard panel uses fill + hug: QTR / DOWN / TO GO / BL ON stretch to fill remaining height; possession is a short content-sized row under them
 - **Period (QTR) editing:** same iOS-style scroll wheel as the time picker (Q1–Q4, then OT…)
 - **DOWN / TO GO / BL ON editing:** same scroll wheel as the time picker (no −/+ steppers)
