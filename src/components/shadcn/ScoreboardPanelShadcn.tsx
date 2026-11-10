@@ -595,12 +595,7 @@ export function ScoreboardPanelShadcn({
         )}
       >
         {editingPeriodPanel ? (
-          <div className="grid min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden rounded-lg border border-border">
-            <div className="shrink-0 border-b border-border px-3 py-2">
-              <p className="text-center text-sm font-semibold text-foreground">
-                Edit period
-              </p>
-            </div>
+          <div className="grid min-h-0 flex-1 grid-rows-[minmax(0,1fr)_auto] overflow-hidden rounded-lg border border-border">
             <div className="min-h-0 flex-1 overflow-auto">
               <PeriodManagementEditor
                 key={clockEditSession}

@@ -383,7 +383,7 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 - Documented **supported phone display & browser settings** baseline (Default font, Bold off, Display Default, Zoom 100%)
 
 <!-- AUTO-SNAPSHOTS:week-4-shipped-design-variants:START -->
-![Inline clock edit — Time (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-numeric-editor.png) ![Period management — wheel + status](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-period-editor.png)
+![Inline clock edit — Time (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-numeric-editor.png) ![Period management — horizontal picker + status](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-period-editor.png)
 <!-- AUTO-SNAPSHOTS:week-4-shipped-design-variants:END -->
 
 **Scoreboard / clock polish**
@@ -391,7 +391,7 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 - Stat cells (DOWN, TO GO, QTR, ball-on): tighter spacing between label and value
 - Scoreboard stacks **QTR / DOWN / TO GO / BL ON** (and possession) **above** the clock face
 - **QTR** status: **Not Started** / **In-Progress** / **End Pending** / **Ended (Unconfirmed)** / **Ended (Confirmed)**; tap **END PERIOD** sets **End Pending** while Confirm/Cancel is open
-- **Period management (AC7):** tap QTR opens a full Scoreboard dialog with a **horizontal period scroller** (1–4, OT…) + status options and **Cancel / Confirm**. P1–P3: Not Started, In-Progress, Ended (Unconfirmed). P4 / OT also offer Ended (Confirmed). Not Started resets the clock to the period duration; confirming Ended (Unconfirmed) on P1–P3 opens the next period Not Started at full duration
+- **Period management (AC7):** tap QTR opens a full Scoreboard dialog (no title bar) with a **horizontal period scroller** (1–4, OT…) + compact status options and **Cancel / Confirm**. P1–P3: Not Started, In-Progress, Ended (Unconfirmed). P4 / OT also offer Ended (Confirmed). Not Started resets the clock to the period duration; confirming Ended (Unconfirmed) on P1–P3 opens the next period Not Started at full duration
 - Stats strip uses fill + hug; **DOWN / TO GO / BL ON** still use scroll wheels in the stats region
 - Inline Min/Sec numeric fields remain only when Variant B clock panel is enabled
 
@@ -497,11 +497,11 @@ Ending the final regulation period (Q4) parks the clock at **0:00** and opens a 
 
 - **Inline clock edits** — Variant B numeric time panel; period management (wheel + status)
 
-![Inline clock edit — Time (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-numeric-editor.png) ![Period management — wheel + status](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-period-editor.png)
+![Inline clock edit — Time (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-numeric-editor.png) ![Period management — horizontal picker + status](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-period-editor.png)
 
 - **Inline scoreboard edits** — stats strip above the clock; tap QTR / DOWN / TO GO / BL ON fills the stats strip only
 
-![Period management — wheel + status](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-period-editor.png) ![Inline down editor — scroll wheel](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/down-distance-editor.png) ![Inline ball-on editor — scroll wheel](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/ball-on-editor.png)
+![Period management — horizontal picker + status](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-period-editor.png) ![Inline down editor — scroll wheel](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/down-distance-editor.png) ![Inline ball-on editor — scroll wheel](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/ball-on-editor.png)
 
 - **Start / Pause chips** — Play/Pause icons with green Start / red Pause; larger invisible tap target
 
