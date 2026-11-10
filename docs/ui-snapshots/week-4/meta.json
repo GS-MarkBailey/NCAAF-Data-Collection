@@ -1,8 +1,8 @@
 {
   "label": "week-4",
   "portrait": true,
-  "capturedAt": "2026-11-09T11:03:42.775Z",
-  "baseUrl": "http://127.0.0.1:5173",
+  "capturedAt": "2026-11-10T11:56:38.731Z",
+  "baseUrl": "https://ncaaf-data-collection.vercel.app",
   "views": [
     "fixtures-landscape",
     "game-landscape"
@@ -33,11 +33,6 @@
       "file": "features/past-fixture-ended.png"
     },
     {
-      "id": "design-variants-panel",
-      "title": "Design variants in Features settings",
-      "file": "features/design-variants-panel.png"
-    },
-    {
       "id": "clock-numeric-editor",
       "title": "Inline clock edit — Time (Variant B)",
       "file": "features/clock-numeric-editor.png"
@@ -61,6 +56,21 @@
       "id": "ball-on-editor",
       "title": "Inline ball-on editor",
       "file": "features/ball-on-editor.png"
+    },
+    {
+      "id": "start-pause-chips",
+      "title": "Start / Pause clock chips",
+      "file": "features/start-pause-chips.png"
+    },
+    {
+      "id": "end-period-chip",
+      "title": "End period action on scoreboard header",
+      "file": "features/end-period-chip.png"
+    },
+    {
+      "id": "header-undo",
+      "title": "Global Undo in game header",
+      "file": "features/header-undo.png"
     },
     {
       "id": "profile-dialog",
