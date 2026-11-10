@@ -1,8 +1,8 @@
 {
   "label": "week-4",
   "portrait": true,
-  "capturedAt": "2026-11-10T14:18:46.146Z",
-  "baseUrl": "http://127.0.0.1:5173",
+  "capturedAt": "2026-11-10T14:37:33.208Z",
+  "baseUrl": "https://ncaaf-data-collection.vercel.app",
   "views": [
     "fixtures-landscape",
     "game-landscape"
@@ -36,11 +36,6 @@
       "id": "clock-numeric-editor",
       "title": "Inline clock edit — Time (Variant B)",
       "file": "features/clock-numeric-editor.png"
-    },
-    {
-      "id": "clock-period-editor",
-      "title": "Inline period edit — scroll wheel",
-      "file": "features/clock-period-editor.png"
     },
     {
       "id": "clock-side-nudge",
