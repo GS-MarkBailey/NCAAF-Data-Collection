@@ -391,7 +391,7 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 - Stat cells (DOWN, TO GO, QTR, ball-on): tighter spacing between label and value
 - Scoreboard stacks **QTR / DOWN / TO GO / BL ON** (and possession) **above** the clock face
 - **QTR** status: **Not Started** / **In-Progress** / **End Pending** / **Ended (Unconfirmed)** / **Ended (Confirmed)**; tap **END PERIOD** sets **End Pending** while Confirm/Cancel is open
-- **Period management (AC7):** tap QTR opens a full Scoreboard dialog with period wheel + status options and **Cancel / Confirm** (not a two-step Yes/No flow). P1–P3 statuses: Not Started, In-Progress, Ended (Unconfirmed). P4 / OT also offer Ended (Confirmed). Not Started resets the clock to the period duration; confirming Ended (Unconfirmed) on P1–P3 opens the next period Not Started at full duration
+- **Period management (AC7):** tap QTR opens a full Scoreboard dialog with a **horizontal period scroller** (1–4, OT…) + status options and **Cancel / Confirm**. P1–P3: Not Started, In-Progress, Ended (Unconfirmed). P4 / OT also offer Ended (Confirmed). Not Started resets the clock to the period duration; confirming Ended (Unconfirmed) on P1–P3 opens the next period Not Started at full duration
 - Stats strip uses fill + hug; **DOWN / TO GO / BL ON** still use scroll wheels in the stats region
 - Inline Min/Sec numeric fields remain only when Variant B clock panel is enabled
 

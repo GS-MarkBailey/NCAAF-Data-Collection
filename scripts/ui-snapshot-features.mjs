@@ -208,7 +208,7 @@ export const WEEK_FEATURES = {
     },
     {
       id: 'clock-period-editor',
-      title: 'Period management — wheel + status',
+      title: 'Period management — horizontal picker + status',
       path: '/game/NCAAF-2026-012',
       viewport: 'game-landscape',
       gameSetup: { fieldDirection: 'dismiss', errorToast: 'dismiss' },
@@ -223,6 +223,11 @@ export const WEEK_FEATURES = {
         await page.getByRole('button', { name: 'Confirm' }).waitFor({ state: 'visible' })
         await page.getByRole('group', { name: 'Edit period' }).waitFor({
           state: 'visible',
+          timeout: 5000,
+        })
+        // Horizontal strip includes OT after regulation periods
+        await page.getByRole('button', { name: 'OT', exact: true }).waitFor({
+          state: 'attached',
           timeout: 5000,
         })
         await page.getByRole('radiogroup', { name: 'Period status' }).waitFor({
