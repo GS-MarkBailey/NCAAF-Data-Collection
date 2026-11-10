@@ -1,5 +1,5 @@
 {
-  "stagedAt": "2026-11-09T11:04:29.293Z",
+  "stagedAt": "2026-11-10T12:11:37.677Z",
   "files": [
     {
       "relPath": "week-1/features/action-log.png",
@@ -86,10 +86,6 @@
       "attachmentName": "week-4--features--clock-side-nudge.png"
     },
     {
-      "relPath": "week-4/features/design-variants-panel.png",
-      "attachmentName": "week-4--features--design-variants-panel.png"
-    },
-    {
       "relPath": "week-4/features/down-distance-editor.png",
       "attachmentName": "week-4--features--down-distance-editor.png"
     },
@@ -104,6 +100,10 @@
     {
       "relPath": "week-4/features/fixtures-search.png",
       "attachmentName": "week-4--features--fixtures-search.png"
+    },
+    {
+      "relPath": "week-4/features/header-undo.png",
+      "attachmentName": "week-4--features--header-undo.png"
     },
     {
       "relPath": "week-4/features/past-fixture-ended.png",
