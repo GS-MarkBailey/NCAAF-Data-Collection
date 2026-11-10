@@ -57,14 +57,14 @@ export const FEATURE_FLAGS = [
     label: 'Field direction dialog',
     description: 'Prompt on first open to set attacking direction.',
     group: 'Game Console',
-    defaultEnabled: true,
+    defaultEnabled: false,
   },
   {
     id: 'game.errorToast',
     label: 'Fixture error toast',
     description: 'Demo error notification on the game console (dismissible).',
     group: 'Game Console',
-    defaultEnabled: true,
+    defaultEnabled: false,
   },
   {
     id: 'header.connectionStatus',
@@ -78,12 +78,12 @@ export const FEATURE_FLAGS = [
     label: 'Take Control button',
     description: 'Manual override mode for the game console.',
     group: 'Header',
-    defaultEnabled: true,
+    defaultEnabled: false,
   },
   {
     id: 'header.settings',
     label: 'Settings dialog',
-    description: 'Gear icon for field, log, and feature settings.',
+    description: 'Gear icon for field direction and action log.',
     group: 'Header',
     defaultEnabled: true,
   },
@@ -149,7 +149,7 @@ export const FEATURE_FLAGS = [
     description: 'Field-direction arrow beside the BL ON yard line.',
     group: 'Scoreboard',
     parent: 'scoreboard.ballOn',
-    defaultEnabled: true,
+    defaultEnabled: false,
   },
   {
     id: 'playControls.snap',
@@ -231,7 +231,7 @@ export const FEATURE_FLAGS = [
     label: 'Field direction tab',
     group: 'Settings',
     parent: 'header.settings',
-    defaultEnabled: true,
+    defaultEnabled: false,
   },
   {
     id: 'settings.actionLog',
@@ -247,14 +247,6 @@ export const FEATURE_FLAGS = [
       'Download events log CSV (mins, seconds, datapoint, ball on, period, drive, play, down, to go).',
     group: 'Settings',
     parent: 'settings.actionLog',
-    defaultEnabled: true,
-  },
-  {
-    id: 'settings.featureFlags',
-    label: 'Features tab',
-    description: 'Feature flag panel in Settings (always on so you can recover).',
-    group: 'Settings',
-    parent: 'header.settings',
     defaultEnabled: true,
   },
   {
@@ -282,15 +274,15 @@ export const FEATURE_FLAGS = [
     id: 'layout.displayResilience',
     label: 'Variant A — Display resilience',
     description:
-      'ORIGINAL off. ON: soft-caps font growth, safer safe-areas, and scrollable panels under large phone fonts / zoom.',
+      'Soft-caps font growth, safer safe-areas, and scrollable panels under large phone fonts / zoom.',
     group: 'Design variants',
-    defaultEnabled: false,
+    defaultEnabled: true,
   },
   {
     id: 'scoreboard.clockNumericEditor',
     label: 'Variant B — Clock edit panel',
     description:
-      'ORIGINAL off (inline scroll wheel). ON: tap the clock to open a dialog with direct number entry for period, minutes, and seconds.',
+      'Tap the clock for direct number entry (period / minutes / seconds) instead of the scroll wheel.',
     group: 'Design variants',
     parent: 'scoreboard.clockWheelEditor',
     defaultEnabled: false,
@@ -299,11 +291,8 @@ export const FEATURE_FLAGS = [
 
 export type FeatureFlagId = (typeof FEATURE_FLAGS)[number]['id']
 
-/** Cannot be turned off — prevents locking yourself out of Settings → Features. */
-export const LOCKED_ON_FEATURE_FLAGS: FeatureFlagId[] = [
-  'header.settings',
-  'settings.featureFlags',
-]
+/** Flags that must stay enabled in published defaults. */
+export const LOCKED_ON_FEATURE_FLAGS: FeatureFlagId[] = ['header.settings']
 
 export const FEATURE_FLAG_BY_ID = Object.fromEntries(
   FEATURE_FLAGS.map((flag) => [flag.id, flag]),

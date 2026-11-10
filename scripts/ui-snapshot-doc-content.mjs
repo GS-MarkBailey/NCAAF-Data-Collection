@@ -51,7 +51,7 @@ export const WEEK_INTERACTIONS = {
       featureIds: ['error-toast'],
     },
     {
-      text: '**Settings dialog** — Log | Field | Features tabs in a single gear entry point',
+      text: '**Settings dialog** — gear entry point for Log and Field tabs',
       featureIds: ['settings-tabs'],
     },
   ],
@@ -69,12 +69,8 @@ export const WEEK_INTERACTIONS = {
       featureIds: ['portrait-stack'],
     },
     {
-      text: '**Design variants** — Settings → Features → Design variants (Variant A display resilience, Variant B clock edit panel with Period / Time tabs)',
-      featureIds: [
-        'design-variants-panel',
-        'clock-numeric-editor',
-        'clock-period-editor',
-      ],
+      text: '**Inline clock edits** — Variant B numeric clock panel (period / time) and period editor',
+      featureIds: ['clock-numeric-editor', 'clock-period-editor'],
     },
     {
       text: '**Inline scoreboard edits** — tap QTR / DOWN / TO GO / BL ON fills the Scoreboard card content with the editor (no popup)',
@@ -139,11 +135,7 @@ export const WEEK_SHIPPED = {
     'match-ended': { featureIds: ['past-fixture-ended'] },
     'portrait-game': { featureIds: ['portrait-stack'] },
     'design-variants': {
-      featureIds: [
-        'design-variants-panel',
-        'clock-numeric-editor',
-        'clock-period-editor',
-      ],
+      featureIds: ['clock-numeric-editor', 'clock-period-editor'],
     },
     'clock-polish': {
       featureIds: ['start-pause-chips', 'clock-side-nudge', 'end-period-chip'],

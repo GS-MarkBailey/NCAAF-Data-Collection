@@ -4,7 +4,7 @@
 **Live demo:** https://ncaaf-data-collection.vercel.app  
 **Repository:** GitHub (auto-deployed to Vercel on each change)  
 **Period covered:** 16 June 2026 – 21 July 2026  
-**Last updated:** 9 Nov 2026 (snapshots synced automatically)
+**Last updated:** 10 Nov 2026 (snapshots synced automatically)
 
 **Confluence images:** Auto-synced by GitHub Actions on push to `main` (capture → publish). Manual fallback: `npm run publish:confluence`.
 
@@ -20,7 +20,7 @@ The prototype is intentionally demo-driven today: fixtures, scores, and play-by-
 
 ## Executive summary
 
-We built a mobile-first NCAAF data collection prototype from scratch in four weeks of active development. The app lets operators select a fixture, take control of a live game console, manage the clock and scoreboard, toggle risk flags, and review an action log — optimised for landscape and portrait phones, installable as a PWA, and configurable via deployable feature flags.
+We built a mobile-first NCAAF data collection prototype from scratch in four weeks of active development. The app lets operators select a fixture, take control of a live game console, manage the clock and scoreboard, toggle risk flags, and review an action log — optimised for landscape and portrait phones and installable as a PWA. Product behaviour is shipped as a single baked-in configuration (no in-app feature-flag toggles).
 
 Development moved in a clear arc: first map requirements and explore responsive layout in Figma, then establish the three-panel game console and deployment pipeline, then add operator-grade clock and period controls, then open up remote feature configuration, then polish fixtures and portrait iPhone, and most recently respond to **on-device feedback** with opt-in design variants (display resilience, numeric clock panel) while keeping the original UI as the default. The heaviest weeks were Week 1 (foundation) and Week 3 (game logic).
 
@@ -276,7 +276,7 @@ Supporting work included the connection status chip, fixture-scoped error toasts
 
 ![Fixture error toast](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/features/error-toast.png)
 
-- **Settings dialog** — Log | Field | Features tabs in a single gear entry point
+- **Settings dialog** — gear entry point for Log and Field tabs
 
 ![Settings dialog (Log / Field / Features)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-3/features/settings-tabs.png)
 <!-- AUTO-SNAPSHOTS:week-3-interactions:END -->
@@ -370,22 +370,20 @@ On the game page, portrait mode dropped tabs in favour of a vertical stack of pa
 - Feature flag renamed from `fixtures.filters` to `fixtures.search`
 
 **Publishing**
-- Code changes: push to GitHub `main` → Vercel auto-deploys
-- Feature flag defaults: Settings → Features → **Confirm & deploy** (separate from git push)
+- Code + product defaults: push to GitHub `main` → Vercel auto-deploys
 - Confluence build-in-public doc: auto-sync on push via GitHub Actions; manual `npm run publish:confluence`
 
 ### 21 July — device feedback & design variants
 
-Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX and display-scaling notes) drove a set of **design variants** plus operator polish. As of 21 July these are **on by default** for all users (still toggleable in Settings → Features).
+Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX and display-scaling notes) drove a set of **design variants** plus operator polish. Display resilience ships on by default; the numeric clock panel remains available via product defaults when enabled in repo config.
 
-**Design variants** (Settings → Features → **Design variants**)
-- Dedicated group with clear **Variant A / Variant B** labels and “Compare vs original” guidance
-- **Variant A — Display resilience:** soft-caps rem growth, improves bottom safe-area padding, allows console panels to scroll under larger fonts / bold text / display scaling / zoom
-- **Variant B — Clock edit panel:** tap the clock opens **Time**, tap **QTR** opens **Period** — each **inline in the bottom scoreboard panel** (no dialog / no Period↔Time switcher) with **− / +** steppers and direct entry
+**Design variants (shipped behaviour)**
+- **Display resilience:** soft-caps rem growth, safer bottom safe-area padding, scrollable panels under larger fonts / bold text / display scaling / zoom
+- **Clock edit panel:** when enabled in product defaults, tap the clock / QTR opens inline **− / +** steppers and direct entry in the Scoreboard card
 - Documented **supported phone display & browser settings** baseline (Default font, Bold off, Display Default, Zoom 100%)
 
 <!-- AUTO-SNAPSHOTS:week-4-shipped-design-variants:START -->
-![Design variants in Features settings](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/design-variants-panel.png) ![Inline clock edit — Time (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-numeric-editor.png) ![Inline period edit (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-period-editor.png)
+![Inline clock edit — Time (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-numeric-editor.png) ![Inline period edit (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-period-editor.png)
 <!-- AUTO-SNAPSHOTS:week-4-shipped-design-variants:END -->
 
 **Scoreboard / clock polish**
@@ -428,7 +426,7 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 **Play controls panel**
 - New console panel on the **right** of the game console (scoreboard / risk / play-by-play to the left): **SNAP**, **END PLAY**, and **+1 / +5 / −5 / −1** yard buttons
 - Snap starts a live play (pauses auto play-by-play sim); yard buttons move ball-on and update to-go; End Play advances down / first down / turnover on downs
-- Feature-flagged under Settings → Features → **Play Controls** (`game.playControls` + Snap / End play / Yard adjustments)
+- Play controls panel ships in the console (Snap / End play / Yard adjustments)
 
 <!-- AUTO-SNAPSHOTS:week-4-shipped-play-controls:START -->
 ![Play controls panel (idle)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/play-controls-idle.png) ![Play controls — choose rush / throw](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/play-controls-choose-type.png) ![Play controls — pass result after throw](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/play-controls-pass-result.png) ![Play controls panel (live play)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/play-controls-live.png)
@@ -474,6 +472,10 @@ Classic SNAP → yards → END PLAY remains available when Match-state guide is 
 **Publishing habit**
 - Finished app updates are pushed to `main` for Vercel; the build-in-public markdown (including screenshots) is kept in sync with shipped operator-visible changes
 
+### 10 Nov — remove feature-flag UI
+
+Settings → **Features** (toggles, Confirm & deploy, Design variants panel) is removed so operators and the dev team work against one shipped configuration. Behaviour still loads from `feature-flag-defaults.json` in the repo; changing product defaults is a normal code change on `main`, not an in-app toggle.
+
 ### Key interactions
 
 <!-- AUTO-SNAPSHOTS:week-4-interactions:START -->
@@ -489,9 +491,9 @@ Classic SNAP → yards → END PLAY remains available when Match-state guide is 
 
 ![Portrait game console (stacked panels)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/portrait-stack.png)
 
-- **Design variants** — Settings → Features → Design variants (Variant A display resilience, Variant B clock edit panel with Period / Time tabs)
+- **Inline clock edits** — Variant B numeric clock panel (period / time) and period editor
 
-![Design variants in Features settings](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/design-variants-panel.png) ![Inline clock edit — Time (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-numeric-editor.png) ![Inline period edit (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-period-editor.png)
+![Inline clock edit — Time (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-numeric-editor.png) ![Inline period edit (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-period-editor.png)
 
 - **Inline scoreboard edits** — tap QTR / DOWN / TO GO / BL ON fills the Scoreboard card content with the editor (no popup)
 
@@ -551,7 +553,7 @@ The table below is a checklist of what the prototype supports today on the live 
 | Play controls FLAG collection (logic ready; entry button temporarily hidden) | ⏸ |
 | Play-by-play (feature-flagged, off by default) | ✅ |
 | Action log + events CSV export (wall-clock mins/seconds + drive/play situation) | ✅ |
-| Feature flags with Vercel deploy (Confirm & deploy) | ✅ |
+| Shipped product defaults (`feature-flag-defaults.json` in repo) | ✅ |
 | Design variants group (A display resilience, B clock panel) | ✅ |
 | Connection status chip (feature-flagged) | ✅ |
 | Profile button + email dialog | ✅ |
@@ -569,7 +571,7 @@ The table below is a checklist of what the prototype supports today on the live 
 
 ### Overview
 
-The app is a single-page React application with no server-side rendering. Game and fixture state live in the browser; server interaction today is limited to fetching published feature flag defaults (`/feature-flag-defaults.json`) and posting new defaults through the deploy API. **Code** ships via git push to `main` (Vercel rebuilds automatically). **Feature flag defaults** ship separately via Settings → Features → Confirm & deploy, which commits `public/feature-flag-defaults.json` to GitHub and triggers another Vercel deploy.
+The app is a single-page React application with no server-side rendering. Game and fixture state live in the browser; product defaults load from `public/feature-flag-defaults.json` (no in-app toggle UI). **Code and product defaults** ship together via git push to `main` (Vercel rebuilds automatically).
 
 | Layer | Technology |
 |-------|------------|
@@ -578,7 +580,7 @@ The app is a single-page React application with no server-side rendering. Game a
 | State | Zustand |
 | Routing | React Router |
 | Hosting | Vercel |
-| Config | `feature-flag-defaults.json` + deploy API |
+| Config | `feature-flag-defaults.json` (repo-shipped) |
 | Data | In-memory fixtures & demo plays (no backend API yet) |
 
 ---
@@ -591,13 +593,11 @@ These are deliberate prototype boundaries or open items identified during the fo
 
 - Demo data only — no live feed or backend integration yet
 - Flag / penalty catalog + enforcement live in the game layer; play-controls **FLAG** entry is temporarily hidden (offsetting / 10-second runoff / decline-vs-result still need later work)
-- Feature flag deploy requires **Confirm & deploy** in Settings → Features (toggles alone are local preview); passphrase required on production if configured
-- Git push deploys code only — not in-browser feature flag drafts
 - Clock wheel initialisation on iPhone may need further device testing
 - Play-by-play simulation is synthetic, not tied to real game events
 - Connection status chip is UI-only (no real connectivity check)
 - Profile email is a placeholder (no auth yet)
-- Mobile layout is sensitive to system font size, bold text, display scaling, and browser zoom when using the **original** design — see supported settings under How to try it; **Display resilience** is an opt-in feature-flagged variant
+- Mobile layout is still sensitive to extreme system font size / zoom — see supported settings under How to try it; display resilience ships on by default
 
 ---
 
@@ -621,18 +621,8 @@ The game console is a fixed-height operator UI. System font size, bold text, dis
 
 **Devices verified for layout work:** Samsung Galaxy S24 Ultra, iPhone 13 Pro Max (portrait + landscape).
 
-**Optional design variants** (Settings → Features → **Design variants**):
-
-| Variant | Off (original) | On |
-|---------|----------------|----|
-| **A — Display resilience** | Fixed-height console as shipped | Soft font cap, safe-area padding, scrollable panels under large fonts/zoom |
-| **B — Clock edit panel** | Inline scroll wheels in the scoreboard | Dialog panel with direct number entry for Period · Min : Sec |
-
-Turn either off anytime to revert. Confirm & deploy to publish a variant as the app default.
-
 1. Open https://ncaaf-data-collection.vercel.app on a phone or desktop
 2. On iPhone: Safari → Share → Add to Home Screen for full-screen PWA
-3. Confirm phone font/display settings match the table above (or enable Display resilience to trial the variant)
+3. Confirm phone font/display settings match the table above
 4. Select a fixture from the list
-5. Set field direction on first open (if enabled)
-6. Use Take Control, clock, scoreboard, play controls, and risk panels as an operator would
+5. Use clock, scoreboard, play controls, and risk panels as an operator would

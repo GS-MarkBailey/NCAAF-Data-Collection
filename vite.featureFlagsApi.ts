@@ -38,9 +38,7 @@ export function featureFlagsApiPlugin(): Plugin {
               return
             }
 
-            for (const id of ['header.settings', 'settings.featureFlags'] as const) {
-              body.flags[id] = true
-            }
+            body.flags['header.settings'] = true
 
             const payload = {
               version: body.version ?? Date.now(),

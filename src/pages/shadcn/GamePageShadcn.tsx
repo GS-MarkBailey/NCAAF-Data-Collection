@@ -126,8 +126,7 @@ export function GamePageShadcn() {
         ) : (
           <div className="flex min-h-0 flex-1 items-center justify-center rounded-lg border border-dashed border-border md:hidden landscape-mobile:hidden">
             <p className="px-4 text-center text-sm text-muted-foreground">
-              All game console panels are disabled. Re-enable them in Settings →
-              Features.
+              All game console panels are disabled.
             </p>
           </div>
         )}
@@ -160,8 +159,7 @@ export function GamePageShadcn() {
         ) : (
           <div className="hidden min-h-0 flex-1 items-center justify-center rounded-lg border border-dashed border-border md:flex landscape-mobile:flex">
             <p className="px-4 text-center text-sm text-muted-foreground">
-              All game console panels are disabled. Re-enable them in Settings →
-              Features.
+              All game console panels are disabled.
             </p>
           </div>
         )}

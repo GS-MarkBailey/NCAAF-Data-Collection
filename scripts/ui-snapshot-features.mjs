@@ -191,25 +191,6 @@ export const WEEK_FEATURES = {
       },
     },
     {
-      id: 'design-variants-panel',
-      title: 'Design variants in Features settings',
-      path: '/game/NCAAF-2026-001',
-      viewport: 'game-landscape',
-      gameSetup: { fieldDirection: 'dismiss', errorToast: 'dismiss' },
-      async prepare(page) {
-        await page.getByRole('button', { name: /open settings/i }).click()
-        await page.getByRole('tab', { name: 'Features' }).click()
-        await page.getByRole('dialog').waitFor({ state: 'visible' })
-        const heading = page.getByRole('heading', { name: /design variants/i })
-        await heading.waitFor({ state: 'visible', timeout: 8000 })
-        await heading.scrollIntoViewIfNeeded()
-        await page.getByText(/Variant A — Display resilience/i).first().waitFor({
-          state: 'visible',
-          timeout: 5000,
-        })
-      },
-    },
-    {
       id: 'clock-numeric-editor',
       title: 'Inline clock edit — Time (Variant B)',
       path: '/game/NCAAF-2026-012',

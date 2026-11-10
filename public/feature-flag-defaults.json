@@ -1,6 +1,6 @@
 {
-  "version": 1791230536240,
-  "updatedAt": "2026-10-05T20:02:16.240Z",
+  "version": 1,
+  "updatedAt": "2026-11-10T12:00:00.000Z",
   "flags": {
     "game.scoreboard": true,
     "game.playByPlay": false,
@@ -15,7 +15,7 @@
     "scoreboard.possessionSwitch": true,
     "scoreboard.clockWheelEditor": true,
     "scoreboard.playPause": true,
-    "scoreboard.periodManagement": true,
+    "scoreboard.periodManagement": false,
     "scoreboard.downDistance": true,
     "scoreboard.ballOn": true,
     "scoreboard.ballOnArrow": false,
@@ -32,11 +32,10 @@
     "settings.fieldDirection": false,
     "settings.actionLog": true,
     "settings.csvExport": true,
-    "settings.featureFlags": true,
     "fixtures.search": true,
     "fixtures.pullToRefresh": true,
     "fixtures.statusChips": true,
     "layout.displayResilience": true,
-    "scoreboard.clockNumericEditor": true
+    "scoreboard.clockNumericEditor": false
   }
 }

@@ -60,6 +60,6 @@ Do not leave finished UI/app work, stale build-in-public prose, or missing scree
 
 After `capture:*`, `sync:confluence-doc`, or `publish:confluence`, also commit and push the generated docs/snapshot paths as above. When the user asks to republish Confluence, run `npm run publish:confluence` then push any sync artifacts.
 
-## Exception — feature flag defaults
+## Product defaults
 
-`public/feature-flag-defaults.json` only ships via **Confirm & deploy** in the app unless the user explicitly asks to commit those defaults. You may still add new flag keys with safe defaults when introducing a flag.
+`public/feature-flag-defaults.json` ships with normal git commits on `main` (there is no in-app Features / Confirm & deploy UI). Keep code defaults in `src/config/featureFlags.ts` aligned when changing shipped behaviour.

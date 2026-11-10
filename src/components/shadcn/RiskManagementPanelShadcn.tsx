@@ -113,7 +113,7 @@ export function RiskManagementPanelShadcn({
       <CardContent className="flex min-h-0 flex-1 flex-col">
         {visibleRisks.length === 0 ? (
           <p className="flex flex-1 items-center justify-center px-2 text-center text-sm text-muted-foreground">
-            All risk flags are disabled in Settings → Features.
+            All risk chips are disabled.
           </p>
         ) : (
           <ToggleGroup

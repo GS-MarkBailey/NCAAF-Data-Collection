@@ -204,7 +204,7 @@ export function PlayControlsPanelShadcn({
           />
         ) : !showSnap && !showEndPlay && !showYardAdjust ? (
           <p className="flex flex-1 items-center justify-center px-2 text-center text-sm text-muted-foreground">
-            Play controls are disabled in Settings → Features.
+            Play controls are disabled.
           </p>
         ) : classicButtons.length === 0 && !(showYardAdjust && canAdjustYards) ? (
           <p className="flex flex-1 items-center justify-center px-2 text-center text-sm text-muted-foreground">

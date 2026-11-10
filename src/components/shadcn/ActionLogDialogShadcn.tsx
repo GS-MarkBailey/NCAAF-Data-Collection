@@ -7,7 +7,6 @@ import {
 } from '@/lib/actionLog'
 import { downloadEventsLogCsv } from '@/lib/eventsLog'
 import { FieldDirectionPicker } from '@/components/game/FieldDirectionPicker'
-import { FeatureFlagsPanel } from '@/components/shadcn/FeatureFlagsPanel'
 import { useFeatureFlag } from '@/hooks/useFeatureFlag'
 import { useAppStore } from '@/store/gameStore'
 import type { UserAction } from '@/types/actions'
@@ -50,8 +49,8 @@ export function ActionLogDialogShadcn({ fixtureId }: ActionLogDialogShadcnProps)
   const showFieldTab = useFeatureFlag('settings.fieldDirection')
   const showLogTab = useFeatureFlag('settings.actionLog')
   const showCsvExport = useFeatureFlag('settings.csvExport')
-  const showFeaturesTab = useFeatureFlag('settings.featureFlags')
-  const defaultTab = showFieldTab ? 'field' : showLogTab ? 'log' : 'features'
+  const defaultTab = showFieldTab ? 'field' : 'log'
+  const tabCount = Number(showFieldTab) + Number(showLogTab)
 
   const reversed = [...actions].reverse()
 
@@ -68,7 +67,7 @@ export function ActionLogDialogShadcn({ fixtureId }: ActionLogDialogShadcnProps)
         <DialogHeader className="shrink-0 border-b border-border px-4 pt-4 pb-0">
           <DialogTitle>Settings</DialogTitle>
           <DialogDescription>
-            Field direction, action log, and feature flags
+            {showFieldTab ? 'Field direction and action log' : 'Action log'}
           </DialogDescription>
         </DialogHeader>
 
@@ -76,23 +75,20 @@ export function ActionLogDialogShadcn({ fixtureId }: ActionLogDialogShadcnProps)
           defaultValue={defaultTab}
           className="flex min-h-0 flex-1 flex-col gap-0"
         >
-          <TabsList className="mx-4 mt-3 w-[calc(100%-2rem)] shrink-0">
-            {showFieldTab ? (
-              <TabsTrigger value="field" className="flex-1">
-                Field
-              </TabsTrigger>
-            ) : null}
-            {showLogTab ? (
-              <TabsTrigger value="log" className="flex-1">
-                Log
-              </TabsTrigger>
-            ) : null}
-            {showFeaturesTab ? (
-              <TabsTrigger value="features" className="flex-1">
-                Features
-              </TabsTrigger>
-            ) : null}
-          </TabsList>
+          {tabCount > 1 ? (
+            <TabsList className="mx-4 mt-3 w-[calc(100%-2rem)] shrink-0">
+              {showFieldTab ? (
+                <TabsTrigger value="field" className="flex-1">
+                  Field
+                </TabsTrigger>
+              ) : null}
+              {showLogTab ? (
+                <TabsTrigger value="log" className="flex-1">
+                  Log
+                </TabsTrigger>
+              ) : null}
+            </TabsList>
+          ) : null}
 
           <div className="relative min-h-0 flex-1">
             {showFieldTab ? (
@@ -179,14 +175,6 @@ export function ActionLogDialogShadcn({ fixtureId }: ActionLogDialogShadcnProps)
                       </ol>
                     )}
                   </div>
-                </div>
-              </TabsContent>
-            ) : null}
-
-            {showFeaturesTab ? (
-              <TabsContent value="features" className={SETTINGS_TAB_CONTENT}>
-                <div className={`${SETTINGS_TAB_PANEL} h-full`}>
-                  <FeatureFlagsPanel />
                 </div>
               </TabsContent>
             ) : null}
