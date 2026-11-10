@@ -294,19 +294,24 @@ export const WEEK_FEATURES = {
     },
     {
       id: 'end-period-chip',
-      title: 'End period action on scoreboard header',
+      title: 'END PERIOD → QTR End Pending',
       path: '/game/NCAAF-2026-012',
       viewport: 'game-landscape',
       gameSetup: { fieldDirection: 'dismiss', errorToast: 'dismiss' },
       async prepare(page) {
-        // END PERIOD appears in the scoreboard header after Start (kickoff not required).
+        // END PERIOD appears after Start; clicking it arms End Pending on QTR.
         const start = page.getByRole('button', { name: 'Start clock' })
         await start.waitFor({ state: 'visible', timeout: 5000 })
         await start.click()
-        await page
+        const endPeriod = page
           .getByRole('button', { name: 'End period' })
           .filter({ visible: true })
-          .waitFor({ state: 'visible', timeout: 5000 })
+        await endPeriod.waitFor({ state: 'visible', timeout: 5000 })
+        await endPeriod.click()
+        await page.getByText('End Pending', { exact: true }).waitFor({
+          state: 'visible',
+          timeout: 5000,
+        })
       },
     },
     {

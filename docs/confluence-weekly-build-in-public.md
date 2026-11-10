@@ -4,7 +4,7 @@
 **Live demo:** https://ncaaf-data-collection.vercel.app  
 **Repository:** GitHub (auto-deployed to Vercel on each change)  
 **Period covered:** 16 June 2026 – 21 July 2026  
-**Last updated:** 10 Nov 2026 (snapshots synced automatically)
+**Last updated:** 10 Nov 2026 (QTR End Pending) (snapshots synced automatically)
 
 **Confluence images:** Auto-synced by GitHub Actions on push to `main` (capture → publish). Manual fallback: `npm run publish:confluence`.
 
@@ -389,7 +389,7 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 **Scoreboard / clock polish**
 - Start/Pause chips: Play/Pause icons; green Start / red Pause with matching chip style; larger invisible tap target around the chip
 - Stat cells (DOWN, TO GO, QTR, ball-on): tighter spacing between label and value
-- **QTR** shows a small pencil when editable, plus a compact status under the number (**Not Started** / **In Progress** / **Ended**); tap **QTR / DOWN / TO GO / BL ON** fills only the stats strip (clock stays visible); tap the clock fills only the clock face
+- **QTR** shows a small pencil when editable, plus a compact status under the number (**Not Started** / **In Progress** / **End Pending** / **Ended**); tap **END PERIOD** sets **End Pending** while Confirm/Cancel is open; tap **QTR / DOWN / TO GO / BL ON** fills only the stats strip (clock stays visible)
 - Bottom scoreboard panel uses fill + hug: QTR / DOWN / TO GO / BL ON stretch to fill remaining height; possession is a short content-sized row under them
 - **Period (QTR) editing:** same iOS-style scroll wheel as the time picker (Q1–Q4, then OT…)
 - **DOWN / TO GO / BL ON editing:** same scroll wheel as the time picker (no −/+ steppers)
@@ -400,7 +400,7 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 <!-- AUTO-SNAPSHOTS:week-4-shipped-down-distance:END -->
 
 <!-- AUTO-SNAPSHOTS:week-4-shipped-clock-polish:START -->
-![Start / Pause clock chips](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/start-pause-chips.png) ![Clock ±1 second side buttons](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-side-nudge.png) ![End period action on scoreboard header](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/end-period-chip.png)
+![Start / Pause clock chips](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/start-pause-chips.png) ![Clock ±1 second side buttons](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-side-nudge.png) ![END PERIOD → QTR End Pending](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/end-period-chip.png)
 <!-- AUTO-SNAPSHOTS:week-4-shipped-clock-polish:END -->
 
 **Game header (landscape)**
@@ -458,7 +458,7 @@ With **Match-state guide** on, scheduled fixtures open in **pregame** so the ful
 - Events log CSV (Settings → Log or Collected datapoints → CSV): `mins, seconds, datapoint, ball on, period, drive, play, down, to go` — **mins/seconds are wall-clock elapsed** from the first event (not game clock)
 - Scoreboard edits (Start/Pause, ±1s, clock/period set, down, to go, possession, end period / OT / end game) also append datapoints to that log
 - Scoreboard header has an **END PERIOD** action (Undo-sized, red) after **Start** begins the period (kickoff not required); confirming end period advances **QTR** and resets the clock to **15:00** (final regulation period still parks at 0:00 for OT / end game)
-- After confirming a **period** edit or **END PERIOD**, **period in progress?** Yes / No appears in the same region that triggered it (stats strip for QTR edit; clock face for END PERIOD)
+- Tap **END PERIOD** → clock face Confirm/Cancel and QTR status **End Pending**; confirm ends the period, then **period in progress?** Yes / No (stats strip for QTR edit; clock face for END PERIOD)
 - **Undo** is a global header icon (next to Collected datapoints) — reverses the last operator change across scoreboard, risks, possession, and play controls (not only play-control steps)
 - **END PLAY** appears when the chosen result is ready
 - Later quarters: confirm **END PERIOD** to open the next quarter at 15:00; press **Start** to run the clock (no Start Q / Kick off badges on the scoreboard)
@@ -509,7 +509,7 @@ Ending the final regulation period (Q4) parks the clock at **0:00** and opens a 
 
 - **END PERIOD** — red header action on the Scoreboard card (Undo-sized) after Start begins the period
 
-![End period action on scoreboard header](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/end-period-chip.png)
+![END PERIOD → QTR End Pending](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/end-period-chip.png)
 
 - **Global Undo** — header icon next to Collected datapoints reverses the last operator change
 

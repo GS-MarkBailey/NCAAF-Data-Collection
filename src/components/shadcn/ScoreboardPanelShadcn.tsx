@@ -962,6 +962,7 @@ export function ScoreboardPanelShadcn({
                         periodActive,
                         periodEnded,
                         gameEnded,
+                        endPending: pendingConfirmation === 'endPeriod',
                       })}
                       status={
                         showQuarterStatus
@@ -1103,11 +1104,12 @@ const QUARTER_STATUS_CLASS: Record<
   ended: { className: 'bg-red-50', pulseEnd: '#fef2f2' },
 }
 
-type PeriodPhase = 'not_started' | 'in_progress' | 'ended'
+type PeriodPhase = 'not_started' | 'in_progress' | 'end_pending' | 'ended'
 
 const PERIOD_PHASE_LABEL: Record<PeriodPhase, string> = {
   not_started: 'Not Started',
   in_progress: 'In Progress',
+  end_pending: 'End Pending',
   ended: 'Ended',
 }
 
@@ -1117,6 +1119,7 @@ const PERIOD_PHASE_CLASS: Record<
 > = {
   not_started: { className: 'bg-amber-50', pulseEnd: '#fffbeb' },
   in_progress: { className: 'bg-emerald-50', pulseEnd: '#ecfdf5' },
+  end_pending: { className: 'bg-orange-50', pulseEnd: '#fff7ed' },
   ended: { className: 'bg-red-50', pulseEnd: '#fef2f2' },
 }
 
@@ -1124,8 +1127,11 @@ function getPeriodPhase(params: {
   periodActive: boolean
   periodEnded: boolean
   gameEnded: boolean
+  /** True while END PERIOD confirmation is open. */
+  endPending?: boolean
 }): PeriodPhase {
   if (params.gameEnded || params.periodEnded) return 'ended'
+  if (params.endPending) return 'end_pending'
   if (params.periodActive) return 'in_progress'
   return 'not_started'
 }
