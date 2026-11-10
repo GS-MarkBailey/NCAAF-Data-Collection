@@ -57,9 +57,11 @@ export function PeriodManagementEditor({
         <p className="shrink-0 text-center text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
           Status
         </p>
-        <div className="mx-auto flex w-full max-w-sm flex-col gap-0.5">
-          {available.map((option) => {
+        <div className="mx-auto grid w-full max-w-sm grid-cols-2 gap-1">
+          {available.map((option, index) => {
             const selected = option === status
+            const oddLast =
+              available.length % 2 === 1 && index === available.length - 1
             return (
               <Button
                 key={option}
@@ -69,7 +71,8 @@ export function PeriodManagementEditor({
                 variant="secondary"
                 size="sm"
                 className={cn(
-                  'h-7 min-h-7 w-full shrink-0 touch-manipulation justify-center px-2 text-xs font-medium',
+                  'h-8 min-h-8 w-full shrink-0 touch-manipulation justify-center px-2 text-xs font-medium',
+                  oddLast && 'col-span-2',
                   selected
                     ? 'border-[var(--color-brand)] bg-[var(--color-brand)]/10 text-foreground ring-1 ring-[var(--color-brand)]/40'
                     : OPERATOR_SECONDARY_SURFACE,
