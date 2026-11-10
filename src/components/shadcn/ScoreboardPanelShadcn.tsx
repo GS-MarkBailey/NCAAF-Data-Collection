@@ -138,6 +138,8 @@ export function ScoreboardPanelShadcn({
   const [ballOnSession, setBallOnSession] = useState(0)
   /** After confirming period edit / end period — Yes/No for periodActive. */
   const [askingPeriodInProgress, setAskingPeriodInProgress] = useState(false)
+  /** Draft answer while asking — defaults to Yes. */
+  const [draftPeriodInProgress, setDraftPeriodInProgress] = useState(true)
   /** Which scoreboard region shows the period-in-progress prompt. */
   const [periodAskRegion, setPeriodAskRegion] = useState<'clock' | 'stats'>(
     'stats',
@@ -255,8 +257,18 @@ export function ScoreboardPanelShadcn({
     setEditingBallOn(true)
   }
 
-  const handlePeriodInProgressAnswer = (inProgress: boolean) => {
-    setPeriodActive(fixtureId, inProgress)
+  const openPeriodInProgressAsk = (region: 'clock' | 'stats') => {
+    setPeriodAskRegion(region)
+    setDraftPeriodInProgress(true)
+    setAskingPeriodInProgress(true)
+  }
+
+  const handleCancelPeriodInProgressAsk = () => {
+    setAskingPeriodInProgress(false)
+  }
+
+  const handleConfirmPeriodInProgressAsk = () => {
+    setPeriodActive(fixtureId, draftPeriodInProgress)
     setAskingPeriodInProgress(false)
   }
 
@@ -300,8 +312,7 @@ export function ScoreboardPanelShadcn({
         // Q4 (final regulation): show OT / end-game decision instead of
         // "period in progress?" — OT only appears when scores are level.
         if (!endingFinalRegulation) {
-          setPeriodAskRegion('clock')
-          setAskingPeriodInProgress(true)
+          openPeriodInProgressAsk('clock')
         }
         break
       }
@@ -329,8 +340,7 @@ export function ScoreboardPanelShadcn({
     setClockPeriod(fixtureId, draftPeriod)
     setEditingClock(false)
     if (clockEditTab === 'period') {
-      setPeriodAskRegion('stats')
-      setAskingPeriodInProgress(true)
+      openPeriodInProgressAsk('stats')
     }
   }
 
@@ -675,7 +685,7 @@ export function ScoreboardPanelShadcn({
                   </div>
                 </div>
               ) : askingInClock ? (
-                <div className="grid h-full min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)] overflow-hidden">
+                <div className="grid h-full min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden">
                   <div className="shrink-0 border-b border-border px-3 py-2">
                     <p className="text-center text-sm font-semibold text-foreground">
                       period in progress?
@@ -683,30 +693,56 @@ export function ScoreboardPanelShadcn({
                   </div>
                   <div
                     className="flex min-h-0 flex-1 items-center justify-center gap-2 px-3 py-3"
-                    role="group"
+                    role="radiogroup"
                     aria-label="Period in progress"
                   >
                     <Button
                       type="button"
+                      role="radio"
+                      aria-checked={draftPeriodInProgress}
                       variant="secondary"
                       className={cn(
                         'h-10 min-h-10 flex-1 shrink-0 touch-manipulation',
-                        OPERATOR_SECONDARY_SURFACE,
+                        draftPeriodInProgress
+                          ? 'border-[var(--color-brand)] bg-[var(--color-brand)]/10 text-foreground ring-1 ring-[var(--color-brand)]/40'
+                          : OPERATOR_SECONDARY_SURFACE,
                       )}
-                      onClick={() => handlePeriodInProgressAnswer(true)}
+                      onClick={() => setDraftPeriodInProgress(true)}
                     >
                       Yes
                     </Button>
                     <Button
                       type="button"
+                      role="radio"
+                      aria-checked={!draftPeriodInProgress}
                       variant="secondary"
                       className={cn(
                         'h-10 min-h-10 flex-1 shrink-0 touch-manipulation',
-                        OPERATOR_SECONDARY_SURFACE,
+                        !draftPeriodInProgress
+                          ? 'border-[var(--color-brand)] bg-[var(--color-brand)]/10 text-foreground ring-1 ring-[var(--color-brand)]/40'
+                          : OPERATOR_SECONDARY_SURFACE,
                       )}
-                      onClick={() => handlePeriodInProgressAnswer(false)}
+                      onClick={() => setDraftPeriodInProgress(false)}
                     >
                       No
+                    </Button>
+                  </div>
+                  <div className="flex shrink-0 gap-2 border-t border-border bg-background p-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-8 min-h-8 flex-1 shrink-0 touch-manipulation"
+                      onClick={handleCancelPeriodInProgressAsk}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="button"
+                      autoFocus
+                      className="h-8 min-h-8 flex-1 shrink-0 touch-manipulation bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
+                      onClick={handleConfirmPeriodInProgressAsk}
+                    >
+                      Confirm
                     </Button>
                   </div>
                 </div>
@@ -836,9 +872,7 @@ export function ScoreboardPanelShadcn({
               className={cn(
                 'grid min-h-0 flex-1 overflow-hidden rounded-lg border border-border',
                 editingStatsRegion
-                  ? askingInStats
-                    ? 'grid-rows-[auto_minmax(0,1fr)]'
-                    : 'grid-rows-[auto_minmax(0,1fr)_auto]'
+                  ? 'grid-rows-[auto_minmax(0,1fr)_auto]'
                   : showPossessionSwitch
                     ? 'grid-rows-[minmax(0,1fr)_auto]'
                     : 'grid-rows-[minmax(0,1fr)]',
@@ -854,97 +888,107 @@ export function ScoreboardPanelShadcn({
                   {askingInStats ? (
                     <div
                       className="flex min-h-0 flex-1 items-center justify-center gap-2 px-3 py-3"
-                      role="group"
+                      role="radiogroup"
                       aria-label="Period in progress"
                     >
                       <Button
                         type="button"
+                        role="radio"
+                        aria-checked={draftPeriodInProgress}
                         variant="secondary"
                         className={cn(
                           'h-10 min-h-10 flex-1 shrink-0 touch-manipulation',
-                          OPERATOR_SECONDARY_SURFACE,
+                          draftPeriodInProgress
+                            ? 'border-[var(--color-brand)] bg-[var(--color-brand)]/10 text-foreground ring-1 ring-[var(--color-brand)]/40'
+                            : OPERATOR_SECONDARY_SURFACE,
                         )}
-                        onClick={() => handlePeriodInProgressAnswer(true)}
+                        onClick={() => setDraftPeriodInProgress(true)}
                       >
                         Yes
                       </Button>
                       <Button
                         type="button"
+                        role="radio"
+                        aria-checked={!draftPeriodInProgress}
                         variant="secondary"
                         className={cn(
                           'h-10 min-h-10 flex-1 shrink-0 touch-manipulation',
-                          OPERATOR_SECONDARY_SURFACE,
+                          !draftPeriodInProgress
+                            ? 'border-[var(--color-brand)] bg-[var(--color-brand)]/10 text-foreground ring-1 ring-[var(--color-brand)]/40'
+                            : OPERATOR_SECONDARY_SURFACE,
                         )}
-                        onClick={() => handlePeriodInProgressAnswer(false)}
+                        onClick={() => setDraftPeriodInProgress(false)}
                       >
                         No
                       </Button>
                     </div>
                   ) : (
-                    <>
-                      <div className="flex min-h-0 flex-1 items-center justify-center overflow-auto px-2 py-3">
-                        {editingBallOn ? (
-                          <BallOnEditor
-                            key={ballOnSession}
-                            ballOn={draftBallOn}
-                            onBallOnChange={setDraftBallOn}
-                            rulesetId={rulesetId}
-                          />
-                        ) : editingDownDistance ? (
-                          <DownDistanceEditor
-                            key={downDistanceSession}
-                            down={draftDown}
-                            distance={draftDistance}
-                            onDownChange={setDraftDown}
-                            onDistanceChange={setDraftDistance}
-                            initialTab={downDistanceTab}
-                            rulesetId={rulesetId}
-                          />
-                        ) : (
-                          <ClockNumericEditor
-                            key={clockEditSession}
-                            period={draftPeriod}
-                            minutes={draftMinutes}
-                            seconds={draftSeconds}
-                            onPeriodChange={setDraftPeriod}
-                            onMinutesChange={setDraftMinutes}
-                            onSecondsChange={setDraftSeconds}
-                            initialTab="period"
-                          />
-                        )}
-                      </div>
-                      <div className="flex shrink-0 gap-2 border-t border-border bg-background p-2">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          className="h-8 min-h-8 flex-1 shrink-0 touch-manipulation"
-                          onClick={
-                            editingBallOn
-                              ? handleCancelBallOnEdit
-                              : editingDownDistance
-                                ? handleCancelDownDistanceEdit
-                                : handleCancelClockEdit
-                          }
-                        >
-                          Cancel
-                        </Button>
-                        <Button
-                          type="button"
-                          autoFocus
-                          className="h-8 min-h-8 flex-1 shrink-0 touch-manipulation bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
-                          onClick={
-                            editingBallOn
-                              ? handleConfirmBallOnEdit
-                              : editingDownDistance
-                                ? handleConfirmDownDistanceEdit
-                                : handleConfirmClockEdit
-                          }
-                        >
-                          Confirm
-                        </Button>
-                      </div>
-                    </>
+                    <div className="flex min-h-0 flex-1 items-center justify-center overflow-auto px-2 py-3">
+                      {editingBallOn ? (
+                        <BallOnEditor
+                          key={ballOnSession}
+                          ballOn={draftBallOn}
+                          onBallOnChange={setDraftBallOn}
+                          rulesetId={rulesetId}
+                        />
+                      ) : editingDownDistance ? (
+                        <DownDistanceEditor
+                          key={downDistanceSession}
+                          down={draftDown}
+                          distance={draftDistance}
+                          onDownChange={setDraftDown}
+                          onDistanceChange={setDraftDistance}
+                          initialTab={downDistanceTab}
+                          rulesetId={rulesetId}
+                        />
+                      ) : (
+                        <ClockNumericEditor
+                          key={clockEditSession}
+                          period={draftPeriod}
+                          minutes={draftMinutes}
+                          seconds={draftSeconds}
+                          onPeriodChange={setDraftPeriod}
+                          onMinutesChange={setDraftMinutes}
+                          onSecondsChange={setDraftSeconds}
+                          initialTab="period"
+                        />
+                      )}
+                    </div>
                   )}
+                  <div className="flex shrink-0 gap-2 border-t border-border bg-background p-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-8 min-h-8 flex-1 shrink-0 touch-manipulation"
+                      onClick={
+                        askingInStats
+                          ? handleCancelPeriodInProgressAsk
+                          : editingBallOn
+                            ? handleCancelBallOnEdit
+                            : editingDownDistance
+                              ? handleCancelDownDistanceEdit
+                              : handleCancelClockEdit
+                      }
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="button"
+                      autoFocus
+                      className="h-8 min-h-8 flex-1 shrink-0 touch-manipulation bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
+                      onClick={
+                        askingInStats
+                          ? handleConfirmPeriodInProgressAsk
+                          : editingBallOn
+                            ? handleConfirmBallOnEdit
+                            : editingDownDistance
+                              ? handleConfirmDownDistanceEdit
+                              : handleConfirmClockEdit
+                      }
+                    >
+                      Confirm
+                    </Button>
+                  </div>
                 </>
               ) : (
                 <>
