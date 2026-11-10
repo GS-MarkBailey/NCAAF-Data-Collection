@@ -100,7 +100,7 @@ export interface GameState {
    */
   periodActive: boolean
   /**
-   * True when Ended (Confirmed) is set on the final regulation period or OT.
+   * True when Ended is set on the final regulation period or OT.
    * Arms the OT / end-game regulation decision.
    */
   periodEndConfirmed: boolean

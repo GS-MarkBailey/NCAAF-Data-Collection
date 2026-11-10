@@ -1073,8 +1073,8 @@ const PERIOD_PHASE_LABEL: Record<PeriodPhase, string> = {
   not_started: 'Not Started',
   in_progress: 'In-Progress',
   end_pending: 'End Pending',
-  ended_unconfirmed: 'Ended (Unconfirmed)',
-  ended_confirmed: 'Ended (Confirmed)',
+  ended_unconfirmed: 'End Pending',
+  ended_confirmed: 'Ended',
 }
 
 const PERIOD_PHASE_CLASS: Record<

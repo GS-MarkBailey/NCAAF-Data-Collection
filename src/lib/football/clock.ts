@@ -232,11 +232,11 @@ export type PeriodStatus =
 export const PERIOD_STATUS_LABEL: Record<PeriodStatus, string> = {
   not_started: 'Not Started',
   in_progress: 'In-Progress',
-  ended_unconfirmed: 'Ended (Unconfirmed)',
-  ended_confirmed: 'Ended (Confirmed)',
+  ended_unconfirmed: 'End Pending',
+  ended_confirmed: 'Ended',
 }
 
-/** Statuses available for a period (P1–P3 omit Ended Confirmed). */
+/** Statuses available for a period (P1–P3 omit Ended). */
 export function getAvailablePeriodStatuses(
   period: number,
   rulesRef?: RulesetRef,

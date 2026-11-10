@@ -390,8 +390,8 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 - Start/Pause chips: Play/Pause icons; green Start / red Pause with matching chip style; larger invisible tap target around the chip
 - Stat cells (DOWN, TO GO, QTR, ball-on): tighter spacing between label and value
 - Scoreboard stacks **QTR / DOWN / TO GO / BL ON** (and possession) **above** the clock face
-- **QTR** status: **Not Started** / **In-Progress** / **End Pending** / **Ended (Unconfirmed)** / **Ended (Confirmed)**; tap **END PERIOD** sets **End Pending** while Confirm/Cancel is open
-- **Period management (AC7):** tap QTR opens a full Scoreboard dialog (no title bar) with a **horizontal period scroller** (1–4, OT…) + compact status options and **Cancel / Confirm**. P1–P3: Not Started, In-Progress, Ended (Unconfirmed). P4 / OT also offer Ended (Confirmed). Not Started resets the clock to the period duration; confirming Ended (Unconfirmed) on P1–P3 opens the next period Not Started at full duration
+- **QTR** status: **Not Started** / **In-Progress** / **End Pending** / **Ended**; tap **END PERIOD** sets **End Pending** while Confirm/Cancel is open
+- **Period management (AC7):** tap QTR opens a full Scoreboard dialog (no title bar) with a **horizontal period scroller** (1–4, OT…) + compact status options and **Cancel / Confirm**. P1–P3: Not Started, In-Progress, End Pending. P4 / OT also offer Ended. Not Started resets the clock to the period duration; confirming End Pending on P1–P3 opens the next period Not Started at full duration
 - Stats strip uses fill + hug; **DOWN / TO GO / BL ON** still use scroll wheels in the stats region
 - Inline Min/Sec numeric fields remain only when Variant B clock panel is enabled
 
@@ -458,7 +458,7 @@ With **Match-state guide** on, scheduled fixtures open in **pregame** so the ful
 - Events log CSV (Settings → Log or Collected datapoints → CSV): `mins, seconds, datapoint, ball on, period, drive, play, down, to go` — **mins/seconds are wall-clock elapsed** from the first event (not game clock)
 - Scoreboard edits (Start/Pause, ±1s, clock/period set, down, to go, possession, end period / OT / end game) also append datapoints to that log
 - Scoreboard header has an **END PERIOD** action (Undo-sized, red) after **Start** begins the period (kickoff not required); confirming end period advances **QTR** and resets the clock to **15:00** (final regulation period still parks at 0:00 for OT / end game)
-- Tap **END PERIOD** → clock face **Cancel / Confirm** (Confirm default) and QTR **End Pending**; confirm ends the period (P1–P3 → next Not Started; P4 → Ended Unconfirmed until confirmed in period management)
+- Tap **END PERIOD** → clock face **Cancel / Confirm** (Confirm default) and QTR **End Pending**; confirm ends the period (P1–P3 → next Not Started; P4 → End Pending until set to Ended in period management)
 - **Undo** is a global header icon (next to Collected datapoints) — reverses the last operator change across scoreboard, risks, possession, and play controls (not only play-control steps)
 - **END PLAY** appears when the chosen result is ready
 - Later quarters: confirm **END PERIOD** to open the next quarter at 15:00; press **Start** to run the clock (no Start Q / Kick off badges on the scoreboard)

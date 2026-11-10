@@ -82,7 +82,7 @@ interface AppStore {
   /**
    * AC7 — set period number + lifecycle status in one confirm.
    * Not Started resets the clock to the configured period duration.
-   * Ended (Unconfirmed) on P1–P3 advances to the next period Not Started.
+   * End Pending on P1–P3 advances to the next period Not Started.
    */
   setPeriodManagement: (
     fixtureId: string,
@@ -713,7 +713,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
       }
       const flags = flagsForPeriodStatus(status)
 
-      // Ended (Unconfirmed) on P1–P3 → prepare next period Not Started + full clock.
+      // End Pending on P1–P3 → prepare next period Not Started + full clock.
       const advanceEarlyEnded =
         status === 'ended_unconfirmed' && toPeriod < rules.regulationPeriods
 
@@ -1687,7 +1687,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
                   gameStarted: true,
                   periodEnded: endedMatch.periodEnded,
                   periodActive: false,
-                  // END PERIOD leaves Ended (Unconfirmed); confirm via period edit.
+                  // END PERIOD leaves End Pending; confirm via period edit.
                   periodEndConfirmed: false,
                   playInProgress: endedMatch.playInProgress,
                   seriesKind: endedMatch.seriesKind,
