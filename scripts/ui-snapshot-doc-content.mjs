@@ -73,7 +73,7 @@ export const WEEK_INTERACTIONS = {
       featureIds: ['clock-numeric-editor', 'clock-period-editor'],
     },
     {
-      text: '**Inline scoreboard edits** — tap QTR / DOWN / TO GO / BL ON fills the stats strip only (clock stays visible)',
+      text: '**Inline scoreboard edits** — stats strip above the clock; tap QTR / DOWN / TO GO / BL ON fills the stats strip only',
       featureIds: [
         'clock-period-editor',
         'down-distance-editor',

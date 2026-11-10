@@ -389,8 +389,9 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 **Scoreboard / clock polish**
 - Start/Pause chips: Play/Pause icons; green Start / red Pause with matching chip style; larger invisible tap target around the chip
 - Stat cells (DOWN, TO GO, QTR, ball-on): tighter spacing between label and value
+- Scoreboard stacks **QTR / DOWN / TO GO / BL ON** (and possession) **above** the clock face
 - **QTR** shows a small pencil when editable, plus a compact status (**Not Started** / **In Progress** / **End Pending** / **Ended**) pinned to the bottom of the cell; tap **END PERIOD** sets **End Pending** while Confirm/Cancel is open; tap **QTR / DOWN / TO GO / BL ON** fills only the stats strip (clock stays visible)
-- Bottom scoreboard panel uses fill + hug: QTR / DOWN / TO GO / BL ON stretch to fill remaining height; possession is a short content-sized row under them
+- Stats strip uses fill + hug: QTR / DOWN / TO GO / BL ON stretch to fill remaining height; possession is a short content-sized row under them
 - **Period (QTR) editing:** same iOS-style scroll wheel as the time picker (Q1–Q4, then OT…)
 - **DOWN / TO GO / BL ON editing:** same scroll wheel as the time picker (no −/+ steppers)
 - Inline Min/Sec numeric fields remain only when Variant B clock panel is enabled
@@ -499,7 +500,7 @@ Ending the final regulation period (Q4) parks the clock at **0:00** and opens a 
 
 ![Inline clock edit — Time (Variant B)](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-numeric-editor.png) ![Inline period edit — scroll wheel](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-period-editor.png)
 
-- **Inline scoreboard edits** — tap QTR / DOWN / TO GO / BL ON fills the stats strip only (clock stays visible)
+- **Inline scoreboard edits** — stats strip above the clock; tap QTR / DOWN / TO GO / BL ON fills the stats strip only
 
 ![Inline period edit — scroll wheel](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-period-editor.png) ![Inline down editor — scroll wheel](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/down-distance-editor.png) ![Inline ball-on editor — scroll wheel](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/ball-on-editor.png)
 

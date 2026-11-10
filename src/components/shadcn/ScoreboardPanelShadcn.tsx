@@ -653,223 +653,6 @@ export function ScoreboardPanelShadcn({
           <>
             <div
               className={cn(
-                'relative flex min-h-0 flex-1 items-stretch overflow-hidden rounded-lg border border-border',
-              )}
-            >
-              {pendingConfirmation ? (
-                <div className="grid h-full min-h-0 flex-1 grid-rows-[minmax(0,1fr)_auto] overflow-hidden">
-                  <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-4 text-center">
-                    <p className="text-sm font-semibold text-foreground">
-                      {pendingConfirmation === 'endPeriod'
-                        ? `End Q${clockPeriod}?`
-                        : CONFIRMATION_TITLE[pendingConfirmation]}
-                    </p>
-                  </div>
-                  <div className="flex gap-2 border-t border-border bg-background p-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="h-8 min-h-8 flex-1 shrink-0 touch-manipulation"
-                      onClick={handleCancelConfirmation}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      type="button"
-                      autoFocus
-                      className="h-8 min-h-8 flex-1 shrink-0 touch-manipulation bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
-                      onClick={handleConfirmAction}
-                    >
-                      Confirm
-                    </Button>
-                  </div>
-                </div>
-              ) : askingInClock ? (
-                <div className="grid h-full min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden">
-                  <div className="shrink-0 border-b border-border px-3 py-2">
-                    <p className="text-center text-sm font-semibold text-foreground">
-                      period in progress?
-                    </p>
-                  </div>
-                  <div
-                    className="flex min-h-0 flex-1 items-center justify-center gap-2 px-3 py-3"
-                    role="radiogroup"
-                    aria-label="Period in progress"
-                  >
-                    <Button
-                      type="button"
-                      role="radio"
-                      aria-checked={draftPeriodInProgress}
-                      variant="secondary"
-                      className={cn(
-                        'h-10 min-h-10 flex-1 shrink-0 touch-manipulation',
-                        draftPeriodInProgress
-                          ? 'border-[var(--color-brand)] bg-[var(--color-brand)]/10 text-foreground ring-1 ring-[var(--color-brand)]/40'
-                          : OPERATOR_SECONDARY_SURFACE,
-                      )}
-                      onClick={() => setDraftPeriodInProgress(true)}
-                    >
-                      Yes
-                    </Button>
-                    <Button
-                      type="button"
-                      role="radio"
-                      aria-checked={!draftPeriodInProgress}
-                      variant="secondary"
-                      className={cn(
-                        'h-10 min-h-10 flex-1 shrink-0 touch-manipulation',
-                        !draftPeriodInProgress
-                          ? 'border-[var(--color-brand)] bg-[var(--color-brand)]/10 text-foreground ring-1 ring-[var(--color-brand)]/40'
-                          : OPERATOR_SECONDARY_SURFACE,
-                      )}
-                      onClick={() => setDraftPeriodInProgress(false)}
-                    >
-                      No
-                    </Button>
-                  </div>
-                  <div className="flex shrink-0 gap-2 border-t border-border bg-background p-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="h-8 min-h-8 flex-1 shrink-0 touch-manipulation"
-                      onClick={handleCancelPeriodInProgressAsk}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      type="button"
-                      autoFocus
-                      className="h-8 min-h-8 flex-1 shrink-0 touch-manipulation bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
-                      onClick={handleConfirmPeriodInProgressAsk}
-                    >
-                      Confirm
-                    </Button>
-                  </div>
-                </div>
-              ) : editingClockTime ? (
-                <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
-                  <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden px-2 py-2">
-                    {showClockNumericEditor ? (
-                      <ClockNumericEditor
-                        key={clockEditSession}
-                        period={draftPeriod}
-                        minutes={draftMinutes}
-                        seconds={draftSeconds}
-                        onPeriodChange={setDraftPeriod}
-                        onMinutesChange={setDraftMinutes}
-                        onSecondsChange={setDraftSeconds}
-                        initialTab="time"
-                        minutesInputRef={clockMinutesInputRef}
-                      />
-                    ) : (
-                      <ClockWheelEditor
-                        key={clockEditSession}
-                        minutes={draftMinutes}
-                        seconds={draftSeconds}
-                        onMinutesChange={setDraftMinutes}
-                        onSecondsChange={setDraftSeconds}
-                      />
-                    )}
-                  </div>
-                  <div className="relative z-10 flex shrink-0 gap-2 border-t border-border bg-background p-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="h-8 min-h-8 flex-1 shrink-0 touch-manipulation"
-                      onClick={handleCancelClockEdit}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      type="button"
-                      autoFocus
-                      className="h-8 min-h-8 flex-1 shrink-0 touch-manipulation bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
-                      onClick={handleConfirmClockEdit}
-                    >
-                      Confirm
-                    </Button>
-                  </div>
-                </div>
-              ) : stacked ? (
-                <div
-                  className={cn(
-                    'grid h-full min-h-0 flex-1 grid-rows-[minmax(0,1fr)_auto] overflow-hidden',
-                    clockSurfaceClassName,
-                  )}
-                >
-                  <div className="relative flex min-h-0 flex-1 items-stretch">
-                    {clockNudgeMinus}
-                    <div
-                      className={cn(
-                        'relative flex min-h-0 min-w-0 flex-1 items-center justify-center px-2',
-                        canToggleClock &&
-                          'cursor-pointer hover:bg-muted/40 active:bg-muted/60',
-                      )}
-                      role={canToggleClock ? 'button' : undefined}
-                      tabIndex={canToggleClock ? 0 : undefined}
-                      aria-label={
-                        gameEnded
-                          ? 'Game final'
-                          : canUsePlayPause
-                            ? paused
-                              ? 'Start clock'
-                              : 'Pause clock'
-                            : 'Game clock'
-                      }
-                      onClick={canToggleClock ? handleToggleClock : undefined}
-                      onKeyDown={
-                        canToggleClock ? handleContainerKeyDown : undefined
-                      }
-                    >
-                      {clockEditButton}
-                    </div>
-                    {clockNudgePlus}
-                  </div>
-                  {showActionBar ? (
-                    <div className="flex shrink-0 flex-wrap items-center justify-center gap-2 px-2 pb-2">
-                      {actionBadges}
-                    </div>
-                  ) : null}
-                </div>
-              ) : (
-                <div className={clockAreaClassName}>
-                  {clockNudgeMinus}
-                  <div
-                    role={canToggleClock ? 'button' : 'presentation'}
-                    tabIndex={canToggleClock ? 0 : undefined}
-                    aria-label={
-                      gameEnded
-                        ? 'Game final'
-                        : canUsePlayPause
-                          ? paused
-                            ? 'Start clock'
-                            : 'Pause clock'
-                          : 'Game clock'
-                    }
-                    onClick={canToggleClock ? handleToggleClock : undefined}
-                    onKeyDown={
-                      canToggleClock ? handleContainerKeyDown : undefined
-                    }
-                    className={cn(
-                      'relative flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center gap-2 px-2',
-                      canToggleClock &&
-                        'cursor-pointer hover:bg-muted/40 active:bg-muted/60',
-                    )}
-                  >
-                    {clockEditButton}
-                  </div>
-                  {clockNudgePlus}
-                  <div className="pointer-events-none absolute inset-x-2 bottom-2 flex justify-center gap-2">
-                    <div className="pointer-events-auto flex flex-wrap items-center justify-center gap-2">
-                      {actionBadges}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div
-              className={cn(
                 'grid min-h-0 flex-1 overflow-hidden rounded-lg border border-border',
                 editingStatsRegion
                   ? 'grid-rows-[auto_minmax(0,1fr)_auto]'
@@ -1146,6 +929,223 @@ export function ScoreboardPanelShadcn({
                     </div>
                   ) : null}
                 </>
+              )}
+            </div>
+
+            <div
+              className={cn(
+                'relative flex min-h-0 flex-1 items-stretch overflow-hidden rounded-lg border border-border',
+              )}
+            >
+              {pendingConfirmation ? (
+                <div className="grid h-full min-h-0 flex-1 grid-rows-[minmax(0,1fr)_auto] overflow-hidden">
+                  <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-4 text-center">
+                    <p className="text-sm font-semibold text-foreground">
+                      {pendingConfirmation === 'endPeriod'
+                        ? `End Q${clockPeriod}?`
+                        : CONFIRMATION_TITLE[pendingConfirmation]}
+                    </p>
+                  </div>
+                  <div className="flex gap-2 border-t border-border bg-background p-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-8 min-h-8 flex-1 shrink-0 touch-manipulation"
+                      onClick={handleCancelConfirmation}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="button"
+                      autoFocus
+                      className="h-8 min-h-8 flex-1 shrink-0 touch-manipulation bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
+                      onClick={handleConfirmAction}
+                    >
+                      Confirm
+                    </Button>
+                  </div>
+                </div>
+              ) : askingInClock ? (
+                <div className="grid h-full min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden">
+                  <div className="shrink-0 border-b border-border px-3 py-2">
+                    <p className="text-center text-sm font-semibold text-foreground">
+                      period in progress?
+                    </p>
+                  </div>
+                  <div
+                    className="flex min-h-0 flex-1 items-center justify-center gap-2 px-3 py-3"
+                    role="radiogroup"
+                    aria-label="Period in progress"
+                  >
+                    <Button
+                      type="button"
+                      role="radio"
+                      aria-checked={draftPeriodInProgress}
+                      variant="secondary"
+                      className={cn(
+                        'h-10 min-h-10 flex-1 shrink-0 touch-manipulation',
+                        draftPeriodInProgress
+                          ? 'border-[var(--color-brand)] bg-[var(--color-brand)]/10 text-foreground ring-1 ring-[var(--color-brand)]/40'
+                          : OPERATOR_SECONDARY_SURFACE,
+                      )}
+                      onClick={() => setDraftPeriodInProgress(true)}
+                    >
+                      Yes
+                    </Button>
+                    <Button
+                      type="button"
+                      role="radio"
+                      aria-checked={!draftPeriodInProgress}
+                      variant="secondary"
+                      className={cn(
+                        'h-10 min-h-10 flex-1 shrink-0 touch-manipulation',
+                        !draftPeriodInProgress
+                          ? 'border-[var(--color-brand)] bg-[var(--color-brand)]/10 text-foreground ring-1 ring-[var(--color-brand)]/40'
+                          : OPERATOR_SECONDARY_SURFACE,
+                      )}
+                      onClick={() => setDraftPeriodInProgress(false)}
+                    >
+                      No
+                    </Button>
+                  </div>
+                  <div className="flex shrink-0 gap-2 border-t border-border bg-background p-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-8 min-h-8 flex-1 shrink-0 touch-manipulation"
+                      onClick={handleCancelPeriodInProgressAsk}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="button"
+                      autoFocus
+                      className="h-8 min-h-8 flex-1 shrink-0 touch-manipulation bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
+                      onClick={handleConfirmPeriodInProgressAsk}
+                    >
+                      Confirm
+                    </Button>
+                  </div>
+                </div>
+              ) : editingClockTime ? (
+                <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
+                  <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden px-2 py-2">
+                    {showClockNumericEditor ? (
+                      <ClockNumericEditor
+                        key={clockEditSession}
+                        period={draftPeriod}
+                        minutes={draftMinutes}
+                        seconds={draftSeconds}
+                        onPeriodChange={setDraftPeriod}
+                        onMinutesChange={setDraftMinutes}
+                        onSecondsChange={setDraftSeconds}
+                        initialTab="time"
+                        minutesInputRef={clockMinutesInputRef}
+                      />
+                    ) : (
+                      <ClockWheelEditor
+                        key={clockEditSession}
+                        minutes={draftMinutes}
+                        seconds={draftSeconds}
+                        onMinutesChange={setDraftMinutes}
+                        onSecondsChange={setDraftSeconds}
+                      />
+                    )}
+                  </div>
+                  <div className="relative z-10 flex shrink-0 gap-2 border-t border-border bg-background p-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-8 min-h-8 flex-1 shrink-0 touch-manipulation"
+                      onClick={handleCancelClockEdit}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="button"
+                      autoFocus
+                      className="h-8 min-h-8 flex-1 shrink-0 touch-manipulation bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
+                      onClick={handleConfirmClockEdit}
+                    >
+                      Confirm
+                    </Button>
+                  </div>
+                </div>
+              ) : stacked ? (
+                <div
+                  className={cn(
+                    'grid h-full min-h-0 flex-1 grid-rows-[minmax(0,1fr)_auto] overflow-hidden',
+                    clockSurfaceClassName,
+                  )}
+                >
+                  <div className="relative flex min-h-0 flex-1 items-stretch">
+                    {clockNudgeMinus}
+                    <div
+                      className={cn(
+                        'relative flex min-h-0 min-w-0 flex-1 items-center justify-center px-2',
+                        canToggleClock &&
+                          'cursor-pointer hover:bg-muted/40 active:bg-muted/60',
+                      )}
+                      role={canToggleClock ? 'button' : undefined}
+                      tabIndex={canToggleClock ? 0 : undefined}
+                      aria-label={
+                        gameEnded
+                          ? 'Game final'
+                          : canUsePlayPause
+                            ? paused
+                              ? 'Start clock'
+                              : 'Pause clock'
+                            : 'Game clock'
+                      }
+                      onClick={canToggleClock ? handleToggleClock : undefined}
+                      onKeyDown={
+                        canToggleClock ? handleContainerKeyDown : undefined
+                      }
+                    >
+                      {clockEditButton}
+                    </div>
+                    {clockNudgePlus}
+                  </div>
+                  {showActionBar ? (
+                    <div className="flex shrink-0 flex-wrap items-center justify-center gap-2 px-2 pb-2">
+                      {actionBadges}
+                    </div>
+                  ) : null}
+                </div>
+              ) : (
+                <div className={clockAreaClassName}>
+                  {clockNudgeMinus}
+                  <div
+                    role={canToggleClock ? 'button' : 'presentation'}
+                    tabIndex={canToggleClock ? 0 : undefined}
+                    aria-label={
+                      gameEnded
+                        ? 'Game final'
+                        : canUsePlayPause
+                          ? paused
+                            ? 'Start clock'
+                            : 'Pause clock'
+                          : 'Game clock'
+                    }
+                    onClick={canToggleClock ? handleToggleClock : undefined}
+                    onKeyDown={
+                      canToggleClock ? handleContainerKeyDown : undefined
+                    }
+                    className={cn(
+                      'relative flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center gap-2 px-2',
+                      canToggleClock &&
+                        'cursor-pointer hover:bg-muted/40 active:bg-muted/60',
+                    )}
+                  >
+                    {clockEditButton}
+                  </div>
+                  {clockNudgePlus}
+                  <div className="pointer-events-none absolute inset-x-2 bottom-2 flex justify-center gap-2">
+                    <div className="pointer-events-auto flex flex-wrap items-center justify-center gap-2">
+                      {actionBadges}
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
           </>
