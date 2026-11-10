@@ -133,12 +133,9 @@ export function ScoreboardPanelShadcn({
   const [draftDown, setDraftDown] = useState(1)
   const [draftDistance, setDraftDistance] = useState(10)
   const [downDistanceSession, setDownDistanceSession] = useState(0)
-  const downInputRef = useRef<HTMLInputElement>(null)
-  const distanceInputRef = useRef<HTMLInputElement>(null)
   const [editingBallOn, setEditingBallOn] = useState(false)
   const [draftBallOn, setDraftBallOn] = useState(25)
   const [ballOnSession, setBallOnSession] = useState(0)
-  const ballOnInputRef = useRef<HTMLInputElement>(null)
   /** After confirming period edit / end period — Yes/No for periodActive. */
   const [askingPeriodInProgress, setAskingPeriodInProgress] = useState(false)
 
@@ -650,7 +647,6 @@ export function ScoreboardPanelShadcn({
                   key={ballOnSession}
                   ballOn={draftBallOn}
                   onBallOnChange={setDraftBallOn}
-                  inputRef={ballOnInputRef}
                   rulesetId={rulesetId}
                 />
               ) : editingDownDistance ? (
@@ -661,8 +657,6 @@ export function ScoreboardPanelShadcn({
                   onDownChange={setDraftDown}
                   onDistanceChange={setDraftDistance}
                   initialTab={downDistanceTab}
-                  downInputRef={downInputRef}
-                  distanceInputRef={distanceInputRef}
                   rulesetId={rulesetId}
                 />
               ) : (

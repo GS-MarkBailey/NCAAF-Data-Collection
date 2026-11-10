@@ -1,13 +1,10 @@
-import type { Ref } from 'react'
 import {
   clampDistance,
   clampDown,
   getFootballRuleset,
-  parseDistanceInput,
-  parseDownInput,
   type FootballCode,
 } from '@/lib/football'
-import { ScoreboardStepperField } from '@/components/game/ScoreboardStepperField'
+import { ScrollWheelField } from '@/components/game/ClockWheelEditor'
 
 export type DownDistanceEditTab = 'down' | 'distance'
 
@@ -17,10 +14,12 @@ interface DownDistanceEditorProps {
   onDownChange: (down: number) => void
   onDistanceChange: (distance: number) => void
   initialTab?: DownDistanceEditTab
-  downInputRef?: Ref<HTMLInputElement>
-  distanceInputRef?: Ref<HTMLInputElement>
   /** League rules pack — drives max downs (4 NCAA/NFL, 3 CFL). */
   rulesetId?: FootballCode
+}
+
+function rangeInclusive(min: number, max: number): number[] {
+  return Array.from({ length: max - min + 1 }, (_, index) => min + index)
 }
 
 export function DownDistanceEditor({
@@ -29,45 +28,27 @@ export function DownDistanceEditor({
   onDownChange,
   onDistanceChange,
   initialTab = 'down',
-  downInputRef,
-  distanceInputRef,
   rulesetId,
 }: DownDistanceEditorProps) {
   const rules = getFootballRuleset(rulesetId)
-  const clampedDown = clampDown(down, rules)
-  const clampedDistance = clampDistance(distance, rules)
 
   if (initialTab === 'distance') {
     return (
-      <ScoreboardStepperField
-        id="distance-edit-value"
-        label="To go"
-        value={clampedDistance}
-        displayValue={String(clampedDistance)}
-        min={rules.minDistance}
-        max={rules.maxDistance}
-        groupLabel="Edit yards to go"
-        autoFocus
-        inputRef={distanceInputRef}
-        parseInput={(raw) => parseDistanceInput(raw, rules)}
+      <ScrollWheelField
+        values={rangeInclusive(rules.minDistance, rules.maxDistance)}
+        value={clampDistance(distance, rules)}
         onChange={(next) => onDistanceChange(clampDistance(next, rules))}
+        groupLabel="Edit yards to go"
       />
     )
   }
 
   return (
-    <ScoreboardStepperField
-      id="down-edit-value"
-      label="Down"
-      value={clampedDown}
-      displayValue={String(clampedDown)}
-      min={rules.minDown}
-      max={rules.maxDown}
-      groupLabel="Edit down"
-      autoFocus
-      inputRef={downInputRef}
-      parseInput={(raw) => parseDownInput(raw, rules)}
+    <ScrollWheelField
+      values={rangeInclusive(rules.minDown, rules.maxDown)}
+      value={clampDown(down, rules)}
       onChange={(next) => onDownChange(clampDown(next, rules))}
+      groupLabel="Edit down"
     />
   )
 }

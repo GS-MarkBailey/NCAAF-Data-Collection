@@ -4,7 +4,7 @@
 **Live demo:** https://ncaaf-data-collection.vercel.app  
 **Repository:** GitHub (auto-deployed to Vercel on each change)  
 **Period covered:** 16 June 2026 – 21 July 2026  
-**Last updated:** 10 Nov 2026 (snapshots synced automatically)
+**Last updated:** 10 Nov 2026 (scoreboard scroll wheels) (snapshots synced automatically)
 
 **Confluence images:** Auto-synced by GitHub Actions on push to `main` (capture → publish). Manual fallback: `npm run publish:confluence`.
 
@@ -392,12 +392,11 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 - **QTR** shows a small pencil when editable, plus a compact status under the number (**Not Started** / **In Progress** / **Ended**); tap **QTR / DOWN / TO GO / BL ON** fills the whole Scoreboard card content with the editor (clock + stats hide until Cancel / Confirm)
 - Bottom scoreboard panel uses fill + hug: QTR / DOWN / TO GO / BL ON stretch to fill remaining height; possession is a short content-sized row under them
 - **Period (QTR) editing:** same iOS-style scroll wheel as the time picker (Q1–Q4, then OT…)
-- Inline steppers are mobile-friendly: − / value / + on one full-width row with 44px touch targets (panel title names the field; value flexes in narrow columns)
-- **DOWN / TO GO editing:** tap opens that field’s −/+ steppers and direct entry (no Down↔To go switcher)
-- **BL ON editing:** −/+ steppers and direct entry for offense-relative ball-on
+- **DOWN / TO GO / BL ON editing:** same scroll wheel as the time picker (no −/+ steppers)
+- Inline Min/Sec numeric fields remain only when Variant B clock panel is enabled
 
 <!-- AUTO-SNAPSHOTS:week-4-shipped-down-distance:START -->
-![Inline down & to-go editor](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/down-distance-editor.png) ![Inline ball-on editor](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/ball-on-editor.png)
+![Inline down editor — scroll wheel](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/down-distance-editor.png) ![Inline ball-on editor — scroll wheel](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/ball-on-editor.png)
 <!-- AUTO-SNAPSHOTS:week-4-shipped-down-distance:END -->
 
 <!-- AUTO-SNAPSHOTS:week-4-shipped-clock-polish:START -->
@@ -502,7 +501,7 @@ Ending the final regulation period (Q4) parks the clock at **0:00** and opens a 
 
 - **Inline scoreboard edits** — tap QTR / DOWN / TO GO / BL ON fills the Scoreboard card content with the editor (no popup)
 
-![Inline period edit — scroll wheel](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-period-editor.png) ![Inline down & to-go editor](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/down-distance-editor.png) ![Inline ball-on editor](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/ball-on-editor.png)
+![Inline period edit — scroll wheel](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/clock-period-editor.png) ![Inline down editor — scroll wheel](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/down-distance-editor.png) ![Inline ball-on editor — scroll wheel](https://raw.githubusercontent.com/GS-MarkBailey/NCAAF-Data-Collection/main/docs/ui-snapshots/week-4/features/ball-on-editor.png)
 
 - **Start / Pause chips** — Play/Pause icons with green Start / red Pause; larger invisible tap target
 
@@ -550,7 +549,7 @@ The table below is a checklist of what the prototype supports today on the live 
 | Take Control with confirmation (feature-flagged) | ✅ |
 | Clock edit — original inline wheel (tap clock time) | ✅ |
 | Clock edit — Variant B dialog with numeric entry (feature-flagged) | ✅ |
-| Down & to-go edit dialog (tap DOWN / TO GO; steppers + tabs) | ✅ |
+| QTR / DOWN / TO GO / BL ON edit — scroll wheel (same as time picker) | ✅ |
 | Play / pause clock with icons + colour chips (no kick-off required in MVP) | ✅ |
 | Full period / overtime / game-end flow (feature-flagged, off in MVP) | ✅ |
 | Field direction + quarter-end flip | ✅ |

@@ -247,7 +247,7 @@ export const WEEK_FEATURES = {
     },
     {
       id: 'down-distance-editor',
-      title: 'Inline down & to-go editor',
+      title: 'Inline down editor — scroll wheel',
       path: '/game/NCAAF-2026-012',
       viewport: 'game-landscape',
       gameSetup: { fieldDirection: 'dismiss', errorToast: 'dismiss' },
@@ -257,7 +257,7 @@ export const WEEK_FEATURES = {
           .filter({ visible: true })
           .click()
         await page.getByRole('button', { name: 'Confirm' }).waitFor({ state: 'visible' })
-        await page.getByRole('textbox', { name: 'Down' }).waitFor({
+        await page.getByRole('group', { name: 'Edit down' }).waitFor({
           state: 'visible',
           timeout: 5000,
         })
@@ -265,7 +265,7 @@ export const WEEK_FEATURES = {
     },
     {
       id: 'ball-on-editor',
-      title: 'Inline ball-on editor',
+      title: 'Inline ball-on editor — scroll wheel',
       path: '/game/NCAAF-2026-012',
       viewport: 'game-landscape',
       gameSetup: { fieldDirection: 'dismiss', errorToast: 'dismiss' },
@@ -275,7 +275,7 @@ export const WEEK_FEATURES = {
           .filter({ visible: true })
           .click()
         await page.getByRole('button', { name: 'Confirm' }).waitFor({ state: 'visible' })
-        await page.getByRole('textbox', { name: 'Ball on' }).waitFor({
+        await page.getByRole('group', { name: 'Edit ball on' }).waitFor({
           state: 'visible',
           timeout: 5000,
         })

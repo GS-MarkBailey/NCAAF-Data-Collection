@@ -1,7 +1,7 @@
 {
   "label": "week-4",
   "portrait": true,
-  "capturedAt": "2026-11-10T12:11:17.251Z",
+  "capturedAt": "2026-11-10T12:14:20.142Z",
   "baseUrl": "http://127.0.0.1:5173",
   "views": [
     "fixtures-landscape",
@@ -49,12 +49,12 @@
     },
     {
       "id": "down-distance-editor",
-      "title": "Inline down & to-go editor",
+      "title": "Inline down editor — scroll wheel",
       "file": "features/down-distance-editor.png"
     },
     {
       "id": "ball-on-editor",
-      "title": "Inline ball-on editor",
+      "title": "Inline ball-on editor — scroll wheel",
       "file": "features/ball-on-editor.png"
     },
     {

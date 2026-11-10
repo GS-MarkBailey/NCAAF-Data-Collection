@@ -232,6 +232,43 @@ export function ClockWheelEditor({
   )
 }
 
+interface ScrollWheelFieldProps {
+  values: number[]
+  value: number
+  onChange: (value: number) => void
+  groupLabel: string
+  formatValue?: (value: number) => string
+}
+
+/** Single-column scroll wheel — same interaction as the time picker. */
+export function ScrollWheelField({
+  values,
+  value,
+  onChange,
+  groupLabel,
+  formatValue = (option) => String(option),
+}: ScrollWheelFieldProps) {
+  const min = values[0] ?? value
+  const max = values[values.length - 1] ?? value
+  const clamped = Math.max(min, Math.min(max, value))
+
+  return (
+    <div
+      className="flex w-full items-center justify-center gap-1.5 overflow-hidden px-1"
+      style={{ height: CLOCK_WHEEL_VIEWPORT_HEIGHT }}
+      role="group"
+      aria-label={groupLabel}
+    >
+      <ClockWheelColumn
+        values={values}
+        value={clamped}
+        onChange={onChange}
+        formatValue={formatValue}
+      />
+    </div>
+  )
+}
+
 interface PeriodWheelEditorProps {
   period: number
   onPeriodChange: (period: number) => void
@@ -242,24 +279,13 @@ export function PeriodWheelEditor({
   period,
   onPeriodChange,
 }: PeriodWheelEditorProps) {
-  const clamped = Math.max(
-    MIN_PERIOD,
-    Math.min(CLOCK_PERIOD_WHEEL_MAX, period),
-  )
-
   return (
-    <div
-      className="flex w-full items-center justify-center gap-1.5 overflow-hidden px-1"
-      style={{ height: CLOCK_WHEEL_VIEWPORT_HEIGHT }}
-      role="group"
-      aria-label="Edit period"
-    >
-      <ClockWheelColumn
-        values={CLOCK_PERIOD_VALUES}
-        value={clamped}
-        onChange={onPeriodChange}
-        formatValue={(option) => formatPeriodLabel(option)}
-      />
-    </div>
+    <ScrollWheelField
+      values={CLOCK_PERIOD_VALUES}
+      value={period}
+      onChange={onPeriodChange}
+      groupLabel="Edit period"
+      formatValue={(option) => formatPeriodLabel(option)}
+    />
   )
 }

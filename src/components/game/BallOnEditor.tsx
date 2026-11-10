@@ -1,48 +1,35 @@
-import type { Ref } from 'react'
 import {
   clampBallOn,
   getFootballRuleset,
   type FootballCode,
 } from '@/lib/football'
-import { ScoreboardStepperField } from '@/components/game/ScoreboardStepperField'
+import { ScrollWheelField } from '@/components/game/ClockWheelEditor'
 
 interface BallOnEditorProps {
   /** Offense-relative yards from own goal. */
   ballOn: number
   onBallOnChange: (ballOn: number) => void
-  inputRef?: Ref<HTMLInputElement>
   rulesetId?: FootballCode
 }
 
-function parseBallOnInput(raw: string, rulesetId?: FootballCode): number | null {
-  const digits = raw.replace(/\D/g, '')
-  if (!digits) return null
-  return clampBallOn(Number.parseInt(digits, 10), rulesetId)
+function rangeInclusive(min: number, max: number): number[] {
+  return Array.from({ length: max - min + 1 }, (_, index) => min + index)
 }
 
-/** Mobile-friendly − / value / + editor for offense-relative ball-on. */
+/** Scroll-wheel editor for offense-relative ball-on — same as the time picker. */
 export function BallOnEditor({
   ballOn,
   onBallOnChange,
-  inputRef,
   rulesetId,
 }: BallOnEditorProps) {
   const rules = getFootballRuleset(rulesetId)
-  const clamped = clampBallOn(ballOn, rulesetId)
 
   return (
-    <ScoreboardStepperField
-      id="ball-on-edit-value"
-      label="Ball on"
-      value={clamped}
-      displayValue={String(clamped)}
-      min={rules.minBallOn}
-      max={rules.maxBallOn}
-      groupLabel="Edit ball on"
-      autoFocus
-      inputRef={inputRef}
-      parseInput={(raw) => parseBallOnInput(raw, rulesetId)}
+    <ScrollWheelField
+      values={rangeInclusive(rules.minBallOn, rules.maxBallOn)}
+      value={clampBallOn(ballOn, rulesetId)}
       onChange={onBallOnChange}
+      groupLabel="Edit ball on"
     />
   )
 }
