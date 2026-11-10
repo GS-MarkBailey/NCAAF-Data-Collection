@@ -4,7 +4,7 @@
 **Live demo:** https://ncaaf-data-collection.vercel.app  
 **Repository:** GitHub (auto-deployed to Vercel on each change)  
 **Period covered:** 16 June 2026 – 21 July 2026  
-**Last updated:** 10 Nov 2026 (snapshots synced automatically)
+**Last updated:** 10 Nov 2026 (AC7 period + status) (snapshots synced automatically)
 
 **Confluence images:** Auto-synced by GitHub Actions on push to `main` (capture → publish). Manual fallback: `npm run publish:confluence`.
 
@@ -379,7 +379,7 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 
 **Design variants (shipped behaviour)**
 - **Display resilience:** soft-caps rem growth, safer bottom safe-area padding, scrollable panels under larger fonts / bold text / display scaling / zoom
-- **Clock edit panel:** when enabled in product defaults, tap the clock opens inline **Min / Sec** numeric fields in the Scoreboard card; tap **QTR** always uses the same scroll wheel as the time picker
+- **Clock edit panel:** when enabled in product defaults, tap the clock opens inline **Min / Sec** numeric fields; tap **QTR** opens period management (wheel + status)
 - Documented **supported phone display & browser settings** baseline (Default font, Bold off, Display Default, Zoom 100%)
 
 <!-- AUTO-SNAPSHOTS:week-4-shipped-design-variants:START -->
@@ -390,10 +390,9 @@ Feedback from Galaxy S24 Ultra / iPhone 13 Pro Max operators (including timer UX
 - Start/Pause chips: Play/Pause icons; green Start / red Pause with matching chip style; larger invisible tap target around the chip
 - Stat cells (DOWN, TO GO, QTR, ball-on): tighter spacing between label and value
 - Scoreboard stacks **QTR / DOWN / TO GO / BL ON** (and possession) **above** the clock face
-- **QTR** shows a small pencil when editable, plus a compact status (**Not Started** / **In Progress** / **End Pending** / **Ended**) pinned to the bottom of the cell; tap **END PERIOD** sets **End Pending** while Confirm/Cancel is open; tap **QTR / DOWN / TO GO / BL ON** fills only the stats strip (clock stays visible)
-- Stats strip uses fill + hug: QTR / DOWN / TO GO / BL ON stretch to fill remaining height; possession is a short content-sized row under them
-- **Period (QTR) editing:** same iOS-style scroll wheel as the time picker (Q1–Q4, then OT…)
-- **DOWN / TO GO / BL ON editing:** same scroll wheel as the time picker (no −/+ steppers)
+- **QTR** status: **Not Started** / **In-Progress** / **End Pending** / **Ended (Unconfirmed)** / **Ended (Confirmed)**; tap **END PERIOD** sets **End Pending** while Confirm/Cancel is open
+- **Period management (AC7):** tap QTR opens a full Scoreboard dialog with period wheel + status options and **Cancel / Confirm** (not a two-step Yes/No flow). P1–P3 statuses: Not Started, In-Progress, Ended (Unconfirmed). P4 / OT also offer Ended (Confirmed). Not Started resets the clock to the period duration; confirming Ended (Unconfirmed) on P1–P3 opens the next period Not Started at full duration
+- Stats strip uses fill + hug; **DOWN / TO GO / BL ON** still use scroll wheels in the stats region
 - Inline Min/Sec numeric fields remain only when Variant B clock panel is enabled
 
 <!-- AUTO-SNAPSHOTS:week-4-shipped-down-distance:START -->
@@ -459,7 +458,7 @@ With **Match-state guide** on, scheduled fixtures open in **pregame** so the ful
 - Events log CSV (Settings → Log or Collected datapoints → CSV): `mins, seconds, datapoint, ball on, period, drive, play, down, to go` — **mins/seconds are wall-clock elapsed** from the first event (not game clock)
 - Scoreboard edits (Start/Pause, ±1s, clock/period set, down, to go, possession, end period / OT / end game) also append datapoints to that log
 - Scoreboard header has an **END PERIOD** action (Undo-sized, red) after **Start** begins the period (kickoff not required); confirming end period advances **QTR** and resets the clock to **15:00** (final regulation period still parks at 0:00 for OT / end game)
-- Tap **END PERIOD** → clock face **Cancel / Confirm** (Confirm default) and QTR status **End Pending**; confirm ends the period, then **period in progress?** with selectable **Yes / No** (defaults to Yes) plus **Cancel / Confirm**
+- Tap **END PERIOD** → clock face **Cancel / Confirm** (Confirm default) and QTR **End Pending**; confirm ends the period (P1–P3 → next Not Started; P4 → Ended Unconfirmed until confirmed in period management)
 - **Undo** is a global header icon (next to Collected datapoints) — reverses the last operator change across scoreboard, risks, possession, and play controls (not only play-control steps)
 - **END PLAY** appears when the chosen result is ready
 - Later quarters: confirm **END PERIOD** to open the next quarter at 15:00; press **Start** to run the clock (no Start Q / Kick off badges on the scoreboard)
@@ -550,7 +549,7 @@ The table below is a checklist of what the prototype supports today on the live 
 | Take Control with confirmation (feature-flagged) | ✅ |
 | Clock edit — original inline wheel (tap clock time) | ✅ |
 | Clock edit — Variant B dialog with numeric entry (feature-flagged) | ✅ |
-| QTR / DOWN / TO GO / BL ON edit — scroll wheel (same as time picker) | ✅ |
+| Period management — wheel + status (AC7); DOWN / TO GO / BL ON scroll wheels | ✅ |
 | Play / pause clock with icons + colour chips (no kick-off required in MVP) | ✅ |
 | Full period / overtime / game-end flow (feature-flagged, off in MVP) | ✅ |
 | Field direction + quarter-end flip | ✅ |

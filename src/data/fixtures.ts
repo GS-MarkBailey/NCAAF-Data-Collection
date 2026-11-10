@@ -348,6 +348,7 @@ export function createInitialGameState(
     gameEnded: false,
     periodEnded: false,
     periodActive: false,
+    periodEndConfirmed: false,
     playInProgress: false,
     seriesKind: 'scrimmage',
     playCollectionStep: null,
@@ -381,6 +382,7 @@ export function createPostMatchGameState(
     gameStarted: true,
     gameEnded: true,
     periodEnded: true,
+    periodEndConfirmed: true,
     clock: {
       period: rules.regulationPeriods,
       seconds: 0,

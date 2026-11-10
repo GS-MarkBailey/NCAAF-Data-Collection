@@ -5,6 +5,7 @@ import { formatClock } from '@/lib/format'
 import {
   clockFromParts,
   clockToParts,
+  derivePeriodStatus,
   formatPeriodLabel,
   getFootballRuleset,
   getQuarterStatus,
@@ -15,6 +16,8 @@ import {
   isAwaitingRegulationDecision,
   isOvertimePeriod,
   isPeriodInProgress,
+  PERIOD_STATUS_LABEL,
+  type PeriodStatus,
   type QuarterStatus,
 } from '@/lib/football'
 import { usePushPulse } from '@/hooks/usePushPulse'
@@ -33,6 +36,7 @@ import { BallOnStatCell } from '@/components/game/BallOnStatCell'
 import { ClockNumericEditor, type ClockEditTab } from '@/components/game/ClockNumericEditor'
 import { DownDistanceEditor, type DownDistanceEditTab } from '@/components/game/DownDistanceEditor'
 import { ClockWheelEditor } from '@/components/game/ClockWheelEditor'
+import { PeriodManagementEditor } from '@/components/game/PeriodManagementEditor'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -70,6 +74,9 @@ export function ScoreboardPanelShadcn({
   const gameEnded = useAppStore((s) => s.games[fixtureId]?.gameEnded ?? false)
   const periodEnded = useAppStore((s) => s.games[fixtureId]?.periodEnded ?? false)
   const periodActive = useAppStore((s) => s.games[fixtureId]?.periodActive ?? false)
+  const periodEndConfirmed = useAppStore(
+    (s) => s.games[fixtureId]?.periodEndConfirmed ?? false,
+  )
   const down = useAppStore((s) => s.games[fixtureId]?.down ?? 1)
   const distance = useAppStore((s) => s.games[fixtureId]?.distance ?? 10)
   const ballOn = useAppStore((s) => s.games[fixtureId]?.ballOn ?? 25)
@@ -92,7 +99,6 @@ export function ScoreboardPanelShadcn({
   )
 
   const setClockTime = useAppStore((s) => s.setClockTime)
-  const setClockPeriod = useAppStore((s) => s.setClockPeriod)
   const adjustClock = useAppStore((s) => s.adjustClock)
   const toggleClock = useAppStore((s) => s.toggleClock)
   const endPeriod = useAppStore((s) => s.endPeriod)
@@ -102,7 +108,7 @@ export function ScoreboardPanelShadcn({
   const setDown = useAppStore((s) => s.setDown)
   const setDistance = useAppStore((s) => s.setDistance)
   const setBallOn = useAppStore((s) => s.setBallOn)
-  const setPeriodActive = useAppStore((s) => s.setPeriodActive)
+  const setPeriodManagement = useAppStore((s) => s.setPeriodManagement)
   const scoreHome = useAppStore((s) => s.games[fixtureId]?.score.home ?? 0)
   const scoreAway = useAppStore((s) => s.games[fixtureId]?.score.away ?? 0)
   const showQuarterStatus = useFeatureFlag('scoreboard.quarterStatus')
@@ -136,14 +142,8 @@ export function ScoreboardPanelShadcn({
   const [editingBallOn, setEditingBallOn] = useState(false)
   const [draftBallOn, setDraftBallOn] = useState(25)
   const [ballOnSession, setBallOnSession] = useState(0)
-  /** After confirming period edit / end period — Yes/No for periodActive. */
-  const [askingPeriodInProgress, setAskingPeriodInProgress] = useState(false)
-  /** Draft answer while asking — defaults to Yes. */
-  const [draftPeriodInProgress, setDraftPeriodInProgress] = useState(true)
-  /** Which scoreboard region shows the period-in-progress prompt. */
-  const [periodAskRegion, setPeriodAskRegion] = useState<'clock' | 'stats'>(
-    'stats',
-  )
+  const [draftPeriodStatus, setDraftPeriodStatus] =
+    useState<PeriodStatus>('not_started')
 
   const paused = !clockRunning
   const pregame = !gameStarted
@@ -190,8 +190,17 @@ export function ScoreboardPanelShadcn({
     score,
   )
   const inOvertime = isOvertimePeriod(clockPeriod)
+  const currentPeriodStatus = derivePeriodStatus({
+    periodActive,
+    periodEnded,
+    periodEndConfirmed,
+    gameEnded,
+  })
   const atRegulationDecision =
-    awaitingRegulationDecision && periodEnded && !gameEnded
+    awaitingRegulationDecision &&
+    periodEnded &&
+    periodEndConfirmed &&
+    !gameEnded
   const showEndOvertimeButton = inOvertime && !gameEnded
   const showRegulationEndGame = atRegulationDecision
   const showPlayPauseButton = showPeriodManagement
@@ -205,20 +214,22 @@ export function ScoreboardPanelShadcn({
   const clockLocked = gameEnded
 
   const handleOpenClockEditor = (tab: ClockEditTab = 'time') => {
-    if (
-      !showClockWheelEditor ||
-      clockLocked ||
-      inOvertime ||
-      pendingConfirmation ||
-      askingPeriodInProgress
-    )
-      return
+    if (!showClockWheelEditor || clockLocked || pendingConfirmation) return
+    // Time edit stays regulation-only; period management covers OT statuses.
+    if (tab === 'time' && inOvertime) return
 
     const parts = clockToParts(clockSeconds)
     setEditingDownDistance(false)
     setEditingBallOn(false)
-    setAskingPeriodInProgress(false)
     setDraftPeriod(clockPeriod)
+    setDraftPeriodStatus(
+      derivePeriodStatus({
+        periodActive,
+        periodEnded,
+        periodEndConfirmed,
+        gameEnded,
+      }),
+    )
     setDraftMinutes(parts.minutes)
     setDraftSeconds(parts.seconds)
     setClockEditTab(tab)
@@ -226,8 +237,13 @@ export function ScoreboardPanelShadcn({
     setEditingClock(true)
   }
 
+  const canOpenPeriodEditor =
+    showClockWheelEditor && !clockLocked && !pendingConfirmation
   const canOpenClockEditor =
-    showClockWheelEditor && !clockLocked && !inOvertime && !pendingConfirmation
+    showClockWheelEditor &&
+    !clockLocked &&
+    !inOvertime &&
+    !pendingConfirmation
 
   const canOpenDownDistanceEditor =
     showDownDistance && !gameEnded && !pendingConfirmation
@@ -236,10 +252,9 @@ export function ScoreboardPanelShadcn({
     showBallOn && !gameEnded && !pendingConfirmation
 
   const handleOpenDownDistanceEditor = (tab: DownDistanceEditTab) => {
-    if (!canOpenDownDistanceEditor || askingPeriodInProgress) return
+    if (!canOpenDownDistanceEditor) return
     setEditingClock(false)
     setEditingBallOn(false)
-    setAskingPeriodInProgress(false)
     setDraftDown(down)
     setDraftDistance(distance)
     setDownDistanceTab(tab)
@@ -248,28 +263,12 @@ export function ScoreboardPanelShadcn({
   }
 
   const handleOpenBallOnEditor = () => {
-    if (!canOpenBallOnEditor || askingPeriodInProgress) return
+    if (!canOpenBallOnEditor) return
     setEditingClock(false)
     setEditingDownDistance(false)
-    setAskingPeriodInProgress(false)
     setDraftBallOn(ballOn)
     setBallOnSession((session) => session + 1)
     setEditingBallOn(true)
-  }
-
-  const openPeriodInProgressAsk = (region: 'clock' | 'stats') => {
-    setPeriodAskRegion(region)
-    setDraftPeriodInProgress(true)
-    setAskingPeriodInProgress(true)
-  }
-
-  const handleCancelPeriodInProgressAsk = () => {
-    setAskingPeriodInProgress(false)
-  }
-
-  const handleConfirmPeriodInProgressAsk = () => {
-    setPeriodActive(fixtureId, draftPeriodInProgress)
-    setAskingPeriodInProgress(false)
   }
 
   const handleCancelDownDistanceEdit = () => {
@@ -304,16 +303,10 @@ export function ScoreboardPanelShadcn({
 
     switch (pendingConfirmation) {
       case 'endPeriod': {
-        const endingFinalRegulation = clockPeriod >= regulationPeriodCount
         endPeriod(fixtureId)
         setEditingClock(false)
         setEditingDownDistance(false)
         setEditingBallOn(false)
-        // Q4 (final regulation): show OT / end-game decision instead of
-        // "period in progress?" — OT only appears when scores are level.
-        if (!endingFinalRegulation) {
-          openPeriodInProgressAsk('clock')
-        }
         break
       }
       case 'endGame':
@@ -336,12 +329,16 @@ export function ScoreboardPanelShadcn({
   }
 
   const handleConfirmClockEdit = () => {
-    setClockTime(fixtureId, clockFromParts(draftMinutes, draftSeconds))
-    setClockPeriod(fixtureId, draftPeriod)
-    setEditingClock(false)
     if (clockEditTab === 'period') {
-      openPeriodInProgressAsk('stats')
+      setPeriodManagement(fixtureId, {
+        period: draftPeriod,
+        status: draftPeriodStatus,
+      })
+      setEditingClock(false)
+      return
     }
+    setClockTime(fixtureId, clockFromParts(draftMinutes, draftSeconds))
+    setEditingClock(false)
   }
 
   const handlePlayPause = (event?: MouseEvent<HTMLButtonElement>) => {
@@ -358,27 +355,15 @@ export function ScoreboardPanelShadcn({
   const canToggleClock =
     !clockLocked && canUsePlayPause && !showClockWheelEditor
 
-  // Editors stay inside the region that opened them (clock face vs stats strip).
+  // Period management fills the whole Scoreboard; other editors stay in-region.
+  const editingPeriodPanel = editingClock && clockEditTab === 'period'
   const editingClockTime = editingClock && clockEditTab === 'time'
-  const editingPeriodInStats = editingClock && clockEditTab === 'period'
-  const askingInClock =
-    askingPeriodInProgress && periodAskRegion === 'clock'
-  const askingInStats =
-    askingPeriodInProgress && periodAskRegion === 'stats'
-  const editingStatsRegion =
-    editingPeriodInStats ||
-    editingDownDistance ||
-    editingBallOn ||
-    askingInStats
-  const statsEditorTitle = askingInStats
-    ? 'period in progress?'
-    : editingBallOn
-      ? 'Edit ball on'
-      : editingDownDistance
-        ? downDistanceTab === 'distance'
-          ? 'Edit to go'
-          : 'Edit down'
-        : 'Edit period'
+  const editingStatsRegion = editingDownDistance || editingBallOn
+  const statsEditorTitle = editingBallOn
+    ? 'Edit ball on'
+    : downDistanceTab === 'distance'
+      ? 'Edit to go'
+      : 'Edit down'
 
   const handleEndPeriod = (event: MouseEvent<HTMLButtonElement>) => {
     openConfirmation('endPeriod', event)
@@ -609,7 +594,43 @@ export function ScoreboardPanelShadcn({
           stacked && 'gap-1.5',
         )}
       >
-        {atRegulationDecision && !pendingConfirmation ? (
+        {editingPeriodPanel ? (
+          <div className="grid min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden rounded-lg border border-border">
+            <div className="shrink-0 border-b border-border px-3 py-2">
+              <p className="text-center text-sm font-semibold text-foreground">
+                Edit period
+              </p>
+            </div>
+            <div className="min-h-0 flex-1 overflow-auto">
+              <PeriodManagementEditor
+                key={clockEditSession}
+                period={draftPeriod}
+                status={draftPeriodStatus}
+                onPeriodChange={setDraftPeriod}
+                onStatusChange={setDraftPeriodStatus}
+                rulesetId={rulesetId}
+              />
+            </div>
+            <div className="flex shrink-0 gap-2 border-t border-border bg-background p-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="h-8 min-h-8 flex-1 shrink-0 touch-manipulation"
+                onClick={handleCancelClockEdit}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                autoFocus
+                className="h-8 min-h-8 flex-1 shrink-0 touch-manipulation bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
+                onClick={handleConfirmClockEdit}
+              >
+                Confirm
+              </Button>
+            </div>
+          </div>
+        ) : atRegulationDecision && !pendingConfirmation ? (
           <div className="grid min-h-0 flex-1 grid-rows-[minmax(0,1fr)_auto] overflow-hidden rounded-lg border border-border">
             <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-2 px-4 text-center">
               <p className="text-sm font-semibold text-foreground">
@@ -668,89 +689,35 @@ export function ScoreboardPanelShadcn({
                       {statsEditorTitle}
                     </p>
                   </div>
-                  {askingInStats ? (
-                    <div
-                      className="flex min-h-0 flex-1 items-center justify-center gap-2 px-3 py-3"
-                      role="radiogroup"
-                      aria-label="Period in progress"
-                    >
-                      <Button
-                        type="button"
-                        role="radio"
-                        aria-checked={draftPeriodInProgress}
-                        variant="secondary"
-                        className={cn(
-                          'h-10 min-h-10 flex-1 shrink-0 touch-manipulation',
-                          draftPeriodInProgress
-                            ? 'border-[var(--color-brand)] bg-[var(--color-brand)]/10 text-foreground ring-1 ring-[var(--color-brand)]/40'
-                            : OPERATOR_SECONDARY_SURFACE,
-                        )}
-                        onClick={() => setDraftPeriodInProgress(true)}
-                      >
-                        Yes
-                      </Button>
-                      <Button
-                        type="button"
-                        role="radio"
-                        aria-checked={!draftPeriodInProgress}
-                        variant="secondary"
-                        className={cn(
-                          'h-10 min-h-10 flex-1 shrink-0 touch-manipulation',
-                          !draftPeriodInProgress
-                            ? 'border-[var(--color-brand)] bg-[var(--color-brand)]/10 text-foreground ring-1 ring-[var(--color-brand)]/40'
-                            : OPERATOR_SECONDARY_SURFACE,
-                        )}
-                        onClick={() => setDraftPeriodInProgress(false)}
-                      >
-                        No
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="flex min-h-0 flex-1 items-center justify-center overflow-auto px-2 py-3">
-                      {editingBallOn ? (
-                        <BallOnEditor
-                          key={ballOnSession}
-                          ballOn={draftBallOn}
-                          onBallOnChange={setDraftBallOn}
-                          rulesetId={rulesetId}
-                        />
-                      ) : editingDownDistance ? (
-                        <DownDistanceEditor
-                          key={downDistanceSession}
-                          down={draftDown}
-                          distance={draftDistance}
-                          onDownChange={setDraftDown}
-                          onDistanceChange={setDraftDistance}
-                          initialTab={downDistanceTab}
-                          rulesetId={rulesetId}
-                        />
-                      ) : (
-                        <ClockNumericEditor
-                          key={clockEditSession}
-                          period={draftPeriod}
-                          minutes={draftMinutes}
-                          seconds={draftSeconds}
-                          onPeriodChange={setDraftPeriod}
-                          onMinutesChange={setDraftMinutes}
-                          onSecondsChange={setDraftSeconds}
-                          initialTab="period"
-                        />
-                      )}
-                    </div>
-                  )}
+                  <div className="flex min-h-0 flex-1 items-center justify-center overflow-auto px-2 py-3">
+                    {editingBallOn ? (
+                      <BallOnEditor
+                        key={ballOnSession}
+                        ballOn={draftBallOn}
+                        onBallOnChange={setDraftBallOn}
+                        rulesetId={rulesetId}
+                      />
+                    ) : (
+                      <DownDistanceEditor
+                        key={downDistanceSession}
+                        down={draftDown}
+                        distance={draftDistance}
+                        onDownChange={setDraftDown}
+                        onDistanceChange={setDraftDistance}
+                        initialTab={downDistanceTab}
+                        rulesetId={rulesetId}
+                      />
+                    )}
+                  </div>
                   <div className="flex shrink-0 gap-2 border-t border-border bg-background p-2">
                     <Button
                       type="button"
                       variant="outline"
                       className="h-8 min-h-8 flex-1 shrink-0 touch-manipulation"
                       onClick={
-                        askingInStats
-                          ? handleCancelPeriodInProgressAsk
-                          : editingBallOn
-                            ? handleCancelBallOnEdit
-                            : editingDownDistance
-                              ? handleCancelDownDistanceEdit
-                              : handleCancelClockEdit
+                        editingBallOn
+                          ? handleCancelBallOnEdit
+                          : handleCancelDownDistanceEdit
                       }
                     >
                       Cancel
@@ -760,13 +727,9 @@ export function ScoreboardPanelShadcn({
                       autoFocus
                       className="h-8 min-h-8 flex-1 shrink-0 touch-manipulation bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
                       onClick={
-                        askingInStats
-                          ? handleConfirmPeriodInProgressAsk
-                          : editingBallOn
-                            ? handleConfirmBallOnEdit
-                            : editingDownDistance
-                              ? handleConfirmDownDistanceEdit
-                              : handleConfirmClockEdit
+                        editingBallOn
+                          ? handleConfirmBallOnEdit
+                          : handleConfirmDownDistanceEdit
                       }
                     >
                       Confirm
@@ -790,21 +753,22 @@ export function ScoreboardPanelShadcn({
                           : formatPeriodLabel(clockPeriod)
                       }
                       compact={stacked}
-                      interactive={canOpenClockEditor}
-                      showEditIcon={canOpenClockEditor}
+                      interactive={canOpenPeriodEditor}
+                      showEditIcon={canOpenPeriodEditor}
                       onClick={
-                        canOpenClockEditor
+                        canOpenPeriodEditor
                           ? () => handleOpenClockEditor('period')
                           : undefined
                       }
                       ariaLabel={
-                        canOpenClockEditor
-                          ? `Edit period, currently ${formatPeriodLabel(clockPeriod)}`
+                        canOpenPeriodEditor
+                          ? `Edit period, currently ${formatPeriodLabel(clockPeriod)}, ${PERIOD_STATUS_LABEL[currentPeriodStatus]}`
                           : undefined
                       }
                       periodPhase={getPeriodPhase({
                         periodActive,
                         periodEnded,
+                        periodEndConfirmed,
                         gameEnded,
                         endPending: pendingConfirmation === 'endPeriod',
                       })}
@@ -965,68 +929,6 @@ export function ScoreboardPanelShadcn({
                     </Button>
                   </div>
                 </div>
-              ) : askingInClock ? (
-                <div className="grid h-full min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden">
-                  <div className="shrink-0 border-b border-border px-3 py-2">
-                    <p className="text-center text-sm font-semibold text-foreground">
-                      period in progress?
-                    </p>
-                  </div>
-                  <div
-                    className="flex min-h-0 flex-1 items-center justify-center gap-2 px-3 py-3"
-                    role="radiogroup"
-                    aria-label="Period in progress"
-                  >
-                    <Button
-                      type="button"
-                      role="radio"
-                      aria-checked={draftPeriodInProgress}
-                      variant="secondary"
-                      className={cn(
-                        'h-10 min-h-10 flex-1 shrink-0 touch-manipulation',
-                        draftPeriodInProgress
-                          ? 'border-[var(--color-brand)] bg-[var(--color-brand)]/10 text-foreground ring-1 ring-[var(--color-brand)]/40'
-                          : OPERATOR_SECONDARY_SURFACE,
-                      )}
-                      onClick={() => setDraftPeriodInProgress(true)}
-                    >
-                      Yes
-                    </Button>
-                    <Button
-                      type="button"
-                      role="radio"
-                      aria-checked={!draftPeriodInProgress}
-                      variant="secondary"
-                      className={cn(
-                        'h-10 min-h-10 flex-1 shrink-0 touch-manipulation',
-                        !draftPeriodInProgress
-                          ? 'border-[var(--color-brand)] bg-[var(--color-brand)]/10 text-foreground ring-1 ring-[var(--color-brand)]/40'
-                          : OPERATOR_SECONDARY_SURFACE,
-                      )}
-                      onClick={() => setDraftPeriodInProgress(false)}
-                    >
-                      No
-                    </Button>
-                  </div>
-                  <div className="flex shrink-0 gap-2 border-t border-border bg-background p-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="h-8 min-h-8 flex-1 shrink-0 touch-manipulation"
-                      onClick={handleCancelPeriodInProgressAsk}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      type="button"
-                      autoFocus
-                      className="h-8 min-h-8 flex-1 shrink-0 touch-manipulation bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
-                      onClick={handleConfirmPeriodInProgressAsk}
-                    >
-                      Confirm
-                    </Button>
-                  </div>
-                </div>
               ) : editingClockTime ? (
                 <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
                   <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden px-2 py-2">
@@ -1165,13 +1067,19 @@ const QUARTER_STATUS_CLASS: Record<
   ended: { className: 'bg-red-50', pulseEnd: '#fef2f2' },
 }
 
-type PeriodPhase = 'not_started' | 'in_progress' | 'end_pending' | 'ended'
+type PeriodPhase =
+  | 'not_started'
+  | 'in_progress'
+  | 'end_pending'
+  | 'ended_unconfirmed'
+  | 'ended_confirmed'
 
 const PERIOD_PHASE_LABEL: Record<PeriodPhase, string> = {
   not_started: 'Not Started',
-  in_progress: 'In Progress',
+  in_progress: 'In-Progress',
   end_pending: 'End Pending',
-  ended: 'Ended',
+  ended_unconfirmed: 'Ended (Unconfirmed)',
+  ended_confirmed: 'Ended (Confirmed)',
 }
 
 const PERIOD_PHASE_CLASS: Record<
@@ -1181,18 +1089,21 @@ const PERIOD_PHASE_CLASS: Record<
   not_started: { className: 'bg-amber-50', pulseEnd: '#fffbeb' },
   in_progress: { className: 'bg-emerald-50', pulseEnd: '#ecfdf5' },
   end_pending: { className: 'bg-orange-50', pulseEnd: '#fff7ed' },
-  ended: { className: 'bg-red-50', pulseEnd: '#fef2f2' },
+  ended_unconfirmed: { className: 'bg-orange-50', pulseEnd: '#fff7ed' },
+  ended_confirmed: { className: 'bg-red-50', pulseEnd: '#fef2f2' },
 }
 
 function getPeriodPhase(params: {
   periodActive: boolean
   periodEnded: boolean
+  periodEndConfirmed?: boolean
   gameEnded: boolean
   /** True while END PERIOD confirmation is open. */
   endPending?: boolean
 }): PeriodPhase {
-  if (params.gameEnded || params.periodEnded) return 'ended'
   if (params.endPending) return 'end_pending'
+  if (params.gameEnded || params.periodEndConfirmed) return 'ended_confirmed'
+  if (params.periodEnded) return 'ended_unconfirmed'
   if (params.periodActive) return 'in_progress'
   return 'not_started'
 }

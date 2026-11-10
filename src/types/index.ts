@@ -99,6 +99,11 @@ export interface GameState {
    * Gates the scoreboard END PERIOD chip.
    */
   periodActive: boolean
+  /**
+   * True when Ended (Confirmed) is set on the final regulation period or OT.
+   * Arms the OT / end-game regulation decision.
+   */
+  periodEndConfirmed: boolean
   /** True between SNAP and END PLAY while the operator is collecting a play */
   playInProgress: boolean
   /**

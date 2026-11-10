@@ -222,6 +222,86 @@ export function getQuarterStatus(clock: {
   return 'in_progress'
 }
 
+/** Operator-facing period lifecycle status (AC7). */
+export type PeriodStatus =
+  | 'not_started'
+  | 'in_progress'
+  | 'ended_unconfirmed'
+  | 'ended_confirmed'
+
+export const PERIOD_STATUS_LABEL: Record<PeriodStatus, string> = {
+  not_started: 'Not Started',
+  in_progress: 'In-Progress',
+  ended_unconfirmed: 'Ended (Unconfirmed)',
+  ended_confirmed: 'Ended (Confirmed)',
+}
+
+/** Statuses available for a period (P1–P3 omit Ended Confirmed). */
+export function getAvailablePeriodStatuses(
+  period: number,
+  rulesRef?: RulesetRef,
+): PeriodStatus[] {
+  const value = clampPeriod(period)
+  const regulation = regulationPeriods(rulesRef)
+  const base: PeriodStatus[] = [
+    'not_started',
+    'in_progress',
+    'ended_unconfirmed',
+  ]
+  // Final regulation period and overtime can confirm the end.
+  if (value >= regulation) {
+    return [...base, 'ended_confirmed']
+  }
+  return base
+}
+
+export function derivePeriodStatus(params: {
+  periodActive: boolean
+  periodEnded: boolean
+  periodEndConfirmed?: boolean
+  gameEnded?: boolean
+}): PeriodStatus {
+  if (params.gameEnded || params.periodEndConfirmed) return 'ended_confirmed'
+  if (params.periodEnded) return 'ended_unconfirmed'
+  if (params.periodActive) return 'in_progress'
+  return 'not_started'
+}
+
+/** Map a status onto the boolean flags used by the rest of the app. */
+export function flagsForPeriodStatus(status: PeriodStatus): {
+  periodActive: boolean
+  periodEnded: boolean
+  periodEndConfirmed: boolean
+} {
+  switch (status) {
+    case 'in_progress':
+      return {
+        periodActive: true,
+        periodEnded: false,
+        periodEndConfirmed: false,
+      }
+    case 'ended_unconfirmed':
+      return {
+        periodActive: false,
+        periodEnded: true,
+        periodEndConfirmed: false,
+      }
+    case 'ended_confirmed':
+      return {
+        periodActive: false,
+        periodEnded: true,
+        periodEndConfirmed: true,
+      }
+    case 'not_started':
+    default:
+      return {
+        periodActive: false,
+        periodEnded: false,
+        periodEndConfirmed: false,
+      }
+  }
+}
+
 /** @deprecated Prefer `rules.clockEditMaxMinutes`. NCAA default. */
 export const CLOCK_EDIT_MAX_MINUTES =
   DEFAULT_FOOTBALL_RULESET.clockEditMaxMinutes

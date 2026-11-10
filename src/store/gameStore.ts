@@ -22,6 +22,11 @@ import {
   clampPeriod,
   createInitialSimulation,
   createQuarterStartPlay,
+  derivePeriodStatus,
+  flagsForPeriodStatus,
+  getAvailablePeriodStatuses,
+  PERIOD_STATUS_LABEL,
+  type PeriodStatus,
   INITIAL_KICKOFF_COLLECTION_STEP,
   INITIAL_PLAY_COLLECTION_STEP,
   INITIAL_TRY_COLLECTION_STEP,
@@ -74,6 +79,15 @@ interface AppStore {
   setBallOn: (fixtureId: string, ballOn: number) => void
   /** Arms / clears the scoreboard END PERIOD header action. */
   setPeriodActive: (fixtureId: string, periodActive: boolean) => void
+  /**
+   * AC7 — set period number + lifecycle status in one confirm.
+   * Not Started resets the clock to the configured period duration.
+   * Ended (Unconfirmed) on P1–P3 advances to the next period Not Started.
+   */
+  setPeriodManagement: (
+    fixtureId: string,
+    input: { period: number; status: PeriodStatus },
+  ) => void
   snapPlay: (fixtureId: string) => void
   endPlay: (fixtureId: string, options?: { skipUndoPush?: boolean }) => void
   adjustYards: (fixtureId: string, delta: number) => void
@@ -662,7 +676,125 @@ export const useAppStore = create<AppStore>((set, get) => ({
           withUndo(g, (base) => ({
             ...base,
             periodActive,
+            // Starting the period clears any prior end confirmation.
+            periodEndConfirmed: periodActive
+              ? false
+              : (base.periodEndConfirmed ?? false),
+            periodEnded: periodActive ? false : base.periodEnded,
           })),
+        ),
+      }
+    })
+  },
+
+  setPeriodManagement: (fixtureId, input) => {
+    set((state) => {
+      const game = state.games[fixtureId]
+      if (!game || game.gameEnded) return state
+
+      const rules = getFootballRuleset(game.rulesetId)
+      const toPeriod = clampPeriod(input.period)
+      const available = getAvailablePeriodStatuses(toPeriod, game.rulesetId)
+      const status = available.includes(input.status)
+        ? input.status
+        : 'not_started'
+      const fromPeriod = game.clock.period
+      const fromStatus = derivePeriodStatus({
+        periodActive: game.periodActive ?? false,
+        periodEnded: game.periodEnded,
+        periodEndConfirmed: game.periodEndConfirmed,
+        gameEnded: game.gameEnded,
+      })
+      if (toPeriod === fromPeriod && status === fromStatus) return state
+
+      const clockBefore = {
+        seconds: game.clock.seconds,
+        period: fromPeriod,
+      }
+      const flags = flagsForPeriodStatus(status)
+
+      // Ended (Unconfirmed) on P1–P3 → prepare next period Not Started + full clock.
+      const advanceEarlyEnded =
+        status === 'ended_unconfirmed' && toPeriod < rules.regulationPeriods
+
+      return {
+        games: updateGame(state.games, fixtureId, (g) =>
+          withUndo(g, (base) => {
+            if (advanceEarlyEnded) {
+              const nextPeriod = toPeriod + 1
+              const nextFlags = flagsForPeriodStatus('not_started')
+              return withScoreboardDatapoint(
+                {
+                  ...base,
+                  gameStarted: true,
+                  periodActive: nextFlags.periodActive,
+                  periodEnded: nextFlags.periodEnded,
+                  periodEndConfirmed: nextFlags.periodEndConfirmed,
+                  clock: {
+                    period: nextPeriod,
+                    seconds: rules.quarterLengthSeconds,
+                    running: false,
+                  },
+                  plays: [
+                    ...base.plays,
+                    createQuarterStartPlay(base, nextPeriod),
+                  ],
+                },
+                'period_set',
+                `Period Q${fromPeriod} ended → Q${nextPeriod} not started`,
+              )
+            }
+
+            const resetClock =
+              status === 'not_started' ||
+              (status === 'ended_unconfirmed' &&
+                toPeriod >= rules.regulationPeriods) ||
+              status === 'ended_confirmed'
+
+            const nextSeconds = resetClock
+              ? status === 'not_started'
+                ? rules.quarterLengthSeconds
+                : 0
+              : clampClockSeconds(base.clock.seconds, base.rulesetId)
+
+            return withScoreboardDatapoint(
+              {
+                ...base,
+                gameStarted:
+                  status === 'in_progress' ||
+                  status === 'ended_unconfirmed' ||
+                  status === 'ended_confirmed'
+                    ? true
+                    : base.gameStarted,
+                periodActive: flags.periodActive,
+                periodEnded: flags.periodEnded,
+                periodEndConfirmed: flags.periodEndConfirmed,
+                clock: {
+                  period: toPeriod,
+                  seconds: nextSeconds,
+                  running: false,
+                },
+              },
+              'period_set',
+              `Period Q${toPeriod} · ${PERIOD_STATUS_LABEL[status]}`,
+            )
+          }),
+        ),
+        actionLogs: appendAction(
+          state.actionLogs,
+          createUserAction(
+            fixtureId,
+            {
+              type: 'period_set',
+              payload: {
+                fromPeriod,
+                toPeriod,
+                fromStatus,
+                toStatus: advanceEarlyEnded ? 'not_started' : status,
+              },
+            },
+            clockBefore,
+          ),
         ),
       }
     })
@@ -1555,6 +1687,8 @@ export const useAppStore = create<AppStore>((set, get) => ({
                   gameStarted: true,
                   periodEnded: endedMatch.periodEnded,
                   periodActive: false,
+                  // END PERIOD leaves Ended (Unconfirmed); confirm via period edit.
+                  periodEndConfirmed: false,
                   playInProgress: endedMatch.playInProgress,
                   seriesKind: endedMatch.seriesKind,
                   clock: {
@@ -1606,6 +1740,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
           ...pushPlayUndoSnapshot(game),
           periodEnded: false,
           periodActive: false,
+          periodEndConfirmed: false,
           playInProgress: openedMatch.playInProgress,
           seriesKind: openedMatch.seriesKind,
           clock: {
@@ -1692,6 +1827,8 @@ export const useAppStore = create<AppStore>((set, get) => ({
               {
                 ...base,
                 periodEnded: match.periodEnded,
+                periodActive: false,
+                periodEndConfirmed: false,
                 playInProgress: match.playInProgress,
                 seriesKind: match.seriesKind,
                 clock: {

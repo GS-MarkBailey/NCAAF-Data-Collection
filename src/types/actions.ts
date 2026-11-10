@@ -64,6 +64,8 @@ export type PeriodSetAction = UserActionBase & {
   payload: {
     fromPeriod: number
     toPeriod: number
+    fromStatus?: string
+    toStatus?: string
   }
 }
 
