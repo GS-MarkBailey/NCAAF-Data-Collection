@@ -606,11 +606,11 @@ export function ScoreboardPanelShadcn({
                 rulesetId={rulesetId}
               />
             </div>
-            <div className="flex shrink-0 gap-2 border-t border-border bg-background p-2">
+            <div className="flex shrink-0 gap-2 border-t border-border bg-background p-3">
               <Button
                 type="button"
                 variant="outline"
-                className="h-8 min-h-8 flex-1 shrink-0 touch-manipulation"
+                className="h-10 min-h-10 flex-1 shrink-0 touch-manipulation"
                 onClick={handleCancelClockEdit}
               >
                 Cancel
@@ -618,7 +618,7 @@ export function ScoreboardPanelShadcn({
               <Button
                 type="button"
                 autoFocus
-                className="h-8 min-h-8 flex-1 shrink-0 touch-manipulation bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
+                className="h-10 min-h-10 flex-1 shrink-0 touch-manipulation bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-hover)]"
                 onClick={handleConfirmClockEdit}
               >
                 Confirm

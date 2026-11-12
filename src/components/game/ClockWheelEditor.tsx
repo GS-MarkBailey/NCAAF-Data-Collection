@@ -417,7 +417,7 @@ export function HorizontalScrollPicker({
       <div
         ref={viewportRef}
         className="relative w-full max-w-sm overflow-hidden"
-        style={{ height: 36 }}
+        style={{ height: 44 }}
       >
         <div
           className="pointer-events-none absolute inset-y-0.5 left-1/2 z-10 -translate-x-1/2 rounded-md border border-border bg-muted/35"
